@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { cache } from 'react';
 import Link from 'next/link';
 
 import { TrophyIcon } from '@/components/game-icons';
@@ -23,6 +24,9 @@ import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayer } from '@/types/brawlstars';
 
 const DAYS = 30;
+
+/** One read per request, shared with the Overview's playstyle panel. */
+export const trophyGamesFor = cache((tag: string) => getPlayerTrophyGames(tag));
 
 /** "+12" / "−5" / "±0". */
 const signed = (n: number) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${formatNumber(Math.abs(n))}`;
@@ -54,7 +58,7 @@ export async function PlayerTrophies({
     new Date(`${day}T00:00:00Z`).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
   const rows = (await activityFor(tag)) ?? [];
-  const stored = (await getPlayerTrophyGames(tag)) ?? [];
+  const stored = (await trophyGamesFor(tag)) ?? [];
   const log = await getBattleLog(tag)
     .then((r) => r.items)
     .catch(() => []);

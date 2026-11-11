@@ -7,6 +7,8 @@ import {
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { brawlerArt } from '@/lib/brawler-art';
 import { getBattleLog } from '@/lib/bs-api';
+import { getActiveMaps } from '@/lib/game-maps';
+import { mapNameKey } from '@/lib/stats';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, ordinal, relativeTime } from '@/lib/format';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
@@ -89,6 +91,12 @@ export async function BattleLog({
     v.tint = brawlerMeta.get(v.brawlerId)?.rarity.color ?? null;
   }
 
+  // Map art for the row backdrops; the active rotation covers almost every
+  // game in a 25-battle log, and a retired map just has no backdrop.
+  const maps = await getActiveMaps().catch(() => []);
+  const mapByKey = new Map(maps.map((m) => [mapNameKey(m.map.name), m.map.imageUrl]));
+  for (const v of view) v.mapImageUrl = mapByKey.get(mapNameKey(v.map)) ?? null;
+
   return <BattleLogView entries={view} />;
 }
 
@@ -135,7 +143,8 @@ function toViewEntry(
     modeIconUrl:
       modeMeta.get((battle.mode ?? event.mode ?? '').toLowerCase())?.imageUrl ?? null,
     map: event.map ?? 'Unknown map',
-    type: battle.type ? humanizeMode(battle.type) : 'Casual',
+    mapImageUrl: null,
+    type: battleTypeLabel(battle.type),
     relative: relativeTime(entry.battleTime),
     trophyChange: battle.trophyChange ?? myBrawler?.trophyChange ?? null,
     brawlerName: myBrawler?.name ?? null,
@@ -149,6 +158,19 @@ function toViewEntry(
     teams,
     isTeamMode: Boolean(battle.teams),
   };
+}
+
+/**
+ * The game calls the trophy ladder `ranked` and real Ranked `soloRanked` /
+ * `teamRanked`, so the raw type read "Ranked" on every trophy game
+ * (2026-11-11). Named for what the player sees in the game instead.
+ */
+function battleTypeLabel(type: string | null | undefined): string {
+  const t = getT(requestLocale());
+  if (!type) return t('Casual');
+  if (type === 'ranked') return t('Trophies');
+  if (type === 'soloRanked' || type === 'teamRanked') return t('Ranked');
+  return humanizeMode(type);
 }
 
 /** Flattens team and free-for-all payloads into one list of participants. */

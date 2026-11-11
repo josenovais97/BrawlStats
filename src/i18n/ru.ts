@@ -5137,4 +5137,40 @@ export const RU: Record<string, string> = {
     "Сильнее всех вырос {name}: плюс {delta} очка, теперь тир {tier}.",
   "{n} brawlers changed tier: {up} up and {down} down.":
     "Тир сменили бойцов: {n}, {up} вверх и {down} вниз.",
+  "All-rounder":
+    "Универсал",
+  "Main":
+    "Мейн",
+  "Playstyle":
+    "Стиль игры",
+  "{class} main":
+    "Мейн: {class}",
+  "{n} brawlers played, the top 3 are {pct} of games":
+    "Бойцов сыграно: {n}, на топ-3 приходится {pct} игр",
+  "Best run":
+    "Лучший отрезок",
+  "Momentum":
+    "Динамика",
+  "Net":
+    "Итог",
+  "Worst run":
+    "Худший отрезок",
+  "Trophies over the last {n} battles":
+    "Трофеи за последние {n} {n|one:бой|few:боя|many:боёв|other:боя}",
+  "By rank":
+    "По рангам",
+  "{name} gets better as the ranks go up.":
+    "{name} становится сильнее с ростом ранга.",
+  "{name} is stronger in lower ranks than at the top.":
+    "{name} сильнее на низких рангах, чем на вершине.",
+  "{name} holds about the same place at every rank.":
+    "{name} занимает примерно одно и то же место на всех рангах.",
+  "Best rank":
+    "Лучший ранг",
+  "of {n}":
+    "из {n}",
+  "Not enough games at this rank yet.":
+    "Пока мало игр на этом ранге.",
+  "of {n} in Ranked this week":
+    "из {n} в ранговых боях на этой неделе",
 };

@@ -9,6 +9,7 @@ import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
 import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
+import { BrawlerByRank } from '@/components/brawlers/brawler-by-rank';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
 import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
 import { RecommendedBuild } from '@/components/brawlers/recommended-build';
@@ -32,6 +33,7 @@ import {
   brawlerModelUrl,
   existingAccessoryArt,
   getBrawler,
+  getGameModeMap,
   hasBrawlerModel,
   rarityColor,
   realBrawlerClass,
@@ -71,7 +73,7 @@ import {
   getMetaIndex,
   normalizeWinRate,
 } from '@/lib/stats';
-import type { BAAccessory, BABrawler } from '@/types/brawlapi';
+import type { BAAccessory, BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSAccessory } from '@/types/brawlstars';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
@@ -565,6 +567,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Maps come and go from rotation; a split naming a retired one still has a
   // real record behind it, so the row stays and only the link is dropped.
   const activeMaps = await getActiveMaps().catch(() => []);
+  const modeMeta = await getGameModeMap().catch(() => new Map<string, BAGameMode>());
   const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
 
   const normalizedWinRate = stat
@@ -578,6 +581,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     scored?.tier ??
     (stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER ? assignTier(normalizedWinRate) : null);
   const metaScore = scored?.metaScore ?? null;
+  // Its place in this week's Ranked list, beside the score (2026-11-11).
+  const metaRated = [...metaIndex.values()]
+    .filter((s) => s.metaScore !== null)
+    .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
+  const metaPlace = metaRated.findIndex((s) => s.brawlerId === brawlerId) + 1;
 
 
   // Cleaned at the source now — see `rarityColor` — so this only picks the
@@ -860,7 +868,13 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   <p
                     className="text-sm text-muted"
                     title={t('Win rate and pick rate combined, out of 10')}
-                  >{t('Meta score')}{' '}<span className="font-bold tabular-nums text-foreground">{metaScore.toFixed(1)}</span>/10</p>
+                  >{t('Meta score')}{' '}<span className="font-bold tabular-nums text-foreground">{metaScore.toFixed(1)}</span>/10{metaPlace > 0 ? (
+                    <>
+                      {' · '}
+                      <span className="font-bold tabular-nums text-foreground">#{metaPlace}</span>{' '}
+                      {t('of {n} in Ranked this week', { n: metaRated.length })}
+                    </>
+                  ) : null}</p>
                 ) : null}
               </div>
             </div>
@@ -1140,6 +1154,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         ) : null}
       </section>
 
+      {/* Tier and place at each Ranked rank (2026-11-11). */}
+      <BrawlerByRank brawlerId={brawlerId} name={name} />
+
       {splits.modes.length > 0 || splits.maps.length > 0 ? (
         <section>
           <SectionHeading
@@ -1149,6 +1166,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           <BrawlerSplits
             modes={splits.modes}
             maps={splits.maps}
+            modeIconFor={(mode) => modeMeta.get(mode.toLowerCase())?.imageUrl ?? null}
+            mapImageFor={(split) =>
+              activeMaps.find((m) => m.mapSlug === slugify(split.mapName ?? '') && m.scHash === split.mode)?.map.imageUrl ?? null
+            }
             mapSlugFor={(split) => {
               const match = activeMaps.find(
                 (m) => m.mapSlug === slugify(split.mapName ?? '') && m.scHash === split.mode,

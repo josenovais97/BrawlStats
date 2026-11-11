@@ -5136,4 +5136,40 @@ export const TR: Record<string, string> = {
     "En çok yükselen {name}: {delta} puan arttı, şimdi {tier} kademesinde.",
   "{n} brawlers changed tier: {up} up and {down} down.":
     "{n} savaşçının kademesi değişti: {up} yükseldi, {down} düştü.",
+  "All-rounder":
+    "Çok yönlü",
+  "Main":
+    "Ana brawler",
+  "Playstyle":
+    "Oyun tarzı",
+  "{class} main":
+    "{class} oyuncusu",
+  "{n} brawlers played, the top 3 are {pct} of games":
+    "{n} brawler oynandı, ilk 3'ü maçların {pct} kadarı",
+  "Best run":
+    "En iyi seri",
+  "Momentum":
+    "Gidişat",
+  "Net":
+    "Net",
+  "Worst run":
+    "En kötü seri",
+  "Trophies over the last {n} battles":
+    "Son {n} maçta kupalar",
+  "By rank":
+    "Rütbeye göre",
+  "{name} gets better as the ranks go up.":
+    "{name} rütbe yükseldikçe daha iyi oluyor.",
+  "{name} is stronger in lower ranks than at the top.":
+    "{name} düşük rütbelerde zirveden daha güçlü.",
+  "{name} holds about the same place at every rank.":
+    "{name} her rütbede aşağı yukarı aynı sırada.",
+  "Best rank":
+    "En iyi rütbe",
+  "of {n}":
+    "{n} içinde",
+  "Not enough games at this rank yet.":
+    "Bu rütbede henüz yeterli maç yok.",
+  "of {n} in Ranked this week":
+    "bu hafta Aşamalı'da {n} içinde",
 };

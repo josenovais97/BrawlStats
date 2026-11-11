@@ -4552,11 +4552,31 @@ function cachedRead<A extends unknown[], R>(
   key: string,
   fn: (...args: A) => Promise<R>,
 ): (...args: A) => Promise<R> {
-  const wrapped = unstable_cache(
-    fn as (...args: unknown[]) => Promise<R>,
-    [key],
-    { revalidate: READ_CACHE_SECONDS },
-  );
+  /*
+   * One computation per process for each set of arguments (2026-11-11).
+   * `unstable_cache` does not dedupe a miss: every render that finds no
+   * entry runs `fn` itself. Its key includes the function's compiled text,
+   * so a deploy that touches this file starts every read cold, and on
+   * 2026-11-11 each profile view started its own copy of the 3-minute role
+   * compositions query -- 16 at once, profiles timing out -- until the
+   * duplicates were cancelled by hand. Shared inside the cached function so
+   * each render still goes through `unstable_cache` (and still registers its
+   * revalidate on the page); only the work is shared. A joiner gets its own
+   * copy, as a cache hit would: callers sort and slice what they get.
+   */
+  const inflight = new Map<string, Promise<R>>();
+  const shared = (...args: unknown[]): Promise<R> => {
+    const flightKey = JSON.stringify(args);
+    const running = inflight.get(flightKey);
+    if (running) return running.then((value) => structuredClone(value));
+    const started = fn(...(args as A));
+    inflight.set(flightKey, started);
+    void started.finally(() => inflight.delete(flightKey)).catch(() => {});
+    return started;
+  };
+  // `fn`'s text stays in the key, so a deploy that changes a read still
+  // drops its old entries, as it did when `fn` itself was the callback.
+  const wrapped = unstable_cache(shared, [key, fn.toString()], { revalidate: READ_CACHE_SECONDS });
   return async (...args: A) => {
     try {
       return await wrapped(...(args as unknown[]));
@@ -4711,6 +4731,20 @@ export async function getBracketRoster(
   if (stored === 'none') return null;
   if (stored) return stored;
   return compute_getBracketRoster(bracket, mode);
+}
+
+/**
+ * A rank's all-modes list from the precompute only, or null (2026-11-11).
+ * For the brawler pages' "By rank" panel: ~100 ISR pages times four ranks
+ * must never fall through to the live lineup reads.
+ */
+export async function getStoredBracketRoster(
+  bracket: number,
+): Promise<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | null> {
+  const stored = await precomputed<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | 'none'>(
+    bracketRosterKey(bracket),
+  );
+  return stored && stored !== 'none' ? stored : null;
 }
 
 /** `precomputed_reads` key for one rank's list, all modes or one. */

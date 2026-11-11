@@ -37,6 +37,8 @@ import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { PlayerSeason, SeasonTeaser } from '@/components/player/player-season';
 import { PlayerActivity } from '@/components/player/player-activity';
+import { PlayerPlaystyle } from '@/components/player/player-playstyle';
+import { BattleMomentum } from '@/components/player/battle-momentum';
 import { PlayerTrophies } from '@/components/player/player-trophies';
 import {
   getEventRotation,
@@ -378,6 +380,11 @@ export default async function PlayerPage({ params }: PageProps) {
           </Suspense>
         ) : null}
 
+        {/* How this account plays: main, classes, modes (2026-11-11). */}
+        <Suspense fallback={null}>
+          <PlayerPlaystyle player={player} tag={normalizedTag} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
+        </Suspense>
+
         {/*
           The account's own brawlers, drawn in the skins actually equipped,
           with what is on a streak and what is nearly at its next prestige.
@@ -553,6 +560,11 @@ export default async function PlayerPage({ params }: PageProps) {
             sampler visits; renders nothing for the rest. */}
         <Suspense fallback={null}>
           <PlayerActivity tag={normalizedTag} brawlerMeta={brawlerMeta} />
+        </Suspense>
+
+        {/* The last 25 games as a trophy line (2026-11-11). */}
+        <Suspense fallback={null}>
+          <BattleMomentum tag={tag} />
         </Suspense>
 
         {/* Above the log rather than below it: this is the same subject read one

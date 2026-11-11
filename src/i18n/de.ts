@@ -5137,4 +5137,40 @@ export const DE: Record<string, string> = {
     "{name} ist am stärksten gestiegen: {delta} Punkte mehr, jetzt Tier {tier}.",
   "{n} brawlers changed tier: {up} up and {down} down.":
     "{n} Brawler haben das Tier gewechselt: {up} hoch, {down} runter.",
+  "All-rounder":
+    "Allrounder",
+  "Main":
+    "Main",
+  "Playstyle":
+    "Spielstil",
+  "{class} main":
+    "{class}-Main",
+  "{n} brawlers played, the top 3 are {pct} of games":
+    "{n} Brawler gespielt, die Top 3 machen {pct} der Spiele aus",
+  "Best run":
+    "Bester Lauf",
+  "Momentum":
+    "Verlauf",
+  "Net":
+    "Netto",
+  "Worst run":
+    "Schlechtester Lauf",
+  "Trophies over the last {n} battles":
+    "Trophäen in den letzten {n} Kämpfen",
+  "By rank":
+    "Nach Rang",
+  "{name} gets better as the ranks go up.":
+    "{name} wird mit steigendem Rang stärker.",
+  "{name} is stronger in lower ranks than at the top.":
+    "{name} ist in niedrigen Rängen stärker als ganz oben.",
+  "{name} holds about the same place at every rank.":
+    "{name} steht in jedem Rang etwa gleich da.",
+  "Best rank":
+    "Bester Rang",
+  "of {n}":
+    "von {n}",
+  "Not enough games at this rank yet.":
+    "Noch nicht genug Spiele in diesem Rang.",
+  "of {n} in Ranked this week":
+    "von {n} in Ranked diese Woche",
 };

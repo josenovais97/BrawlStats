@@ -40,6 +40,8 @@ export interface BattleEntry {
    */
   modeIconUrl: string | null;
   map: string;
+  /** The map's own art, for the row's backdrop (2026-11-11); null for retired maps. */
+  mapImageUrl: string | null;
   type: string;
   relative: string;
   trophyChange: number | null;
@@ -447,7 +449,11 @@ function RunRow({ run }: { run: BattleEntry[] }) {
       className="card group overflow-hidden"
       style={{ borderLeft: `3px solid ${TONE_COLOR[head.tone]}` }}
     >
-      <summary className="flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden">
+      <summary
+        className="relative isolate flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden"
+        style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${TONE_COLOR[head.tone]} 13%, transparent), transparent 45%)` }}
+      >
+        <MapBackdrop url={head.mapImageUrl} />
         <BrawlerTile iconUrl={head.iconUrl} name={head.brawlerName} count={run.length} />
 
         <div className="min-w-0 flex-1">
@@ -494,7 +500,11 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
       className={`group overflow-hidden ${nested ? 'rounded-xl bg-surface' : 'card'}`}
       style={{ borderLeft: `3px solid ${TONE_COLOR[entry.tone]}` }}
     >
-      <summary className="flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden">
+      <summary
+        className="relative isolate flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden"
+        style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${TONE_COLOR[entry.tone]} 13%, transparent), transparent 45%)` }}
+      >
+        <MapBackdrop url={entry.mapImageUrl} />
         <BrawlerTile iconUrl={entry.iconUrl} name={entry.brawlerName} />
 
         <div className="min-w-0 flex-1">
@@ -513,6 +523,7 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
           <p className="mt-0.5 truncate text-xs text-muted">
             {entry.map} · {entry.type} · {entry.relative}
           </p>
+          <Faces teams={entry.teams} isTeamMode={entry.isTeamMode} />
         </div>
 
         <TrophyDelta value={entry.trophyChange} />
@@ -560,6 +571,56 @@ function BrawlerTile({
         </span>
       ) : null}
     </span>
+  );
+}
+
+/**
+ * The map's art faded in behind the right of a row (2026-11-11): the map is
+ * the other thing a player knows by shape, after the brawler.
+ */
+function MapBackdrop({ url }: { url: string | null }) {
+  if (!url) return null;
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-2/5 overflow-hidden opacity-30 sm:w-1/3"
+      style={{ maskImage: 'linear-gradient(to left, black 30%, transparent)', WebkitMaskImage: 'linear-gradient(to left, black 30%, transparent)' }}
+    >
+      <Image src={url} alt="" fill unoptimized sizes="320px" className="object-cover object-center" />
+    </span>
+  );
+}
+
+/**
+ * Both teams as faces on the row itself (2026-11-11), so a game reads as a
+ * match -- who was with you and who was against -- without opening it. Only
+ * for two-team games; Showdown has no "against".
+ */
+function Faces({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMode: boolean }) {
+  if (!isTeamMode || teams.length !== 2) return null;
+  const mineFirst = teams[0].some((p) => p.isSelf) ? teams : [teams[1], teams[0]];
+  const big = mineFirst[0].length <= 3;
+  const face = (p: BattleParticipant, i: number) =>
+    p.iconUrl ? (
+      <Image
+        key={`${p.tag}-${i}`}
+        src={p.iconUrl}
+        alt={p.brawlerName ?? ''}
+        title={p.brawlerName ?? undefined}
+        width={22}
+        height={22}
+        unoptimized
+        className={`${big ? 'size-[22px]' : 'size-[18px]'} rounded-md border border-ink bg-surface-3 ${p.isSelf ? 'ring-2 ring-brand' : ''}`}
+      />
+    ) : (
+      <span key={`${p.tag}-${i}`} className={`${big ? 'size-[22px]' : 'size-[18px]'} rounded-md border border-ink bg-surface-3`} />
+    );
+  return (
+    <div className="mt-1.5 flex items-center gap-1">
+      {mineFirst[0].map(face)}
+      <span className="px-1 text-[10px] font-black uppercase text-muted">vs</span>
+      {mineFirst[1].map(face)}
+    </div>
   );
 }
 
