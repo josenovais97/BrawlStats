@@ -1050,4 +1050,14 @@ export const CLIENT_PT: Record<string, string> = {
     "Ainda sem avaliação",
   "Ranked win rate this week":
     "Taxa de vitórias no Ranqueado esta semana",
+  "Claimed":
+    "Resgatada",
+  "New":
+    "Novo",
+  "All {n} claimed. New ones show up here first.":
+    "As {n} resgatadas. As novas aparecem aqui primeiro.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "Você resgatou {done} de {n}. Toque em Resgatar nas outras.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "{n} recompensas grátis ativas. Toque em Resgatar em cada uma e elas são marcadas aqui.",
 };

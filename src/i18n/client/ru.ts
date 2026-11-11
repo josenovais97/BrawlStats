@@ -578,4 +578,14 @@ export const CLIENT_RU: Record<string, string> = {
     "Пока без оценки",
   "Ranked win rate this week":
     "Процент побед в ранговых боях за неделю",
+  "Claimed":
+    "Получено",
+  "New":
+    "Новое",
+  "All {n} claimed. New ones show up here first.":
+    "Все награды получены ({n}). Новые появятся здесь первыми.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "Получено {done} из {n}. Нажми «Забрать» на остальных.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "Бесплатных наград сейчас: {n}. Нажми «Забрать» на каждой, и они отметятся здесь.",
 };

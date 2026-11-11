@@ -1050,4 +1050,14 @@ export const CLIENT_ES: Record<string, string> = {
     "Sin valorar aún",
   "Ranked win rate this week":
     "Tasa de victorias en Competitivo esta semana",
+  "Claimed":
+    "Reclamada",
+  "New":
+    "Nuevo",
+  "All {n} claimed. New ones show up here first.":
+    "Las {n} reclamadas. Las nuevas aparecen aquí primero.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "Reclamaste {done} de {n}. Toca Reclamar en el resto.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "{n} recompensas gratis activas. Toca Reclamar en cada una y se marcan aquí.",
 };

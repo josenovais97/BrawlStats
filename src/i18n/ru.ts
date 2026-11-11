@@ -5227,4 +5227,12 @@ export const RU: Record<string, string> = {
     "Сборка",
   "Play now":
     "Играть сейчас",
+  "Claimed":
+    "Получено",
+  "All {n} claimed. New ones show up here first.":
+    "Все награды получены ({n}). Новые появятся здесь первыми.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "Получено {done} из {n}. Нажми «Забрать» на остальных.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "Бесплатных наград сейчас: {n}. Нажми «Забрать» на каждой, и они отметятся здесь.",
 };

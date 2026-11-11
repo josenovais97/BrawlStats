@@ -5226,4 +5226,12 @@ export const TR: Record<string, string> = {
     "Build",
   "Play now":
     "Şimdi oyna",
+  "Claimed":
+    "Alındı",
+  "All {n} claimed. New ones show up here first.":
+    "{n} ödülün hepsi alındı. Yenileri önce burada çıkar.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "{n} ödülden {done} tanesini aldın. Kalanlara Al'a dokun.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "{n} ücretsiz ödül aktif. Her birinde Al'a dokun, burada işaretlenir.",
 };

@@ -9,6 +9,7 @@ import { NotifyButton } from '@/components/rewards/notify-button';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { relativeTime } from '@/lib/format';
 import { RewardArt } from '@/components/rewards/reward-art';
+import { ClaimSummary, RewardFlag } from '@/components/rewards/claim-tracker';
 import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
 import { dropForReward, getStarrDrops } from '@/lib/starr-drops';
 import { currentMonth, WHATSAPP_URL } from '@/lib/site';
@@ -80,6 +81,8 @@ export default async function RewardsPage() {
         <LastChecked />
       </div>
 
+      {/* What this phone has claimed of the live ones (2026-11-11). */}
+      <ClaimSummary ids={live.map((r) => r.id)} />
       {hero ? <RewardStage reward={hero} total={live.length} /> : <EmptyStage />}
 
       <GiveawayBanner from="rewards" />
@@ -93,11 +96,12 @@ export default async function RewardsPage() {
                 <RewardArt src={r.art} fallback={r.fallbackArt} size={88} className="size-20 shrink-0 object-contain drop-shadow-[0_6px_8px_rgb(0_0_0/0.5)]" />
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="display text-game-stroke truncate text-xl text-white">{r.name}</p>
+                  <RewardFlag id={r.id} postedAt={r.postedAt} />
                   <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
                   {isStoreFreebie(r.url) ? (
                     <p className="text-xs text-muted">{t('Opens the Supercell Store. Sign in with Supercell ID to claim it.')}</p>
                   ) : null}
-                  <ClaimButton url={r.url} small />
+                  <ClaimButton url={r.url} id={r.id} small />
                 </div>
               </li>
             ))}
@@ -138,7 +142,8 @@ export default async function RewardsPage() {
                   <p className="truncate font-semibold">{r.name}</p>
                   <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
                 </div>
-                <a href={r.url} target="_blank" rel="noopener noreferrer nofollow" data-claim data-umami-event="reward_claim" data-umami-event-from="earlier" className="shrink-0 text-sm font-semibold text-brand hover:underline">
+                <RewardFlag id={r.id} postedAt={r.postedAt} />
+                <a href={r.url} target="_blank" rel="noopener noreferrer nofollow" data-claim data-reward-id={r.id} data-umami-event="reward_claim" data-umami-event-from="earlier" className="shrink-0 text-sm font-semibold text-brand hover:underline">
                   {t('Try it')}
                 </a>
               </li>
@@ -188,8 +193,11 @@ function RewardStage({ reward, total }: { reward: FreeReward; total: number }) {
         <RewardArt src={reward.art} fallback={reward.fallbackArt} size={260} className="reward-float size-52 object-contain sm:size-64" />
         <p className="mt-4 text-sm font-semibold text-white/70">{t('Free reward')}</p>
         <h2 id="reward-now" className="display text-game-stroke mt-1 text-4xl leading-none text-white sm:text-6xl">{reward.name}</h2>
+        <span className="mt-2 empty:hidden">
+          <RewardFlag id={reward.id} postedAt={reward.postedAt} />
+        </span>
         <div className="mt-8 w-full max-w-xs">
-          <ClaimButton url={reward.url} />
+          <ClaimButton url={reward.url} id={reward.id} />
         </div>
         <p className="mt-3 text-xs text-white/60">
           {isStoreFreebie(reward.url)
@@ -259,7 +267,7 @@ function isStoreFreebie(url: string): boolean {
 }
 
 /** The game's green claim button, in the site's btn-game shape. */
-function ClaimButton({ url, small = false }: { url: string; small?: boolean }) {
+function ClaimButton({ url, id, small = false }: { url: string; id: string; small?: boolean }) {
   const t = getT(requestLocale());
   return (
     <a
@@ -267,6 +275,7 @@ function ClaimButton({ url, small = false }: { url: string; small?: boolean }) {
       target="_blank"
       rel="noopener noreferrer nofollow"
       data-claim
+      data-reward-id={id}
       data-umami-event="reward_claim"
       data-umami-event-from={small ? 'tile' : 'hero'}
       className={`btn-game inline-flex items-center justify-center bg-[#3ddc63] text-[#0b2a14] [--btn-shadow:#1a7a33] hover:bg-[#52e676] ${

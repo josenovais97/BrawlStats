@@ -578,4 +578,14 @@ export const CLIENT_DE: Record<string, string> = {
     "Noch nicht bewertet",
   "Ranked win rate this week":
     "Ranked-Siegquote diese Woche",
+  "Claimed":
+    "Abgeholt",
+  "New":
+    "Neu",
+  "All {n} claimed. New ones show up here first.":
+    "Alle {n} abgeholt. Neue erscheinen zuerst hier.",
+  "You claimed {done} of {n}. Tap Claim on the rest.":
+    "Du hast {done} von {n} abgeholt. Tipp bei den übrigen auf Abholen.",
+  "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
+    "{n} Gratis-Belohnungen aktiv. Tipp bei jeder auf Abholen, sie werden hier abgehakt.",
 };
