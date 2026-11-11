@@ -5235,4 +5235,28 @@ export const FR: Record<string, string> = {
     "Tu en as récupéré {done} sur {n}. Touche Récupérer pour les autres.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "{n} récompenses gratuites en ce moment. Touche Récupérer sur chacune, elles seront cochées ici.",
+  "Best at your rank":
+    "Les meilleurs à ton rang",
+  "Dead even":
+    "Égalité parfaite",
+  "From {n} sampled games against each other":
+    "Sur {n} parties relevées l'un contre l'autre",
+  "{name} wins the matchup":
+    "{name} gagne le duel",
+  "Even: each places higher at {n} ranks.":
+    "Égalité : chacun est devant à {n} rangs.",
+  "{name} places higher at {n} of {total} ranks.":
+    "{name} est devant à {n} rangs sur {total}.",
+  "Safe on most maps":
+    "Sûrs sur la plupart des cartes",
+  "The brawlers in the top three on the most Ranked maps this season.":
+    "Les brawlers dans le top 3 sur le plus de cartes Classé cette saison.",
+  "Top 3 on {n} of {total} maps":
+    "Top 3 sur {n} cartes sur {total}",
+  "This week in Ranked":
+    "Cette semaine en Classé",
+  "Weekly report →":
+    "Rapport de la semaine →",
+  "Top picks":
+    "Meilleurs choix",
 };

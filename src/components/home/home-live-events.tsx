@@ -2,10 +2,13 @@ import { ClockIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getBestPicksByMode } from '@/lib/stats';
+import type { ModeBestPicks } from '@/types/stats';
 import { getEventRotation } from '@/lib/bs-api';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
-import type { BAGameMode, BAMap } from '@/types/brawlapi';
+import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -30,9 +33,11 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
     return null;
   }
 
-  const [mapMeta, modeMeta] = await Promise.all([
+  const [mapMeta, modeMeta, picksByMode, brawlerMeta] = await Promise.all([
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    getBestPicksByMode(3).catch(() => new Map<string, ModeBestPicks>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
   ]);
 
   const { active } = partitionRotation(rotation);
@@ -108,6 +113,12 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                     loading="lazy"
                     unoptimized
                   />
+                ) : mode?.imageUrl ? (
+                  /* A map too new for the art source: the mode's own icon,
+                     large on its colour, rather than an empty frame. */
+                  <span className="absolute inset-0 grid place-items-center">
+                    <Image src={mode.imageUrl} alt="" width={72} height={72} unoptimized className="size-12 object-contain opacity-90 drop-shadow-[0_4px_0_rgb(5_10_31/0.5)] sm:size-[72px]" />
+                  </span>
                 ) : null}
 
                 <span
@@ -152,6 +163,25 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                     </p>
                   </div>
                 </div>
+                {/* What to play in this mode right now (2026-11-11). */}
+                {(picksByMode.get(slot.event.mode)?.picks.length ?? 0) > 0 ? (
+                  <div className="flex items-center gap-1.5 border-t border-border/60 pt-2">
+                    <span className="mr-auto text-[11px] font-bold text-muted">{t('Top picks')}</span>
+                    {picksByMode.get(slot.event.mode)!.picks.slice(0, 3).map((p) => (
+                      <Image
+                        key={p.brawlerId}
+                        src={brawlerMeta.get(p.brawlerId)?.imageUrl ?? brawlerIconUrl(p.brawlerId)}
+                        alt={p.brawlerName}
+                        title={p.brawlerName}
+                        width={28}
+                        height={28}
+                        unoptimized
+                        loading="lazy"
+                        className="size-7 rounded-md border-2 border-ink bg-surface-3"
+                      />
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </Link>
           </li>

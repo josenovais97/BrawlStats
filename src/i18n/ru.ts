@@ -5235,4 +5235,28 @@ export const RU: Record<string, string> = {
     "Получено {done} из {n}. Нажми «Забрать» на остальных.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "Бесплатных наград сейчас: {n}. Нажми «Забрать» на каждой, и они отметятся здесь.",
+  "Best at your rank":
+    "Лучшие на твоём ранге",
+  "Dead even":
+    "Полное равенство",
+  "From {n} sampled games against each other":
+    "По {n} записанным играм друг против друга",
+  "{name} wins the matchup":
+    "{name} выигрывает противостояние",
+  "Even: each places higher at {n} ranks.":
+    "Поровну: каждый выше на рангах ({n}).",
+  "{name} places higher at {n} of {total} ranks.":
+    "{name} выше на {n} из {total} рангов.",
+  "Safe on most maps":
+    "Надёжны на большинстве карт",
+  "The brawlers in the top three on the most Ranked maps this season.":
+    "Бойцы, которые в топ-3 на большинстве карт ранговых боёв в этом сезоне.",
+  "Top 3 on {n} of {total} maps":
+    "Топ-3 на {n} из {total} карт",
+  "This week in Ranked":
+    "Эта неделя в ранговых боях",
+  "Weekly report →":
+    "Недельный отчёт →",
+  "Top picks":
+    "Лучшие бойцы",
 };

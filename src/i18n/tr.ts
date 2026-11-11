@@ -5234,4 +5234,28 @@ export const TR: Record<string, string> = {
     "{n} ödülden {done} tanesini aldın. Kalanlara Al'a dokun.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "{n} ücretsiz ödül aktif. Her birinde Al'a dokun, burada işaretlenir.",
+  "Best at your rank":
+    "Rütbende en iyiler",
+  "Dead even":
+    "Tam berabere",
+  "From {n} sampled games against each other":
+    "Birbirlerine karşı {n} maçtan",
+  "{name} wins the matchup":
+    "Eşleşmeyi {name} kazanıyor",
+  "Even: each places higher at {n} ranks.":
+    "Berabere: ikisi de {n} rütbede önde.",
+  "{name} places higher at {n} of {total} ranks.":
+    "{name}, {total} rütbenin {n} tanesinde önde.",
+  "Safe on most maps":
+    "Çoğu haritada güvenli",
+  "The brawlers in the top three on the most Ranked maps this season.":
+    "Bu sezon en çok Aşamalı haritasında ilk üçte olan brawlerlar.",
+  "Top 3 on {n} of {total} maps":
+    "{total} haritanın {n} tanesinde ilk 3",
+  "This week in Ranked":
+    "Bu hafta Aşamalı'da",
+  "Weekly report →":
+    "Haftalık rapor →",
+  "Top picks":
+    "En iyi seçimler",
 };

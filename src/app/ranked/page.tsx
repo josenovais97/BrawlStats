@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { RankedHeroRanks } from '@/components/ranked/ranked-hero-ranks';
 import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
@@ -201,6 +202,19 @@ export default async function RankedPage() {
   const totalSamples = onBoard.reduce((sum, m) => sum + (m.picks?.sampleSize ?? 0), 0);
   const baseline = maps[0]?.baselineWinRate ?? 0;
   const rated = onBoard.filter((m) => (m.picks?.picks.length ?? 0) > 0).length;
+  const topThreeCount = new Map<number, { name: string; n: number }>();
+  for (const m of onBoard) {
+    for (const p of m.picks?.picks.slice(0, 3) ?? []) {
+      const e = topThreeCount.get(p.brawlerId) ?? { name: titleCaseLabel(brawlerMeta.get(p.brawlerId)?.name ?? p.brawlerName), n: 0 };
+      e.n += 1;
+      topThreeCount.set(p.brawlerId, e);
+    }
+  }
+  const allRounders = [...topThreeCount.entries()]
+    .map(([id, e]) => ({ id, ...e }))
+    .filter((e) => e.n >= 2)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 5);
 
   /*
    * Only maps this board can actually answer for.
@@ -246,7 +260,8 @@ export default async function RankedPage() {
         happens: what this is, how much evidence is behind it, which mode, then
         the picks.
       */}
-      <header>
+      <header className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <RankedIcon className="size-4" />{t('Competitive only')}</p>
         <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{t('Ranked maps')}</h1>
@@ -281,6 +296,9 @@ export default async function RankedPage() {
             <Fact>{t('{rated} of {length} maps with a pick', { rated: rated, length: onBoard.length })}</Fact>
           ) : null}
         </ul>
+        </div>
+        {/* The top three at each rank (2026-11-11), filling the empty half. */}
+        <RankedHeroRanks brawlerMeta={brawlerMeta} />
       </header>
 
       {/* Which season it is decides which maps are in the pool at all, so it
@@ -305,6 +323,25 @@ export default async function RankedPage() {
 
       {/* The November 2026 rules change, under the season it applies to. */}
       <RankedRefresh nextReset={season.nextStartsOn} />
+
+      {/* Safe on most maps: top three on the most maps in the pool (2026-11-11). */}
+      {allRounders.length >= 3 ? (
+        <section className="card p-5 sm:p-6">
+          <h2 className="display text-xl leading-none sm:text-2xl">{t('Safe on most maps')}</h2>
+          <p className="mt-1.5 text-sm text-muted">{t('The brawlers in the top three on the most Ranked maps this season.')}</p>
+          <ol className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+            {allRounders.map(({ id, name, n }) => (
+              <li key={id} className="flex items-center gap-2.5 rounded-xl bg-surface-2/50 px-3 py-2.5">
+                <Image src={brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id)} alt="" width={40} height={40} unoptimized className="size-10 shrink-0 rounded-lg border-2 border-ink bg-surface-3" />
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-bold">{name}</span>
+                  <span className="block text-xs text-muted">{t('Top 3 on {n} of {total} maps', { n, total: rated })}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
 
       {modeNav.length > 1 ? (
         <nav aria-label={t('Jump to a mode')} className="-mx-4 px-4 sm:mx-0 sm:px-0">

@@ -5,6 +5,7 @@ import { FavoritesList } from '@/components/favorites-list';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeBubble } from '@/components/home/home-bubble';
 import { HomeHero } from '@/components/home/home-hero';
+import { HomeMovers } from '@/components/home/home-movers';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeLobby } from '@/components/home/home-lobby';
 import { HomeMetaNow } from '@/components/home/home-meta-now';
@@ -152,6 +153,11 @@ export default function HomePage() {
 
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
         <HomeMetaNow />
+      </Suspense>
+
+      {/* The week's biggest moves, under the podium (2026-11-11). */}
+      <Suspense fallback={null}>
+        <HomeMovers />
       </Suspense>
 
       {/* Our own findings: what no tier list says. Nothing on a quiet day. */}

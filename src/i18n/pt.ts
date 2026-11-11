@@ -5234,4 +5234,28 @@ export const PT: Record<string, string> = {
     "Você resgatou {done} de {n}. Toque em Resgatar nas outras.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "{n} recompensas grátis ativas. Toque em Resgatar em cada uma e elas são marcadas aqui.",
+  "Best at your rank":
+    "Os melhores no seu rank",
+  "Dead even":
+    "Empate técnico",
+  "From {n} sampled games against each other":
+    "De {n} partidas registradas entre eles",
+  "{name} wins the matchup":
+    "{name} vence o confronto",
+  "Even: each places higher at {n} ranks.":
+    "Empatados: cada um fica à frente em {n} ranks.",
+  "{name} places higher at {n} of {total} ranks.":
+    "{name} fica à frente em {n} de {total} ranks.",
+  "Safe on most maps":
+    "Seguros na maioria dos mapas",
+  "The brawlers in the top three on the most Ranked maps this season.":
+    "Os brawlers no top 3 de mais mapas do Ranqueado nesta temporada.",
+  "Top 3 on {n} of {total} maps":
+    "Top 3 em {n} de {total} mapas",
+  "This week in Ranked":
+    "Esta semana no Ranqueado",
+  "Weekly report →":
+    "Relatório semanal →",
+  "Top picks":
+    "Melhores escolhas",
 };

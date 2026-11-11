@@ -23,8 +23,12 @@ import {
   normalizeWinRate,
   type BrawlerSplit,
 } from '@/lib/stats';
-import { realBrawlerClass } from '@/lib/brawlapi';
-import type { BABrawler } from '@/types/brawlapi';
+import { getGameModeMap, realBrawlerClass } from '@/lib/brawlapi';
+import { isListedMode } from '@/lib/battle-mode';
+import { gameWords } from '@/lib/i18n-game';
+import { byRankCells } from '@/components/brawlers/brawler-by-rank';
+import { CompareByRank } from '@/components/compare/compare-by-rank';
+import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BrawlerStatRow, Tier } from '@/types/stats';
 import { andList, getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
@@ -147,6 +151,20 @@ export default async function ComparePage({ params }: PageProps) {
     fullBodyArt(right.brawler.id, right.brawler.name, right.brawler.imageUrl),
   ]);
   const verdict = buildVerdict(left, right);
+  const locale = requestLocale();
+  const words = await gameWords(locale);
+  const modeMeta = await getGameModeMap().catch(() => new Map<string, BAGameMode>());
+  const [rankA, rankB] = await Promise.all([byRankCells(left.brawler.id), byRankCells(right.brawler.id)]);
+  const colorA = left.brawler.rarity?.color ?? '#8b95b8';
+  // Same rarity, same colour: the right side switches to gold so the two
+  // halves of the bar and the By rank columns stay apart.
+  const colorB = (right.brawler.rarity?.color ?? '#8b95b8') === colorA ? 'var(--brand)' : (right.brawler.rarity?.color ?? '#8b95b8');
+  // The head-to-head as one bar in the face-off (2026-11-11). The two rates
+  // come from different samples, so the bar splits them by their ratio.
+  const h2h =
+    leftVsRight && rightVsLeft
+      ? { a: leftVsRight.winRate, b: rightVsLeft.winRate, games: Math.max(leftVsRight.decidedSampleSize, rightVsLeft.decidedSampleSize) }
+      : null;
   const faq = [
     {
       question: t('Is {nameA} better than {nameB}?', { nameA: nameA, nameB: nameB }),
@@ -200,6 +218,29 @@ export default async function ComparePage({ params }: PageProps) {
           <span className="display mb-16 text-3xl uppercase text-brand sm:mb-24 sm:text-5xl">{t('vs')}</span>
           <Portrait side={right} align="start" art={rightArt} />
         </div>
+        {h2h ? (
+          <div className="relative border-t border-border/70 px-4 py-4 sm:px-6">
+            <p className="label-game mb-2 text-center text-xs text-muted">{t('Head to head')}</p>
+            <div className="flex items-end justify-between gap-3">
+              <span className="display text-3xl leading-none sm:text-4xl" style={{ color: h2h.a >= h2h.b ? colorA : undefined }}>
+                {formatPercent(h2h.a)}
+              </span>
+              <span className="pb-1 text-center text-sm font-bold">
+                {h2h.a === h2h.b
+                  ? t('Dead even')
+                  : t('{name} wins the matchup', { name: h2h.a > h2h.b ? nameA : nameB })}
+              </span>
+              <span className="display text-3xl leading-none sm:text-4xl" style={{ color: h2h.b > h2h.a ? colorB : undefined }}>
+                {formatPercent(h2h.b)}
+              </span>
+            </div>
+            <div className="mt-2 flex h-3.5 overflow-hidden rounded-full border-2 border-ink">
+              <div style={{ flexGrow: h2h.a, background: colorA }} />
+              <div style={{ flexGrow: h2h.b, background: colorB }} />
+            </div>
+            <p className="mt-1.5 text-center text-xs text-muted">{t('From {n} sampled games against each other', { n: formatNumber(h2h.games) })}</p>
+          </div>
+        ) : null}
         <p className="relative border-t border-border/70 px-4 py-3.5 text-center leading-relaxed sm:px-6">
           {t(verdict)}
         </p>
@@ -277,8 +318,8 @@ export default async function ComparePage({ params }: PageProps) {
                 },
                 {
                   label: t('Best mode'),
-                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '–',
-                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '–',
+                  a: left.splits[0] ? words.mode(left.splits[0].mode) : '–',
+                  b: right.splits[0] ? words.mode(right.splits[0].mode) : '–',
                   leader: null,
                 },
               ],
@@ -319,6 +360,8 @@ export default async function ComparePage({ params }: PageProps) {
         )}
       </section>
 
+      <CompareByRank nameA={nameA} nameB={nameB} left={rankA} right={rankB} colorA={colorA} colorB={colorB} />
+
       <section>
         <SectionHeading title={t('Where each one performs')} />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -336,8 +379,11 @@ export default async function ComparePage({ params }: PageProps) {
                       key={split.mode}
                       className="flex items-center justify-between gap-3 px-4 py-2.5"
                     >
-                      <span className="min-w-0 truncate text-sm font-medium">
-                        {humanizeMode(split.mode)}
+                      <span className="flex min-w-0 items-center gap-2.5">
+                        {modeMeta.get(split.mode.toLowerCase())?.imageUrl ? (
+                          <Image src={modeMeta.get(split.mode.toLowerCase())!.imageUrl} alt="" width={26} height={26} unoptimized className="size-[26px] shrink-0 object-contain" />
+                        ) : null}
+                        <span className="truncate text-sm font-medium">{words.mode(split.mode)}</span>
                       </span>
                       <span className="shrink-0 text-sm font-bold tabular-nums text-victory">
                         {formatPercent(split.score)}
@@ -368,7 +414,8 @@ export default async function ComparePage({ params }: PageProps) {
 
 async function loadSide(brawler: BABrawler): Promise<Side> {
   const stat = await getBrawlerStat(brawler.id);
-  const splits = await getBrawlerSplits(brawler.id).then((s) => s.modes);
+  // Listed modes only: no 5v5 or event variants as anyone's "best mode".
+  const splits = await getBrawlerSplits(brawler.id).then((s) => s.modes.filter((m) => isListedMode(m.mode)));
   const adjusted = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;

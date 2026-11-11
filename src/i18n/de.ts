@@ -5235,4 +5235,28 @@ export const DE: Record<string, string> = {
     "Du hast {done} von {n} abgeholt. Tipp bei den übrigen auf Abholen.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "{n} Gratis-Belohnungen aktiv. Tipp bei jeder auf Abholen, sie werden hier abgehakt.",
+  "Best at your rank":
+    "Die Besten in deinem Rang",
+  "Dead even":
+    "Völlig ausgeglichen",
+  "From {n} sampled games against each other":
+    "Aus {n} erfassten Spielen gegeneinander",
+  "{name} wins the matchup":
+    "{name} gewinnt das Duell",
+  "Even: each places higher at {n} ranks.":
+    "Ausgeglichen: jeder liegt in {n} Rängen vorn.",
+  "{name} places higher at {n} of {total} ranks.":
+    "{name} liegt in {n} von {total} Rängen vorn.",
+  "Safe on most maps":
+    "Auf den meisten Maps sicher",
+  "The brawlers in the top three on the most Ranked maps this season.":
+    "Die Brawler, die diese Saison auf den meisten Ranked-Maps in den Top 3 sind.",
+  "Top 3 on {n} of {total} maps":
+    "Top 3 auf {n} von {total} Maps",
+  "This week in Ranked":
+    "Diese Woche in Ranked",
+  "Weekly report →":
+    "Wochenbericht →",
+  "Top picks":
+    "Top-Picks",
 };
