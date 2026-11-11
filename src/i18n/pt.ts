@@ -5214,4 +5214,16 @@ export const PT: Record<string, string> = {
     "{map} é um mapa de {class}: {n} das {total} melhores escolhas.",
   "{diff} vs average":
     "{diff} vs média",
+  "Beats":
+    "Vence",
+  "Countered by":
+    "Counter de",
+  "In Ranked":
+    "No Ranqueado",
+  "of {n} this week":
+    "de {n} esta semana",
+  "Build":
+    "Build",
+  "Play now":
+    "Jogar agora",
 };

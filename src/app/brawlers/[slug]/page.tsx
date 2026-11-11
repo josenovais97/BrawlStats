@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowLeft, BarChart3, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShareImageButton } from '@/components/share-image-button';
@@ -9,8 +9,9 @@ import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
 import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
-import { BrawlerByRank } from '@/components/brawlers/brawler-by-rank';
-import { BrawlerLiveMaps } from '@/components/brawlers/brawler-live-maps';
+import { BrawlerByRank, byRankCells } from '@/components/brawlers/brawler-by-rank';
+import { BrawlerHeroStats } from '@/components/brawlers/brawler-hero-stats';
+import { BrawlerLiveMaps, livePicksFor } from '@/components/brawlers/brawler-live-maps';
 import { liveSlots } from '@/lib/live-slots';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
 import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
@@ -21,13 +22,11 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import {
   ClassIcon,
   CombatStatIcon,
   HyperchargeIcon,
-  PlayersIcon,
   PrestigeIcon,
   TrophyIcon,
 } from '@/components/game-icons';
@@ -599,6 +598,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Live trophy maps, cached as long as the page itself: the default 120 s
   // would pin this whole route to two-minute renders (AGENTS.md trap 2).
   const live = liveSlots(await getEventRotation(revalidate).catch(() => []));
+  const livePicks = livePicksFor(live, splits.maps, activeMaps);
+  const rankCells = await byRankCells(brawlerId);
+  const jumps = [
+    { id: 'build', label: t('Build') },
+    ...(livePicks.length > 0 ? [{ id: 'play-now', label: t('Play now') }] : []),
+    ...(rankCells ? [{ id: 'by-rank', label: t('By rank') }] : []),
+    ...(splits.modes.length > 0 || splits.maps.length > 0 ? [{ id: 'maps', label: t('Best maps') }] : []),
+    ...(pairings ? [{ id: 'matchups', label: t('Matchups') }] : []),
+    { id: 'players', label: t('Top players') },
+    ...(skins.length > 0 ? [{ id: 'skins', label: t('Skins') }] : []),
+  ];
 
 
   // Cleaned at the source now — see `rarityColor` — so this only picks the
@@ -955,6 +965,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           with sample sizes and caveats, is still the "Build & upgrades"
           section below.
         */}
+        {/* The page's numbers and the brawler at a glance (2026-11-11). */}
+        <BrawlerHeroStats
+          winRate={normalizedWinRate}
+          pickRate={stat?.usageRate ?? null}
+          pickPlace={pickPlace}
+          metaPlace={metaPlace}
+          metaTotal={metaRated.length}
+          mover={mover}
+          splits={splits}
+          pairings={pairings}
+          brawlerMeta={brawlerMeta}
+          modeMeta={modeMeta}
+          activeMaps={activeMaps}
+        />
         {build ? (
           <div className="relative border-t border-border/70 p-4 sm:px-6">
             <RecommendedBuild
@@ -966,6 +990,19 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           </div>
         ) : null}
       </header>
+
+      {/* Shortcuts to the sections below (2026-11-11); only ones that rendered. */}
+      <nav aria-label={t('On this page')} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+        {jumps.map((j) => (
+          <a key={j.id} href={`#${j.id}`} className="bz-chip inline-flex min-h-10 shrink-0 items-center px-3.5 text-sm hover:text-white">
+            {j.label}
+          </a>
+        ))}
+      </nav>
+
+      {/* Where to play it now, and how it holds up rank by rank (2026-11-11). */}
+      <BrawlerLiveMaps name={name} picks={livePicks} modeMeta={modeMeta} />
+      <BrawlerByRank cells={rankCells} name={name} />
 
       {/* The answer the page title promises, before the biography and the stat
           grid. A summary of the Build & upgrades section below, which keeps
@@ -1093,6 +1130,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         just unlocked a brawler wants the kit; the win rates are for deciding
         whether to unlock it at all, and that reader scrolls.
       */}
+      <div id="build" className="scroll-mt-24" />
       <BuildAndUpgrades
         name={name}
         brawler={brawler}
@@ -1113,58 +1151,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
       <section>
         <SectionHeading title={t('Performance')} />
-        {stat ? (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              icon={BarChart3}
-              label={t('Win rate')}
-              value={formatPercent(normalizedWinRate)}
-              hint={
-                normalizedWinRate !== null
-                  ? t('{diff} vs average', {
-                      diff: `${normalizedWinRate >= 0.5 ? '+' : '−'}${Math.abs((normalizedWinRate - 0.5) * 100).toFixed(1)}`,
-                    })
-                  : t('{decidedSampleSize} battles', { decidedSampleSize: formatNumber(stat.decidedSampleSize) })
-              }
-              tone="text-victory"
-            />
-            <StatCard
-              node={<PlayersIcon className="size-6" />}
-              label={t('Pick rate')}
-              value={formatPercent(stat.usageRate)}
-              hint={pickPlace > 0 ? t('#{n} most picked this week', { n: pickPlace }) : t('Last 7 days')}
-              tone="text-accent"
-            />
-            <StatCard
-              node={<TrophyIcon className="size-6" />}
-              label={t('Avg trophies')}
-              value={stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))}
-              hint={t('Across tracked players')}
-            />
-            {mover ? (
-              /* The week's move, where there is one (2026-11-11): the meta
-                 score change and the tier it came from. */
-              <StatCard
-                icon={Sparkles}
-                label={t('This week')}
-                value={`${mover.metaScoreDelta >= 0 ? '▲ +' : '▼ −'}${Math.abs(mover.metaScoreDelta).toFixed(1)}`}
-                hint={
-                  mover.tierBefore !== mover.tierNow
-                    ? t('{from} tier to {to} tier', { from: mover.tierBefore, to: mover.tierNow })
-                    : t('Meta score, still {tier} tier', { tier: mover.tierNow })
-                }
-                tone={mover.metaScoreDelta >= 0 ? 'text-victory' : 'text-defeat'}
-              />
-            ) : (
-              <StatCard
-                icon={Sparkles}
-                label={t('Avg rank')}
-                value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
-                hint={t('Across tracked players')}
-              />
-            )}
-          </div>
-        ) : (
+        {/* The headline numbers moved into the hero (2026-11-11); the trend stays here. */}
+        {stat ? null : (
           /* An empty state that ends the visit is a wasted one. This says what
              is missing and offers the two pages that do have an answer. */
           <div className="card p-6">
@@ -1189,14 +1177,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         ) : null}
       </section>
 
-      {/* Live maps where it is strong (2026-11-11). */}
-      <BrawlerLiveMaps name={name} live={live} maps={splits.maps} activeMaps={activeMaps} modeMeta={modeMeta} />
-
-      {/* Tier and place at each Ranked rank (2026-11-11). */}
-      <BrawlerByRank brawlerId={brawlerId} name={name} />
-
       {splits.modes.length > 0 || splits.maps.length > 0 ? (
-        <section>
+        <section id="maps" className="scroll-mt-24">
           <SectionHeading
             title={t('Where it performs')}
             subtitle={t('Each mode and map is compared with its own average.')}
@@ -1219,7 +1201,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ) : null}
 
       {pairings ? (
-        <section>
+        <section id="matchups" className="scroll-mt-24">
           <SectionHeading
             title={t('Matchups')}
             subtitle={t('Which brawlers {v} beats, which ones win the matchup, and who to draft alongside.', { v: name.toLowerCase() })}
@@ -1238,7 +1220,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         </section>
       ) : null}
 
-      <section>
+      <section id="players" className="scroll-mt-24">
         <SectionHeading title={t('Top players with {v}', { v: brawler.name.toLowerCase() })} />
         <Suspense fallback={<TableSkeleton rows={5} />}>
           <BrawlerLeaderboard brawlerId={brawlerId} />
@@ -1246,7 +1228,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       </section>
 
       {skins.length > 0 ? (
-        <section>
+        <section id="skins" className="scroll-mt-24">
           <SectionHeading
             title={t('Skins')}
             subtitle={t('Which {name} skins players actually equip, from the sampled snapshot pool.', { name: name })}

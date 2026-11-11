@@ -13,6 +13,21 @@ import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
 import type { BAGameMode } from '@/types/brawlapi';
 
+export type LivePick = { slot: LiveSlot; split: BrawlerSplit; art: GameMap | undefined };
+
+/** Live maps where the brawler beats the map's own average, best first, up to four. */
+export function livePicksFor(live: LiveSlot[], maps: BrawlerSplit[], activeMaps: GameMap[]): LivePick[] {
+  return live
+    .map((slot) => {
+      const split = maps.find((m) => m.mode === slot.mode && slugify(m.mapName ?? '') === slugify(slot.map));
+      const art = activeMaps.find((m) => m.scHash === slot.mode && m.mapSlug === slugify(slot.map));
+      return split ? { slot, split, art } : null;
+    })
+    .filter((x): x is LivePick => x !== null && x.split.score >= 0.5)
+    .sort((a, b) => b.split.score - a.split.score)
+    .slice(0, 4);
+}
+
 /**
  * Where to play this brawler right now (2026-11-11): the maps in the live
  * rotation where it beats that map's own average, best first, with the map
@@ -20,33 +35,20 @@ import type { BAGameMode } from '@/types/brawlapi';
  */
 export async function BrawlerLiveMaps({
   name,
-  live,
-  maps,
-  activeMaps,
+  picks,
   modeMeta,
 }: {
   name: string;
-  live: LiveSlot[];
-  maps: BrawlerSplit[];
-  activeMaps: GameMap[];
+  picks: LivePick[];
   modeMeta: Map<string, BAGameMode>;
 }) {
   const locale = requestLocale();
   const t = getT(locale);
   const words = await gameWords(locale);
-  const picks = live
-    .map((slot) => {
-      const split = maps.find((m) => m.mode === slot.mode && slugify(m.mapName ?? '') === slugify(slot.map));
-      const art = activeMaps.find((m) => m.scHash === slot.mode && m.mapSlug === slugify(slot.map));
-      return split ? { slot, split, art } : null;
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null && x.split.score >= 0.5)
-    .sort((a, b) => b.split.score - a.split.score)
-    .slice(0, 4);
   if (picks.length === 0) return null;
 
   return (
-    <section>
+    <section id="play-now" className="scroll-mt-24">
       <SectionHeading title={t('Play {name} right now', { name })} subtitle={t('Live maps where {name} beats the map average.', { name })} />
       <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {picks.map(({ slot, split, art }) => {

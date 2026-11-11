@@ -5215,4 +5215,16 @@ export const RU: Record<string, string> = {
     "{map} — карта для класса «{class}»: {n} из топ-{total}.",
   "{diff} vs average":
     "{diff} к среднему",
+  "Beats":
+    "Побеждает",
+  "Countered by":
+    "Контрят",
+  "In Ranked":
+    "В ранговых",
+  "of {n} this week":
+    "из {n} на этой неделе",
+  "Build":
+    "Сборка",
+  "Play now":
+    "Играть сейчас",
 };

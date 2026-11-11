@@ -11,7 +11,7 @@ import { getT } from '@/lib/t';
 import { TIER_COLOR } from '@/lib/tiers';
 import { requestLocale } from '@/lib/request-locale';
 
-interface RankCell {
+export interface RankCell {
   bracket: RankBracket;
   entry: ScoredBrawler | null;
   position: number | null;
@@ -31,18 +31,23 @@ function placeIn(scored: ScoredBrawler[], brawlerId: number): { entry: ScoredBra
  * whether a pick holds up as the lobbies get better. From the precomputed
  * per-rank lists only; a rank without one is left out.
  */
-export async function BrawlerByRank({ brawlerId, name }: { brawlerId: number; name: string }) {
-  const locale = requestLocale();
-  const t = getT(locale);
-  const lp = (path: string) => localePath(locale, path);
+/** The brawler's place at each rank with a stored list; null when fewer than two ranks place it. */
+export async function byRankCells(brawlerId: number): Promise<RankCell[] | null> {
   const cells: RankCell[] = [];
   for (const bracket of RANK_BRACKETS) {
     const roster = await getStoredBracketRoster(bracket.id).catch(() => null);
     if (!roster) continue;
     cells.push({ bracket, ...placeIn(roster.scored, brawlerId) });
   }
+  return cells.filter((c) => c.position !== null && c.of > 0).length >= 2 ? cells : null;
+}
+
+export function BrawlerByRank({ cells, name }: { cells: RankCell[] | null; name: string }) {
+  const locale = requestLocale();
+  const t = getT(locale);
+  const lp = (path: string) => localePath(locale, path);
+  if (!cells) return null;
   const placed = cells.filter((c) => c.position !== null && c.of > 0);
-  if (placed.length < 2) return null;
 
   // Relative place, so a rank with fewer rated brawlers compares fairly.
   const rel = (c: RankCell) => (c.position as number) / c.of;
@@ -58,7 +63,7 @@ export async function BrawlerByRank({ brawlerId, name }: { brawlerId: number; na
         : t('{name} holds about the same place at every rank.', { name });
 
   return (
-    <section>
+    <section id="by-rank" className="scroll-mt-24">
       <SectionHeading title={t('By rank')} subtitle={verdict} />
       <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {cells.map((c) => {

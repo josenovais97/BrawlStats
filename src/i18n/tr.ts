@@ -5214,4 +5214,16 @@ export const TR: Record<string, string> = {
     "{map} bir {class} haritası: ilk {total} seçimin {n} tanesi.",
   "{diff} vs average":
     "Ortalamaya göre {diff}",
+  "Beats":
+    "Yener",
+  "Countered by":
+    "Karşısında zorlanır",
+  "In Ranked":
+    "Aşamalı'da",
+  "of {n} this week":
+    "bu hafta {n} içinde",
+  "Build":
+    "Build",
+  "Play now":
+    "Şimdi oyna",
 };
