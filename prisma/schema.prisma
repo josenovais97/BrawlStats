@@ -793,3 +793,15 @@ model RankedEloRate {
   @@id([day, rank])
   @@map("ranked_elo_rates")
 }
+
+/// The last good /api/bubble/roster and /api/bubble/me answer per tag
+/// (2026-11-11), served when the game API is down so the app keeps the
+/// player's account instead of reading the outage as "no such tag". Keyed
+/// "<kind>:<tag>"; rows older than 60 days are pruned on write.
+model BubbleLastRead {
+  key     String   @id
+  value   Json
+  savedAt DateTime @default(now()) @map("saved_at")
+
+  @@map("bubble_last_reads")
+}

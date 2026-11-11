@@ -2,6 +2,8 @@ import { cdnPlayerIconUrl } from '@/lib/brawlapi';
 import { getPlayer } from '@/lib/bs-api';
 import { normalizeTag } from '@/lib/tags';
 import { recordLookup } from '@/lib/stats';
+import { lastBubble, rememberBubble } from '@/lib/bubble-last';
+import { toApiError } from '@/lib/errors';
 
 /**
  * What one account can actually field, for the overlay.
@@ -33,10 +35,18 @@ export async function GET(request: Request) {
   let player;
   try {
     player = await getPlayer(tag);
-  } catch {
-    // The panel treats any failure as "no account configured" and falls back
-    // to the global list, so the distinction between a bad tag and an upstream
-    // outage is not worth a taxonomy here.
+  } catch (err) {
+    /*
+     * Only a tag that does not exist is "not found" (2026-11-11). The app read
+     * every failure that way, so a Supercell maintenance reopened the tag
+     * field with "No account with that tag" and the "Add your player tag"
+     * card. Any other failure serves the last good answer for this tag.
+     */
+    const code = toApiError(err).code;
+    if (code !== 'notFound' && code !== 'invalidTag') {
+      const last = await lastBubble<Record<string, unknown>>('roster', tag);
+      if (last) return Response.json({ ...last, stale: true }, { headers: { 'cache-control': 'no-store' } });
+    }
     return Response.json({ error: 'lookup failed' }, { status: 404 });
   }
 
@@ -64,8 +74,7 @@ export async function GET(request: Request) {
     /* Never let the sampling side-effect fail the reply. */
   });
 
-  return Response.json(
-    {
+  const body = {
       tag: normalizeTag(player.tag),
       name: player.name,
       /*
@@ -88,7 +97,9 @@ export async function GET(request: Request) {
         // same thing to the filter: you cannot field a hypercharge.
         hypercharge: (b.hyperCharges?.length ?? 0) > 0,
       })),
-    },
-    { headers: { 'cache-control': 'no-store' } },
-  );
+  };
+  rememberBubble('roster', body.tag, body).catch(() => {
+    /* A lost copy only matters during the next outage. */
+  });
+  return Response.json(body, { headers: { 'cache-control': 'no-store' } });
 }

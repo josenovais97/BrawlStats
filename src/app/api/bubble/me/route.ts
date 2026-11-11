@@ -8,6 +8,8 @@ import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
 import { getRankedEloRates } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
+import { lastBubble, rememberBubble } from '@/lib/bubble-last';
+import { toApiError } from '@/lib/errors';
 
 /**
  * One player's Ranked standing for the Bubble app (1.40): the "My rank"
@@ -29,15 +31,28 @@ export async function GET(request: NextRequest) {
   const tag = normalizeTag(params.get('tag'));
   if (!tag) return Response.json({ error: 'no tag' }, { status: 400 });
 
+  let failure: unknown = null;
   const [player, log, rates, name] = await Promise.all([
-    getPlayer(tag).catch(() => null),
+    getPlayer(tag).catch((err) => {
+      failure = err;
+      return null;
+    }),
     getBattleLog(tag)
       .then((r) => r.items)
       .catch(() => []),
     getRankedEloRates().catch(() => ({})),
     appNames(params.get('lang')),
   ]);
-  if (!player) return Response.json({ error: 'not found' }, { status: 404 });
+  if (!player) {
+    // During an outage, the last good answer (see lib/bubble-last), so the
+    // My rank widget keeps the rank instead of asking for a tag.
+    const code = failure ? toApiError(failure).code : 'unknown';
+    if (code !== 'notFound' && code !== 'invalidTag') {
+      const last = await lastBubble<Record<string, unknown>>('me', tag);
+      if (last) return Response.json({ ...last, stale: true }, { headers: { 'cache-control': 'no-store' } });
+    }
+    return Response.json({ error: 'not found' }, { status: 404 });
+  }
 
   const progress = rankProgress(player.rankedElo ?? null);
   const rankIndex = progress ? RANK_ELO_FLOORS.findIndex(([n]) => n === progress.rank.toUpperCase()) : -1;
@@ -57,8 +72,7 @@ export async function GET(request: NextRequest) {
 
   const icon = absolute(playerIconUrl(player.icon?.id));
 
-  return okResponse(
-    {
+  const body = {
       tag,
       name: player.name,
       iconUrl: icon,
@@ -77,9 +91,11 @@ export async function GET(request: NextRequest) {
         stars: games.filter((g) => g.star).length,
       },
       games,
-    },
-    600,
-  );
+  };
+  rememberBubble('me', tag, body).catch(() => {
+    /* A lost copy only matters during the next outage. */
+  });
+  return okResponse(body, 600);
 }
 
 function absolute(url: string | null): string | null {
