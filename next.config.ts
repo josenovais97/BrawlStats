@@ -1,4 +1,5 @@
 import { BUBBLE_APP } from './src/lib/bubble-app';
+import { INTL_INDEXED, INTL_PREFIXES } from './src/lib/intl-indexing';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -72,6 +73,17 @@ const nextConfig: NextConfig = {
         source: '/sw.js',
         headers: [{ key: 'Cache-Control', value: 'no-cache' }],
       },
+      /*
+       * Translated pages out of search engines while INTL_INDEXED is off
+       * (2026-11-12, AdSense "low value content"; see src/lib/intl-indexing).
+       * A header rather than page metadata so no page can forget it.
+       */
+      ...(INTL_INDEXED
+        ? []
+        : [
+            { source: `/:lang(${INTL_PREFIXES.join('|')})`, headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }] },
+            { source: `/:lang(${INTL_PREFIXES.join('|')})/:path*`, headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }] },
+          ]),
     ];
   },
 

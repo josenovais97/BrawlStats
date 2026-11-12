@@ -33,7 +33,9 @@ HOST="brawlzone.net"
 KEY="7c5d42c3d2b23f04c659bb537275876b"
 # The core pages and, since 2026-10-14, their Spanish and Portuguese copies
 # (the intl section). Each file's newest-dated entries are taken separately.
-SITEMAPS="https://${HOST}/sitemaps/sitemap/core.xml https://${HOST}/sitemaps/sitemap/intl.xml"
+# intl.xml left out since 2026-11-12: the translations answer noindex while
+# INTL_INDEXED is off (src/lib/intl-indexing.ts). Put it back with the flag.
+SITEMAPS="https://${HOST}/sitemaps/sitemap/core.xml"
 ENDPOINT="https://api.indexnow.org/IndexNow"
 
 # The key has to be fetchable at the root before anything is accepted: it is

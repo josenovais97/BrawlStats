@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { MIN_INDEXABLE_COMPS } from '@/lib/comps-indexing';
 import { INTL_LOCALES, isTranslatedPath, languageAlternates } from '@/lib/i18n';
+import { INTL_INDEXED } from '@/lib/intl-indexing';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
 
-import { countersHaveRows } from '@/components/brawlers/counters-view';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
@@ -15,7 +15,7 @@ import { PAIR_SEPARATOR } from '@/lib/compare';
 import {
   getBestPicksByMode,
   getFilterableModes,
-  getIndexablePairs,
+  getCorePairs,
   getNewestDayByMap,
   getTeamComps,
 } from '@/lib/stats';
@@ -78,7 +78,7 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
       ...(lastModified ? { lastModified } : {}),
       // hreflang has to point both ways: the English page names its
       // translations here, as the `intl` section's entries name it.
-      ...(id !== 'intl' && isTranslatedPath(path || '/') ? { alternates: { languages: absoluteAlternates(path || '/') } } : {}),
+      ...(INTL_INDEXED && id !== 'intl' && isTranslatedPath(path || '/') ? { alternates: { languages: absoluteAlternates(path || '/') } } : {}),
     });
   };
 
@@ -130,8 +130,9 @@ async function core(add: Add, dataDay: Date | null) {
   const catalog = await getBrawlerCatalog().catch(() => null);
   for (const brawler of catalog?.current ?? []) {
     add(`/brawlers/${slugify(brawler.name)}`, 'daily', 0.8);
-    // Only with something to list: an empty one is noindex (countersMetadata).
-    if (await countersHaveRows(brawler.id)) add(`/brawlers/${slugify(brawler.name)}/counters`, 'daily', 0.7);
+    // Counters pages are out of the index since 2026-11-12 (countersMetadata):
+    // most were "unknown to Google" and they repeat the brawler page's
+    // Matchups section, the shape AdSense calls low value.
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough
@@ -251,7 +252,7 @@ async function compare(add: Add) {
   const catalogById = new Map(
     (catalog?.current ?? []).map((brawler) => [brawler.id, brawler.name]),
   );
-  const pairs = await getIndexablePairs().catch(() => []);
+  const pairs = await getCorePairs().catch(() => []);
   for (const [a, b] of pairs) {
     const nameA = catalogById.get(a);
     const nameB = catalogById.get(b);

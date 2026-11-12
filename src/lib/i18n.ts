@@ -1,3 +1,4 @@
+import { INTL_INDEXED } from '@/lib/intl-indexing';
 /**
  * The site in Spanish and Portuguese, for the pages that have been translated.
  *
@@ -94,6 +95,9 @@ export function localePath(locale: Locale, path: string): string {
  * other language should land on.
  */
 export function languageAlternates(path: string): Record<string, string> {
+  // No hreflang while the translations are kept out of search engines: an
+  // alternate that answers noindex is an error in Search Console.
+  if (!INTL_INDEXED) return {};
   const under = (l: string) => (path === '/' ? `/${l}` : `/${l}${path}`);
   return {
     en: path,

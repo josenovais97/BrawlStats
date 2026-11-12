@@ -387,7 +387,7 @@ export async function countersMetadata(slug: string, locale: Locale): Promise<Me
   const b = await resolve(slug);
   if (!b) return { title: w.fallbackTitle };
   const scores = await getRankedCounterScores([b.id], WINDOW_DAYS).catch(() => new Map());
-  const { counters, avoid } = split(scores, b.id, MIN_GAMES, b.named);
+  const { counters } = split(scores, b.id, MIN_GAMES, b.named);
   const top = counters.slice(0, 3).map((c) => c.name);
   const description = top.length ? w.description(b.name, w.join(top)) : w.descriptionNone(b.name);
   const path = `/brawlers/${b.slug}/counters`;
@@ -398,7 +398,10 @@ export async function countersMetadata(slug: string, locale: Locale): Promise<Me
     openGraph: { title: w.ogTitle(b.name), description },
     // Nothing to list yet (a brawler just released: Vince on 2026-10-30) is a
     // page of "not enough battles", which is no answer to index.
-    ...(counters.length === 0 && avoid.length === 0 ? { robots: { index: false, follow: true } } : {}),
+    // Out of the index since 2026-11-12 (AdSense "low value content"): it
+    // repeats the brawler page's Matchups, and Google left most unindexed.
+    // Still linked and crawlable (`follow`) for readers.
+    robots: { index: false, follow: true },
   };
 }
 

@@ -6754,6 +6754,28 @@ export async function getIndexablePairs(): Promise<[number, number][]> {
   return (await precomputed<[number, number][]>('indexable-pairs')) ?? cachedIndexablePairs();
 }
 
+/** Both brawlers in the ten most picked in Ranked this week. */
+const CORE_PAIR_BRAWLERS = 10;
+
+/**
+ * The comparisons offered to search engines (2026-11-12): the linked set
+ * (`getIndexablePairs`, which brawler pages link to and which stays
+ * crawlable) narrowed to pairs of the ten most-picked brawlers, at most 45.
+ * 117 were listed and Google had indexed almost none (AdSense "low value
+ * content"); the rest stay live, linked and `follow`, just not indexed.
+ */
+export async function getCorePairs(): Promise<[number, number][]> {
+  const [pairs, meta] = await Promise.all([getIndexablePairs(), getMetaIndex('ranked', 7)]);
+  const top = new Set(
+    [...meta.values()]
+      .filter((s) => s.usageRate !== null)
+      .sort((a, b) => (b.usageRate ?? 0) - (a.usageRate ?? 0))
+      .slice(0, CORE_PAIR_BRAWLERS)
+      .map((s) => s.brawlerId),
+  );
+  return pairs.filter(([a, b]) => top.has(a) && top.has(b));
+}
+
 /**
  * How the coin value of accounts is spread across the players we sample, as
  * 101 cut points (0th..100th percentile), for /account-value.

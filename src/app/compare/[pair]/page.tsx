@@ -19,7 +19,7 @@ import {
   getBrawlerSplits,
   getBrawlerStat,
   getHeadToHead,
-  getIndexablePairs,
+  getCorePairs,
   normalizeWinRate,
   type BrawlerSplit,
 } from '@/lib/stats';
@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
    * question is which are worth a crawler's budget, and the answer cannot be
    * "all of them": there are 5,565, each server-rendered against the database.
    */
-  const indexable = await getIndexablePairs()
+  const indexable = await getCorePairs()
     .then((pairs) =>
       pairs.some(
         ([x, y]) =>

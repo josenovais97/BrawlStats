@@ -1,3 +1,4 @@
+import { INTL_INDEXED } from '@/lib/intl-indexing';
 import { SECTIONS } from '@/lib/sitemap-sections';
 import { SITE_URL } from '@/lib/site';
 
@@ -19,7 +20,8 @@ export function GET(): Response {
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...SECTIONS.map((id) => `  <sitemap><loc>${SITE_URL}/sitemaps/sitemap/${id}.xml</loc></sitemap>`),
+    // The translations section only while they are offered to search engines.
+    ...SECTIONS.filter((id) => id !== 'intl' || INTL_INDEXED).map((id) => `  <sitemap><loc>${SITE_URL}/sitemaps/sitemap/${id}.xml</loc></sitemap>`),
     '</sitemapindex>',
     '',
   ].join('\n');
