@@ -7,6 +7,17 @@ import { usePathname } from 'next/navigation';
 const MEASUREMENT_ID = 'G-EQEN36TD7L';
 
 /**
+ * Google tag gateway (2026-11-12): Cloudflare serves the tag from our own
+ * domain at this path and forwards measurement to Google, so content
+ * blockers that drop googletagmanager.com no longer hide the visit (Umami
+ * counted about twice GA's Tier-1 visitors). Set up from GA's Google tag
+ * settings with Cloudflare; read back with
+ * GET /zones/<id>/settings/google-tag-gateway/config (needs Zaraz Read).
+ * Automatic tag setup stays off there: consent mode is set here first.
+ */
+const GATEWAY_PATH = '/rwwq';
+
+/**
  * Same pages as the ads leave out: the Bubble panel runs inside the Android
  * app, whose Play listing and privacy section say it carries no analytics
  * SDK and shares nothing with third parties.
@@ -41,7 +52,20 @@ export function GoogleAnalytics() {
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:${JSON.stringify(CONSENT_REGIONS)},wait_for_update:500});
 gtag('js',new Date());gtag('config','${MEASUREMENT_ID}');`}
       </Script>
-      <Script id="ga" src={`https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`} strategy="afterInteractive" />
+      <Script
+        id="ga"
+        src={`${GATEWAY_PATH}/?id=${MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+        onError={() => {
+          // The gateway answers from Cloudflare, before the origin; if it is
+          // ever switched off, /rwwq/ falls through to a 404 and analytics
+          // would stop silently. Load the tag from Google instead.
+          const s = document.createElement('script');
+          s.async = true;
+          s.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
+          document.head.appendChild(s);
+        }}
+      />
     </>
   );
 }
