@@ -275,6 +275,7 @@ function ClaimButton({ url, id, small = false }: { url: string; id: string; smal
       target="_blank"
       rel="noopener noreferrer nofollow"
       data-claim
+      data-haptic="success"
       data-reward-id={id}
       data-umami-event="reward_claim"
       data-umami-event-from={small ? 'tile' : 'hero'}

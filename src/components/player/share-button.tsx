@@ -3,6 +3,7 @@
 import { Check, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { useT } from '@/components/i18n/use-t';
+import { haptic } from '@/lib/haptics';
 
 /**
  * Shares the current profile, or copies its link.
@@ -31,6 +32,7 @@ export function ShareButton({
     if (navigator.share) {
       try {
         await navigator.share({ title, text, url });
+        haptic('success');
         return;
       } catch {
         // Cancelling the sheet rejects, which is not a failure worth reporting
@@ -40,6 +42,7 @@ export function ShareButton({
 
     try {
       await navigator.clipboard.writeText(url);
+      haptic('success');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

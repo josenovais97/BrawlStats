@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { useLocale } from '@/components/i18n/use-locale';
 import { useT } from '@/components/i18n/use-t';
+import { haptic } from '@/lib/haptics';
 
 /**
  * Shares a ready-made picture (a profile card, a tier list) rather than a link.
@@ -73,6 +74,7 @@ export function ShareImageButton({
         );
       } catch {}
       setState('done');
+      haptic('success');
       setTimeout(() => setState('idle'), 2500);
     } catch {
       setState('idle');

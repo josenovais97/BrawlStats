@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
+import { haptic } from '@/lib/haptics';
+
 /*
  * Feedback for every tap (2026-11-12). Owner: "make sure every button, card,
  * etc that the user clicks gives feedback and doesn't just stay there".
@@ -11,30 +13,16 @@ import { useEffect, useRef } from 'react';
  *   starts a navigation, finished when the new page's path is on screen.
  * - The tapped link or submit button gets `data-pending` until then, which
  *   globals.css draws as a pulsing ring, so the card itself reads as loading.
- * - A light haptic tick on touch for buttons, cards, chips and tabs: the
- *   Bubble app's native haptics inside its panel (window.BrawlZoneApp), else
- *   navigator.vibrate where the browser has it (Android; iOS Safari does not).
+ * - A light haptic tick when a button, card, chip or tab is tapped (lib/
+ *   haptics: the Bubble app's own haptics in its panel, else
+ *   navigator.vibrate; iOS Safari has none). `data-haptic="success"` on an
+ *   element gives the success pattern instead.
  *
  * All from three document listeners, so no component has to opt in.
  */
 
 const TAPPABLE =
   'button, [role="tab"], [role="button"], summary, .btn-game, .bz-chip, .bz-chip-on, .card-interactive, .row-interactive, .brawler-card, .lobby-tile, .tier-chip, [data-haptic]';
-
-type AppBridge = { haptic?: (kind: string) => void };
-
-function tick() {
-  try {
-    const app = (window as unknown as { BrawlZoneApp?: AppBridge }).BrawlZoneApp;
-    if (app?.haptic) {
-      app.haptic('tap');
-      return;
-    }
-    navigator.vibrate?.(8);
-  } catch {
-    // Haptics are a nicety; a browser that refuses is fine.
-  }
-}
 
 /** Where a click on this anchor goes, when it is an in-site navigation to another page. */
 function internalTarget(a: HTMLAnchorElement, e: MouseEvent): URL | null {
@@ -110,23 +98,21 @@ export function NavFeedback() {
   }, [pathname]);
 
   useEffect(() => {
-    let tickedOnDown = false;
+    // Haptics on the click, never on touch-down: a scroll starts with a
+    // finger on a card too, and buzzed on every swipe (owner, 2026-11-12).
+    // A click only fires for a tap. The pointer type is kept from the
+    // touch-down so a mouse or keyboard click stays silent.
+    let lastPointer = '';
     const onPointerDown = (e: PointerEvent) => {
-      tickedOnDown = false;
-      if (e.pointerType !== 'touch') return;
-      const hit = (e.target as Element | null)?.closest?.(TAPPABLE);
-      // The first tap of a visit does not count as user activation yet on
-      // pointerdown, so the browser would refuse; that one ticks on click.
-      const activated = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive;
-      if (hit && activated) {
-        tick();
-        tickedOnDown = true;
-      }
+      lastPointer = e.pointerType;
     };
     const onClick = (e: MouseEvent) => {
       const target = e.target as Element | null;
-      if (!tickedOnDown && target?.closest?.(TAPPABLE) && window.matchMedia('(pointer: coarse)').matches) tick();
-      tickedOnDown = false;
+      const hit = target?.closest?.(TAPPABLE) as HTMLElement | null;
+      if (hit && lastPointer === 'touch' && e.detail > 0 && !hit.matches(':disabled, [aria-disabled="true"]')) {
+        const kind = hit.dataset.haptic;
+        haptic(kind === 'success' || kind === 'error' ? kind : 'tap');
+      }
       const a = target?.closest?.('a[href]') as HTMLAnchorElement | null;
       if (!a) return;
       if (!internalTarget(a, e)) return;

@@ -12,6 +12,7 @@ import { DISCORD_BONUS, FOLLOW_PLATFORMS, isCode, type FollowPlatform } from '@/
 import type { NameMatch } from '@/lib/player-search';
 import { readRecentSearches, serverRecentSearches, subscribeRecentSearches } from '@/lib/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
+import { haptic } from '@/lib/haptics';
 
 /**
  * The giveaway's interactive half (2026-10-27): the entry form, then the
@@ -218,9 +219,11 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
     }).catch(() => null);
     const body = res ? await res.json().catch(() => null) : null;
     if (body?.ok) {
+      haptic('success');
       window.history.replaceState(null, '', `?me=${body.code}`);
       await onEntered(body.code);
     } else {
+      haptic('error');
       setError(t(ERRORS[body?.error ?? 'unavailable'] ?? ERRORS.unavailable));
       // Which refusal, so a form that fails people shows up in the numbers.
       window.umami?.track('giveaway_error', { code: String(body?.error ?? 'network') });
