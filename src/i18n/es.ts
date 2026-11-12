@@ -5258,4 +5258,10 @@ export const ES: Record<string, string> = {
     "Informe semanal →",
   "Top picks":
     "Mejores elecciones",
+  "Share my season":
+    "Compartir mi temporada",
+  "Get your own Season Wrapped":
+    "Consigue tu propio Season Wrapped",
+  "MOST PLAYED":
+    "MÁS JUGADOS",
 };

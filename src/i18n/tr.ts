@@ -5258,4 +5258,10 @@ export const TR: Record<string, string> = {
     "Haftalık rapor →",
   "Top picks":
     "En iyi seçimler",
+  "Share my season":
+    "Sezonumu paylaş",
+  "Get your own Season Wrapped":
+    "Kendi Season Wrapped'ini al",
+  "MOST PLAYED":
+    "EN ÇOK OYNANAN",
 };

@@ -5258,4 +5258,10 @@ export const PT: Record<string, string> = {
     "Relatório semanal →",
   "Top picks":
     "Melhores escolhas",
+  "Share my season":
+    "Compartilhar minha temporada",
+  "Get your own Season Wrapped":
+    "Veja o seu Season Wrapped",
+  "MOST PLAYED":
+    "MAIS JOGADOS",
 };

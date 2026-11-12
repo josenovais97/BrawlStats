@@ -9,6 +9,7 @@ import { RankRoad } from '@/components/player/season/rank-road';
 import { SeasonCalendar } from '@/components/player/season/season-calendar';
 import { SeasonHours } from '@/components/player/season/season-hours';
 import { ShareButton } from '@/components/player/share-button';
+import { ShareImageButton } from '@/components/share-image-button';
 import { rankedTierIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
 import { formatNumber, formatPercentWhole } from '@/lib/format';
@@ -235,6 +236,16 @@ export async function PlayerSeason({
             </h2>
             {subtitle ? <p className="mt-3 max-w-xl text-sm text-muted">{subtitle}</p> : null}
             {!hasSeason && games > 0 ? <p className="mt-1 max-w-xl text-sm text-muted">{t('Season totals show up here within a few hours.')}</p> : null}
+            {/* The season as a phone story, branded, for sharing (2026-11-12). */}
+            {games >= 5 ? (
+              <ShareImageButton
+                src={`/player/${encodeURIComponent(tag)}/season-story`}
+                fileName={`brawlzone-season-${tag}.png`}
+                kind="season"
+                label={t('Share my season')}
+                className="mt-4"
+              />
+            ) : null}
           </div>
 
           {/* Today's rank big, the season's and the all-time best beside it. */}

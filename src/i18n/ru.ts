@@ -5259,4 +5259,10 @@ export const RU: Record<string, string> = {
     "Недельный отчёт →",
   "Top picks":
     "Лучшие бойцы",
+  "Share my season":
+    "Поделиться сезоном",
+  "Get your own Season Wrapped":
+    "Получи свой Season Wrapped",
+  "MOST PLAYED":
+    "ЧАЩЕ ВСЕГО",
 };
