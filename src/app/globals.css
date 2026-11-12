@@ -1376,3 +1376,50 @@ html.fx-ready [data-fx='stamp'].fx-in:not(.fx-instant) { animation-name: fx-stam
 @media (prefers-reduced-motion: reduce) {
   .bz-sheet { animation: none; }
 }
+
+/* ------------------------------------------------------------------------
+   Tap feedback (2026-11-12): the top bar NavFeedback drives, the ring on a
+   link or button whose page is loading, and a press state on everything
+   tappable, so no tap ever looks ignored.
+   ------------------------------------------------------------------------ */
+.bz-navbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--brand), #ffe08a);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--brand) 70%, transparent);
+}
+
+/* The tapped card or button while its page loads: a pulsing brand ring.
+   Outline, not position or transform, so no layout moves under it. */
+[data-pending] {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  animation: bz-pending 0.9s ease-in-out infinite alternate;
+  cursor: progress;
+}
+@keyframes bz-pending {
+  from { outline-color: color-mix(in srgb, var(--brand) 95%, transparent); }
+  to { outline-color: color-mix(in srgb, var(--brand) 25%, transparent); opacity: 0.8; }
+}
+
+/* Pressed: a short darken on anything tappable that does not draw its own
+   press. A filter, not a transform, so elements positioned with translate
+   do not jump. */
+:where(button, [role="tab"], [role="button"], summary, .bz-chip, .bz-chip-on, .card-interactive, .row-interactive, .card a, a.card):not(:disabled):not(.btn-game):active {
+  filter: brightness(0.88);
+}
+:where(button, [role="tab"], [role="button"], summary, .bz-chip, .bz-chip-on, .card-interactive, .row-interactive, a.card) {
+  -webkit-tap-highlight-color: transparent;
+  transition-property: filter, background-color, border-color, color, opacity, box-shadow;
+  transition-duration: 90ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pending] { animation: none; }
+}

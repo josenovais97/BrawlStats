@@ -32,6 +32,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -582,9 +583,15 @@ class BubbleService : Service() {
                     hideCloseTarget()
 
                     when {
-                        onTarget -> stopSelf()
+                        onTarget -> {
+                            buzz(host, "success")
+                            stopSelf()
+                        }
                         dragging -> snapToEdge(host, params)
-                        else -> togglePanel()
+                        else -> {
+                            buzz(host)
+                            togglePanel()
+                        }
                     }
                     scheduleRest()
                     true
@@ -767,9 +774,28 @@ class BubbleService : Service() {
     }
 
     private fun setCloseTargetActive(active: Boolean) {
+        // One tick on the way in, so the drop zone is felt as well as seen.
+        if (active && !closeTargetHot) buzz(bubble, "drag")
+        closeTargetHot = active
         closeTargetArt?.setBackgroundResource(
             if (active) R.drawable.close_target_active else R.drawable.close_target,
         )
+    }
+
+    private var closeTargetHot = false
+
+    /**
+     * A short haptic tick through the view's own feedback (1.41): no VIBRATE
+     * permission, and it follows the phone's touch-feedback setting.
+     */
+    private fun buzz(view: View?, kind: String = "tap") {
+        val constant = when (kind) {
+            "success" -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.CONTEXT_CLICK
+            "error" -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
+            "drag" -> HapticFeedbackConstants.CLOCK_TICK
+            else -> HapticFeedbackConstants.KEYBOARD_TAP
+        }
+        runCatching { view?.performHapticFeedback(constant) }
     }
 
     /** Whether the bubble's centre is inside the drop zone around the target. */
@@ -1734,6 +1760,16 @@ class BubbleService : Service() {
          * moved along with it: otherwise the next open would see a changed
          * account key and reload a page that is already right.
          */
+        /**
+         * A haptic tick for a tap in the panel (1.41): "tap", "success" or
+         * "error". The page calls it instead of navigator.vibrate, which a
+         * WebView without the VIBRATE permission ignores.
+         */
+        @JavascriptInterface
+        fun haptic(kind: String) {
+            handler.post { buzz(panelWeb, kind) }
+        }
+
         /** The panel put the post-game review on screen (1.40): the badge can go. */
         @JavascriptInterface
         fun reviewSeen() {

@@ -10,6 +10,7 @@ import { PwaTelemetry } from '@/components/pwa-telemetry';
 import { LanguageSuggest } from '@/components/i18n/language-suggest';
 import { SiteFooter } from '@/components/site-footer';
 import { GiveawayStrip } from '@/components/giveaway/giveaway-strip';
+import { NavFeedback } from '@/components/feedback/nav-feedback';
 import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
@@ -114,6 +115,8 @@ export default function RootLayout({
       className={`${nunito.variable} ${geistMono.variable} ${lilita.variable}`}
     >
       <body className="antialiased">
+        {/* Tap feedback: top bar, loading cards, haptics (2026-11-12). */}
+        <NavFeedback />
         {/* overflow-x: clip here, not only on body (2026-10-30): body's value
             is handed to the viewport, and a phone still widened its layout
             viewport to fit anything wider -- 569px of page on a 412px screen,

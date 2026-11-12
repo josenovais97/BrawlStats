@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { BrawlerPicker } from '@/components/brawlers/brawler-picker';
 import { useT } from '@/components/i18n/use-t';
 import { useLp } from '@/components/i18n/use-lp';
+import { navStart } from '@/lib/nav-start';
 
 /**
  * Two brawler pickers and a button, which is the whole interaction.
@@ -38,7 +39,10 @@ export function ComparePicker({
       className="card flex flex-wrap items-center gap-2 p-3"
       onSubmit={(event) => {
         event.preventDefault();
-        if (a && b && a !== b) router.push(lp(`/compare/${a}-vs-${b}`));
+        if (a && b && a !== b) {
+          navStart((event.nativeEvent as SubmitEvent).submitter);
+          router.push(lp(`/compare/${a}-vs-${b}`));
+        }
       }}
     >
       <BrawlerPicker

@@ -13,6 +13,7 @@ import { TagLocationHint } from '@/components/tag-location-hint';
 import { useLocale } from '@/components/i18n/use-locale';
 import { useT } from '@/components/i18n/use-t';
 import { localePath } from '@/lib/i18n';
+import { navStart } from '@/lib/nav-start';
 
 type Mode = 'player' | 'club';
 
@@ -82,6 +83,7 @@ export function SearchBar({
   const hero = size === 'hero';
 
   function open(tag: string) {
+    navStart();
     startTransition(() => {
       router.push(localePath(locale, `/player/${tag}`));
     });
@@ -107,6 +109,7 @@ export function SearchBar({
     }
 
     setError(null);
+    navStart();
     startTransition(() => {
       router.push(localePath(locale, `/${mode}/${tag}`));
     });

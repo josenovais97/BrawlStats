@@ -16,6 +16,7 @@ import {
 } from '@/lib/recent-searches';
 import { useT } from '@/components/i18n/use-t';
 import { useLp } from '@/components/i18n/use-lp';
+import { navStart } from '@/lib/nav-start';
 
 /**
  * Two tag inputs, fed by the profiles this device has already looked at.
@@ -66,6 +67,7 @@ export function PlayerCompareForm({
   // A path, not a query string: the pairing is its own route so that the tool
   // page it navigates from can stay static. See `/compare/players/[a]/[b]`.
   const go = (first: string, second: string) => {
+    navStart();
     router.push(
       lp(`/compare/players/${encodeURIComponent(first)}/${encodeURIComponent(second)}`),
     );

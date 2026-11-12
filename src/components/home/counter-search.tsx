@@ -6,6 +6,7 @@ import { useId, useState, type FormEvent } from 'react';
 
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
+import { navStart } from '@/lib/nav-start';
 
 /**
  * "How to counter ___": type a brawler, land on its counters page. A plain
@@ -28,6 +29,7 @@ export function CounterSearch({ brawlers }: { brawlers: { name: string; slug: st
       setMissing(Boolean(q));
       return;
     }
+    navStart();
     router.push(lp(`/brawlers/${hit.slug}/counters`));
   };
 

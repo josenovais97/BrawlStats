@@ -14,6 +14,7 @@ import { useTransition } from 'react';
 import { RegionPicker } from '@/components/leaderboard/region-picker';
 import { leaderboardHref, type LeaderboardBoard } from '@/lib/leaderboard-route';
 import { useLp } from '@/components/i18n/use-lp';
+import { navStart } from '@/lib/nav-start';
 
 /* Defined with the URL scheme it is a segment of; re-exported so the callers
    that already import it from here keep working. */
@@ -51,6 +52,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
   // behind that names nothing.
   function navigate(next: { region?: string; type?: LeaderboardBoard }) {
     const target = leaderboardHref(next.type ?? board, next.region ?? region);
+    navStart();
     startTransition(() => {
       router.push(lp(target));
     });

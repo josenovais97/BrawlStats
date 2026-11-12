@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
+import { navStart } from '@/lib/nav-start';
 
 /** "#2PQ8..." in, /account-value/2PQ8... out. Same clean-up the Bubble applies. */
 function cleanTag(raw: string): string {
@@ -36,7 +37,10 @@ export function AccountValueForm({
       className="flex w-full max-w-xl flex-col gap-3 sm:flex-row"
       onSubmit={(e) => {
         e.preventDefault();
-        if (valid) router.push(lp(`${base}/${cleanTag(tag)}`));
+        if (valid) {
+          navStart((e.nativeEvent as SubmitEvent).submitter);
+          router.push(lp(`${base}/${cleanTag(tag)}`));
+        }
       }}
     >
       <input
