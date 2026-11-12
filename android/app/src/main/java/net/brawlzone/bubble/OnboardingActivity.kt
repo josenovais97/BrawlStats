@@ -114,10 +114,19 @@ class OnboardingActivity : AppCompatActivity() {
         tagStatus.visibility = View.VISIBLE
         tagStatus.setTextColor(getColor(R.color.muted))
         tagStatus.text = getString(R.string.tag_checking)
-        AccountLookup.lookup(tag) { result ->
+        AccountLookup.lookupStatus(tag) { result, unavailable ->
+            if (result == null && unavailable) {
+                // The tag looks right and could not be checked: keep it (1.41).
+                Account.save(this, tag, Account.filter(this), Account.hide(this))
+                tagStatus.text = getString(R.string.tag_unavailable)
+                clip.visibility = View.GONE
+                tagSaved = true
+                paint()
+                return@lookupStatus
+            }
             if (result == null) {
                 tagStatus.text = getString(R.string.tag_not_found)
-                return@lookup
+                return@lookupStatus
             }
             Account.save(this, tag, Account.filter(this), Account.hide(this))
             Account.rememberAccount(this, tag, result.name)

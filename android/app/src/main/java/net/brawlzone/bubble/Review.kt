@@ -27,6 +27,8 @@ object Review {
     private const val KEY_TAG = "tag"
     private const val KEY_SINCE = "since"
     private const val KEY_ELO = "elo"
+    private const val KEY_DAY = "session_day"
+    private const val KEY_DAY_ELO = "session_day_elo"
     private const val FRESH_MS = 15 * 60 * 1000L
 
     data class Found(val json: JSONObject, val win: Boolean)
@@ -58,6 +60,16 @@ object Review {
 
         val latest = j.optString("latest").takeIf { it.isNotEmpty() && it != "null" }
         val edit = p.edit().putString(KEY_TAG, tag)
+        // A new day: the elo last seen is where today started (1.41 session
+        // score). Read before this answer's elo replaces it.
+        val today = LocalDate.now(ZoneId.systemDefault()).toString()
+        if (!sameTag || p.getString(KEY_DAY, null) != today) {
+            edit.putString(KEY_DAY, today)
+            val start = if (sameTag && elo > 0) elo else j.optInt("elo")
+            if (start > 0) edit.putInt(KEY_DAY_ELO, start) else edit.remove(KEY_DAY_ELO)
+        } else if (!p.contains(KEY_DAY_ELO) && j.optInt("elo") > 0) {
+            edit.putInt(KEY_DAY_ELO, j.optInt("elo"))
+        }
         if (latest != null) edit.putString(KEY_SINCE, latest)
         if (!j.isNull("elo") && j.optInt("elo") > 0) edit.putInt(KEY_ELO, j.optInt("elo"))
         edit.apply()
@@ -82,6 +94,24 @@ object Review {
         val at = Tally.time(game.optString("battleTime")) ?: return null
         if (System.currentTimeMillis() - at > FRESH_MS) return null
         return decorate(context, tag, game, j.optInt("newGames", 1))
+    }
+
+    /** Today's Ranked record on this phone and the elo moved since the day began (1.41). */
+    data class Session(val wins: Int, val losses: Int, val elo: Int?)
+
+    /** Null with no Ranked game today. Reads only what the polls stored. */
+    fun session(context: Context): Session? {
+        val tag = Account.tag(context).ifEmpty { return null }
+        val zone = ZoneId.systemDefault()
+        val today = LocalDate.now(zone)
+        val todays = Tally.battles(context, tag).filter { Instant.ofEpochMilli(it.at).atZone(zone).toLocalDate() == today }
+        if (todays.isEmpty()) return null
+        val p = prefs(context)
+        val sameDay = p.getString(KEY_TAG, null) == tag && p.getString(KEY_DAY, null) == today.toString()
+        val now = p.getInt(KEY_ELO, 0)
+        val start = p.getInt(KEY_DAY_ELO, 0)
+        val moved = if (sameDay && now > 0 && start > 0) (now - start).takeIf { kotlin.math.abs(it) < 1500 } else null
+        return Session(todays.count { it.win }, todays.count { !it.win }, moved)
     }
 
     /**

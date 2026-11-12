@@ -220,4 +220,14 @@
     <string name="name_none">BrawlZoneにはまだその名前のプレイヤーがいません。#タグを使ってください。ゲームのプロフィールで名前の下にあります。</string>
     <string name="name_pick_friend">リストからフレンドを選ぶか、#タグを入力してください。</string>
     <string name="friends_none">BrawlZoneにはまだその名前のプレイヤーがいません。#タグで試してください。</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">今はタグを確認できません。保存済みで、ゲームが復旧したら更新されます。</string>
+    <string name="widget_rank_waiting">ランクをまだ読み込めません。1時間ごとに更新されます。</string>
+    <string name="widget_rank_unranked">今シーズンはまだガチバトルのランクがありません。</string>
+    <string name="channel_patch">バランス調整</string>
+    <string name="patch_title">あなたのキャラのバランス調整</string>
+    <string name="patch_buff">%1$s 強化</string>
+    <string name="patch_nerf">%1$s 弱体化</string>
+    <string name="patch_change">%1$s 調整</string>
 </resources>

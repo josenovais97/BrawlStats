@@ -220,4 +220,14 @@
     <string name="name_none">BrawlZone chưa có người chơi tên đó. Hãy dùng #thẻ của bạn: nằm dưới tên trong hồ sơ trò chơi.</string>
     <string name="name_pick_friend">Chọn bạn bè trong danh sách hoặc nhập #thẻ của họ.</string>
     <string name="friends_none">BrawlZone chưa có người chơi tên đó. Thử #thẻ của họ.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Hiện chưa kiểm tra được tag của bạn. Tag đã được lưu và sẽ cập nhật khi trò chơi hoạt động lại.</string>
+    <string name="widget_rank_waiting">Chưa tải được hạng của bạn. Hạng cập nhật mỗi giờ.</string>
+    <string name="widget_rank_unranked">Mùa này bạn chưa có hạng Xếp hạng.</string>
+    <string name="channel_patch">Thay đổi cân bằng</string>
+    <string name="patch_title">Thay đổi cân bằng cho brawler của bạn</string>
+    <string name="patch_buff">%1$s được tăng sức mạnh</string>
+    <string name="patch_nerf">%1$s bị giảm sức mạnh</string>
+    <string name="patch_change">%1$s được điều chỉnh</string>
 </resources>

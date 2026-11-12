@@ -220,4 +220,14 @@
     <string name="name_none">ยังไม่มีผู้เล่นชื่อนี้ใน BrawlZone ใช้ #แท็ก ของคุณ อยู่ใต้ชื่อในโปรไฟล์เกม</string>
     <string name="name_pick_friend">เลือกเพื่อนจากรายการ หรือพิมพ์ #แท็ก ของเพื่อน</string>
     <string name="friends_none">ยังไม่มีผู้เล่นชื่อนี้ใน BrawlZone ลองใช้ #แท็ก</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">ยังตรวจสอบแท็กของคุณไม่ได้ตอนนี้ บันทึกไว้แล้วและจะอัปเดตเมื่อเกมกลับมา</string>
+    <string name="widget_rank_waiting">ยังโหลดแรงก์ของคุณไม่ได้ จะอัปเดตทุกชั่วโมง</string>
+    <string name="widget_rank_unranked">ซีซันนี้ยังไม่มีแรงก์โหมดจัดอันดับ</string>
+    <string name="channel_patch">การปรับสมดุล</string>
+    <string name="patch_title">การปรับสมดุลบรอว์เลอร์ของคุณ</string>
+    <string name="patch_buff">%1$s ถูกบัฟ</string>
+    <string name="patch_nerf">%1$s ถูกเนิร์ฟ</string>
+    <string name="patch_change">%1$s ถูกปรับ</string>
 </resources>

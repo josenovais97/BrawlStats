@@ -31,6 +31,9 @@ object Notify {
     private const val CH_PROGRESS = "brawlzone-progress"
     private const val CH_GOAL = "brawlzone-goal"
     private const val CH_FRIENDS = "brawlzone-friends"
+    private const val CH_PATCH = "brawlzone-patch"
+    private const val KEY_PATCH_SEEN = "seen_patch"
+    private const val KEY_PATCH_TAG = "seen_patch_tag"
 
     private const val KEY_SEEN = "seen_rewards"
     private const val KEY_SEASON_START = "season_start_sent"
@@ -56,6 +59,9 @@ object Notify {
         )
         m.createNotificationChannel(
             NotificationChannel(CH_FRIENDS, local.getString(R.string.channel_friends), NotificationManager.IMPORTANCE_DEFAULT),
+        )
+        m.createNotificationChannel(
+            NotificationChannel(CH_PATCH, local.getString(R.string.channel_patch), NotificationManager.IMPORTANCE_DEFAULT),
         )
     }
 
@@ -123,6 +129,52 @@ object Notify {
         prefs.edit().putStringSet(KEY_SEEN, (seen + fresh.map { it.id }).toList().takeLast(MAX_SEEN).toSet()).apply()
         if (!post || manager(context)?.areNotificationsEnabled() != true) return
         for (reward in fresh.take(3)) postReward(context, reward)
+    }
+
+    /**
+     * Balance changes to the player's mains (1.41), one notification for all
+     * the new ones: "Mortis nerfed · Bo buffed". The first look and a new tag
+     * only record what is already out: a change from last week is not news.
+     * Tapping opens the first brawler's page on brawlzone.net.
+     */
+    fun patch(context: Context, changes: List<Patch.Change>, post: Boolean) {
+        val prefs = Alerts.prefs(context)
+        val tag = Account.tag(context)
+        val stored = prefs.getStringSet(KEY_PATCH_SEEN, null)
+        val ids = changes.map { it.id }
+        if (stored == null || prefs.getString(KEY_PATCH_TAG, null) != tag) {
+            prefs.edit().putStringSet(KEY_PATCH_SEEN, ids.toSet()).putString(KEY_PATCH_TAG, tag).apply()
+            return
+        }
+        val seen = HashSet(stored)
+        val fresh = changes.filter { it.id !in seen }
+        if (fresh.isEmpty()) return
+        prefs.edit().putStringSet(KEY_PATCH_SEEN, (seen + fresh.map { it.id }).toList().takeLast(MAX_SEEN).toSet()).apply()
+        if (!post || manager(context)?.areNotificationsEnabled() != true) return
+        channels(context)
+        val local = AppLang.wrap(context)
+        val lines = fresh.distinctBy { it.brawlerId to it.kind }.map { c ->
+            when (c.kind) {
+                "buff" -> local.getString(R.string.patch_buff, c.name)
+                "nerf" -> local.getString(R.string.patch_nerf, c.name)
+                else -> local.getString(R.string.patch_change, c.name)
+            }
+        }
+        val open = PendingIntent.getActivity(
+            context,
+            KEY_PATCH_SEEN.hashCode(),
+            Intent(Intent.ACTION_VIEW, Uri.parse(fresh.first().url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val builder = Notification.Builder(context, CH_PATCH)
+            .setSmallIcon(R.drawable.bubble_glyph)
+            .setColor(context.getColor(R.color.brand))
+            .setContentTitle(local.getString(R.string.patch_title))
+            .setContentText(lines.joinToString(" · "))
+            .setStyle(Notification.BigTextStyle().bigText(lines.joinToString("\n")))
+            .setContentIntent(open)
+            .setAutoCancel(true)
+        runCatching { manager(context)?.notify(KEY_PATCH_SEEN.hashCode(), builder.build()) }
     }
 
     private fun postReward(context: Context, reward: Alerts.Reward) {

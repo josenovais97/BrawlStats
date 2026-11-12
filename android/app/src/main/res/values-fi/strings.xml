@@ -220,4 +220,14 @@
     <string name="name_none">BrawlZonessa ei vielä ole pelaajaa tällä nimellä. Käytä #pelaajatunnustasi: se on nimesi alla pelin profiilissa.</string>
     <string name="name_pick_friend">Valitse kaveri listalta tai kirjoita hänen #pelaajatunnuksensa.</string>
     <string name="friends_none">BrawlZonessa ei vielä ole pelaajaa tällä nimellä. Kokeile #pelaajatunnusta.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Tunnistetta ei voi tarkistaa juuri nyt. Se on tallennettu ja päivittyy, kun peli palaa.</string>
+    <string name="widget_rank_waiting">Arvoasi ei voitu vielä ladata. Se päivittyy tunnin välein.</string>
+    <string name="widget_rank_unranked">Ei vielä rankattua arvoa tällä kaudella.</string>
+    <string name="channel_patch">Tasapainomuutokset</string>
+    <string name="patch_title">Tasapainomuutokset brawlereillesi</string>
+    <string name="patch_buff">%1$s vahvistettu</string>
+    <string name="patch_nerf">%1$s heikennetty</string>
+    <string name="patch_change">%1$s muutettu</string>
 </resources>

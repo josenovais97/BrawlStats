@@ -220,4 +220,14 @@
     <string name="name_none">아직 BrawlZone에 그 이름의 플레이어가 없어요. #태그를 사용하세요. 게임 프로필에서 이름 아래에 있어요.</string>
     <string name="name_pick_friend">목록에서 친구를 고르거나 #태그를 입력하세요.</string>
     <string name="friends_none">아직 BrawlZone에 그 이름의 플레이어가 없어요. #태그로 해 보세요.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">지금은 태그를 확인할 수 없어요. 저장되었으며 게임이 복구되면 업데이트돼요.</string>
+    <string name="widget_rank_waiting">아직 랭크를 불러오지 못했어요. 매시간 업데이트돼요.</string>
+    <string name="widget_rank_unranked">이번 시즌에는 아직 경쟁전 랭크가 없어요.</string>
+    <string name="channel_patch">밸런스 변경</string>
+    <string name="patch_title">내 브롤러의 밸런스 변경</string>
+    <string name="patch_buff">%1$s 상향</string>
+    <string name="patch_nerf">%1$s 하향</string>
+    <string name="patch_change">%1$s 변경</string>
 </resources>

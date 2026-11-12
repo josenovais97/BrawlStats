@@ -47,11 +47,21 @@ object AccountLookup {
         token += 1
     }
 
-    fun lookup(tag: String, onResult: (Result?) -> Unit) {
+    fun lookup(tag: String, onResult: (Result?) -> Unit) = lookupStatus(tag) { result, _ -> onResult(result) }
+
+    /**
+     * The account, or null with `unavailable` saying why (1.41): true when the
+     * check could not be made (no network, a game API outage, a server error),
+     * false only when the server answered that the tag does not exist. On
+     * Nov 11 an outage read as "no account with that tag": the field reopened,
+     * the bubble lost its icon and the setup card came back for a tag that
+     * was fine.
+     */
+    fun lookupStatus(tag: String, onResult: (Result?, Boolean) -> Unit) {
         val mine = ++token
         pool.execute {
-            val result = runCatching { fetch(tag) }.getOrNull()
-            main.post { if (mine == token) onResult(result) }
+            val (result, unavailable) = runCatching { fetch(tag) }.getOrElse { null to true }
+            main.post { if (mine == token) onResult(result, unavailable) }
         }
     }
 
@@ -65,10 +75,14 @@ object AccountLookup {
         }
     }
 
-    private fun fetch(tag: String): Result? {
-        val body = Http.text("${Http.SITE}/api/bubble/roster?tag=$tag")
-        val json = JSONObject(body)
-        if (json.has("error")) return null
+    private fun fetch(tag: String): Pair<Result?, Boolean> {
+        val reply = Http.get("${Http.SITE}/api/bubble/roster?tag=$tag")
+        // Only a 404 is "no such tag"; everything else is "could not check".
+        if (reply.code == 404) return null to false
+        val body = reply.body
+        if (reply.code !in 200..299 || body == null) return null to true
+        val json = runCatching { JSONObject(body) }.getOrNull() ?: return null to true
+        if (json.has("error")) return null to true
 
         val brawlers = json.getJSONArray("brawlers")
         var eleven = 0
@@ -89,6 +103,6 @@ object AccountLookup {
             owned = brawlers.length(),
             powerEleven = eleven,
             hypercharged = hyper,
-        )
+        ) to false
     }
 }

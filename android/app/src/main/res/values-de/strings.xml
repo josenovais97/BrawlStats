@@ -220,4 +220,14 @@
     <string name="name_none">Noch kein Spieler mit diesem Namen bei BrawlZone. Nimm deine #Spieler-ID: Sie steht in deinem Spielprofil unter deinem Namen.</string>
     <string name="name_pick_friend">Wähle deinen Freund aus der Liste oder gib seine #Spieler-ID ein.</string>
     <string name="friends_none">Noch kein Spieler mit diesem Namen bei BrawlZone. Versuch es mit der #Spieler-ID.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Dein Tag kann gerade nicht geprüft werden. Er ist gespeichert und wird aktualisiert, sobald das Spiel wieder erreichbar ist.</string>
+    <string name="widget_rank_waiting">Dein Rang konnte noch nicht geladen werden. Er wird stündlich aktualisiert.</string>
+    <string name="widget_rank_unranked">Diese Saison noch kein Ranglisten-Rang.</string>
+    <string name="channel_patch">Balance-Änderungen</string>
+    <string name="patch_title">Balance-Änderungen an deinen Brawlern</string>
+    <string name="patch_buff">%1$s gebufft</string>
+    <string name="patch_nerf">%1$s generft</string>
+    <string name="patch_change">%1$s geändert</string>
 </resources>

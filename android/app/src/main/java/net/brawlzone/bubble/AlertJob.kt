@@ -72,6 +72,8 @@ class AlertJob : JobService() {
                 Notify.rewards(context, data.rewards, post)
                 Notify.season(context, data, post)
             }
+            // Balance changes to the player's mains (1.41).
+            Patch.fetch(context)?.let { Notify.patch(context, it, post) }
             val alerts = data ?: Alerts.last(context)
             val season = alerts?.season?.number
             if (me != null) {

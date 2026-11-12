@@ -220,4 +220,14 @@
     <string name="name_none">На BrawlZone пока нет игрока с таким ником. Введи свой #тег: он под ником в профиле в игре.</string>
     <string name="name_pick_friend">Выбери друга из списка или введи его #тег.</string>
     <string name="friends_none">На BrawlZone пока нет игрока с таким ником. Попробуй его #тег.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Сейчас не удаётся проверить тег. Он сохранён и обновится, когда игра снова будет доступна.</string>
+    <string name="widget_rank_waiting">Пока не удалось загрузить ранг. Он обновляется каждый час.</string>
+    <string name="widget_rank_unranked">В этом сезоне ещё нет ранга в ранговых боях.</string>
+    <string name="channel_patch">Изменения баланса</string>
+    <string name="patch_title">Изменения баланса ваших бойцов</string>
+    <string name="patch_buff">%1$s: усиление</string>
+    <string name="patch_nerf">%1$s: ослабление</string>
+    <string name="patch_change">%1$s: изменение</string>
 </resources>

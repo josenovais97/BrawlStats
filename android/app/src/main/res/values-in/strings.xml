@@ -220,4 +220,14 @@
     <string name="name_none">Belum ada pemain dengan nama itu di BrawlZone. Pakai #tag-mu: ada di bawah namamu di profil game.</string>
     <string name="name_pick_friend">Pilih temanmu dari daftar, atau ketik #tag-nya.</string>
     <string name="friends_none">Belum ada pemain dengan nama itu di BrawlZone. Coba #tag-nya.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Tag kamu belum bisa dicek sekarang. Sudah tersimpan dan akan diperbarui saat game kembali.</string>
+    <string name="widget_rank_waiting">Rank kamu belum bisa dimuat. Diperbarui setiap jam.</string>
+    <string name="widget_rank_unranked">Belum ada rank Berperingkat musim ini.</string>
+    <string name="channel_patch">Perubahan balance</string>
+    <string name="patch_title">Perubahan balance untuk brawler kamu</string>
+    <string name="patch_buff">%1$s di-buff</string>
+    <string name="patch_nerf">%1$s di-nerf</string>
+    <string name="patch_change">%1$s diubah</string>
 </resources>

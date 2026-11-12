@@ -31,6 +31,9 @@ import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -254,6 +257,7 @@ class BubbleService : Service() {
     private var reviewPending: String? = null
     private var reviewWin = false
     private var reviewBadge: View? = null
+    private var sessionBadge: View? = null
     private val reviewBusy = java.util.concurrent.atomic.AtomicBoolean(false)
 
     private val reviewLoop = object : Runnable {
@@ -275,6 +279,8 @@ class BubbleService : Service() {
             } finally {
                 reviewBusy.set(false)
             }
+            val session = runCatching { Review.session(app) }.getOrNull()
+            handler.post { paintSessionBadge(session) }
             if (found != null) handler.post { onNewReview(found) }
         }.start()
     }
@@ -320,6 +326,52 @@ class BubbleService : Service() {
         }
         host.addView(dot, lp)
         reviewBadge = dot
+    }
+
+    /**
+     * Today's Ranked score across the foot of the bubble, "4–2 +38" (1.41):
+     * the record on this phone and the elo moved since the day began. Nothing
+     * before the day's first Ranked game, so a quiet day is a clean bubble.
+     * Inside the window's padding, so nothing is clipped.
+     */
+    private fun paintSessionBadge(session: Review.Session?) {
+        val host = bubble as? FrameLayout ?: return
+        sessionBadge?.let { host.removeView(it) }
+        sessionBadge = null
+        if (session == null) return
+        host.clipToPadding = false
+        host.clipChildren = false
+        val record = "${session.wins}–${session.losses}"
+        val moved = session.elo?.takeIf { it != 0 }
+        val delta = moved?.let { if (it > 0) " +$it" else " −${-it}" }.orEmpty()
+        val label = SpannableString(record + delta).apply {
+            if (moved != null) {
+                setSpan(ForegroundColorSpan(resultColor(moved > 0)), record.length, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        val pill = TextView(this).apply {
+            text = label
+            setTextColor(Color.WHITE)
+            textSize = 9f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            includeFontPadding = false
+            maxLines = 1
+            setPadding(dp(5), dp(1), dp(5), dp(2))
+            background = GradientDrawable().apply {
+                cornerRadius = dp(8).toFloat()
+                setColor(0xF0050A1F.toInt())
+                setStroke(dp(1), 0x55FFFFFF)
+            }
+            elevation = dp(9).toFloat()
+        }
+        val lp = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+        ).apply { bottomMargin = -dp(5) }
+        host.addView(pill, lp)
+        sessionBadge = pill
     }
 
     /** One pulse: a bounce, and a ring in the result's colour growing out and fading. */
@@ -609,6 +661,7 @@ class BubbleService : Service() {
             .onSuccess {
                 scheduleRest()
                 paintReviewBadge()
+                paintSessionBadge(runCatching { Review.session(this) }.getOrNull())
             }
             .onFailure {
                 bubble = null

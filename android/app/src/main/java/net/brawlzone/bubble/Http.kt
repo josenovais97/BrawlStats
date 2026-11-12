@@ -28,6 +28,25 @@ object Http {
 
     fun text(url: String): String = open(url).use { it.readBytes().decodeToString() }
 
+    /** A status and a body: what failed matters when a lookup fails (1.41). */
+    data class Reply(val code: Int, val body: String?)
+
+    /**
+     * GET that tells "the server said no" (404 and friends, with the body)
+     * from "could not ask" (no network, timeout: code -1). The account check
+     * needs the difference: only a real 404 means the tag does not exist.
+     */
+    fun get(url: String): Reply = runCatching {
+        val c = (URL(url).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 10_000
+            readTimeout = 10_000
+            setRequestProperty("User-Agent", "BrawlZoneBubble")
+        }
+        val code = c.responseCode
+        val stream = if (code in 200..299) c.inputStream else c.errorStream
+        Reply(code, stream?.use { it.readBytes().decodeToString() })
+    }.getOrElse { Reply(-1, null) }
+
     /** A drawn share card can take several seconds on the server (1.40). */
     fun bytes(url: String): ByteArray = open(url, readTimeoutMs = 30_000).use { it.readBytes() }
 }

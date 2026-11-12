@@ -220,4 +220,14 @@
     <string name="name_none">BrawlZone 上还没有这个名字的玩家。请使用你的 #标签：在游戏个人资料里名字下方。</string>
     <string name="name_pick_friend">从列表中选择好友，或输入对方的 #标签。</string>
     <string name="friends_none">BrawlZone 上还没有这个名字的玩家。试试对方的 #标签。</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">暂时无法验证你的标签。已保存，游戏恢复后会更新。</string>
+    <string name="widget_rank_waiting">还无法加载你的段位。每小时更新一次。</string>
+    <string name="widget_rank_unranked">本赛季还没有排位赛段位。</string>
+    <string name="channel_patch">平衡调整</string>
+    <string name="patch_title">你的英雄的平衡调整</string>
+    <string name="patch_buff">%1$s 增强</string>
+    <string name="patch_nerf">%1$s 削弱</string>
+    <string name="patch_change">%1$s 调整</string>
 </resources>

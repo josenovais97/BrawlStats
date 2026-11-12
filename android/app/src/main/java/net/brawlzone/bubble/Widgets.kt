@@ -221,7 +221,15 @@ object Widgets {
         if (me == null || me.rank == null) {
             v.setViewVisibility(R.id.widget_rank_body, View.GONE)
             v.setViewVisibility(R.id.widget_rank_empty, View.VISIBLE)
-            v.setTextViewText(R.id.widget_rank_empty, local.getString(R.string.widget_rank_none))
+            // "Add your tag" only when there is none (1.41): with a tag set,
+            // no data yet means offline or a game API outage, and no rank
+            // means no Ranked games this season.
+            val message = when {
+                Account.tag(context).isEmpty() -> R.string.widget_rank_none
+                me == null -> R.string.widget_rank_waiting
+                else -> R.string.widget_rank_unranked
+            }
+            v.setTextViewText(R.id.widget_rank_empty, local.getString(message))
             return v
         }
         v.setViewVisibility(R.id.widget_rank_body, View.VISIBLE)

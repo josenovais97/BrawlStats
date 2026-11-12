@@ -220,4 +220,14 @@
     <string name="name_none">Ainda não há nenhum jogador com esse nome no BrawlZone. Use sua #tag: fica embaixo do seu nome no perfil do jogo.</string>
     <string name="name_pick_friend">Escolha seu amigo na lista ou digite a #tag dele.</string>
     <string name="friends_none">Ainda não há nenhum jogador com esse nome no BrawlZone. Tente a #tag.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Agora não dá para verificar sua tag. Ela foi salva e vai atualizar quando o jogo voltar.</string>
+    <string name="widget_rank_waiting">Ainda não foi possível carregar seu rank. Atualiza a cada hora.</string>
+    <string name="widget_rank_unranked">Você ainda não tem rank no Ranqueado nesta temporada.</string>
+    <string name="channel_patch">Mudanças de balanceamento</string>
+    <string name="patch_title">Mudanças de balanceamento nos seus brawlers</string>
+    <string name="patch_buff">%1$s fortalecido</string>
+    <string name="patch_nerf">%1$s enfraquecido</string>
+    <string name="patch_change">%1$s alterado</string>
 </resources>

@@ -220,4 +220,14 @@
     <string name="name_none">Na BrawlZone nie ma jeszcze gracza o tym nicku. Użyj swojego #tagu: jest pod nickiem w profilu w grze.</string>
     <string name="name_pick_friend">Wybierz znajomego z listy lub wpisz jego #tag.</string>
     <string name="friends_none">Na BrawlZone nie ma jeszcze gracza o tym nicku. Spróbuj jego #tagu.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">Nie można teraz sprawdzić tagu. Jest zapisany i zaktualizuje się, gdy gra znów będzie dostępna.</string>
+    <string name="widget_rank_waiting">Nie udało się jeszcze wczytać rangi. Aktualizuje się co godzinę.</string>
+    <string name="widget_rank_unranked">W tym sezonie nie masz jeszcze rangi rankingowej.</string>
+    <string name="channel_patch">Zmiany balansu</string>
+    <string name="patch_title">Zmiany balansu twoich zadymiarzy</string>
+    <string name="patch_buff">%1$s: wzmocnienie</string>
+    <string name="patch_nerf">%1$s: osłabienie</string>
+    <string name="patch_change">%1$s: zmiana</string>
 </resources>

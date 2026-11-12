@@ -220,4 +220,14 @@
     <string name="name_none">עדיין אין ב־BrawlZone שחקן בשם הזה. השתמשו ב־#תג שלכם: הוא מתחת לשם בפרופיל במשחק.</string>
     <string name="name_pick_friend">בחרו את החבר מהרשימה או הקלידו את ה־#תג שלו.</string>
     <string name="friends_none">עדיין אין ב־BrawlZone שחקן בשם הזה. נסו את ה־#תג שלו.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">אי אפשר לבדוק את התג שלך כרגע. הוא נשמר ויתעדכן כשהמשחק יחזור.</string>
+    <string name="widget_rank_waiting">עדיין לא הצלחנו לטעון את הדירוג שלך. הוא מתעדכן כל שעה.</string>
+    <string name="widget_rank_unranked">עדיין אין לך דירוג מדורג העונה.</string>
+    <string name="channel_patch">שינויי איזון</string>
+    <string name="patch_title">שינויי איזון בבראולרים שלך</string>
+    <string name="patch_buff">%1$s חוזק</string>
+    <string name="patch_nerf">%1$s נחלש</string>
+    <string name="patch_change">%1$s שונה</string>
 </resources>

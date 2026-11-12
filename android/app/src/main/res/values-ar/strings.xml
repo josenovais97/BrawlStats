@@ -220,4 +220,14 @@
     <string name="name_none">لا يوجد لاعب بهذا الاسم على BrawlZone بعد. استخدم #وسمك: تجده تحت اسمك في ملفك في اللعبة.</string>
     <string name="name_pick_friend">اختر صديقك من القائمة أو اكتب #وسمه.</string>
     <string name="friends_none">لا يوجد لاعب بهذا الاسم على BrawlZone بعد. جرّب #وسمه.</string>
+
+    <!-- 1.41 -->
+    <string name="tag_unavailable">تعذّر التحقق من رمزك الآن. تم حفظه وسيتحدّث عند عودة اللعبة.</string>
+    <string name="widget_rank_waiting">تعذّر تحميل رتبتك بعد. تتحدّث كل ساعة.</string>
+    <string name="widget_rank_unranked">لا توجد رتبة في المصنف بعد هذا الموسم.</string>
+    <string name="channel_patch">تغييرات التوازن</string>
+    <string name="patch_title">تغييرات التوازن على مقاتليك</string>
+    <string name="patch_buff">تقوية %1$s</string>
+    <string name="patch_nerf">إضعاف %1$s</string>
+    <string name="patch_change">تعديل %1$s</string>
 </resources>

@@ -944,7 +944,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> {
                     status.setText(R.string.tag_checking)
-                    AccountLookup.lookup(Account.normalise(raw)) { result ->
+                    AccountLookup.lookupStatus(Account.normalise(raw)) { result, unavailable ->
+                        // Could not check (offline, a game API outage): keep
+                        // the card as it is and say so, rather than calling a
+                        // saved tag wrong (1.41).
+                        if (result == null && unavailable) {
+                            status.setText(R.string.tag_unavailable)
+                            return@lookupStatus
+                        }
                         showAccount(result)
                         // A name that happens to look like a tag: search by name when no account has it.
                         if (result == null && !raw.trim().startsWith("#")) nameSearch.query(raw) else nameSearch.clear()
