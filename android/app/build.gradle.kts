@@ -36,8 +36,8 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 53
-    versionName = "1.40"
+    versionCode = 54
+    versionName = "1.41"
 
     // The launcher name. The test build (qa, below) overrides it so it can sit
     // next to the real app on the same phone without looking identical.
