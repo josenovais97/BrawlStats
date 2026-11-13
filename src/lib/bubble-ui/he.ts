@@ -168,6 +168,7 @@ const he: UiStrings = {
   'trophies.prestige': "הכי קרובים ליוקרה הבאה",
   'trophies.toNext': "עוד {n}",
   'trophies.empty': "אין כרגע אירועי גביעים.",
+  'review.fullSeason': "כל העונה שלך ב-brawlzone.net ←",
 };
 
 export default he;

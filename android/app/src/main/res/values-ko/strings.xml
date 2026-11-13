@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s 상향</string>
     <string name="patch_nerf">%1$s 하향</string>
     <string name="patch_change">%1$s 변경</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">트로피 맵</string>
+    <string name="widget_trophies_description">진행 중인 트로피 맵과 올리기 좋은 내 최고의 브롤러</string>
+    <string name="widget_trophies_label">지금 트로피 맵</string>
+    <string name="widget_trophies_none">지금은 트로피 이벤트가 없어요.</string>
+    <string name="widget_trophies_soon">곧 종료</string>
+    <string name="widget_trophies_left">%1$d시간 남음</string>
+    <string name="menu_draft">드래프트</string>
+    <string name="menu_counters">카운터</string>
+    <string name="menu_meta">메타</string>
+    <string name="menu_trophies">트로피</string>
+    <string name="menu_season">내 시즌</string>
+    <string name="open_site_season">brawlzone.net에서 시즌 전체 보기 →</string>
+    <string name="alert_wrapped_stats">%1$s판 · 승률 %2$d%% · 최고 연승 %3$d. 탭해서 Season Wrapped를 공유하세요.</string>
+    <string name="prestige_title">%1$s 프레스티지 임박</string>
+    <string name="prestige_text">%1$d 트로피 남았어요. 오늘의 트로피 맵에서 올려보세요.</string>
 </resources>

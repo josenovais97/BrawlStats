@@ -168,6 +168,7 @@ const ru: UiStrings = {
   'trophies.prestige': "Ближе всего к следующему престижу",
   'trophies.toNext': "ещё {n}",
   'trophies.empty': "Сейчас нет событий на кубки.",
+  'review.fullSeason': "Весь твой сезон на brawlzone.net →",
 };
 
 export default ru;

@@ -168,6 +168,7 @@ const vi: UiStrings = {
   'trophies.prestige': "Gần mốc uy tín tiếp theo nhất",
   'trophies.toNext': "còn {n}",
   'trophies.empty': "Hiện không có sự kiện cúp.",
+  'review.fullSeason': "Cả mùa của bạn trên brawlzone.net →",
 };
 
 export default vi;

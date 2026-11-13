@@ -168,6 +168,7 @@ const ko: UiStrings = {
   'trophies.prestige': "다음 프레스티지에 가장 가까운 브롤러",
   'trophies.toNext': "{n} 남음",
   'trophies.empty': "지금은 트로피 이벤트가 없어요.",
+  'review.fullSeason': "brawlzone.net에서 시즌 전체 보기 →",
 };
 
 export default ko;

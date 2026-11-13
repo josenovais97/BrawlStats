@@ -168,6 +168,7 @@ const ja: UiStrings = {
   'trophies.prestige': "次のプレステージに近いキャラ",
   'trophies.toNext': "あと{n}",
   'trophies.empty': "現在トロフィーイベントはありません。",
+  'review.fullSeason': "シーズン全体を brawlzone.net で見る →",
 };
 
 export default ja;

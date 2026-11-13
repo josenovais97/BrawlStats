@@ -168,6 +168,7 @@ const ar: UiStrings = {
   'trophies.prestige': "الأقرب إلى البريستيج التالي",
   'trophies.toNext': "تبقّى {n}",
   'trophies.empty': "لا توجد أحداث كؤوس الآن.",
+  'review.fullSeason': "موسمك كاملًا على brawlzone.net ←",
 };
 
 export default ar;

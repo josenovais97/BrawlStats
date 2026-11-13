@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s vahvistettu</string>
     <string name="patch_nerf">%1$s heikennetty</string>
     <string name="patch_change">%1$s muutettu</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Pokaalikartat</string>
+    <string name="widget_trophies_description">Nykyiset pokaalikartat ja paras brawlerisi nostettavaksi</string>
+    <string name="widget_trophies_label">POKAALIKARTAT NYT</string>
+    <string name="widget_trophies_none">Ei pokaalitapahtumia juuri nyt.</string>
+    <string name="widget_trophies_soon">Päättyy pian</string>
+    <string name="widget_trophies_left">%1$d h jäljellä</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Vastavalinnat</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Pokaalit</string>
+    <string name="menu_season">Kauteni</string>
+    <string name="open_site_season">Koko kautesi brawlzone.netissä →</string>
+    <string name="alert_wrapped_stats">%1$s peliä · %2$d%% voittoja · paras putki %3$d. Napauta jakaaksesi Season Wrappedin.</string>
+    <string name="prestige_title">%1$s on lähellä prestigeä</string>
+    <string name="prestige_text">%1$d pokaalia jäljellä. Nosta tämän päivän pokaalikartoilla.</string>
 </resources>

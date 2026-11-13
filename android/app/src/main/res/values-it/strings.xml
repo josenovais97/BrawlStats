@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s potenziato</string>
     <string name="patch_nerf">%1$s indebolito</string>
     <string name="patch_change">%1$s modificato</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Mappe trofei</string>
+    <string name="widget_trophies_description">Le mappe trofei attive con il tuo brawler migliore da spingere</string>
+    <string name="widget_trophies_label">MAPPE TROFEI ORA</string>
+    <string name="widget_trophies_none">Nessun evento trofei in questo momento.</string>
+    <string name="widget_trophies_soon">Finisce presto</string>
+    <string name="widget_trophies_left">Ancora %1$d h</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Counter</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Trofei</string>
+    <string name="menu_season">La mia stagione</string>
+    <string name="open_site_season">Tutta la tua stagione su brawlzone.net →</string>
+    <string name="alert_wrapped_stats">%1$s partite · %2$d%% vittorie · serie migliore %3$d. Tocca per condividere il tuo Season Wrapped.</string>
+    <string name="prestige_title">%1$s è vicino al prestigio</string>
+    <string name="prestige_text">Mancano %1$d trofei. Spingi sulle mappe trofei di oggi.</string>
 </resources>

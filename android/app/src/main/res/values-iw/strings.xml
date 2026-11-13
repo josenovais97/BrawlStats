@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s חוזק</string>
     <string name="patch_nerf">%1$s נחלש</string>
     <string name="patch_change">%1$s שונה</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">מפות גביעים</string>
+    <string name="widget_trophies_description">מפות הגביעים הפעילות עם הבראולר הכי טוב שלך לדחיפה</string>
+    <string name="widget_trophies_label">מפות גביעים עכשיו</string>
+    <string name="widget_trophies_none">אין כרגע אירועי גביעים.</string>
+    <string name="widget_trophies_soon">מסתיים בקרוב</string>
+    <string name="widget_trophies_left">עוד %1$d שע׳</string>
+    <string name="menu_draft">דראפט</string>
+    <string name="menu_counters">קאונטרים</string>
+    <string name="menu_meta">מטא</string>
+    <string name="menu_trophies">גביעים</string>
+    <string name="menu_season">העונה שלי</string>
+    <string name="open_site_season">כל העונה שלך ב-brawlzone.net ←</string>
+    <string name="alert_wrapped_stats">%1$s משחקים · %2$d%% ניצחונות · רצף הכי טוב %3$d. הקש כדי לשתף את Season Wrapped.</string>
+    <string name="prestige_title">%1$s קרוב ליוקרה</string>
+    <string name="prestige_text">עוד %1$d גביעים. דחוף במפות הגביעים של היום.</string>
 </resources>

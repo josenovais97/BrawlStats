@@ -168,6 +168,7 @@ const nl: UiStrings = {
   'trophies.prestige': "Het dichtst bij hun volgende prestige",
   'trophies.toNext': "nog {n}",
   'trophies.empty': "Nu geen trofeeën-events.",
+  'review.fullSeason': "Je hele seizoen op brawlzone.net →",
 };
 
 export default nl;

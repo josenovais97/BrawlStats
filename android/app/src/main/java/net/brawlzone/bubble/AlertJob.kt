@@ -74,6 +74,8 @@ class AlertJob : JobService() {
             }
             // Balance changes to the player's mains (1.41).
             Patch.fetch(context)?.let { Notify.patch(context, it, post) }
+            // Live trophy maps for the Trophies widget, and the prestige heads-up (1.41).
+            Notify.prestige(context, Trophy.fetch(context) ?: Trophy.last(context), post)
             val alerts = data ?: Alerts.last(context)
             val season = alerts?.season?.number
             if (me != null) {

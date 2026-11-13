@@ -390,6 +390,16 @@ class MainActivity : AppCompatActivity() {
         val wrapped = findViewById<TextView>(R.id.share_wrapped)
         rank.setOnClickListener { Share.rank(this) { busy -> shareBusy(rank, busy) } }
         wrapped.setOnClickListener { Share.wrapped(this) { busy -> shareBusy(wrapped, busy) } }
+        // The whole season on brawlzone.net (1.41): the profile's Ranked tab.
+        findViewById<TextView>(R.id.open_site_season).setOnClickListener {
+            val tag = Account.tag(this)
+            if (tag.isEmpty()) return@setOnClickListener
+            val lang = AppLang.current(this).lowercase().substringBefore('-')
+            val prefix = if (lang in setOf("es", "pt", "tr", "de", "ru", "fr")) "/$lang" else ""
+            runCatching {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${Http.SITE}$prefix/player/$tag#ranked")))
+            }
+        }
         findViewById<View>(R.id.season_goal_row).setOnClickListener {
             val choices = Goal.CHOICES
             val labels = choices.map { if (it == 0) getString(R.string.goal_off) else it.toString() }.toTypedArray()

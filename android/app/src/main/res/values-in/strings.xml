@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s di-buff</string>
     <string name="patch_nerf">%1$s di-nerf</string>
     <string name="patch_change">%1$s diubah</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Map trofi</string>
+    <string name="widget_trophies_description">Map trofi yang aktif dengan brawler terbaikmu untuk push</string>
+    <string name="widget_trophies_label">MAP TROFI SEKARANG</string>
+    <string name="widget_trophies_none">Tidak ada event trofi saat ini.</string>
+    <string name="widget_trophies_soon">Segera berakhir</string>
+    <string name="widget_trophies_left">Sisa %1$d jam</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Counter</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Trofi</string>
+    <string name="menu_season">Musimku</string>
+    <string name="open_site_season">Seluruh musimmu di brawlzone.net →</string>
+    <string name="alert_wrapped_stats">%1$s pertandingan · %2$d%% menang · streak terbaik %3$d. Ketuk untuk membagikan Season Wrapped.</string>
+    <string name="prestige_title">%1$s hampir prestige</string>
+    <string name="prestige_text">Kurang %1$d trofi. Push di map trofi hari ini.</string>
 </resources>

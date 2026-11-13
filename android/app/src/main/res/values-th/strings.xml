@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s ถูกบัฟ</string>
     <string name="patch_nerf">%1$s ถูกเนิร์ฟ</string>
     <string name="patch_change">%1$s ถูกปรับ</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">แมปถ้วย</string>
+    <string name="widget_trophies_description">แมปถ้วยที่เปิดอยู่พร้อมบรอว์เลอร์ที่ดีที่สุดของคุณสำหรับดันถ้วย</string>
+    <string name="widget_trophies_label">แมปถ้วยตอนนี้</string>
+    <string name="widget_trophies_none">ตอนนี้ไม่มีอีเวนต์ถ้วย</string>
+    <string name="widget_trophies_soon">ใกล้จบแล้ว</string>
+    <string name="widget_trophies_left">เหลือ %1$d ชม.</string>
+    <string name="menu_draft">ดราฟต์</string>
+    <string name="menu_counters">เคาน์เตอร์</string>
+    <string name="menu_meta">เมต้า</string>
+    <string name="menu_trophies">ถ้วยรางวัล</string>
+    <string name="menu_season">ซีซันของฉัน</string>
+    <string name="open_site_season">ดูทั้งซีซันของคุณที่ brawlzone.net →</string>
+    <string name="alert_wrapped_stats">%1$s เกม · ชนะ %2$d%% · ชนะติดกันสูงสุด %3$d แตะเพื่อแชร์ Season Wrapped</string>
+    <string name="prestige_title">%1$s ใกล้เพรสทีจแล้ว</string>
+    <string name="prestige_text">อีก %1$d ถ้วย ดันถ้วยในแมปวันนี้</string>
 </resources>

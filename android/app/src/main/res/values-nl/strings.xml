@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s gebufft</string>
     <string name="patch_nerf">%1$s generft</string>
     <string name="patch_change">%1$s gewijzigd</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Trofeeënmaps</string>
+    <string name="widget_trophies_description">De actuele trofeeënmaps met je beste brawler om te pushen</string>
+    <string name="widget_trophies_label">TROFEEËNMAPS NU</string>
+    <string name="widget_trophies_none">Nu geen trofeeën-events.</string>
+    <string name="widget_trophies_soon">Eindigt bijna</string>
+    <string name="widget_trophies_left">Nog %1$d u</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Counters</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Trofeeën</string>
+    <string name="menu_season">Mijn seizoen</string>
+    <string name="open_site_season">Je hele seizoen op brawlzone.net →</string>
+    <string name="alert_wrapped_stats">%1$s potjes · %2$d%% gewonnen · beste reeks %3$d. Tik om je Season Wrapped te delen.</string>
+    <string name="prestige_title">%1$s is bijna prestige</string>
+    <string name="prestige_text">Nog %1$d trofeeën. Push op de trofeeënmaps van vandaag.</string>
 </resources>

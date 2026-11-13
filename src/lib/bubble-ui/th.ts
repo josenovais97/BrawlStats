@@ -168,6 +168,7 @@ const th: UiStrings = {
   'trophies.prestige': "ใกล้เพรสทีจถัดไปที่สุด",
   'trophies.toNext': "อีก {n}",
   'trophies.empty': "ตอนนี้ไม่มีอีเวนต์ถ้วย",
+  'review.fullSeason': "ดูทั้งซีซันของคุณที่ brawlzone.net →",
 };
 
 export default th;

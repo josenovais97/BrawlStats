@@ -168,6 +168,7 @@ const id: UiStrings = {
   'trophies.prestige': "Paling dekat ke prestige berikutnya",
   'trophies.toNext': "kurang {n}",
   'trophies.empty': "Tidak ada event trofi saat ini.",
+  'review.fullSeason': "Seluruh musimmu di brawlzone.net →",
 };
 
 export default id;

@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s 增強</string>
     <string name="patch_nerf">%1$s 削弱</string>
     <string name="patch_change">%1$s 調整</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">獎盃地圖</string>
+    <string name="widget_trophies_description">目前獎盃地圖與你最適合衝分的英雄</string>
+    <string name="widget_trophies_label">目前獎盃地圖</string>
+    <string name="widget_trophies_none">目前沒有獎盃活動。</string>
+    <string name="widget_trophies_soon">即將結束</string>
+    <string name="widget_trophies_left">剩餘%1$d小時</string>
+    <string name="menu_draft">選擇</string>
+    <string name="menu_counters">剋制</string>
+    <string name="menu_meta">強勢榜</string>
+    <string name="menu_trophies">獎盃</string>
+    <string name="menu_season">我的賽季</string>
+    <string name="open_site_season">在 brawlzone.net 查看整個賽季 →</string>
+    <string name="alert_wrapped_stats">%1$s 場 · 勝率 %2$d%% · 最長連勝 %3$d。點按分享你的 Season Wrapped。</string>
+    <string name="prestige_title">%1$s 即將達到聲望</string>
+    <string name="prestige_text">還差 %1$d 獎盃。在今天的獎盃地圖上衝分吧。</string>
 </resources>

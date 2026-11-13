@@ -37,6 +37,7 @@ export const UI_EN = {
   'trophies.prestige': 'Closest to their next prestige',
   'trophies.toNext': '{n} to go',
   'trophies.empty': 'No trophy events right now.',
+  'review.fullSeason': 'Your whole season on brawlzone.net →',
   'chooser.counters': "Tap any brawler to see what beats it",
 
   'mode.all': 'All',

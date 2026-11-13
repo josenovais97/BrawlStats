@@ -230,4 +230,21 @@
     <string name="patch_buff">تقوية %1$s</string>
     <string name="patch_nerf">إضعاف %1$s</string>
     <string name="patch_change">تعديل %1$s</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">خرائط الكؤوس</string>
+    <string name="widget_trophies_description">خرائط الكؤوس الحالية مع أفضل مقاتل لديك للدفع</string>
+    <string name="widget_trophies_label">خرائط الكؤوس الآن</string>
+    <string name="widget_trophies_none">لا توجد أحداث كؤوس الآن.</string>
+    <string name="widget_trophies_soon">ينتهي قريبًا</string>
+    <string name="widget_trophies_left">تبقّى %1$d س</string>
+    <string name="menu_draft">الاختيار</string>
+    <string name="menu_counters">المضادات</string>
+    <string name="menu_meta">الميتا</string>
+    <string name="menu_trophies">الكؤوس</string>
+    <string name="menu_season">موسمي</string>
+    <string name="open_site_season">موسمك كاملًا على brawlzone.net ←</string>
+    <string name="alert_wrapped_stats">%1$s مباراة · %2$d%% فوز · أفضل سلسلة %3$d. اضغط لمشاركة Season Wrapped.</string>
+    <string name="prestige_title">%1$s قريب من البريستيج</string>
+    <string name="prestige_text">تبقّى %1$d كأس. ادفع على خرائط الكؤوس اليوم.</string>
 </resources>

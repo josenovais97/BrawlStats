@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s: усиление</string>
     <string name="patch_nerf">%1$s: ослабление</string>
     <string name="patch_change">%1$s: изменение</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Карты на кубки</string>
+    <string name="widget_trophies_description">Текущие карты на кубки с твоим лучшим бойцом для апа</string>
+    <string name="widget_trophies_label">КАРТЫ НА КУБКИ СЕЙЧАС</string>
+    <string name="widget_trophies_none">Сейчас нет событий на кубки.</string>
+    <string name="widget_trophies_soon">Скоро конец</string>
+    <string name="widget_trophies_left">Ещё %1$d ч</string>
+    <string name="menu_draft">Драфт</string>
+    <string name="menu_counters">Контрпики</string>
+    <string name="menu_meta">Мета</string>
+    <string name="menu_trophies">Кубки</string>
+    <string name="menu_season">Мой сезон</string>
+    <string name="open_site_season">Весь твой сезон на brawlzone.net →</string>
+    <string name="alert_wrapped_stats">Игр: %1$s · побед: %2$d%% · лучшая серия: %3$d. Нажми, чтобы поделиться Season Wrapped.</string>
+    <string name="prestige_title">%1$s близок к престижу</string>
+    <string name="prestige_text">Осталось кубков: %1$d. Апай на сегодняшних картах.</string>
 </resources>

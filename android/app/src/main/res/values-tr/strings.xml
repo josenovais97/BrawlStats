@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s güçlendirildi</string>
     <string name="patch_nerf">%1$s zayıflatıldı</string>
     <string name="patch_change">%1$s değiştirildi</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Kupa haritaları</string>
+    <string name="widget_trophies_description">Aktif kupa haritaları ve kasabileceğin en iyi brawler</string>
+    <string name="widget_trophies_label">ŞU AN KUPA HARİTALARI</string>
+    <string name="widget_trophies_none">Şu an kupa etkinliği yok.</string>
+    <string name="widget_trophies_soon">Yakında bitiyor</string>
+    <string name="widget_trophies_left">%1$d sa kaldı</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Counter</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Kupalar</string>
+    <string name="menu_season">Sezonum</string>
+    <string name="open_site_season">Tüm sezonun brawlzone.net\'te →</string>
+    <string name="alert_wrapped_stats">%1$s maç · %%%2$d galibiyet · en iyi seri %3$d. Season Wrapped\'ini paylaşmak için dokun.</string>
+    <string name="prestige_title">%1$s prestije yakın</string>
+    <string name="prestige_text">%1$d kupa kaldı. Bugünün kupa haritalarında kas.</string>
 </resources>

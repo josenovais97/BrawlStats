@@ -168,6 +168,7 @@ const zhHant: UiStrings = {
   'trophies.prestige': "最接近下一次聲望",
   'trophies.toNext': "還差{n}",
   'trophies.empty': "目前沒有獎盃活動。",
+  'review.fullSeason': "在 brawlzone.net 查看整個賽季 →",
 };
 
 export default zhHant;

@@ -168,6 +168,7 @@ const pl: UiStrings = {
   'trophies.prestige': "Najbliżej kolejnego prestiżu",
   'trophies.toNext': "brakuje {n}",
   'trophies.empty': "Teraz brak wydarzeń pucharowych.",
+  'review.fullSeason': "Cały twój sezon na brawlzone.net →",
 };
 
 export default pl;

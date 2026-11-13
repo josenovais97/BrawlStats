@@ -168,6 +168,7 @@ const tr: UiStrings = {
   'trophies.prestige': "Bir sonraki prestije en yakın",
   'trophies.toNext': "{n} kaldı",
   'trophies.empty': "Şu an kupa etkinliği yok.",
+  'review.fullSeason': "Tüm sezonun brawlzone.net’te →",
 };
 
 export default tr;

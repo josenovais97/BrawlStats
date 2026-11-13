@@ -143,6 +143,19 @@
                 android:resource="@xml/widget_friends_info" />
         </receiver>
 
+        <!-- Trophies (1.41): live trophy maps with your best brawler to push. -->
+        <receiver
+            android:name=".TrophiesWidget"
+            android:exported="false"
+            android:label="@string/widget_trophies_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_trophies_info" />
+        </receiver>
+
         <!-- Share cards (1.40): the drawn PNG, handed to the share sheet from the cache. -->
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -168,6 +168,7 @@ const fi: UiStrings = {
   'trophies.prestige': "Lähimpänä seuraavaa prestigeä",
   'trophies.toNext': "{n} jäljellä",
   'trophies.empty': "Ei pokaalitapahtumia juuri nyt.",
+  'review.fullSeason': "Koko kautesi brawlzone.netissä →",
 };
 
 export default fi;

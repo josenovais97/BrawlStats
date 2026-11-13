@@ -60,7 +60,7 @@ object Season {
             if (saved != null && sameTag && saved.optInt("number") < season.number && saved.optInt("games") > 0) {
                 saved.put("ended", LocalDate.now(ZoneOffset.UTC).toString())
                 p.edit().putString(KEY_LAST, saved.toString()).apply()
-                if (post) Notify.postWrapped(context, saved.optInt("number"))
+                if (post) Notify.postWrapped(context, saved.optInt("number"), saved.optInt("games"), saved.optInt("wins"), saved.optInt("longest"))
             }
             val start = runCatching { LocalDate.parse(season.startsOn) }.getOrNull()
             val fromStart = start != null && ChronoUnit.DAYS.between(start, LocalDate.now(ZoneOffset.UTC)) <= 1

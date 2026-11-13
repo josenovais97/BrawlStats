@@ -41,7 +41,7 @@ object Widgets {
 
     const val ACTION_REFRESH = "net.brawlzone.bubble.WIDGET_REFRESH"
 
-    enum class Kind { SMALL, MEDIUM, LARGE, RANK, FRIENDS }
+    enum class Kind { SMALL, MEDIUM, LARGE, RANK, FRIENDS, TROPHIES }
 
     data class Settings(val mode: String?, val reward: Boolean, val opacity: Int)
 
@@ -54,6 +54,7 @@ object Widgets {
         MetaWidget::class.java to Kind.LARGE,
         RankWidget::class.java to Kind.RANK,
         FriendsWidget::class.java to Kind.FRIENDS,
+        TrophiesWidget::class.java to Kind.TROPHIES,
     )
 
     private val TIER_COLORS = mapOf(
@@ -117,6 +118,7 @@ object Widgets {
             Kind.LARGE -> large(context, id, alerts)
             Kind.RANK -> rank(context, id, me)
             Kind.FRIENDS -> friends(context, id)
+            Kind.TROPHIES -> trophies(context, id)
         }
         runCatching { manager.updateAppWidget(id, views) }
     }
@@ -305,6 +307,61 @@ object Widgets {
 
     private data class FriendRow(val root: Int, val pos: Int, val badge: Int, val name: Int, val elo: Int, val week: Int)
 
+    /**
+     * The live trophy maps (1.41), each with the player's best brawler to push
+     * there and its trophies; without a tag, the map's best brawler. A tap
+     * opens the panel on its Trophies tab.
+     */
+    private fun trophies(context: Context, id: Int): RemoteViews {
+        val local = AppLang.wrap(context)
+        val v = RemoteViews(context.packageName, R.layout.widget_trophies)
+        background(v, settings(context, id))
+        header(context, v, id, TrophiesWidget::class.java, local)
+        v.setOnClickPendingIntent(
+            R.id.widget_root,
+            PendingIntent.getActivity(
+                context,
+                id * 10 + 3,
+                Intent(context, MainActivity::class.java).setAction(Shortcuts.ACTION_TROPHIES).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            ),
+        )
+        v.setTextViewText(R.id.widget_trophies_label, local.getString(R.string.widget_trophies_label))
+        val now = System.currentTimeMillis()
+        val events = Trophy.last(context)?.events.orEmpty().filter { e -> Trophy.endsAtMs(e.endsAt)?.let { it > now } ?: true }
+        v.setViewVisibility(R.id.widget_trophies_empty, if (events.isEmpty()) View.VISIBLE else View.GONE)
+        v.setTextViewText(R.id.widget_trophies_empty, local.getString(R.string.widget_trophies_none))
+        val rows = listOf(
+            TrophyRow(R.id.widget_trophy_1, R.id.widget_trophy_face_1, R.id.widget_trophy_map_1, R.id.widget_trophy_sub_1, R.id.widget_trophy_count_1),
+            TrophyRow(R.id.widget_trophy_2, R.id.widget_trophy_face_2, R.id.widget_trophy_map_2, R.id.widget_trophy_sub_2, R.id.widget_trophy_count_2),
+            TrophyRow(R.id.widget_trophy_3, R.id.widget_trophy_face_3, R.id.widget_trophy_map_3, R.id.widget_trophy_sub_3, R.id.widget_trophy_count_3),
+            TrophyRow(R.id.widget_trophy_4, R.id.widget_trophy_face_4, R.id.widget_trophy_map_4, R.id.widget_trophy_sub_4, R.id.widget_trophy_count_4),
+        )
+        val fmt = NumberFormat.getIntegerInstance()
+        rows.forEachIndexed { i, row ->
+            val e = events.getOrNull(i)
+            if (e == null) {
+                v.setViewVisibility(row.root, View.GONE)
+                return@forEachIndexed
+            }
+            val who = e.yours ?: e.best
+            v.setViewVisibility(row.root, View.VISIBLE)
+            v.setTextViewText(row.map, e.map)
+            val hours = Trophy.endsAtMs(e.endsAt)?.let { ((it - now) / 3_600_000L + 1).toInt() }
+            val left = when {
+                hours == null -> ""
+                hours <= 1 -> local.getString(R.string.widget_trophies_soon)
+                else -> local.getString(R.string.widget_trophies_left, hours)
+            }
+            v.setTextViewText(row.sub, listOfNotNull(who?.name, left.takeIf { it.isNotEmpty() }).joinToString(" · "))
+            v.setTextViewText(row.count, who?.trophies?.let { "🏆 " + fmt.format(it) } ?: "")
+            portrait(context, v, row.face, who?.icon, hideWhenMissing = false)
+        }
+        return v
+    }
+
+    private data class TrophyRow(val root: Int, val face: Int, val map: Int, val sub: Int, val count: Int)
+
     private data class Row(val root: Int, val icon: Int, val name: Int, val tier: Int, val rate: Int)
 
     private fun reward(context: Context, v: RemoteViews, id: Int, data: Alerts.Data?, local: Context) {
@@ -400,6 +457,7 @@ object Widgets {
                     Kind.RANK -> me?.rankIcon?.let(badges::add)
                     Kind.FRIENDS -> Friends.ladder(context).mapNotNullTo(badges) { it.data.rankIcon }
                     Kind.SMALL -> Unit
+                    Kind.TROPHIES -> Trophy.last(context)?.events.orEmpty().take(4).mapNotNullTo(urls) { (it.yours ?: it.best)?.icon }
                 }
             }
         }

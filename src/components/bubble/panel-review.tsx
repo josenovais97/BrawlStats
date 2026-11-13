@@ -6,6 +6,8 @@ import type { ReactNode } from 'react';
 
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
+import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
+import { sitePrefix } from '@/components/bubble/panel-counters';
 
 /**
  * The post-game review (Bubble 1.40, 2026-11-09).
@@ -61,6 +63,7 @@ export function PanelReview({
   onCounters: (brawlerId: number) => void;
 }) {
   const { t, tx, lang, name } = usePanelI18n();
+  const { tag } = useBubbleAccount();
   const won = review.result === 'victory';
   const byId = new Map(roster.map((b) => [b.brawlerId, b]));
   const brawlerName = (id: number) => {
@@ -309,6 +312,23 @@ export function PanelReview({
 
       {review.newGames && review.newGames > 1 ? (
         <p className="px-1 text-[10px] text-muted">{t('review.more', { n: review.newGames - 1 })}</p>
+      ) : null}
+
+      {/* The whole season on brawlzone.net (1.41 and the panel): the profile's
+          Ranked tab, in the browser (inside the app, through its bridge). */}
+      {tag ? (
+        <button
+          type="button"
+          onClick={() => {
+            const url = `${window.location.origin}${sitePrefix(lang)}/player/${encodeURIComponent(tag)}#ranked`;
+            const bridge = (window as unknown as { BrawlZoneApp?: { openExternal?: (u: string) => void } }).BrawlZoneApp;
+            if (typeof bridge?.openExternal === 'function') bridge.openExternal(url);
+            else window.open(url, '_blank', 'noopener');
+          }}
+          className="px-1 text-start text-[11px] font-bold text-[#a3eaff] underline-offset-2 hover:underline"
+        >
+          {t('review.fullSeason')}
+        </button>
       ) : null}
 
       <div className="bz-review-in flex gap-1.5" style={{ animationDelay: '320ms' }}>

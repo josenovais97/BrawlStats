@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s 強化</string>
     <string name="patch_nerf">%1$s 弱体化</string>
     <string name="patch_change">%1$s 調整</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">トロフィーマップ</string>
+    <string name="widget_trophies_description">開催中のトロフィーマップと、プッシュにおすすめのキャラ</string>
+    <string name="widget_trophies_label">現在のトロフィーマップ</string>
+    <string name="widget_trophies_none">現在トロフィーイベントはありません。</string>
+    <string name="widget_trophies_soon">まもなく終了</string>
+    <string name="widget_trophies_left">残り%1$d時間</string>
+    <string name="menu_draft">ドラフト</string>
+    <string name="menu_counters">カウンター</string>
+    <string name="menu_meta">メタ</string>
+    <string name="menu_trophies">トロフィー</string>
+    <string name="menu_season">マイシーズン</string>
+    <string name="open_site_season">シーズン全体を brawlzone.net で見る →</string>
+    <string name="alert_wrapped_stats">%1$s試合 · 勝率%2$d%% · 最長連勝%3$d。タップしてSeason Wrappedをシェア。</string>
+    <string name="prestige_title">%1$s がプレステージ間近</string>
+    <string name="prestige_text">あと%1$dトロフィー。今日のトロフィーマップでプッシュしよう。</string>
 </resources>

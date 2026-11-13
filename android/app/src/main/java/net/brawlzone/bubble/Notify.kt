@@ -34,6 +34,10 @@ object Notify {
     private const val CH_PATCH = "brawlzone-patch"
     private const val KEY_PATCH_SEEN = "seen_patch"
     private const val KEY_PATCH_TAG = "seen_patch_tag"
+    private const val KEY_PRESTIGE_SEEN = "seen_prestige"
+    private const val KEY_PRESTIGE_DAY = "prestige_day"
+    /** Trophies from the next prestige that make a heads-up worth sending. */
+    private const val PRESTIGE_NEAR = 50
 
     private const val KEY_SEEN = "seen_rewards"
     private const val KEY_SEASON_START = "season_start_sent"
@@ -78,15 +82,54 @@ object Notify {
         post(context, CH_FRIENDS, id, title, text, null)
 
     /** A finished season's Wrapped (1.40, Season). Tapping makes the card and opens the share sheet. */
-    fun postWrapped(context: Context, number: Int) {
+    /**
+     * The season just ended: its Wrapped, with the player's own numbers in the
+     * text since 1.41 ("1,002 games · 51% wins · best streak 12"), so the
+     * notification itself is worth reading. Tapping shares the card.
+     */
+    fun postWrapped(context: Context, number: Int, games: Int = 0, wins: Int = 0, longest: Int = 0) {
+        val local = AppLang.wrap(context)
+        val text = if (games > 0) {
+            local.getString(
+                R.string.alert_wrapped_stats,
+                java.text.NumberFormat.getIntegerInstance(AppLang.locale(AppLang.current(context))).format(games),
+                (wins * 100 / games),
+                longest,
+            )
+        } else {
+            local.getString(R.string.alert_wrapped_text)
+        }
+        post(context, CH_SEASON, 7003, local.getString(R.string.alert_wrapped_title, number), text, Share.ACTION_WRAPPED)
+    }
+
+    /**
+     * A brawler within 50 trophies of its next 1,000-trophy prestige (1.41):
+     * once per brawler and prestige, at most one a day. Tapping opens the
+     * panel on its Trophies tab, where today's maps say where to push.
+     */
+    fun prestige(context: Context, data: Trophy.Data?, post: Boolean) {
+        data ?: return
+        if (Account.tag(context).isEmpty()) return
+        val close = data.prestige.filter { it.toNext in 1..PRESTIGE_NEAR }.minByOrNull { it.toNext } ?: return
+        val key = "${close.brawlerId}:${close.trophies / 1000 + 1}"
+        val prefs = Alerts.prefs(context)
+        val seen = HashSet(prefs.getStringSet(KEY_PRESTIGE_SEEN, null) ?: emptySet())
+        if (key in seen) return
+        val today = LocalDate.now().toString()
+        if (prefs.getString(KEY_PRESTIGE_DAY, null) == today) return
+        prefs.edit()
+            .putStringSet(KEY_PRESTIGE_SEEN, (seen + key).toList().takeLast(MAX_SEEN).toSet())
+            .putString(KEY_PRESTIGE_DAY, today)
+            .apply()
+        if (!post) return
         val local = AppLang.wrap(context)
         post(
             context,
-            CH_SEASON,
-            7003,
-            local.getString(R.string.alert_wrapped_title, number),
-            local.getString(R.string.alert_wrapped_text),
-            Share.ACTION_WRAPPED,
+            CH_PROGRESS,
+            7010,
+            local.getString(R.string.prestige_title, close.name),
+            local.getString(R.string.prestige_text, close.toNext),
+            Shortcuts.ACTION_TROPHIES,
         )
     }
 

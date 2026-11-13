@@ -564,6 +564,21 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- 1.41: the whole season on the profile's Ranked tab, in the browser. -->
+            <TextView
+                android:id="@+id/open_site_season"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="@string/open_site_season"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
             <!-- 1.40: runs while a share card is being drawn. -->
             <ProgressBar
                 android:id="@+id/share_progress"

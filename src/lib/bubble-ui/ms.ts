@@ -168,6 +168,7 @@ const ms: UiStrings = {
   'trophies.prestige': "Paling hampir dengan prestij seterusnya",
   'trophies.toNext': "kurang {n}",
   'trophies.empty': "Tiada acara trofi sekarang.",
+  'review.fullSeason': "Seluruh musim anda di brawlzone.net →",
 };
 
 export default ms;

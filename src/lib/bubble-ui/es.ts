@@ -173,6 +173,7 @@ const es: UiStrings = {
   'trophies.prestige': "Más cerca de su próximo prestigio",
   'trophies.toNext': "faltan {n}",
   'trophies.empty': "Ahora no hay eventos de trofeos.",
+  'review.fullSeason': "Tu temporada completa en brawlzone.net →",
 };
 
 export default es;

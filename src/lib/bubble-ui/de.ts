@@ -168,6 +168,7 @@ const de: UiStrings = {
   'trophies.prestige': "Am nächsten am nächsten Prestige",
   'trophies.toNext': "noch {n}",
   'trophies.empty': "Gerade keine Trophäen-Events.",
+  'review.fullSeason': "Deine ganze Saison auf brawlzone.net →",
 };
 
 export default de;

@@ -26,6 +26,8 @@ object Shortcuts {
 
     /** Starts the bubble with the panel open on the Counters tab. */
     const val ACTION_COUNTERS = "net.brawlzone.bubble.COUNTERS"
+    /** The panel on its Trophies tab (1.41): the Trophies widget and the prestige heads-up. */
+    const val ACTION_TROPHIES = "net.brawlzone.bubble.TROPHIES"
 
     /** With ACTION_COUNTERS: open that brawler's counters (a widget tap). */
     const val EXTRA_BRAWLER = "brawler"
@@ -66,6 +68,7 @@ object Shortcuts {
             } else false
         }
         ACTION_COUNTERS -> startBubble(activity, "counters", intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
+        ACTION_TROPHIES -> startBubble(activity, "trophies")
         else -> false
     }
 

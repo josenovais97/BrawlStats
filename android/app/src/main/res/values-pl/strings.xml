@@ -230,4 +230,21 @@
     <string name="patch_buff">%1$s: wzmocnienie</string>
     <string name="patch_nerf">%1$s: osłabienie</string>
     <string name="patch_change">%1$s: zmiana</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Mapy pucharowe</string>
+    <string name="widget_trophies_description">Aktualne mapy pucharowe z twoim najlepszym zadymiarzem do pushowania</string>
+    <string name="widget_trophies_label">MAPY PUCHAROWE TERAZ</string>
+    <string name="widget_trophies_none">Teraz brak wydarzeń pucharowych.</string>
+    <string name="widget_trophies_soon">Wkrótce koniec</string>
+    <string name="widget_trophies_left">Jeszcze %1$d h</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Kontry</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Puchary</string>
+    <string name="menu_season">Mój sezon</string>
+    <string name="open_site_season">Cały twój sezon na brawlzone.net →</string>
+    <string name="alert_wrapped_stats">Gry: %1$s · wygrane: %2$d%% · najlepsza seria: %3$d. Dotknij, aby udostępnić Season Wrapped.</string>
+    <string name="prestige_title">%1$s jest blisko prestiżu</string>
+    <string name="prestige_text">Brakuje %1$d pucharów. Pushuj na dzisiejszych mapach.</string>
 </resources>

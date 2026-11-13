@@ -423,7 +423,7 @@ class BubbleService : Service() {
     private var pendingBrawler: Int? = null
 
     private fun openPanelOn(tab: String?, brawler: Int? = null) {
-        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters") }
+        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters", "trophies") }
         pendingBrawler = brawler
         if (panel == null) showPanel()
         if (panelLoaded) applyPendingTab()
@@ -479,6 +479,7 @@ class BubbleService : Service() {
 
     override fun onDestroy() {
         running = false
+        hideQuickMenu()
         BubbleLook.prefs(this).unregisterOnSharedPreferenceChangeListener(lookListener)
         AppLang.prefs(this).unregisterOnSharedPreferenceChangeListener(langListener)
         slide?.cancel()
@@ -585,6 +586,11 @@ class BubbleService : Service() {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     touching = true
+                    // Held still for a moment: the quick menu (1.41).
+                    longPressed = false
+                    hideQuickMenu()
+                    handler.removeCallbacks(longPress)
+                    handler.postDelayed(longPress, LONG_PRESS_MS)
                     // Back to full strength under the finger, and out from
                     // the edge if it was tucked.
                     wakeBubble(animate = true)
@@ -599,10 +605,12 @@ class BubbleService : Service() {
                 }
 
                 MotionEvent.ACTION_MOVE -> {
+                    if (longPressed) return@setOnTouchListener true
                     val dx = event.rawX - downX
                     val dy = event.rawY - downY
                     if (!dragging && (abs(dx) > slop || abs(dy) > slop)) {
                         dragging = true
+                        handler.removeCallbacks(longPress)
                         // Pressed while tucked: the slide out may still be
                         // running. The drag takes over from the edge, from
                         // where the finger is now, so the bubble never jumps.
@@ -630,7 +638,13 @@ class BubbleService : Service() {
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     touching = false
+                    handler.removeCallbacks(longPress)
                     art.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+                    // The menu is open: lifting the finger leaves it there.
+                    if (longPressed) {
+                        scheduleRest()
+                        return@setOnTouchListener true
+                    }
                     val onTarget = dragging && overCloseTarget(params)
                     hideCloseTarget()
 
@@ -837,6 +851,111 @@ class BubbleService : Service() {
 
     private var closeTargetHot = false
 
+    // ---------------------------------------------------------- quick menu
+
+    private var quickMenu: View? = null
+    private var longPressed = false
+    private val longPress = Runnable { onLongPress() }
+
+    private fun onLongPress() {
+        if (bubble == null) return
+        longPressed = true
+        bubbleArt?.animate()?.scaleX(1f)?.scaleY(1f)?.setDuration(120)?.start()
+        buzz(bubble, "long")
+        showQuickMenu()
+    }
+
+    /**
+     * Long-press the bubble (1.41): a short menu beside it to go straight to
+     * a panel tab, or to My season in the app, instead of the panel opening
+     * on whatever tab was used last. A tap outside closes it.
+     */
+    private fun showQuickMenu() {
+        hideQuickMenu()
+        removePanel()
+        val params = bubbleParams ?: return
+        val items = listOf(
+            "draft" to R.string.menu_draft,
+            "counters" to R.string.menu_counters,
+            "meta" to R.string.menu_meta,
+            "trophies" to R.string.menu_trophies,
+            "season" to R.string.menu_season,
+        )
+        val column = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                cornerRadius = dp(14).toFloat()
+                setColor(0xF2101733.toInt())
+                setStroke(dp(2), 0xFF050A1F.toInt())
+            }
+            setPadding(dp(4), dp(4), dp(4), dp(4))
+            elevation = dp(10).toFloat()
+        }
+        for ((key, label) in items) {
+            column.addView(
+                TextView(this).apply {
+                    text = str(label)
+                    setTextColor(Color.WHITE)
+                    textSize = 14f
+                    typeface = Typeface.DEFAULT_BOLD
+                    setPadding(dp(14), dp(10), dp(20), dp(10))
+                    isClickable = true
+                    setOnTouchListener { v, e ->
+                        when (e.actionMasked) {
+                            MotionEvent.ACTION_DOWN -> v.setBackgroundColor(0x33FFC53D)
+                            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> v.setBackgroundColor(Color.TRANSPARENT)
+                        }
+                        false
+                    }
+                    setOnClickListener {
+                        buzz(it)
+                        hideQuickMenu()
+                        if (key == "season") {
+                            runCatching {
+                                startActivity(Intent(this@BubbleService, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            }
+                        } else {
+                            openPanelOn(key)
+                        }
+                    }
+                },
+            )
+        }
+        val onLeft = params.x + params.width / 2 < screenW / 2
+        val menuParams = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            overlayType(),
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.TOP or (if (onLeft) Gravity.START else Gravity.END)
+            x = if (onLeft) params.x + params.width else (screenW - params.x).coerceAtLeast(0)
+            y = params.y.coerceIn(0, (screenH - dp(260)).coerceAtLeast(0))
+        }
+        column.setOnTouchListener { _, e ->
+            if (e.actionMasked == MotionEvent.ACTION_OUTSIDE) {
+                hideQuickMenu()
+                true
+            } else {
+                false
+            }
+        }
+        column.alpha = 0f
+        runCatching { windows.addView(column, menuParams) }
+            .onSuccess {
+                quickMenu = column
+                column.animate().alpha(1f).setDuration(120).start()
+            }
+    }
+
+    private fun hideQuickMenu() {
+        quickMenu?.let { runCatching { windows.removeView(it) } }
+        quickMenu = null
+    }
+
     /**
      * A short haptic tick through the view's own feedback (1.41): no VIBRATE
      * permission, and it follows the phone's touch-feedback setting.
@@ -846,6 +965,7 @@ class BubbleService : Service() {
             "success" -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.CONTEXT_CLICK
             "error" -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
             "drag" -> HapticFeedbackConstants.CLOCK_TICK
+            "long" -> HapticFeedbackConstants.LONG_PRESS
             else -> HapticFeedbackConstants.KEYBOARD_TAP
         }
         runCatching { view?.performHapticFeedback(constant) }
@@ -1939,6 +2059,8 @@ class BubbleService : Service() {
         private const val NOTIFICATION_ID = 1
         const val ACTION_STOP = "net.brawlzone.bubble.STOP"
         const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
+        /** Held this long without moving: the quick menu (1.41). */
+        private const val LONG_PRESS_MS = 450L
         const val ACTION_OPEN_PANEL = "net.brawlzone.bubble.OPEN_PANEL"
 
         /** The test build's button: replay the newest Ranked game as a post-game review. */

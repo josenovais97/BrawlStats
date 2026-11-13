@@ -237,4 +237,21 @@
     <string name="patch_buff">%1$s buffed</string>
     <string name="patch_nerf">%1$s nerfed</string>
     <string name="patch_change">%1$s changed</string>
+
+    <!-- 1.41: Trophies widget, quick menu, season link, recap numbers, prestige -->
+    <string name="widget_trophies_name">Trophy maps</string>
+    <string name="widget_trophies_description">The live trophy maps with your best brawler to push</string>
+    <string name="widget_trophies_label">TROPHY MAPS NOW</string>
+    <string name="widget_trophies_none">No trophy events right now.</string>
+    <string name="widget_trophies_soon">Ends soon</string>
+    <string name="widget_trophies_left">%1$dh left</string>
+    <string name="menu_draft">Draft</string>
+    <string name="menu_counters">Counters</string>
+    <string name="menu_meta">Meta</string>
+    <string name="menu_trophies">Trophies</string>
+    <string name="menu_season">My season</string>
+    <string name="open_site_season">Your whole season on brawlzone.net →</string>
+    <string name="alert_wrapped_stats">%1$s games · %2$d%% wins · best streak %3$d. Tap to share your Season Wrapped.</string>
+    <string name="prestige_title">%1$s is close to prestige</string>
+    <string name="prestige_text">%1$d trophies to go. Push on today\'s trophy maps.</string>
 </resources>
