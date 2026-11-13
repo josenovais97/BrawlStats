@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Prisma 7 emits TypeScript sources; they are generated, not authored.
     "src/generated/**",
+    // The Remotion Shorts renderer: its own package and dependencies (deploy/motion/package.json).
+    "deploy/motion/**",
   ]),
 ]);
 

@@ -61,6 +61,11 @@ SITE=https://brawlzone.net
 MUSIC_DIR="$HOME/youtube-music"
 PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
 FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
+# The Remotion renderer (deploy/motion, 2026-11-13): its packages live here,
+# outside the checkout, installed from the repo's lockfile when it changes.
+MOTION_APP=/var/lib/brawlzone/motion/app
+NODE_IMAGE="node:24-slim"
+PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
 
 die() { echo "$*" >&2; exit 1; }
 
@@ -362,11 +367,56 @@ PY
 fi  # not newbrawler or daily
 
 # ---------------------------------------------------------------- render
+# The Remotion look (2026-11-13, owner: "the design is still the same... make
+# them way better"): deploy/motion draws the formats it has a design for,
+# while $ROOT/motion-on exists. make.py --plan decides the content exactly as
+# it does for the Pillow frames (picks, clues, timeline) and Remotion only
+# draws it. Anything failing on that side falls back to the Pillow frames, so
+# a broken render never costs a post.
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb "
+SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
+motion_ready () {
+  [ -e "$ROOT/motion-on" ] || return 1
+  mkdir -p "$MOTION_APP" || return 1
+  if ! cmp -s "$REPO/deploy/motion/package-lock.json" "$MOTION_APP/package-lock.json" || [ ! -x "$MOTION_APP/node_modules/.bin/remotion" ]; then
+    cp "$REPO/deploy/motion/package.json" "$REPO/deploy/motion/package-lock.json" "$MOTION_APP/" || return 1
+    docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e npm_config_cache=/tmp/npmcache -v "$MOTION_APP:/app" -w /app "$NODE_IMAGE" \
+      npm ci --no-audit --no-fund > "$CACHE/motion-install.log" 2>&1 \
+      || { echo "motion: npm ci failed"; rm -f "$MOTION_APP/package-lock.json"; return 1; }
+  fi
+  [ -x "$SHELL_BIN" ] || docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$MOTION_APP:/app" -w /app "$PLAYWRIGHT_IMAGE" \
+    ./node_modules/.bin/remotion browser ensure >> "$CACHE/motion-install.log" 2>&1 || { echo "motion: no headless browser"; return 1; }
+}
+motion_draw () { # kind: 0 drawn into $OUT/silent.mp4, 3 nothing to say today, else failed
+  rm -rf "$OUT/public" "$OUT/plan.json" "$OUT/silent.mp4"
+  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" \
+    -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
+    "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out --plan" \
+    > "$CACHE/make-0.log" 2>&1
+  local rc=$?
+  [ "$rc" = 0 ] || return "$rc"
+  # The headline font is the Fan Kit's: into this render's folder only, deleted with it.
+  mkdir -p "$OUT/public/fonts"
+  cp "$CACHE/fonts/Nougat-ExtraBlack-tight.ttf" "$OUT/public/fonts/head.ttf" 2>/dev/null
+  cp "$CACHE/LilitaOne-Regular.ttf" "$OUT/public/fonts/lilita.ttf" && cp "$CACHE/app-icon.png" "$OUT/public/app-icon.png" || return 1
+  timeout 2700 docker run --rm --cpus=1.9 --user "$(id -u):$(id -g)" -e HOME=/tmp \
+    -v "$MOTION_APP/node_modules:/m/node_modules" -v "$REPO/deploy/motion/src:/m/src:ro" \
+    -v "$REPO/deploy/motion/render.mjs:/m/render.mjs:ro" -v "$REPO/deploy/motion/package.json:/m/package.json:ro" \
+    -v "$OUT:/out" -w /m "$PLAYWRIGHT_IMAGE" node render.mjs video /out /out/silent.mp4 > "$CACHE/motion.log" 2>&1 \
+    && [ -s "$OUT/silent.mp4" ] || { echo "motion: render failed: $(tail -c 400 "$CACHE/motion.log")"; rm -f "$OUT/silent.mp4"; return 1; }
+}
+
 draw () { # kind
-  rm -rf "$OUT/frames"
+  rm -rf "$OUT/frames" "$OUT/public" "$OUT/silent.mp4"
   docker run --rm --user "$(id -u):$(id -g)" -v "$CACHE:/cache" "$PYTHON_IMAGE" sh -c '
     [ -d /cache/py/PIL ] && [ -d /cache/py/numpy ] || pip install -q --disable-pip-version-check --target /cache/py pillow numpy >/dev/null 2>&1' \
     || return 1
+  if [[ "$MOTION_KINDS" == *" $1 "* ]] && motion_ready; then
+    local mrc
+    motion_draw "$1"; mrc=$?
+    { [ "$mrc" = 0 ] || [ "$mrc" = 3 ]; } && return "$mrc"
+    echo "drawing $1 with Pillow instead"
+  fi
   # Two halves of the frames in parallel, one core each: the box has two,
   # and the site keeps serving on whatever they leave.
   local pids=() rc=0 part
@@ -413,20 +463,31 @@ fi
 [ "$rc" = 0 ] || die "::error::make.py $kind failed: $(tail -c 600 "$CACHE/make-0.log") $(tail -c 300 "$CACHE/make-1.log")"
 
 DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/meta.json")
-frames=$(find "$OUT/frames" -name '*.jpg' | wc -l)
-[ "$frames" -gt 100 ] || die "::error::only $frames frames were drawn"
+if [ -s "$OUT/silent.mp4" ]; then  # drawn by Remotion: already H.264, only the music to add
+  video_in=(-i silent.mp4); video_out=(-c:v copy)
+else
+  frames=$(find "$OUT/frames" -name '*.jpg' | wc -l)
+  [ "$frames" -gt 100 ] || die "::error::only $frames frames were drawn"
+  video_in=(-framerate 30 -i 'frames/%04d.jpg'); video_out=(-c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p)
+fi
 
 # The cuts are on the beat of $TRACK from its start (tracks.json). The
 # fade-out is the last 1.5 seconds; the music's own loudness is left alone.
 docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
-  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" \
+  -hide_banner -loglevel error -y "${video_in[@]}" -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" \
   -filter_complex "[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 1.5))"):d=1.5[a]" \
-  -map 0:v -map '[a]' -t "$DUR" -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -c:a aac -b:a 160k \
+  -map 0:v -map '[a]' -t "$DUR" "${video_out[@]}" -c:a aac -b:a 160k \
   -movflags +faststart video.mp4 \
   || die "::error::ffmpeg could not encode the video"
 # The cover TikTok's manifest points at: a frame from the first reveal.
-cp "$OUT/frames/$(printf '%04d' $((frames / 4)))".jpg "$OUT/cover.jpg"
-rm -rf "$OUT/frames"
+if [ -s "$OUT/silent.mp4" ]; then
+  docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -w /w "$FFMPEG_IMAGE" \
+    -hide_banner -loglevel error -y -ss "$(python3 -c "print(round($DUR / 4, 2))")" -i silent.mp4 -frames:v 1 -q:v 3 cover.jpg \
+    || die "::error::ffmpeg could not take the cover"
+else
+  cp "$OUT/frames/$(printf '%04d' $((frames / 4)))".jpg "$OUT/cover.jpg"
+fi
+rm -rf "$OUT/frames" "$OUT/public" "$OUT/silent.mp4"
 rm -f "$OUT"/zoom-*.webp "$OUT/shadow.webp"
 
 # The manifest brawlzone-tiktok reads, and the YouTube titles in Portuguese

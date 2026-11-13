@@ -2119,6 +2119,91 @@ def rr_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ plan
+# --plan <dir> (2026-11-13): the same video as data for deploy/motion, the
+# Remotion renderer that draws the formats it knows instead of the frames
+# below (owner: "the design is still the same... make them way better").
+# Everything that decides what a video says stays here: the picks, the
+# levels, the clues, the timeline in beats. What gets written: <dir>/plan.json
+# and the pictures it names under <dir>/public (brawler art and faces, each
+# quiz clue already pixelated, shadowed or with its zoom window), so the two
+# render paths can never disagree on content.
+PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb')
+
+
+def export_plan(out):
+    A = f'{out}/public'
+    for d in ('b', 'c'):
+        os.makedirs(f'{A}/{d}', exist_ok=True)
+
+    def save(img, rel):
+        if not os.path.exists(f'{A}/{rel}'):
+            img.save(f'{A}/{rel}')
+        return rel
+
+    def bz(b, full=False, face=True):
+        o = {'id': str(b['id']), 'name': nice(b['n']).upper(), 'tier': b.get('tier'), 'wr': b.get('wr'),
+             'use': b.get('use'), 'cls': b.get('cls'), 'rar': b.get('rar')}
+        if b.get('skin'): o['skin'] = b['skin']
+        if b.get('ability'): o['ability'] = {'kind': b['ability']['kind'], 'label': ICON_LABEL[b['ability']['kind']],
+                                             'name': (b['ability'].get('name') or '').upper()}
+        if face and not str(b['id']).startswith('skin_'):
+            o['face'] = save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
+        if full:
+            o['art'] = save(art(b, 1000, 1000), f"b/{b['id']}-art.png")
+        return o
+
+    segs = []
+    for s in tl.segments:
+        k = s['kind']; o = {'kind': k, 'start': s['start'], 'len': s['len']}
+        if k == 'q_intro':
+            o.update(n=s['n'], style=s.get('style'),
+                     faces=[save(shadow_face(b), f"c/decoy-{b['id']}.png") for b in s['faces']])
+        elif k == 'q':
+            b, i, clue, lvl = s['b'], s['i'], s['clue'], s['lvl']
+            a = art(b, 820)
+            o.update(i=i, lvl=lvl, clue=clue, style=s.get('style'), b=bz(b, full=True, face=False))
+            label = CLUES.get(clue, 'WHO IS THIS?')
+            if s.get('style') == 'skin': label = CLUES['skin']
+            if clue == 'skin':
+                o['img'] = [save(fit_in(a, 780), f'c/{i}-skin.png')]
+            elif clue == 'pixel':
+                o['img'] = [save(pixelated(fit_in(a, 790), PIXEL_STEPS[lvl][st]), f'c/{i}-px{st}.png') for st in range(4)]
+            elif clue == 'shadow':
+                o['img'] = [save(fit_in(partial_shadow(b, a, lvl), 800), f'c/{i}-shadow.png')]
+            elif clue == 'icon':
+                ab = b['ability']; icon = ability_icon(ab)
+                o['img'] = ([save(pixelated(icon, ICON_PIXELS[st]), f'c/{i}-icon{st}.png') for st in range(4)]
+                            if b.get('pixelate') else [save(icon, f'c/{i}-icon.png')])
+                label = f"WHOSE {ICON_LABEL[ab['kind']]}?"
+                o['tab'] = {'label': ICON_LABEL[ab['kind']], 'color': '#%02x%02x%02x' % ICON_COL[ab['kind']]}
+            else:  # zoom: the big render and where to look; the pull-back is animated there
+                m = art(b, 900); cx, cy = zoom_center(b, m, lvl)
+                hi = art(b, 900 * HI_ZOOM, 900 * HI_ZOOM); kk = hi.width / m.width
+                o['zoom'] = {'img': save(hi, f'c/{i}-zoom.png'), 'w': hi.width, 'h': hi.height, 'cx': cx * kk, 'cy': cy * kk,
+                             's0': 760 * kk, 'from': ZOOM_FROM[lvl], 'pull': ZOOM_PULL}
+            o['label'] = label
+        elif k == 'q_outro':
+            o.update(n=s['n'], picks=[bz(b) for b in s['picks']])
+        elif k in ('c_slam',):
+            o.update(tier=s['tier'], label=s.get('label'))
+        elif k in ('c_page', 'c_rows'):
+            o.update(tier=s.get('tier'), label=s.get('label'), items=[{'rank': r, **bz(b)} for r, b in s['items']])
+        elif k in ('c_big', 'c_one', 'c_tease'):
+            b = s['b']; o.update(rank=s.get('rank', 1), heavy=bool(s.get('heavy')), b=bz(b, full=True))
+            if k == 'c_tease':
+                o['sil'] = save(silhouette(art(b, 900, 1000), (255, 200, 60)), f"c/tease-{b['id']}.png")
+        segs.append(o)
+    plan = {'kind': KIND, 'fps': FPS, 'step': tl.step, 'beats': tl.beats, 'duration': round(tl.dur, 3), 'period': P,
+            'track': os.environ.get('TRACK') or 'fontana', 'episode': episode(KIND), 'segments': segs,
+            'title': META.get('title')}
+    if KIND in ('everyrank', 'classrank', 'seasonclimb'):
+        plan.update(word=WORD, bestLine=BEST_LINE, season=data.get('season'), count=NB,
+                    wall=[save(load_face(b).resize((200, 200), Image.LANCZOS), f"b/{b['id']}-face.png") for b in ranked])
+    json.dump(plan, open(f'{out}/plan.json', 'w'), ensure_ascii=False)
+    print(KIND, 'plan', len(segs), 'segments', round(tl.dur, 2), 's')
+
+
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'skinquiz': quiz_scene, 'iconquiz': quiz_scene,
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
@@ -2138,6 +2223,10 @@ if __name__ == '__main__':
     META['episode'] = episode(KIND)
     if SHOWN: META['shown'] = SHOWN
     json.dump(META, open(f'{OUT}/meta.json', 'w'), ensure_ascii=False)
+    if '--plan' in sys.argv[6:7]:
+        if KIND not in PLAN_KINDS:
+            print(f'{KIND} has no Remotion design yet'); sys.exit(4)
+        export_plan(OUT); sys.exit()
     if ONLY is not None:
         for sec in ONLY:
             frame(sec).save(f'{OUT}/{KIND}-{sec}.jpg', quality=85)

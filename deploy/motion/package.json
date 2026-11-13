@@ -1,0 +1,15 @@
+{
+  "name": "brawlzone-motion",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.543",
+    "@remotion/renderer": "4.0.543",
+    "@remotion/bundler": "4.0.543",
+    "@remotion/transitions": "4.0.543",
+    "@remotion/motion-blur": "4.0.543",
+    "@remotion/noise": "4.0.543",
+    "remotion": "4.0.543",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}
