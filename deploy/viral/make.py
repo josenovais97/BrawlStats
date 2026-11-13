@@ -1617,12 +1617,14 @@ def chaos_drop(rarity, size):
 # rarity; every other one is its own art, cached by brawlzone-viral as
 # drops/<slug>.png.
 # Episode 1 was the Chaos Drops one (2026-10-29), so the list starts there.
-DROP_ROTATION = ['chaos-drops', 'starr-drops', 'mega-boxes', 'monster-eggs', 'coffin-boxes', 'presents',
-                 'boom-boxes', 'pumpkin-boxes', 'sushi-rolls', 'gigi-boxes', 'mina-boxes', 'ziggy-boxes']
+# Only the drops that are always in the game (owner, 2026-11-13: "monster eggs
+# are not even in the game anymore"). The event and brawler boxes come and
+# go with events, and a video about one that is gone reads as stale; the
+# site's own data marks these three as `core`.
+DROP_ROTATION = ['chaos-drops', 'starr-drops', 'ranked-starr-drops']
 if KIND == 'drops':
     _drops = data.get('drops', {})
     _ok = [k for k in DROP_ROTATION if k in _drops and dimg('chaos-drop.png' if k == 'chaos-drops' else f'{k}.png', 16) is not None]
-    _ok += sorted(k for k in _drops if k not in DROP_ROTATION and dimg(f'{k}.png', 16) is not None)
     if not _ok:
         print('no drop table with art'); sys.exit(3)
     DROP_KEY = _ok[(episode('drops') - 1) % len(_ok)]
