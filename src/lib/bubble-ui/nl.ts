@@ -177,6 +177,7 @@ const nl: UiStrings = {
   'history.bestStreak': "beste {n}",
   'history.hint': "Tik op een potje voor de analyse.",
   'history.empty': "Nog geen ladderpotjes in je recente gevechten.",
+  'history.noTag': "Voeg je spelerstag toe in de BrawlZone-app om hier je ladderpotjes te zien.",
   'history.unavailable': "Je potjes kunnen nu niet worden geladen. Probeer het zo opnieuw.",
   'history.win': "Winst",
   'history.loss': "Verlies",

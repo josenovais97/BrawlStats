@@ -316,7 +316,7 @@ export default async function BubblePanelPage() {
         <PanelSupport />
 
 
-        <p className="px-2 pb-2 pt-4 text-center text-[11px] leading-relaxed text-muted">
+        <p data-panel-footer className="px-2 pb-2 pt-4 text-center text-[11px] leading-relaxed text-muted">
           <PanelText k="page.footer" />
         </p>
       </PanelRoot>

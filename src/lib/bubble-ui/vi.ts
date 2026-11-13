@@ -177,6 +177,7 @@ const vi: UiStrings = {
   'history.bestStreak': "tốt nhất {n}",
   'history.hint': "Chạm vào một trận để xem phân tích.",
   'history.empty': "Chưa có trận Xếp hạng nào trong các trận gần đây.",
+  'history.noTag': "Thêm thẻ người chơi trong ứng dụng BrawlZone để xem các trận Xếp hạng của bạn tại đây.",
   'history.unavailable': "Hiện chưa tải được các trận của bạn. Hãy thử lại sau.",
   'history.win': "Thắng",
   'history.loss': "Thua",

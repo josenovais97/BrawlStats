@@ -116,16 +116,16 @@ export function PanelTrophies() {
                 <span className="shrink-0">{left(e.endsAt)}</span>
               </span>
             </span>
-            <span className="flex shrink-0 flex-col gap-1">
-              <span className="flex items-center gap-1">
-                <span className="w-9 text-end text-[9px] font-bold uppercase text-muted">{t('trophies.top')}</span>
-                {faces(e.best, false)}
-              </span>
+            {/* One label column for both rows, as wide as the longer word
+                ("Seninkiler", "Melhores"), so the faces line up in every language. */}
+            <span className="grid shrink-0 grid-cols-[auto_auto] items-center gap-x-1.5 gap-y-1">
+              <span className="whitespace-nowrap text-end text-[9px] font-bold uppercase text-muted">{t('trophies.top')}</span>
+              <span className="flex gap-1">{faces(e.best, false)}</span>
               {e.yours.length > 0 ? (
-                <span className="flex items-start gap-1">
-                  <span className="mt-1.5 w-9 text-end text-[9px] font-bold uppercase text-[#ffc53d]">{t('trophies.you')}</span>
-                  {faces(e.yours, true)}
-                </span>
+                <>
+                  <span className="mt-1.5 self-start whitespace-nowrap text-end text-[9px] font-bold uppercase text-[#ffc53d]">{t('trophies.you')}</span>
+                  <span className="flex items-start gap-1">{faces(e.yours, true)}</span>
+                </>
               ) : null}
             </span>
           </li>
@@ -145,8 +145,6 @@ export function PanelTrophies() {
             ))}
           </ul>
         </div>
-      ) : !data.hasTag ? (
-        <p className="px-1 text-[11px] text-muted">{t('account.noTag')}</p>
       ) : null}
     </div>
   );

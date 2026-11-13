@@ -177,6 +177,7 @@ const th: UiStrings = {
   'history.bestStreak': "ดีที่สุด {n}",
   'history.hint': "แตะเกมเพื่อดูการวิเคราะห์",
   'history.empty': "ยังไม่มีเกมจัดอันดับในการต่อสู้ล่าสุดของคุณ",
+  'history.noTag': "เพิ่มแท็กผู้เล่นในแอป BrawlZone เพื่อดูเกมจัดอันดับของคุณที่นี่",
   'history.unavailable': "ตอนนี้โหลดเกมของคุณไม่ได้ ลองใหม่อีกครั้งในอีกสักครู่",
   'history.win': "ชนะ",
   'history.loss': "แพ้",

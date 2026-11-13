@@ -177,6 +177,7 @@ const ar: UiStrings = {
   'history.bestStreak': "الأفضل {n}",
   'history.hint': "اضغط على مباراة لرؤية مراجعتها.",
   'history.empty': "لا توجد مباريات مصنفة في معاركك الأخيرة بعد.",
+  'history.noTag': "أضف وسم اللاعب في تطبيق BrawlZone لترى مبارياتك المصنفة هنا.",
   'history.unavailable': "تعذّر تحميل مبارياتك الآن. حاول بعد قليل.",
   'history.win': "فوز",
   'history.loss': "خسارة",

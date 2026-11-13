@@ -177,6 +177,7 @@ const ja: UiStrings = {
   'history.bestStreak': "最高{n}",
   'history.hint': "試合をタップすると振り返りが見られます。",
   'history.empty': "最近のバトルにガチバトルの試合はまだありません。",
+  'history.noTag': "BrawlZoneアプリでプレイヤータグを追加すると、ここにガチバトルの試合が表示されます。",
   'history.unavailable': "今は試合を読み込めません。少ししてからもう一度お試しください。",
   'history.win': "勝利",
   'history.loss': "敗北",

@@ -182,6 +182,7 @@ const es: UiStrings = {
   'history.bestStreak': "mejor {n}",
   'history.hint': "Toca una partida para ver su análisis.",
   'history.empty': "Aún no hay partidas de Competitivo en tus batallas recientes.",
+  'history.noTag': "Añade tu ID de jugador en la app BrawlZone para ver aquí tus partidas de Competitivo.",
   'history.unavailable': "Ahora no se pueden cargar tus partidas. Inténtalo en un momento.",
   'history.win': "Victoria",
   'history.loss': "Derrota",

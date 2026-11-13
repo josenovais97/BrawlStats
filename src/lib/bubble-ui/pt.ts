@@ -178,6 +178,7 @@ const pt: UiStrings = {
   'history.bestStreak': "melhor {n}",
   'history.hint': "Toque numa partida para ver a análise.",
   'history.empty': "Ainda não há partidas Ranqueadas nas suas batalhas recentes.",
+  'history.noTag': "Adicione sua tag de jogador no app BrawlZone para ver suas partidas Ranqueadas aqui.",
   'history.unavailable': "Agora não dá para carregar suas partidas. Tente de novo em instantes.",
   'history.win': "Vitória",
   'history.loss': "Derrota",

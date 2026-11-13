@@ -177,6 +177,7 @@ const zhHant: UiStrings = {
   'history.bestStreak': "最佳 {n}",
   'history.hint': "點按一場比賽查看復盤。",
   'history.empty': "最近的對戰中還沒有排位賽。",
+  'history.noTag': "在 BrawlZone 應用程式中加入你的玩家標籤，即可在這裡查看你的排位賽。",
   'history.unavailable': "暫時無法載入你的比賽，請稍後再試。",
   'history.win': "勝利",
   'history.loss': "失敗",

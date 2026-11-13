@@ -6,6 +6,7 @@ const es419: UiStrings = {
   ...es,
   'lang.hint': 'Elige el idioma de tu juego para que los nombres de mapas y brawlers coincidan.',
   'account.noTag': 'Agrega tu ID de jugador en la app BrawlZone y este panel marcará los brawlers que tienes.',
+  'history.noTag': "Agrega tu ID de jugador en la app BrawlZone para ver aquí tus partidas de Competitivo.",
   'draft.addBans': 'Agregar un bloqueo…',
   'draft.addAllies': 'Agregar a tu equipo…',
   'draft.addEnemies': 'Agregar un rival…',

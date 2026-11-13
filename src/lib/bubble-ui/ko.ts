@@ -177,6 +177,7 @@ const ko: UiStrings = {
   'history.bestStreak': "최고 {n}",
   'history.hint': "경기를 탭하면 분석을 볼 수 있어요.",
   'history.empty': "최근 전투에 아직 경쟁전 경기가 없어요.",
+  'history.noTag': "BrawlZone 앱에 플레이어 태그를 추가하면 여기에서 경쟁전 경기를 볼 수 있어요.",
   'history.unavailable': "지금은 경기를 불러올 수 없어요. 잠시 후 다시 시도해 주세요.",
   'history.win': "승리",
   'history.loss': "패배",

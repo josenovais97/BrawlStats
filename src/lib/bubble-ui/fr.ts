@@ -177,6 +177,7 @@ const fr: UiStrings = {
   'history.bestStreak': "meilleure {n}",
   'history.hint': "Touche une partie pour voir son analyse.",
   'history.empty': "Pas encore de parties Classé dans tes combats récents.",
+  'history.noTag': "Ajoute ton identifiant de joueur dans l’app BrawlZone pour voir tes parties Classé ici.",
   'history.unavailable': "Impossible de charger tes parties pour le moment. Réessaie dans un instant.",
   'history.win': "Victoire",
   'history.loss': "Défaite",

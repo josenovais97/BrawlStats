@@ -46,6 +46,7 @@ export const UI_EN = {
   'history.bestStreak': "best {n}",
   'history.hint': "Tap a game for its review.",
   'history.empty': "No Ranked games in your recent battles yet.",
+  'history.noTag': "Add your player tag in the BrawlZone app to see your Ranked games here.",
   'history.unavailable': "Can't load your games right now. Try again in a moment.",
   'history.win': "Win",
   'history.loss': "Loss",

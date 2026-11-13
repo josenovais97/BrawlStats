@@ -1423,3 +1423,9 @@ html.fx-ready [data-fx='stamp'].fx-in:not(.fx-instant) { animation-name: fx-stam
 @media (prefers-reduced-motion: reduce) {
   [data-pending] { animation: none; }
 }
+
+/* Bubble panel: the meta-score footnote belongs to the tabs, not to the
+   History list or a game review opened over them. */
+body:has([data-panel-overlay]) [data-panel-footer] {
+  display: none;
+}

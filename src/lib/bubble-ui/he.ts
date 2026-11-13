@@ -177,6 +177,7 @@ const he: UiStrings = {
   'history.bestStreak': "הכי טוב {n}",
   'history.hint': "הקש על משחק כדי לראות את הניתוח שלו.",
   'history.empty': "עדיין אין משחקים מדורגים בקרבות האחרונים שלך.",
+  'history.noTag': "הוסיפו את תג השחקן באפליקציית BrawlZone כדי לראות כאן את המשחקים המדורגים שלכם.",
   'history.unavailable': "אי אפשר לטעון את המשחקים שלך כרגע. נסה שוב עוד רגע.",
   'history.win': "ניצחון",
   'history.loss': "הפסד",

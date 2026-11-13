@@ -194,7 +194,7 @@ export function PanelHistory({
       ) : null}
 
       {!tag ? (
-        <p className="bz-panel px-3 py-3 text-[12px] text-muted">{t('account.noTag')}</p>
+        <p className="bz-panel px-3 py-3 text-[12px] text-muted">{t('history.noTag')}</p>
       ) : games === null && !failed ? (
         <div className="space-y-1.5">
           {[0, 1, 2, 3].map((i) => (

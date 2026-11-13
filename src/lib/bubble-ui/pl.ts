@@ -177,6 +177,7 @@ const pl: UiStrings = {
   'history.bestStreak': "najlepsza {n}",
   'history.hint': "Dotknij meczu, aby zobaczyć analizę.",
   'history.empty': "Brak jeszcze meczów rankingowych w ostatnich walkach.",
+  'history.noTag': "Dodaj swój tag gracza w aplikacji BrawlZone, aby zobaczyć tu swoje mecze rankingowe.",
   'history.unavailable': "Nie można teraz wczytać meczów. Spróbuj za chwilę.",
   'history.win': "Wygrana",
   'history.loss': "Przegrana",

@@ -177,6 +177,7 @@ const fi: UiStrings = {
   'history.bestStreak': "paras {n}",
   'history.hint': "Napauta peliä nähdäksesi sen analyysin.",
   'history.empty': "Viimeisissä otteluissasi ei ole vielä rankattuja pelejä.",
+  'history.noTag': "Lisää pelaajatunnuksesi BrawlZone-sovellukseen, niin näet rankatut pelisi täällä.",
   'history.unavailable': "Pelejäsi ei voi ladata juuri nyt. Yritä hetken päästä.",
   'history.win': "Voitto",
   'history.loss': "Tappio",

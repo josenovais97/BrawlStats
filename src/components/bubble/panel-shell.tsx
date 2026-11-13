@@ -180,20 +180,24 @@ export function PanelShell({
 
   if (review) {
     return (
-      <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+      <div data-panel-overlay>
+        <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+      </div>
     );
   }
   if (historyOpen) {
     return (
-      <PanelHistory
-        roster={roster}
-        modeArt={modeArt}
-        onClose={() => setHistoryOpen(false)}
-        onCounters={(id) => {
-          setHistoryOpen(false);
-          reviewCounters(id);
-        }}
-      />
+      <div data-panel-overlay>
+        <PanelHistory
+          roster={roster}
+          modeArt={modeArt}
+          onClose={() => setHistoryOpen(false)}
+          onCounters={(id) => {
+            setHistoryOpen(false);
+            reviewCounters(id);
+          }}
+        />
+      </div>
     );
   }
 

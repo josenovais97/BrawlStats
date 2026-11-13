@@ -177,6 +177,7 @@ const ms: UiStrings = {
   'history.bestStreak': "terbaik {n}",
   'history.hint': "Ketik perlawanan untuk melihat ulasannya.",
   'history.empty': "Belum ada perlawanan Berperingkat dalam pertempuran terkini anda.",
+  'history.noTag': "Tambah tag pemain anda dalam aplikasi BrawlZone untuk melihat perlawanan Berperingkat anda di sini.",
   'history.unavailable': "Perlawanan anda tidak dapat dimuatkan sekarang. Cuba sebentar lagi.",
   'history.win': "Menang",
   'history.loss': "Kalah",

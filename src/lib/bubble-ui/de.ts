@@ -177,6 +177,7 @@ const de: UiStrings = {
   'history.bestStreak': "beste {n}",
   'history.hint': "Tippe ein Spiel an für seine Analyse.",
   'history.empty': "Noch keine Ranked-Spiele in deinen letzten Kämpfen.",
+  'history.noTag': "Füge in der BrawlZone-App deine Spieler-ID hinzu, um hier deine Ranked-Spiele zu sehen.",
   'history.unavailable': "Deine Spiele können gerade nicht geladen werden. Versuch es gleich nochmal.",
   'history.win': "Sieg",
   'history.loss': "Niederlage",
