@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">Gry: %1$s · wygrane: %2$d%% · najlepsza seria: %3$d. Dotknij, aby udostępnić Season Wrapped.</string>
     <string name="prestige_title">%1$s jest blisko prestiżu</string>
     <string name="prestige_text">Brakuje %1$d pucharów. Pushuj na dzisiejszych mapach.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Historia meczów</string>
+    <string name="tilt_title">%1$d porażki z rzędu</string>
+    <string name="tilt_text">Przerwa na 5 minut? Odpoczynek pomaga bardziej niż kolejny mecz.</string>
+    <string name="tilt_ok">Graj dalej</string>
+    <string name="widget_goal_name">Następny cel</string>
+    <string name="widget_goal_description">Wygrane do następnej rangi i dzisiejszy cel</string>
+    <string name="widget_goal_label">NASTĘPNY CEL</string>
+    <string name="widget_goal_wins">%1$d wygranych do %2$s</string>
+    <string name="widget_goal_next">Następna: %1$s</string>
+    <string name="widget_goal_top">Osiągnięto najwyższą rangę</string>
+    <string name="widget_goal_today">Dziś %1$d/%2$d wygranych</string>
+    <string name="widget_goal_done">Cel dnia osiągnięty: %1$d wygranych ✓</string>
 </resources>

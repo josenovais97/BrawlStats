@@ -280,7 +280,11 @@ class BubbleService : Service() {
                 reviewBusy.set(false)
             }
             val session = runCatching { Review.session(app) }.getOrNull()
-            handler.post { paintSessionBadge(session) }
+            val losses = runCatching { Review.lossStreak(app) }.getOrNull()
+            handler.post {
+                paintSessionBadge(session)
+                maybeTilt(losses)
+            }
             if (found != null) handler.post { onNewReview(found) }
         }.start()
     }
@@ -423,7 +427,7 @@ class BubbleService : Service() {
     private var pendingBrawler: Int? = null
 
     private fun openPanelOn(tab: String?, brawler: Int? = null) {
-        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters", "trophies") }
+        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters", "trophies", "history") }
         pendingBrawler = brawler
         if (panel == null) showPanel()
         if (panelLoaded) applyPendingTab()
@@ -480,6 +484,7 @@ class BubbleService : Service() {
     override fun onDestroy() {
         running = false
         hideQuickMenu()
+        hideTiltCard()
         BubbleLook.prefs(this).unregisterOnSharedPreferenceChangeListener(lookListener)
         AppLang.prefs(this).unregisterOnSharedPreferenceChangeListener(langListener)
         slide?.cancel()
@@ -879,6 +884,7 @@ class BubbleService : Service() {
             "counters" to R.string.menu_counters,
             "meta" to R.string.menu_meta,
             "trophies" to R.string.menu_trophies,
+            "history" to R.string.menu_history,
             "season" to R.string.menu_season,
         )
         val column = LinearLayout(this).apply {
@@ -954,6 +960,122 @@ class BubbleService : Service() {
     private fun hideQuickMenu() {
         quickMenu?.let { runCatching { windows.removeView(it) } }
         quickMenu = null
+    }
+
+    // ---------------------------------------------------------- tilt guard
+
+    private var tiltCard: View? = null
+    private val hideTilt = Runnable { hideTiltCard() }
+
+    /**
+     * Three Ranked losses in a row (1.41): a small card beside the bubble
+     * suggesting a short break. Once per losing streak (keyed on the newest
+     * loss), at most twice a day, gone after 15 s or a tap. Kind, not a nag.
+     */
+    private fun maybeTilt(losses: Pair<Int, Long>?) {
+        val (streak, at) = losses ?: return
+        if (streak < TILT_AFTER || bubble == null) return
+        // Only a streak still being played: not three losses from this morning.
+        if (System.currentTimeMillis() - at > 30 * 60 * 1000L) return
+        val p = getSharedPreferences(TILT_PREFS, MODE_PRIVATE)
+        if (p.getLong("last", 0L) >= at) return
+        val today = java.time.LocalDate.now().toString()
+        val count = if (p.getString("day", null) == today) p.getInt("count", 0) else 0
+        if (count >= TILT_PER_DAY) return
+        p.edit().putLong("last", at).putString("day", today).putInt("count", count + 1).apply()
+        showTiltCard(streak)
+    }
+
+    private fun showTiltCard(streak: Int) {
+        hideTiltCard()
+        val params = bubbleParams ?: return
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = GradientDrawable().apply {
+                cornerRadius = dp(16).toFloat()
+                setColor(0xF2101733.toInt())
+                setStroke(dp(2), 0xFF050A1F.toInt())
+            }
+            setPadding(dp(12), dp(10), dp(14), dp(10))
+            elevation = dp(10).toFloat()
+        }
+        card.addView(
+            TextView(this).apply {
+                text = "☕"
+                textSize = 24f
+                setPadding(0, 0, dp(10), 0)
+            },
+        )
+        val words = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        words.addView(
+            TextView(this).apply {
+                text = str(R.string.tilt_title).format(streak)
+                setTextColor(Color.WHITE)
+                textSize = 14f
+                typeface = Typeface.DEFAULT_BOLD
+            },
+        )
+        words.addView(
+            TextView(this).apply {
+                text = str(R.string.tilt_text)
+                setTextColor(0xFFB8C2E0.toInt())
+                textSize = 12f
+                maxWidth = dp(200)
+            },
+        )
+        words.addView(
+            TextView(this).apply {
+                text = str(R.string.tilt_ok)
+                setTextColor(0xFFFFC53D.toInt())
+                textSize = 12f
+                typeface = Typeface.DEFAULT_BOLD
+                setPadding(0, dp(6), 0, 0)
+            },
+        )
+        card.addView(words)
+        card.setOnClickListener {
+            buzz(it)
+            hideTiltCard()
+        }
+        card.setOnTouchListener { _, e ->
+            if (e.actionMasked == MotionEvent.ACTION_OUTSIDE) {
+                hideTiltCard()
+                true
+            } else {
+                false
+            }
+        }
+        val onLeft = params.x + params.width / 2 < screenW / 2
+        val lp = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            overlayType(),
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.TOP or (if (onLeft) Gravity.START else Gravity.END)
+            x = if (onLeft) params.x + params.width else (screenW - params.x).coerceAtLeast(0)
+            y = params.y.coerceIn(0, (screenH - dp(120)).coerceAtLeast(0))
+        }
+        card.alpha = 0f
+        card.translationY = dp(8).toFloat()
+        runCatching { windows.addView(card, lp) }
+            .onSuccess {
+                tiltCard = card
+                buzz(bubble, "drag")
+                card.animate().alpha(1f).translationY(0f).setDuration(220).start()
+                handler.removeCallbacks(hideTilt)
+                handler.postDelayed(hideTilt, TILT_SHOW_MS)
+            }
+    }
+
+    private fun hideTiltCard() {
+        handler.removeCallbacks(hideTilt)
+        tiltCard?.let { runCatching { windows.removeView(it) } }
+        tiltCard = null
     }
 
     /**
@@ -2061,6 +2183,11 @@ class BubbleService : Service() {
         const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
         /** Held this long without moving: the quick menu (1.41). */
         private const val LONG_PRESS_MS = 450L
+        /** Tilt guard (1.41): this many Ranked losses in a row, at most so often a day, shown so long. */
+        private const val TILT_AFTER = 3
+        private const val TILT_PER_DAY = 2
+        private const val TILT_SHOW_MS = 15_000L
+        private const val TILT_PREFS = "brawlzone-tilt"
         const val ACTION_OPEN_PANEL = "net.brawlzone.bubble.OPEN_PANEL"
 
         /** The test build's button: replay the newest Ranked game as a post-game review. */

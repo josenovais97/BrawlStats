@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s เกม · ชนะ %2$d%% · ชนะติดกันสูงสุด %3$d แตะเพื่อแชร์ Season Wrapped</string>
     <string name="prestige_title">%1$s ใกล้เพรสทีจแล้ว</string>
     <string name="prestige_text">อีก %1$d ถ้วย ดันถ้วยในแมปวันนี้</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">ประวัติการแข่ง</string>
+    <string name="tilt_title">แพ้ติดกัน %1$d เกม</string>
+    <string name="tilt_text">พัก 5 นาทีไหม การพักช่วยได้มากกว่าเล่นอีกเกม</string>
+    <string name="tilt_ok">เล่นต่อ</string>
+    <string name="widget_goal_name">เป้าหมายถัดไป</string>
+    <string name="widget_goal_description">จำนวนชนะถึงแรงก์ถัดไปและเป้าหมายวันนี้</string>
+    <string name="widget_goal_label">เป้าหมายถัดไป</string>
+    <string name="widget_goal_wins">อีก %1$d ชนะถึง %2$s</string>
+    <string name="widget_goal_next">ถัดไป: %1$s</string>
+    <string name="widget_goal_top">ถึงแรงก์สูงสุดแล้ว</string>
+    <string name="widget_goal_today">วันนี้ %1$d/%2$d ชนะ</string>
+    <string name="widget_goal_done">ครบเป้าวันนี้: %1$d ชนะ ✓</string>
 </resources>

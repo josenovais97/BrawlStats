@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s potjes · %2$d%% gewonnen · beste reeks %3$d. Tik om je Season Wrapped te delen.</string>
     <string name="prestige_title">%1$s is bijna prestige</string>
     <string name="prestige_text">Nog %1$d trofeeën. Push op de trofeeënmaps van vandaag.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Wedstrijdgeschiedenis</string>
+    <string name="tilt_title">%1$d verliespartijen op rij</string>
+    <string name="tilt_text">Even 5 minuten pauze? Dat helpt meer dan nog een potje.</string>
+    <string name="tilt_ok">Verder spelen</string>
+    <string name="widget_goal_name">Volgend doel</string>
+    <string name="widget_goal_description">Overwinningen tot je volgende rang en het doel van vandaag</string>
+    <string name="widget_goal_label">VOLGEND DOEL</string>
+    <string name="widget_goal_wins">Nog %1$d overwinningen tot %2$s</string>
+    <string name="widget_goal_next">Volgende: %1$s</string>
+    <string name="widget_goal_top">Hoogste rang bereikt</string>
+    <string name="widget_goal_today">Vandaag %1$d/%2$d gewonnen</string>
+    <string name="widget_goal_done">Dagdoel gehaald: %1$d overwinningen ✓</string>
 </resources>

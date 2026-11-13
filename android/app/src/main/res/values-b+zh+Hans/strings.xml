@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s 场 · 胜率 %2$d%% · 最长连胜 %3$d。点按分享你的 Season Wrapped。</string>
     <string name="prestige_title">%1$s 即将达到声望</string>
     <string name="prestige_text">还差 %1$d 奖杯。在今天的奖杯地图上冲分吧。</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">比赛历史</string>
+    <string name="tilt_title">已连输 %1$d 场</string>
+    <string name="tilt_text">休息 5 分钟？休息比再来一局更有用。</string>
+    <string name="tilt_ok">继续游戏</string>
+    <string name="widget_goal_name">下一个目标</string>
+    <string name="widget_goal_description">距离下一段位的胜场和今日目标</string>
+    <string name="widget_goal_label">下一个目标</string>
+    <string name="widget_goal_wins">距离 %2$s 还差 %1$d 胜</string>
+    <string name="widget_goal_next">下一段位：%1$s</string>
+    <string name="widget_goal_top">已达到最高段位</string>
+    <string name="widget_goal_today">今天 %1$d/%2$d 胜</string>
+    <string name="widget_goal_done">今日目标完成：%1$d 胜 ✓</string>
 </resources>

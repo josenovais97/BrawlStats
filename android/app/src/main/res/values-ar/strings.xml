@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s مباراة · %2$d%% فوز · أفضل سلسلة %3$d. اضغط لمشاركة Season Wrapped.</string>
     <string name="prestige_title">%1$s قريب من البريستيج</string>
     <string name="prestige_text">تبقّى %1$d كأس. ادفع على خرائط الكؤوس اليوم.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">سجل المباريات</string>
+    <string name="tilt_title">%1$d خسائر متتالية</string>
+    <string name="tilt_text">استراحة 5 دقائق؟ الراحة تفيد أكثر من مباراة أخرى.</string>
+    <string name="tilt_ok">تابع اللعب</string>
+    <string name="widget_goal_name">الهدف التالي</string>
+    <string name="widget_goal_description">الانتصارات حتى رتبتك التالية وهدف اليوم</string>
+    <string name="widget_goal_label">الهدف التالي</string>
+    <string name="widget_goal_wins">%1$d انتصارات حتى %2$s</string>
+    <string name="widget_goal_next">التالي: %1$s</string>
+    <string name="widget_goal_top">وصلت إلى أعلى رتبة</string>
+    <string name="widget_goal_today">اليوم %1$d/%2$d انتصارات</string>
+    <string name="widget_goal_done">تم هدف اليوم: %1$d انتصارات ✓</string>
 </resources>

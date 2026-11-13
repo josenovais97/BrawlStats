@@ -56,3 +56,4 @@ class RankWidget : BubbleWidget(Widgets.Kind.RANK)
 /** Friends (1.40): the player and up to five friends by elo, with this week's record. */
 class FriendsWidget : BubbleWidget(Widgets.Kind.FRIENDS)
 class TrophiesWidget : BubbleWidget(Widgets.Kind.TROPHIES)
+class GoalWidget : BubbleWidget(Widgets.Kind.GOAL)

@@ -96,6 +96,17 @@ object Review {
         return decorate(context, tag, game, j.optInt("newGames", 1))
     }
 
+    /**
+     * The Ranked losses in a row up to the newest game, and that game's time
+     * (1.41 tilt guard). Null when the newest game was a win.
+     */
+    fun lossStreak(context: Context): Pair<Int, Long>? {
+        val tag = Account.tag(context).ifEmpty { return null }
+        val games = Tally.battles(context, tag).sortedByDescending { it.at }
+        val streak = games.takeWhile { !it.win }.size
+        return if (streak == 0) null else streak to games.first().at
+    }
+
     /** Today's Ranked record on this phone and the elo moved since the day began (1.41). */
     data class Session(val wins: Int, val losses: Int, val elo: Int?)
 

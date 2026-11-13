@@ -156,6 +156,19 @@
                 android:resource="@xml/widget_trophies_info" />
         </receiver>
 
+        <!-- Next goal (1.41): wins to the next rank and today's goal. -->
+        <receiver
+            android:name=".GoalWidget"
+            android:exported="false"
+            android:label="@string/widget_goal_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_goal_info" />
+        </receiver>
+
         <!-- Share cards (1.40): the drawn PNG, handed to the share sheet from the cache. -->
         <provider
             android:name="androidx.core.content.FileProvider"

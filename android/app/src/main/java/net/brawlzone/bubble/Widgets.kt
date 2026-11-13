@@ -41,7 +41,7 @@ object Widgets {
 
     const val ACTION_REFRESH = "net.brawlzone.bubble.WIDGET_REFRESH"
 
-    enum class Kind { SMALL, MEDIUM, LARGE, RANK, FRIENDS, TROPHIES }
+    enum class Kind { SMALL, MEDIUM, LARGE, RANK, FRIENDS, TROPHIES, GOAL }
 
     data class Settings(val mode: String?, val reward: Boolean, val opacity: Int)
 
@@ -55,6 +55,7 @@ object Widgets {
         RankWidget::class.java to Kind.RANK,
         FriendsWidget::class.java to Kind.FRIENDS,
         TrophiesWidget::class.java to Kind.TROPHIES,
+        GoalWidget::class.java to Kind.GOAL,
     )
 
     private val TIER_COLORS = mapOf(
@@ -119,6 +120,7 @@ object Widgets {
             Kind.RANK -> rank(context, id, me)
             Kind.FRIENDS -> friends(context, id)
             Kind.TROPHIES -> trophies(context, id)
+            Kind.GOAL -> goal(context, id, me)
         }
         runCatching { manager.updateAppWidget(id, views) }
     }
@@ -362,6 +364,66 @@ object Widgets {
 
     private data class TrophyRow(val root: Int, val face: Int, val map: Int, val sub: Int, val count: Int)
 
+    /**
+     * Next goal (1.41): the wins it takes to reach the next rank, how far into
+     * this one the player is, and today's goal with the streak. Opens the app.
+     */
+    private fun goal(context: Context, id: Int, me: Me.Data?): RemoteViews {
+        val local = AppLang.wrap(context)
+        val v = RemoteViews(context.packageName, R.layout.widget_goal)
+        background(v, settings(context, id))
+        header(context, v, id, GoalWidget::class.java, local)
+        v.setOnClickPendingIntent(R.id.widget_root, openApp(context, id))
+        v.setTextViewText(R.id.widget_goal_label, local.getString(R.string.widget_goal_label))
+        val tag = Account.tag(context)
+        if (tag.isEmpty() || me == null || me.rank == null) {
+            v.setViewVisibility(R.id.widget_goal_body, View.GONE)
+            v.setViewVisibility(R.id.widget_goal_today_row, View.GONE)
+            v.setViewVisibility(R.id.widget_goal_empty, View.VISIBLE)
+            v.setTextViewText(
+                R.id.widget_goal_empty,
+                local.getString(
+                    when {
+                        tag.isEmpty() -> R.string.widget_rank_none
+                        me == null -> R.string.widget_rank_waiting
+                        else -> R.string.widget_rank_unranked
+                    },
+                ),
+            )
+            return v
+        }
+        v.setViewVisibility(R.id.widget_goal_empty, View.GONE)
+        v.setViewVisibility(R.id.widget_goal_body, View.VISIBLE)
+        val next = me.next
+        val wins = me.winsToNext
+        v.setTextViewText(
+            R.id.widget_goal_wins,
+            when {
+                next == null -> local.getString(R.string.widget_goal_top)
+                wins != null && wins > 0 -> local.getString(R.string.widget_goal_wins, wins, next)
+                else -> local.getString(R.string.widget_goal_next, next)
+            },
+        )
+        v.setProgressBar(R.id.widget_goal_bar, 100, ((me.share ?: 1.0) * 100).toInt().coerceIn(0, 100), false)
+        val elo = me.elo?.let { " · " + local.getString(R.string.widget_elo, NumberFormat.getIntegerInstance().format(it)) } ?: ""
+        v.setTextViewText(R.id.widget_goal_rank, me.rank + elo)
+        cached(context, me.rankIcon)?.let { v.setImageViewBitmap(R.id.widget_goal_badge, it) }
+        val target = Goal.goal(context)
+        if (target > 0) {
+            v.setViewVisibility(R.id.widget_goal_today_row, View.VISIBLE)
+            val today = Goal.todayWins(context, tag)
+            v.setTextViewText(
+                R.id.widget_goal_today,
+                if (today >= target) local.getString(R.string.widget_goal_done, target) else local.getString(R.string.widget_goal_today, today.coerceAtMost(target), target),
+            )
+            val streak = Goal.streak(context, tag)
+            v.setTextViewText(R.id.widget_goal_streak, if (streak >= 2) "🔥 $streak" else "")
+        } else {
+            v.setViewVisibility(R.id.widget_goal_today_row, View.GONE)
+        }
+        return v
+    }
+
     private data class Row(val root: Int, val icon: Int, val name: Int, val tier: Int, val rate: Int)
 
     private fun reward(context: Context, v: RemoteViews, id: Int, data: Alerts.Data?, local: Context) {
@@ -458,6 +520,7 @@ object Widgets {
                     Kind.FRIENDS -> Friends.ladder(context).mapNotNullTo(badges) { it.data.rankIcon }
                     Kind.SMALL -> Unit
                     Kind.TROPHIES -> Trophy.last(context)?.events.orEmpty().take(4).mapNotNullTo(urls) { (it.yours ?: it.best)?.icon }
+                    Kind.GOAL -> me?.rankIcon?.let(badges::add)
                 }
             }
         }

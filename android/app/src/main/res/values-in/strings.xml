@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s pertandingan · %2$d%% menang · streak terbaik %3$d. Ketuk untuk membagikan Season Wrapped.</string>
     <string name="prestige_title">%1$s hampir prestige</string>
     <string name="prestige_text">Kurang %1$d trofi. Push di map trofi hari ini.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Riwayat pertandingan</string>
+    <string name="tilt_title">Kalah %1$d kali beruntun</string>
+    <string name="tilt_text">Istirahat 5 menit? Jeda lebih membantu daripada main lagi.</string>
+    <string name="tilt_ok">Lanjut main</string>
+    <string name="widget_goal_name">Target berikutnya</string>
+    <string name="widget_goal_description">Kemenangan menuju rank berikutnya dan target hari ini</string>
+    <string name="widget_goal_label">TARGET BERIKUTNYA</string>
+    <string name="widget_goal_wins">%1$d kemenangan lagi ke %2$s</string>
+    <string name="widget_goal_next">Berikutnya: %1$s</string>
+    <string name="widget_goal_top">Rank tertinggi tercapai</string>
+    <string name="widget_goal_today">Hari ini %1$d/%2$d menang</string>
+    <string name="widget_goal_done">Target harian tercapai: %1$d menang ✓</string>
 </resources>

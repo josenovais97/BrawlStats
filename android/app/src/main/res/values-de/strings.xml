@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s Spiele · %2$d%% Siege · beste Serie %3$d. Tippe, um dein Season Wrapped zu teilen.</string>
     <string name="prestige_title">%1$s ist kurz vor dem Prestige</string>
     <string name="prestige_text">Noch %1$d Trophäen. Push auf den heutigen Trophäen-Maps.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Spielverlauf</string>
+    <string name="tilt_title">%1$d Niederlagen in Folge</string>
+    <string name="tilt_text">Kurz 5 Minuten Pause? Das hilft mehr als noch ein Spiel.</string>
+    <string name="tilt_ok">Weiterspielen</string>
+    <string name="widget_goal_name">Nächstes Ziel</string>
+    <string name="widget_goal_description">Siege bis zum nächsten Rang und dein Tagesziel</string>
+    <string name="widget_goal_label">NÄCHSTES ZIEL</string>
+    <string name="widget_goal_wins">Noch %1$d Siege bis %2$s</string>
+    <string name="widget_goal_next">Nächster: %1$s</string>
+    <string name="widget_goal_top">Höchster Rang erreicht</string>
+    <string name="widget_goal_today">Heute %1$d/%2$d Siege</string>
+    <string name="widget_goal_done">Tagesziel erreicht: %1$d Siege ✓</string>
 </resources>

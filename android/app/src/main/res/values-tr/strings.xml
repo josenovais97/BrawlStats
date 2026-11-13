@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s maç · %%%2$d galibiyet · en iyi seri %3$d. Season Wrapped\'ini paylaşmak için dokun.</string>
     <string name="prestige_title">%1$s prestije yakın</string>
     <string name="prestige_text">%1$d kupa kaldı. Bugünün kupa haritalarında kas.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Maç geçmişi</string>
+    <string name="tilt_title">Üst üste %1$d mağlubiyet</string>
+    <string name="tilt_text">5 dakika mola? Kısa bir ara bir maç daha oynamaktan iyidir.</string>
+    <string name="tilt_ok">Oynamaya devam</string>
+    <string name="widget_goal_name">Sonraki hedef</string>
+    <string name="widget_goal_description">Sonraki rütbeye kalan galibiyet ve bugünkü hedef</string>
+    <string name="widget_goal_label">SONRAKİ HEDEF</string>
+    <string name="widget_goal_wins">%2$s için %1$d galibiyet</string>
+    <string name="widget_goal_next">Sonraki: %1$s</string>
+    <string name="widget_goal_top">En yüksek rütbeye ulaşıldı</string>
+    <string name="widget_goal_today">Bugün %1$d/%2$d galibiyet</string>
+    <string name="widget_goal_done">Günlük hedef tamam: %1$d galibiyet ✓</string>
 </resources>

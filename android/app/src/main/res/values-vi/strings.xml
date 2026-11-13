@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s trận · thắng %2$d%% · chuỗi thắng dài nhất %3$d. Chạm để chia sẻ Season Wrapped.</string>
     <string name="prestige_title">%1$s sắp đạt mốc uy tín</string>
     <string name="prestige_text">Còn %1$d cúp. Leo trên các bản đồ cúp hôm nay.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Lịch sử trận đấu</string>
+    <string name="tilt_title">Thua %1$d trận liên tiếp</string>
+    <string name="tilt_text">Nghỉ 5 phút nhé? Nghỉ ngơi giúp nhiều hơn chơi thêm một trận.</string>
+    <string name="tilt_ok">Chơi tiếp</string>
+    <string name="widget_goal_name">Mục tiêu tiếp theo</string>
+    <string name="widget_goal_description">Số trận thắng đến hạng tiếp theo và mục tiêu hôm nay</string>
+    <string name="widget_goal_label">MỤC TIÊU TIẾP THEO</string>
+    <string name="widget_goal_wins">Còn %1$d trận thắng đến %2$s</string>
+    <string name="widget_goal_next">Tiếp theo: %1$s</string>
+    <string name="widget_goal_top">Đã đạt hạng cao nhất</string>
+    <string name="widget_goal_today">Hôm nay %1$d/%2$d trận thắng</string>
+    <string name="widget_goal_done">Đạt mục tiêu ngày: %1$d trận thắng ✓</string>
 </resources>

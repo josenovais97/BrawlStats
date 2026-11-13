@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s peliä · %2$d%% voittoja · paras putki %3$d. Napauta jakaaksesi Season Wrappedin.</string>
     <string name="prestige_title">%1$s on lähellä prestigeä</string>
     <string name="prestige_text">%1$d pokaalia jäljellä. Nosta tämän päivän pokaalikartoilla.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Otteluhistoria</string>
+    <string name="tilt_title">%1$d tappiota putkeen</string>
+    <string name="tilt_text">Viiden minuutin tauko? Lepo auttaa enemmän kuin yksi peli lisää.</string>
+    <string name="tilt_ok">Jatka pelaamista</string>
+    <string name="widget_goal_name">Seuraava tavoite</string>
+    <string name="widget_goal_description">Voitot seuraavaan arvoon ja päivän tavoite</string>
+    <string name="widget_goal_label">SEURAAVA TAVOITE</string>
+    <string name="widget_goal_wins">%1$d voittoa arvoon %2$s</string>
+    <string name="widget_goal_next">Seuraava: %1$s</string>
+    <string name="widget_goal_top">Korkein arvo saavutettu</string>
+    <string name="widget_goal_today">Tänään %1$d/%2$d voittoa</string>
+    <string name="widget_goal_done">Päivän tavoite täynnä: %1$d voittoa ✓</string>
 </resources>

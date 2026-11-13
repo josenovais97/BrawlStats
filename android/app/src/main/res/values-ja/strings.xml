@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s試合 · 勝率%2$d%% · 最長連勝%3$d。タップしてSeason Wrappedをシェア。</string>
     <string name="prestige_title">%1$s がプレステージ間近</string>
     <string name="prestige_text">あと%1$dトロフィー。今日のトロフィーマップでプッシュしよう。</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">試合履歴</string>
+    <string name="tilt_title">%1$d連敗中</string>
+    <string name="tilt_text">5分休憩しませんか？もう1試合より休む方が効きます。</string>
+    <string name="tilt_ok">続ける</string>
+    <string name="widget_goal_name">次の目標</string>
+    <string name="widget_goal_description">次のランクまでの勝利数と今日の目標</string>
+    <string name="widget_goal_label">次の目標</string>
+    <string name="widget_goal_wins">%2$sまであと%1$d勝</string>
+    <string name="widget_goal_next">次: %1$s</string>
+    <string name="widget_goal_top">最高ランクに到達</string>
+    <string name="widget_goal_today">今日 %1$d/%2$d勝</string>
+    <string name="widget_goal_done">今日の目標達成: %1$d勝 ✓</string>
 </resources>

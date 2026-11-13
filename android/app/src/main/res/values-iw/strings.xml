@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s משחקים · %2$d%% ניצחונות · רצף הכי טוב %3$d. הקש כדי לשתף את Season Wrapped.</string>
     <string name="prestige_title">%1$s קרוב ליוקרה</string>
     <string name="prestige_text">עוד %1$d גביעים. דחוף במפות הגביעים של היום.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">היסטוריית משחקים</string>
+    <string name="tilt_title">%1$d הפסדים ברצף</string>
+    <string name="tilt_text">הפסקה של 5 דקות? מנוחה עוזרת יותר ממשחק נוסף.</string>
+    <string name="tilt_ok">להמשיך לשחק</string>
+    <string name="widget_goal_name">היעד הבא</string>
+    <string name="widget_goal_description">ניצחונות עד הדירוג הבא והיעד של היום</string>
+    <string name="widget_goal_label">היעד הבא</string>
+    <string name="widget_goal_wins">%1$d ניצחונות עד %2$s</string>
+    <string name="widget_goal_next">הבא: %1$s</string>
+    <string name="widget_goal_top">הגעת לדירוג הגבוה ביותר</string>
+    <string name="widget_goal_today">היום %1$d/%2$d ניצחונות</string>
+    <string name="widget_goal_done">היעד היומי הושג: %1$d ניצחונות ✓</string>
 </resources>

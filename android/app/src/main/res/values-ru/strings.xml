@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">Игр: %1$s · побед: %2$d%% · лучшая серия: %3$d. Нажми, чтобы поделиться Season Wrapped.</string>
     <string name="prestige_title">%1$s близок к престижу</string>
     <string name="prestige_text">Осталось кубков: %1$d. Апай на сегодняшних картах.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">История матчей</string>
+    <string name="tilt_title">Поражений подряд: %1$d</string>
+    <string name="tilt_text">Перерыв 5 минут? Отдых поможет больше, чем ещё один бой.</string>
+    <string name="tilt_ok">Играть дальше</string>
+    <string name="widget_goal_name">Следующая цель</string>
+    <string name="widget_goal_description">Победы до следующего ранга и цель на сегодня</string>
+    <string name="widget_goal_label">СЛЕДУЮЩАЯ ЦЕЛЬ</string>
+    <string name="widget_goal_wins">Ещё побед до %2$s: %1$d</string>
+    <string name="widget_goal_next">Дальше: %1$s</string>
+    <string name="widget_goal_top">Достигнут высший ранг</string>
+    <string name="widget_goal_today">Сегодня %1$d/%2$d побед</string>
+    <string name="widget_goal_done">Цель дня выполнена: %1$d побед ✓</string>
 </resources>

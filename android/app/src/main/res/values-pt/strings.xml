@@ -247,4 +247,18 @@
     <string name="alert_wrapped_stats">%1$s partidas · %2$d%% vitórias · melhor sequência %3$d. Toque para compartilhar seu Season Wrapped.</string>
     <string name="prestige_title">%1$s está perto do prestígio</string>
     <string name="prestige_text">Faltam %1$d troféus. Suba nos mapas de troféus de hoje.</string>
+
+    <!-- 1.41: match history menu item, tilt guard, next goal widget -->
+    <string name="menu_history">Histórico</string>
+    <string name="tilt_title">%1$d derrotas seguidas</string>
+    <string name="tilt_text">Uma pausa de 5 minutos? Descansar ajuda mais que outra partida.</string>
+    <string name="tilt_ok">Continuar jogando</string>
+    <string name="widget_goal_name">Próxima meta</string>
+    <string name="widget_goal_description">Vitórias até o próximo rank e a meta de hoje</string>
+    <string name="widget_goal_label">PRÓXIMA META</string>
+    <string name="widget_goal_wins">%1$d vitórias até %2$s</string>
+    <string name="widget_goal_next">Próximo: %1$s</string>
+    <string name="widget_goal_top">Rank máximo alcançado</string>
+    <string name="widget_goal_today">Hoje %1$d/%2$d vitórias</string>
+    <string name="widget_goal_done">Meta diária cumprida: %1$d vitórias ✓</string>
 </resources>
