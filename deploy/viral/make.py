@@ -139,18 +139,38 @@ ASSET_DIR = os.environ.get('ASSETS', '.')
 
 def skin_model(bid, key, src):
     """The skin's Fan Kit render, trimmed, cached as models/<id>.png; fetched
-    here, on the day, because only five of a thousand are needed."""
+    here, on the day, because only five of a thousand are needed.
+
+    Both PARTs get here at the same moment and draw alternate frames, so they
+    must end up with the same picture. Until 2026-11-13 each wrote to
+    <path>.<pid>.png, and the pid is the same in both containers: one part's
+    rename failed, it drew the brawler's default look with a pixel clue, and
+    the skin quizzes flickered frame by frame between the two versions (the
+    skin in plain sight mid-round, clues that did not match the reveal). Now
+    one part downloads under a lock while the other waits for it, and a
+    download that fails leaves a marker the other part obeys."""
+    import fcntl, time, uuid
     sid = f'skin_{bid}_{key}'
     path = f'{ASSET_DIR}/models/{sid}.png'
-    if not os.path.exists(path):
-        import io, urllib.request
-        url = f"{src['url']}?width={min(src['w'], 2400)}"
-        body = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'BrawlZone (https://brawlzone.net)'}), timeout=60).read()
-        img = Image.open(io.BytesIO(body)).convert('RGBA')
-        img = img.crop(img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
-        img.thumbnail((2000, 2000), Image.LANCZOS)
-        tmp = f'{path}.{os.getpid()}.png'
-        img.save(tmp); os.replace(tmp, path)
+    failed = f'{path}.failed'
+    with open(f'{ASSET_DIR}/models/.skin.lock', 'w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if os.path.exists(path):
+            return sid
+        if os.path.exists(failed) and time.time() - os.path.getmtime(failed) < 3600:
+            raise RuntimeError('the other part could not download it')
+        try:
+            import io, urllib.request
+            url = f"{src['url']}?width={min(src['w'], 2400)}"
+            body = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'BrawlZone (https://brawlzone.net)'}), timeout=60).read()
+            img = Image.open(io.BytesIO(body)).convert('RGBA')
+            img = img.crop(img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
+            img.thumbnail((2000, 2000), Image.LANCZOS)
+            tmp = f'{path}.{uuid.uuid4().hex}.png'
+            img.save(tmp); os.replace(tmp, path)
+        except Exception:
+            open(failed, 'w').close()
+            raise
     return sid
 
 
