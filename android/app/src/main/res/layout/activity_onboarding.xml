@@ -213,10 +213,10 @@
                 android:layout_marginTop="12dp"
                 android:autofillHints=""
                 android:background="@drawable/field"
-                android:hint="#2RLCPVGUG"
+                android:hint="@string/tag_hint"
                 android:importantForAutofill="no"
-                android:inputType="textCapCharacters|textNoSuggestions"
-                android:maxLength="16"
+                android:inputType="text|textNoSuggestions"
+                android:maxLength="20"
                 android:paddingStart="16dp"
                 android:paddingTop="15dp"
                 android:paddingEnd="16dp"
@@ -225,6 +225,15 @@
                 android:textColor="@color/foreground"
                 android:textColorHint="@color/muted"
                 android:textSize="16sp" />
+
+            <!-- 1.41: players found by name; tapping one saves its tag. -->
+            <LinearLayout
+                android:id="@+id/onb_tag_matches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/onb_tag_status"

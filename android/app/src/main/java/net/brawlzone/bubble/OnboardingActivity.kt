@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -34,6 +36,7 @@ class OnboardingActivity : AppCompatActivity() {
     private var tagSaved = false
     private lateinit var tagField: EditText
     private lateinit var tagStatus: TextView
+    private lateinit var nameSearch: NameSearch
     private lateinit var clip: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +52,44 @@ class OnboardingActivity : AppCompatActivity() {
 
         tagSaved = Account.tag(this).isNotEmpty()
         if (tagSaved) tagField.setText("#" + Account.tag(this))
+
+        /*
+         * Find by name here too (1.41; the main screen has had it since 1.40):
+         * most players know their name, not their tag. Typing a name lists
+         * matching players; tapping one saves its tag straight away.
+         */
+        nameSearch = NameSearch(
+            this,
+            findViewById(R.id.onb_tag_matches),
+            onPick = { picked, _ ->
+                tagField.setText("#$picked")
+                tagField.setSelection(tagField.text.length)
+                saveTag(picked)
+            },
+            onState = { state ->
+                val text = when (state) {
+                    NameSearch.State.SEARCHING -> R.string.name_searching
+                    NameSearch.State.FOUND -> R.string.name_pick
+                    NameSearch.State.NONE -> R.string.name_none
+                    NameSearch.State.IDLE -> null
+                }
+                if (text != null) {
+                    tagStatus.visibility = View.VISIBLE
+                    tagStatus.setTextColor(getColor(R.color.muted))
+                    tagStatus.setText(text)
+                }
+            },
+        )
+        tagField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                val raw = s?.toString().orEmpty()
+                // A tag (or something typed as one) is saved with the button;
+                // anything else is a name to look up.
+                if (raw.trim().startsWith("#") || Account.isValid(raw)) nameSearch.clear() else nameSearch.query(raw)
+            }
+        })
 
         findViewById<Button>(R.id.onb_allow).setOnClickListener {
             // Overlay toggles are disabled while anything draws over the screen.
@@ -107,9 +148,16 @@ class OnboardingActivity : AppCompatActivity() {
         if (!Account.isValid(raw)) {
             tagStatus.visibility = View.VISIBLE
             tagStatus.setTextColor(getColor(R.color.muted))
-            tagStatus.text = getString(R.string.tag_invalid)
+            // Not a tag: a name, unless it was typed as one.
+            if (raw.trim().startsWith("#") || raw.trim().length < 2) {
+                tagStatus.text = getString(R.string.tag_invalid)
+            } else {
+                tagStatus.text = getString(R.string.name_searching)
+                nameSearch.query(raw)
+            }
             return
         }
+        nameSearch.clear()
         val tag = Account.normalise(raw)
         tagStatus.visibility = View.VISIBLE
         tagStatus.setTextColor(getColor(R.color.muted))
