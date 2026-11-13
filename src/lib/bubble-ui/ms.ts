@@ -159,6 +159,15 @@ const ms: UiStrings = {
   'sheet.bestWith': "Terbaik bersama",
   'sheet.trend': "Kadar menang, 30 hari lalu",
   'sheet.counterIt': "Tunjuk yang mengalahkannya",
+  'tab.trophies': "Trofi",
+  'chooser.trophies': "Peta trofi semasa: pilihan terbaik dan pilihan anda untuk push",
+  'trophies.top': "Terbaik",
+  'trophies.you': "Anda",
+  'trophies.left': "tinggal {h} jam",
+  'trophies.soon': "Tamat tidak lama lagi",
+  'trophies.prestige': "Paling hampir dengan prestij seterusnya",
+  'trophies.toNext': "kurang {n}",
+  'trophies.empty': "Tiada acara trofi sekarang.",
 };
 
 export default ms;

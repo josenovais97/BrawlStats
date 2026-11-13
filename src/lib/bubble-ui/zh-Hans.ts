@@ -159,6 +159,15 @@ const zhHans: UiStrings = {
   'sheet.bestWith': "最佳搭档",
   'sheet.trend': "胜率（近 30 天）",
   'sheet.counterIt': "查看谁克制它",
+  'tab.trophies': "奖杯",
+  'chooser.trophies': "当前奖杯地图：最强选择与你可冲分的英雄",
+  'trophies.top': "最佳",
+  'trophies.you': "你的",
+  'trophies.left': "剩余{h}小时",
+  'trophies.soon': "即将结束",
+  'trophies.prestige': "最接近下一次声望",
+  'trophies.toNext': "还差{n}",
+  'trophies.empty': "现在没有奖杯活动。",
 };
 
 export default zhHans;

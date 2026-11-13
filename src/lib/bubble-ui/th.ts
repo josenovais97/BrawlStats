@@ -159,6 +159,15 @@ const th: UiStrings = {
   'sheet.bestWith': "เข้าคู่ดีกับ",
   'sheet.trend': "อัตราชนะ 30 วันล่าสุด",
   'sheet.counterIt': "ดูตัวที่แก้ทาง",
+  'tab.trophies': "ถ้วยรางวัล",
+  'chooser.trophies': "แมปถ้วยที่เปิดอยู่: ตัวที่ดีที่สุดและตัวของคุณสำหรับดันถ้วย",
+  'trophies.top': "ดีที่สุด",
+  'trophies.you': "ของคุณ",
+  'trophies.left': "เหลือ {h} ชม.",
+  'trophies.soon': "ใกล้จบแล้ว",
+  'trophies.prestige': "ใกล้เพรสทีจถัดไปที่สุด",
+  'trophies.toNext': "อีก {n}",
+  'trophies.empty': "ตอนนี้ไม่มีอีเวนต์ถ้วย",
 };
 
 export default th;

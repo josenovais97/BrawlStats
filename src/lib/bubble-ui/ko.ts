@@ -159,6 +159,15 @@ const ko: UiStrings = {
   'sheet.bestWith': "최고의 조합",
   'sheet.trend': "승률, 최근 30일",
   'sheet.counterIt': "카운터 보기",
+  'tab.trophies': "트로피",
+  'chooser.trophies': "진행 중인 트로피 맵: 최고의 픽과 내가 올릴 브롤러",
+  'trophies.top': "최고",
+  'trophies.you': "내 픽",
+  'trophies.left': "{h}시간 남음",
+  'trophies.soon': "곧 종료",
+  'trophies.prestige': "다음 프레스티지에 가장 가까운 브롤러",
+  'trophies.toNext': "{n} 남음",
+  'trophies.empty': "지금은 트로피 이벤트가 없어요.",
 };
 
 export default ko;

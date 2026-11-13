@@ -159,6 +159,15 @@ const id: UiStrings = {
   'sheet.bestWith': "Terbaik bersama",
   'sheet.trend': "Win rate, 30 hari terakhir",
   'sheet.counterIt': "Lihat counter-nya",
+  'tab.trophies': "Trofi",
+  'chooser.trophies': "Map trofi yang aktif: pilihan terbaik dan milikmu untuk push",
+  'trophies.top': "Terbaik",
+  'trophies.you': "Milikmu",
+  'trophies.left': "sisa {h} jam",
+  'trophies.soon': "Segera berakhir",
+  'trophies.prestige': "Paling dekat ke prestige berikutnya",
+  'trophies.toNext': "kurang {n}",
+  'trophies.empty': "Tidak ada event trofi saat ini.",
 };
 
 export default id;

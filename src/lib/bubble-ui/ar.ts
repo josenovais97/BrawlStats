@@ -159,6 +159,15 @@ const ar: UiStrings = {
   'sheet.bestWith': "الأفضل مع",
   'sheet.trend': "نسبة الفوز، آخر 30 يومًا",
   'sheet.counterIt': "اعرض من يتفوق عليه",
+  'tab.trophies': "الكؤوس",
+  'chooser.trophies': "خرائط الكؤوس الحالية: أفضل الاختيارات واختياراتك للدفع",
+  'trophies.top': "الأفضل",
+  'trophies.you': "لك",
+  'trophies.left': "تبقّى {h} س",
+  'trophies.soon': "ينتهي قريبًا",
+  'trophies.prestige': "الأقرب إلى البريستيج التالي",
+  'trophies.toNext': "تبقّى {n}",
+  'trophies.empty': "لا توجد أحداث كؤوس الآن.",
 };
 
 export default ar;

@@ -159,6 +159,15 @@ const he: UiStrings = {
   'sheet.bestWith': "הכי טוב עם",
   'sheet.trend': "אחוז ניצחונות, 30 הימים האחרונים",
   'sheet.counterIt': "הצג מי מנצח אותו",
+  'tab.trophies': "גביעים",
+  'chooser.trophies': "מפות גביעים פעילות: הבחירות הטובות ביותר ושלך לדחיפה",
+  'trophies.top': "הטובים",
+  'trophies.you': "שלך",
+  'trophies.left': "עוד {h} שע׳",
+  'trophies.soon': "מסתיים בקרוב",
+  'trophies.prestige': "הכי קרובים ליוקרה הבאה",
+  'trophies.toNext': "עוד {n}",
+  'trophies.empty': "אין כרגע אירועי גביעים.",
 };
 
 export default he;

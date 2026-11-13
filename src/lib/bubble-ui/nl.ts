@@ -159,6 +159,15 @@ const nl: UiStrings = {
   'sheet.bestWith': "Beste met",
   'sheet.trend': "Winstratio, laatste 30 dagen",
   'sheet.counterIt': "Laat zien wat hem verslaat",
+  'tab.trophies': "Trofeeën",
+  'chooser.trophies': "Actuele trofeeënmaps: de beste picks en jouw brawlers om te pushen",
+  'trophies.top': "Top",
+  'trophies.you': "Jouw",
+  'trophies.left': "nog {h} u",
+  'trophies.soon': "Eindigt bijna",
+  'trophies.prestige': "Het dichtst bij hun volgende prestige",
+  'trophies.toNext': "nog {n}",
+  'trophies.empty': "Nu geen trofeeën-events.",
 };
 
 export default nl;

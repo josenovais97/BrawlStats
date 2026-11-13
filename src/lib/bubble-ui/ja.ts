@@ -159,6 +159,15 @@ const ja: UiStrings = {
   'sheet.bestWith': "相性の良い味方",
   'sheet.trend': "勝率（過去30日）",
   'sheet.counterIt': "苦手な相手を見る",
+  'tab.trophies': "トロフィー",
+  'chooser.trophies': "開催中のトロフィーマップ：最強キャラとあなたのおすすめ",
+  'trophies.top': "トップ",
+  'trophies.you': "あなた",
+  'trophies.left': "残り{h}時間",
+  'trophies.soon': "まもなく終了",
+  'trophies.prestige': "次のプレステージに近いキャラ",
+  'trophies.toNext': "あと{n}",
+  'trophies.empty': "現在トロフィーイベントはありません。",
 };
 
 export default ja;

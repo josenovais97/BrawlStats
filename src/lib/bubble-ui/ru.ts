@@ -159,6 +159,15 @@ const ru: UiStrings = {
   'sheet.bestWith': "Лучше всего с",
   'sheet.trend': "Процент побед, 30 дней",
   'sheet.counterIt': "Показать контрпики",
+  'tab.trophies': "Кубки",
+  'chooser.trophies': "Текущие карты на кубки: лучшие бойцы и твои для апа",
+  'trophies.top': "Лучшие",
+  'trophies.you': "Твои",
+  'trophies.left': "ещё {h} ч",
+  'trophies.soon': "Скоро конец",
+  'trophies.prestige': "Ближе всего к следующему престижу",
+  'trophies.toNext': "ещё {n}",
+  'trophies.empty': "Сейчас нет событий на кубки.",
 };
 
 export default ru;

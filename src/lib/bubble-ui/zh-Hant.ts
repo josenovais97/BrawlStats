@@ -159,6 +159,15 @@ const zhHant: UiStrings = {
   'sheet.bestWith': "最佳搭檔",
   'sheet.trend': "勝率（近 30 天）",
   'sheet.counterIt': "查看誰克制它",
+  'tab.trophies': "獎盃",
+  'chooser.trophies': "目前獎盃地圖：最強選擇與你可衝分的英雄",
+  'trophies.top': "最佳",
+  'trophies.you': "你的",
+  'trophies.left': "剩餘{h}小時",
+  'trophies.soon': "即將結束",
+  'trophies.prestige': "最接近下一次聲望",
+  'trophies.toNext': "還差{n}",
+  'trophies.empty': "目前沒有獎盃活動。",
 };
 
 export default zhHant;

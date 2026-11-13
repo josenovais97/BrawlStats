@@ -159,6 +159,15 @@ const fi: UiStrings = {
   'sheet.bestWith': "Paras parina",
   'sheet.trend': "Voitto-%, 30 päivää",
   'sheet.counterIt': "Näytä, mikä voittaa sen",
+  'tab.trophies': "Pokaalit",
+  'chooser.trophies': "Nykyiset pokaalikartat: parhaat valinnat ja omasi nostettaviksi",
+  'trophies.top': "Parhaat",
+  'trophies.you': "Omasi",
+  'trophies.left': "{h} h jäljellä",
+  'trophies.soon': "Päättyy pian",
+  'trophies.prestige': "Lähimpänä seuraavaa prestigeä",
+  'trophies.toNext': "{n} jäljellä",
+  'trophies.empty': "Ei pokaalitapahtumia juuri nyt.",
 };
 
 export default fi;

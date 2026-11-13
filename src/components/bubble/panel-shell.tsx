@@ -9,6 +9,7 @@ import { PanelCounters } from '@/components/bubble/panel-counters';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
+import { PanelTrophies } from '@/components/bubble/panel-trophies';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
@@ -36,7 +37,7 @@ import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 const STORED_TAB = 'brawlzone.bubble.tab';
 
-type Tab = 'meta' | 'comps' | 'draft' | 'counters';
+type Tab = 'meta' | 'comps' | 'draft' | 'counters' | 'trophies';
 
 export function PanelShell({
   modes,
@@ -73,7 +74,7 @@ export function PanelShell({
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORED_TAB);
-      if (saved === 'meta' || saved === 'draft' || saved === 'comps' || saved === 'counters') {
+      if (saved === 'meta' || saved === 'draft' || saved === 'comps' || saved === 'counters' || saved === 'trophies') {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setTab(saved);
       }
@@ -104,7 +105,7 @@ export function PanelShell({
   });
   useEffect(() => {
     const open = (next: string) => {
-      if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters') chooseRef.current(next);
+      if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters' || next === 'trophies') chooseRef.current(next);
     };
     (window as unknown as { __bzOpenTab?: (t: string) => void }).__bzOpenTab = open;
     const fromHash = new URLSearchParams(window.location.hash.slice(1)).get('tab');
@@ -385,6 +386,7 @@ export function PanelShell({
             ['comps', t('tab.comps')],
             ['draft', t('tab.draft')],
             ['counters', t('tab.counters')],
+            ['trophies', t('tab.trophies')],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -415,6 +417,7 @@ export function PanelShell({
                 ['comps', t('tab.comps'), t('chooser.comps')],
                 ['draft', t('tab.draft'), t('chooser.draft')],
                 ['counters', t('tab.counters'), t('chooser.counters')],
+                ['trophies', t('tab.trophies'), t('chooser.trophies')],
               ] as const
             ).map(([key, label, hint]) => (
               <li key={key}>
@@ -443,6 +446,8 @@ export function PanelShell({
         <PanelComps modes={modes} comps={comps} />
       ) : tab === 'counters' ? (
         <PanelCounters modes={modes} roster={roster} />
+      ) : tab === 'trophies' ? (
+        <PanelTrophies />
       ) : (
         <PanelDraft modes={modes} roster={roster} />
       )}

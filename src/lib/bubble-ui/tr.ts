@@ -159,6 +159,15 @@ const tr: UiStrings = {
   'sheet.bestWith': "En iyi uyum",
   'sheet.trend': "Kazanma oranı, son 30 gün",
   'sheet.counterIt': "Onu yeneni göster",
+  'tab.trophies': "Kupalar",
+  'chooser.trophies': "Aktif kupa haritaları: en iyi seçimler ve kasabileceğin brawlerlar",
+  'trophies.top': "En iyi",
+  'trophies.you': "Seninkiler",
+  'trophies.left': "{h} sa kaldı",
+  'trophies.soon': "Yakında bitiyor",
+  'trophies.prestige': "Bir sonraki prestije en yakın",
+  'trophies.toNext': "{n} kaldı",
+  'trophies.empty': "Şu an kupa etkinliği yok.",
 };
 
 export default tr;

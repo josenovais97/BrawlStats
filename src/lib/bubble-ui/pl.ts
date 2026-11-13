@@ -159,6 +159,15 @@ const pl: UiStrings = {
   'sheet.bestWith': "Najlepiej z",
   'sheet.trend': "Odsetek wygranych, 30 dni",
   'sheet.counterIt': "Pokaż, kto go kontruje",
+  'tab.trophies': "Puchary",
+  'chooser.trophies': "Aktualne mapy pucharowe: najlepsze wybory i twoje do pushowania",
+  'trophies.top': "Najlepsi",
+  'trophies.you': "Twoi",
+  'trophies.left': "jeszcze {h} h",
+  'trophies.soon': "Wkrótce koniec",
+  'trophies.prestige': "Najbliżej kolejnego prestiżu",
+  'trophies.toNext': "brakuje {n}",
+  'trophies.empty': "Teraz brak wydarzeń pucharowych.",
 };
 
 export default pl;

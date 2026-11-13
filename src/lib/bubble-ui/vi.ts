@@ -159,6 +159,15 @@ const vi: UiStrings = {
   'sheet.bestWith': "Hợp nhất với",
   'sheet.trend': "Tỉ lệ thắng, 30 ngày qua",
   'sheet.counterIt': "Xem ai khắc chế",
+  'tab.trophies': "Cúp",
+  'chooser.trophies': "Bản đồ cúp đang mở: lựa chọn tốt nhất và của bạn để leo",
+  'trophies.top': "Tốt nhất",
+  'trophies.you': "Của bạn",
+  'trophies.left': "còn {h} giờ",
+  'trophies.soon': "Sắp kết thúc",
+  'trophies.prestige': "Gần mốc uy tín tiếp theo nhất",
+  'trophies.toNext': "còn {n}",
+  'trophies.empty': "Hiện không có sự kiện cúp.",
 };
 
 export default vi;

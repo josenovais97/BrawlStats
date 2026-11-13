@@ -159,6 +159,15 @@ const fr: UiStrings = {
   'sheet.bestWith': "Meilleur avec",
   'sheet.trend': "Victoires, 30 derniers jours",
   'sheet.counterIt': "Voir qui le bat",
+  'tab.trophies': "Trophées",
+  'chooser.trophies': "Cartes trophées du moment : les meilleurs choix et les tiens à pousser",
+  'trophies.top': "Top",
+  'trophies.you': "Les tiens",
+  'trophies.left': "encore {h} h",
+  'trophies.soon': "Finit bientôt",
+  'trophies.prestige': "Les plus proches de leur prochain prestige",
+  'trophies.toNext': "encore {n}",
+  'trophies.empty': "Aucun événement trophées pour le moment.",
 };
 
 export default fr;
