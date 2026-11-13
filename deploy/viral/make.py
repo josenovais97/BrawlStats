@@ -54,7 +54,8 @@ from PIL import Image, ImageDraw, ImageFilter
 
 from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, card, clamp,
                     confetti, crown, finish, follow_cta, grey, hits, impact, has_art, has_model, load_face, load_model, nice, out_back,
-                    out_cubic, pill, put, put_rays, rounded_mask, silhouette, slam, text_sprite, tier_pill, vgrad)
+                    out_cubic, pill, put, put_rays, rounded_mask, silhouette, slam, text_sprite, tier_pill, vgrad,
+                    put_panel, ribbon, burst, timer_bar, count_badge, search_cta, panel, shade, mixc, INK)
 
 KIND, DATA, PREV, STATE, OUT = sys.argv[1:6]
 ONLY = [float(x) for x in sys.argv[7:]] if len(sys.argv) > 6 and sys.argv[6] == '--only' else None
@@ -366,8 +367,14 @@ def zoom_center(b, m, lvl):
     return _zoom_at[key]
 
 
-def zoom_view(b, z, lvl='MEDIUM'):
-    """The model cropped at z times around zoom_center, inside a rounded window."""
+def fit_in(img, side):
+    k = min(1.0, side / max(img.size))
+    return img if k == 1.0 else img.resize((int(img.width * k), int(img.height * k)), Image.LANCZOS)
+
+
+def zoom_view(b, z, lvl='MEDIUM', framed=True):
+    """The model cropped at z times around zoom_center, inside a rounded window
+    (framed), or bare and sized to the quiz card's inside (2026-11-13)."""
     m = art(b, 900)
     cx, cy = zoom_center(b, m, lvl)
     # Cropped from the body at 2.4x that size, so a deep zoom shows the Fan
@@ -377,6 +384,9 @@ def zoom_view(b, z, lvl='MEDIUM'):
     win = 760; side = win / z * k
     box = (cx * k - side / 2, cy * k - side / 2, cx * k + side / 2, cy * k + side / 2)
     crop = hi.crop(tuple(int(v) for v in box)).resize((win, win), Image.BILINEAR)
+    if not framed:  # the same view, filling the card's 828px inside
+        inner = Image.new('RGBA', (win, win), (30, 34, 80, 255)); inner.alpha_composite(crop)
+        return inner.resize((828, 828), Image.BILINEAR)
     frame = Image.new('RGBA', (win + 24, win + 24), (0, 0, 0, 0)); d = ImageDraw.Draw(frame)
     d.rounded_rectangle((0, 0, win + 23, win + 23), 70, fill=(12, 14, 34, 255), outline=WHITE, width=10)
     inner = Image.new('RGBA', (win, win), (30, 34, 80, 255)); inner.alpha_composite(crop)
@@ -443,56 +453,68 @@ def quiz_scene(s, t, bt, lt):
         if bt > 3: put(canvas, text_sprite('ONLY REAL FANS GET 5/5', 66, WHITE, stroke=7), W / 2, 1160, scale=out_back((bt - 3) / 0.4))
         shake, flash = hits(bt, (0, 1, 2, 3), 1.2, 0.5)
     elif k == 'q':
+        # 2026-11-13 look: the clue inside a framed card with a timer bar
+        # draining under it and the countdown on a badge at its top; at the
+        # reveal the brawler breaks out of the card and the name lands on a
+        # ribbon.
         b = s['b']; reveal = bt >= 4
-        col = TIER.get(b.get('tier') or 'B', (150, 90, 255)) if reveal else (90, 70, 170)
+        lcol = {'EASY': EASY, 'MEDIUM': MEDIUM, 'HARD': HARD, 'EXPERT': EXPERT}[s['lvl']]
+        col = TIER.get(b.get('tier') or 'B', (150, 90, 255)) if reveal else (110, 80, 230)
         canvas = background(t, col).convert('RGBA')
-        # progress: one dot per round, done ones gold, this one pulsing
-        for j in range(5):
+        for j in range(5):  # progress: one dot per round, done ones gold, this one pulsing
             r = 22 if j != s['i'] else 22 + 6 * abs(math.sin(t * 6))
             d = ImageDraw.Draw(canvas); x = W / 2 + (j - 2) * 80
             d.ellipse((x - r, 330 - r, x + r, 330 + r), fill=GOLD_TOP if j < s['i'] or (j == s['i'] and reveal) else (60, 60, 110), outline=(10, 12, 28), width=5)
-        put(canvas, text_sprite(f"#{s['i'] + 1}", 150, gold=True), 170, 470)
-        put(canvas, pill(s['lvl'], {'EASY': EASY, 'MEDIUM': MEDIUM, 'HARD': HARD, 'EXPERT': EXPERT}[s['lvl']], size=56), W - 220, 470)
+        put(canvas, text_sprite(f"#{s['i'] + 1}", 150, gold=True), 170, 450)
+        put(canvas, pill(s['lvl'], lcol, size=56), W - 220, 450)
         a = art(b, 820)
+        PX, PY, PW = W / 2, 960, 860
         if not reveal:
-            put_rays(canvas, (120, 100, 255), t, W / 2, 980, speed=10, alpha=0.5)
-            pop = 1 + 0.4 * (1 - out_back(bt / 0.5, 1.4))
+            put_rays(canvas, (160, 140, 255), t, PX, PY, speed=10, alpha=0.35)
+            pop = 1 + 0.25 * (1 - out_back(bt / 0.5, 1.4))
             label = CLUES.get(s['clue'], 'WHO IS THIS?')
             if s.get('style') == 'skin':
                 label = CLUES['skin']
+            tab = None
             if s['clue'] == 'skin':
-                put(canvas, a, W / 2, 980, scale=pop)
+                content = fit_in(a, 780)
             elif s['clue'] == 'icon':
                 ab = b['ability']; kind = ab['kind']
-                icon = ability_icon(ab)
+                content = ability_icon(ab)
                 if b.get('pixelate'):
-                    icon = pixelated(icon, ICON_PIXELS[min(3, int(bt))])
-                put(canvas, icon, W / 2, 960, scale=pop)
-                put(canvas, pill(ICON_LABEL[kind], ICON_COL[kind], size=64), W / 2, 600, scale=out_back(bt / 0.4, 1.8))
+                    content = pixelated(content, ICON_PIXELS[min(3, int(bt))])
+                tab = pill(ICON_LABEL[kind], ICON_COL[kind], size=60)
                 label = f'WHOSE {ICON_LABEL[kind]}?'
             elif s['clue'] == 'shadow':
-                put(canvas, partial_shadow(b, a, s['lvl']), W / 2, 980, scale=pop)
+                content = fit_in(partial_shadow(b, a, s['lvl']), 800)
             elif s['clue'] == 'pixel':
                 step = min(3, int(bt))  # sharper on every beat, never sharp
-                put(canvas, pixelated(a, PIXEL_STEPS[s['lvl']][step]), W / 2, 980, scale=pop)
+                content = pixelated(fit_in(a, 790), PIXEL_STEPS[s['lvl']][step])
             else:
                 z = ZOOM_FROM[s['lvl']] - ZOOM_PULL * min(bt, 3.6)  # slowly pulling back
-                put(canvas, zoom_view(b, z, s['lvl']), W / 2, 960, scale=pop)
-            put(canvas, fit(label, 110, 1000, WHITE), W / 2, 1480, scale=out_back(bt / 0.4))
-            if bt >= 1:
-                n = 4 - int(bt); u = bt % 1
-                put(canvas, text_sprite(str(n), 250, (255, 90, 110) if n == 1 else WHITE), W - 150, 760, scale=1 + 0.8 * (1 - out_back(u / 0.4, 1.3)))
-                if u < 0.3: shake = max(shake, impact(u * P, 0.4))
+                content = zoom_view(b, z, s['lvl'], framed=False)
+            put_panel(canvas, PW, PW, lcol, PX, PY, content, scale=pop, inner=(95, 135, 255))  # blue inside: clues read on it
+            if tab is not None:
+                put(canvas, tab, PX, PY + PW / 2 + 4, scale=out_back(bt / 0.4, 1.8))
+            timer_bar(canvas, 1 - bt / 4, PX, PY + PW / 2 + (110 if tab is not None else 80))
+            put(canvas, fit(label, 104, 1000, WHITE), W / 2, PY + PW / 2 + (215 if tab is not None else 190), scale=out_back(bt / 0.4))
+            n = 4 - int(bt) if bt >= 1 else None; u = bt % 1
+            put(canvas, count_badge(n if n else '?', (255, 70, 100) if n == 1 else (40, 44, 90)), PX, PY - PW / 2 - 6,
+                scale=1 + 0.5 * (1 - out_back(u / 0.4, 1.3)) if n else out_back(bt / 0.4, 1.6))
+            if n and u < 0.3: shake = max(shake, impact(u * P, 0.4))
             shake = max(shake, impact(lt, 0.8))
         else:
             u = bt - 4
-            put_rays(canvas, col, t, W / 2, 980, speed=40, alpha=0.9)
-            put(canvas, a, W / 2, 980, scale=1 + 0.25 * (1 - out_back(u / 0.4, 1.6)))
-            put(canvas, text_sprite(nice(b['n']).upper(), 180, WHITE), W / 2, 1480, scale=out_back(u / 0.35, 1.6))
+            put_rays(canvas, col, t, PX, PY, speed=40, alpha=0.9)
+            put_panel(canvas, PW, PW, col, PX, PY, None, lit=True)
+            burst(canvas, u * P, PX, PY)
+            put(canvas, art(b, 960, 1000), PX, PY - 40, scale=1 + 0.25 * (1 - out_back(u / 0.4, 1.6)))
+            put(canvas, ribbon(nice(b['n']).upper(), col if col != (110, 80, 230) else (150, 90, 255), 140), W / 2, PY + PW / 2 + 90,
+                scale=out_back(u / 0.35, 1.6))
             extra = (f"{b['skin']} SKIN" if b.get('skin') else
                      f"{ICON_LABEL[b['ability']['kind']]}: {b['ability']['name'].upper()}" if b.get('ability') and b['ability'].get('name') else None)
             if extra:
-                put(canvas, fit(extra, 60, 980, GOLD_TOP, stroke=6), W / 2, 1640, scale=out_back((u - 0.25) / 0.35, 1.6))
+                put(canvas, fit(extra, 64, 980, GOLD_TOP, stroke=7), W / 2, PY + PW / 2 + 225, scale=out_back((u - 0.25) / 0.35, 1.6))
             shake = impact(u * P, 1.4); flash = impact(u * P) * 0.8
     else:  # q_outro
         canvas = background(t, (150, 90, 255)).convert('RGBA'); mark = False
@@ -1064,7 +1086,7 @@ def daily_scene(s, t, bt, lt):
     else:  # d_outro
         canvas = background(t, (60, 170, 255)).convert('RGBA'); mark = False
         slam(canvas, 'ANSWER ON', 150, WHITE, W / 2, 360, bt)
-        slam(canvas, 'BRAWLZONE.NET', 122, None, W / 2, 540, bt - 0.6, gold=True)
+        search_cta(canvas, bt - 0.6, 540)
         if bt > 1.2: put(canvas, pill('DAILY CHALLENGE', (255, 60, 100), size=76), W / 2, 720, scale=out_back((bt - 1.2) / 0.4, 2.2), rot=-4)
         slam(canvas, 'COMMENT YOUR GUESS', 92, WHITE, W / 2, 920, bt - 2)
         follow_cta(canvas, bt - 3.2, 1220, 'NEW PUZZLE EVERY DAY')
@@ -1275,7 +1297,7 @@ def count_scene(s, t, bt, lt):
         for j, (rank, b) in enumerate(items):
             r_, c_ = divmod(j, 3)
             in_row = min(3, n - r_ * 3)
-            x = W / 2 + (c_ - (in_row - 1) / 2) * 320; y = 700 + r_ * 400
+            x = W / 2 + (c_ - (in_row - 1) / 2) * 320; y = 980 - ((n + 2) // 3 - 1) * 200 + r_ * 400  # centred (2026-11-13)
             u = (lt - j * 0.075) / 0.32
             if u <= 0: continue
             dy = 260 * (1 - out_cubic(u))
@@ -1309,8 +1331,9 @@ def count_scene(s, t, bt, lt):
         else:
             put(canvas, text_sprite(f"#{s['rank']}", 240, gold=True), 250 - 500 * (1 - out_back(u, 1.2)), 420)
             put(canvas, tier_pill(b['tier']), W - 250 + 500 * (1 - out_back((lt - 0.08) / 0.4, 1.2)), 420)
-        put(canvas, text_sprite(nice(b['n']).upper(), 170 if len(b['n']) <= 7 else 140 if len(b['n']) <= 10 else 110, WHITE),
-            W / 2, 1520, scale=out_back((lt - 0.1) / 0.4, 1.5))
+        burst(canvas, lt, W / 2, 1000, GOLD_TOP if one else mixc(tcol, (255, 255, 255), 0.3))
+        put(canvas, ribbon(nice(b['n']).upper(), tcol, 150 if len(b['n']) <= 7 else 130 if len(b['n']) <= 10 else 110),
+            W / 2, 1540, scale=out_back((lt - 0.1) / 0.4, 1.5))
         shake = impact(lt, 1.6 if heavy else 0.9); flash = impact(lt) * (0.9 if one else 0.6 if heavy else 0.35)
     else:  # c_outro: the question that made the original's comments
         mark = False
@@ -1425,7 +1448,7 @@ def stop_scene(s, t, bt, lt):
         put(canvas, text_sprite('DEFEND YOUR MAIN', 104, WHITE), W / 2, 780, scale=out_back((bt - 0.6) / 0.5))
         put(canvas, text_sprite('IN THE COMMENTS', 104, WHITE), W / 2, 910, scale=out_back((bt - 0.9) / 0.5))
         if bt > 1.4: arrow(canvas, W / 2, 1130 + abs(math.sin(t * 6)) * 40)
-        follow_cta(canvas, bt - 2.2, 1460, 'THE HIDDEN META: BRAWLZONE.NET')
+        site_cta(canvas, bt - 2.2, 1400, 'THE HIDDEN META')
         shake, flash = hits(bt, (0, 0.6, 0.9), 0.7, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -1695,7 +1718,7 @@ def drop_art(rarity, size):
 
 
 def sim_note(canvas):
-    put(canvas, text_sprite('SIMULATED WITH THE REAL DROP RATES', 36, (225, 220, 255), stroke=5, shadow=False), W / 2, 160)
+    put(canvas, text_sprite('SIMULATED WITH THE REAL DROP RATES', 36, (225, 220, 255), stroke=5, shadow=False), W / 2, 290)
 
 
 def drops_scene(s, t, bt, lt):
@@ -1806,7 +1829,7 @@ def drops_scene(s, t, bt, lt):
         canvas = background(t, RAR_COL['Legendary']).convert('RGBA')
         bounce = abs(math.sin(bt * math.pi)) * 22
         put(canvas, fit('OPEN YOUR OWN', 170, 960, gold=True), W / 2, 420 - bounce, scale=out_back(bt / 0.5))
-        put(canvas, fit('BRAWLZONE.NET/STARR-DROPS', 88, 980, WHITE, stroke=8), W / 2, 600, scale=out_back((bt - 0.6) / 0.4))
+        search_cta(canvas, bt - 0.6, 600, 'brawlzone.net/starr-drops', width=960, height=112)
         if bt > 1.1: arrow(canvas, W / 2, 790 + abs(math.sin(t * 6)) * 36)
         if bt > 1.4:
             rar = order[int(bt) % len(order)]

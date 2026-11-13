@@ -105,40 +105,69 @@ def radial_mask(w, h, cx, cy, r):
     d = np.sqrt((x - cx) ** 2 + (y - cy) ** 2) / r
     return Image.fromarray((np.clip(1 - d, 0, 1) ** 1.6 * 255).astype('uint8'), 'L')
 
-BASE = vgrad(W, H, (8, 10, 24), (18, 22, 52))
-GLOW = radial_mask(W, H, W / 2, H * 0.42, 1100)
+# The look from 2026-11-13 (owner: "really nice designs and attractive"): the
+# scene's own colour carries the whole frame, deep at the edges and lit in the
+# middle where the subject stands, with comic halftone at the top and bottom
+# and slow light bands. The navy backdrop it replaces made every format read
+# dark and alike in a feed.
+def shade(col, k): return tuple(int(clamp(c * k, 0, 255)) for c in col)
+def mixc(a, b, t): return tuple(int(a[i] * (1 - t) + b[i] * t) for i in range(3))
+
+GLOW = radial_mask(W, H, W / 2, H * 0.45, 1250)
 VIGN = Image.fromarray((np.clip(np.sqrt(((np.ogrid[:H, :W][1] - W / 2) / (W * 0.75)) ** 2 + ((np.ogrid[:H, :W][0] - H / 2) / (H * 0.75)) ** 2), 0, 1) ** 2 * 200).astype('uint8'), 'L')
-# diagonal stripes, drawn once twice the needed size and scrolled
+# light bands, drawn once twice the needed size and scrolled
 STRIPES = Image.new('L', (W * 2, H * 2), 0)
 _d = ImageDraw.Draw(STRIPES)
-for x in range(-H * 2, W * 2, 90):
-    _d.polygon([(x, 0), (x + 40, 0), (x + 40 + H * 2, H * 2), (x + H * 2, H * 2)], fill=16)
+for x in range(-H * 2, W * 2, 150):
+    _d.polygon([(x, 0), (x + 56, 0), (x + 56 + H * 2, H * 2), (x + H * 2, H * 2)], fill=20)
+def _halftone():
+    m = Image.new('L', (W, H), 0); d = ImageDraw.Draw(m); step = 30
+    for yi, y in enumerate(range(0, H + step, step)):
+        e = max(0.0, 1 - y / (H * 0.3), (y - H * 0.7) / (H * 0.3))
+        if e <= 0: continue
+        r = step * 0.46 * e ** 0.8; off = step / 2 if yi % 2 else 0
+        for x in range(-step, W + step, step):
+            d.ellipse((x + off - r, y - r, x + off + r, y + r), fill=255)
+    return m
+HALFTONE = _halftone()
 _bg_cache = {}
 def tier_bg(col):
     if col not in _bg_cache:
-        im = BASE.copy()
-        im.paste(Image.new('RGB', (W, H), col), (0, 0), GLOW.point(lambda v: int(v * 0.55)))
+        im = vgrad(W, H, mixc(shade(col, 0.42), NAVY, 0.3), mixc(shade(col, 0.2), NAVY, 0.45))
+        im.paste(mixc(col, (255, 255, 255), 0.12), (0, 0), GLOW.point(lambda v: int(v * 0.85)))
+        im.paste(mixc(shade(col, 0.12), NAVY, 0.5), (0, 0), HALFTONE.point(lambda v: int(v * 0.42)))
         _bg_cache[col] = im
     return _bg_cache[col]
 
+def _sparkle(r):
+    """A four-point star with a soft halo, the game's own glint."""
+    S = int(r * 6); im = Image.new('L', (S, S), 0); d = ImageDraw.Draw(im); c = S / 2
+    d.polygon([(c, c - r * 2.6), (c + r * 0.42, c - r * 0.42), (c + r * 2.6, c), (c + r * 0.42, c + r * 0.42),
+               (c, c + r * 2.6), (c - r * 0.42, c + r * 0.42), (c - r * 2.6, c), (c - r * 0.42, c - r * 0.42)], fill=255)
+    halo = im.filter(ImageFilter.GaussianBlur(r * 0.9)).point(lambda v: int(v * 0.7))
+    out = Image.new('RGBA', (S, S), (255, 255, 255, 0)); out.putalpha(ImageChops.lighter(im, halo))
+    return out
 random.seed(7)
-SPARKS = [(random.uniform(0, W), random.uniform(0, H), random.uniform(20, 70), random.uniform(2, 5), random.uniform(0, 6.28)) for _ in range(70)]
+SPARKS = [(random.uniform(0, W), random.uniform(0, H), random.uniform(20, 60), random.choice((5, 7, 9)), random.uniform(0, 6.28)) for _ in range(34)]
+_spark_img = {r: _sparkle(r) for r in (5, 7, 9)}
+_spark_big = {r: _sparkle(r * 2) for r in (5, 7, 9)}
 
 def background(t, col, col2=None, mix=0.0):
     im = tier_bg(col).copy()
     if col2 is not None and mix > 0:
         im = Image.blend(im, tier_bg(col2), clamp(mix))
-    off = int(t * 70) % 180
-    white = Image.new('RGB', (W, H), (255, 255, 255))
-    im.paste(white, (0, 0), STRIPES.crop((off, off, off + W, off + H)))
-    d = ImageDraw.Draw(im)
+    off = int(t * 60) % 300
+    im.paste((255, 255, 255), (0, 0), STRIPES.crop((off, off, off + W, off + H)))
+    im = im.convert('RGBA')
     for x, y, v, r, ph in SPARKS:
-        yy = (y - t * v) % H
-        xx = x + math.sin(t * 1.3 + ph) * 18
-        a = 0.5 + 0.5 * math.sin(t * 3 + ph)
-        c = tuple(int(255 * (0.4 + 0.6 * a)) for _ in range(3))
-        d.ellipse((xx - r, yy - r, xx + r, yy + r), fill=c)
-    return im
+        a = 0.5 + 0.5 * math.sin(t * 2.6 + ph)
+        if a < 0.15: continue
+        yy = (y - t * v) % H; xx = x + math.sin(t * 1.1 + ph) * 16
+        sp = _spark_img[r]
+        if a < 0.98:
+            sp = sp.copy(); sp.putalpha(sp.getchannel('A').point(lambda q: int(q * a)))
+        im.alpha_composite(sp, (int(xx - sp.width / 2), int(yy - sp.height / 2)))
+    return im  # RGBA; callers' .convert('RGBA') is then a plain copy
 
 # ---------------------------------------------------------------- text
 _txt = {}
@@ -161,8 +190,12 @@ def text_sprite(txt, size, fill=WHITE, gold=False, stroke=10, shadow=True, font=
     outline = Image.new('L', (w, h), 0)
     ImageDraw.Draw(outline).text((15 - l, 15 - t_), txt, font=f, fill=255, stroke_width=stroke, stroke_fill=255)
     out = Image.new('RGBA', (w, h + 14), (0, 0, 0, 0))
-    if shadow:  # a solid extrude below, then a soft drop
-        sh = Image.new('RGBA', (w, h), (0, 0, 0, 255)); out.paste(sh, (0, 12), outline)
+    if shadow:  # a soft drop, then a solid extrude stepped down to the letters (2026-11-13: deeper, the game's 3D titles)
+        drop = Image.new('L', (w, h + 14), 0); drop.paste(outline, (0, 14))
+        out.paste(Image.new('RGBA', (w, h + 14), (0, 0, 0, 150)), (0, 0), drop.filter(ImageFilter.GaussianBlur(6)))
+        depth = max(4, min(14, size // 12))
+        for dy in range(depth, 0, -2):
+            out.paste(Image.new('RGBA', (w, h), (4, 5, 14, 255)), (0, dy), outline)
     out.paste(Image.new('RGBA', (w, h), (12, 14, 30, 255)), (0, 0), outline)
     face = vgrad(w, h, GOLD_TOP, GOLD_BOT).convert('RGBA') if gold else Image.new('RGBA', (w, h), fill + (255,))
     out.paste(face, (0, 0), mask)
@@ -281,13 +314,47 @@ def crown(size):
         d.ellipse((cx * s - 0.06 * s, (0.25 if cx != 0.5 else 0.05) * s - 0.06 * s, cx * s + 0.06 * s, (0.25 if cx != 0.5 else 0.05) * s + 0.06 * s), fill=(255, 80, 110), outline=(90, 50, 0), width=5)
     return im
 
-APP = Image.open(f'{ASSETS}/app-icon.png').convert('RGBA').resize((64, 64), Image.LANCZOS)
+APP = Image.open(f'{ASSETS}/app-icon.png').convert('RGBA')
+INK = (12, 14, 30)
+
+def magnifier(size, col=INK, width=None):
+    im = Image.new('RGBA', (size, size), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    w = width or max(4, size // 7); r = size * 0.3; c = size * 0.42
+    d.ellipse((c - r, c - r, c + r, c + r), outline=col, width=w)
+    d.line((c + r * 0.72, c + r * 0.72, size * 0.9, size * 0.9), fill=col, width=int(w * 1.25))
+    return im
+
+_boxes = {}
+def search_box(text, width, height, typed=None, cursor=False, button=True):
+    """A search field with `text` typed in it (the first `typed` characters):
+    white, outlined, on a dark lip. The address at the top of every frame and
+    the closing call to action both look like one (2026-11-13): most people
+    find the site by typing its name after seeing a video."""
+    n = len(text) if typed is None else typed
+    key = (text, width, height, n, cursor, button)
+    if key in _boxes: return _boxes[key]
+    lip = max(6, height // 12); r = height // 2
+    im = Image.new('RGBA', (width, height + lip), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.rounded_rectangle((0, lip, width - 1, height + lip - 1), r, fill=INK)
+    d.rounded_rectangle((0, 0, width - 1, height - 1), r, fill=WHITE, outline=INK, width=max(4, height // 18))
+    icon = APP.resize((int(height * 0.7),) * 2, Image.LANCZOS)
+    im.alpha_composite(icon, (int(height * 0.18), int(height * 0.15)))
+    f = L(int(height * 0.52)); x0 = int(height * 1.02)
+    shown = text[:n]
+    d.text((x0, height * 0.47), shown, font=f, fill=INK, anchor='lm')
+    if cursor:
+        cx = x0 + f.getlength(shown) + 6
+        d.rectangle((cx, height * 0.24, cx + max(4, height // 22), height * 0.72), fill=(40, 120, 255))
+    if button:
+        b = int(height * 0.78); bx = width - b - int(height * 0.12); by = int((height - b) / 2)
+        d.ellipse((bx, by + 4, bx + b, by + b + 4), fill=shade(GOLD_BOT, 0.55))
+        d.ellipse((bx, by, bx + b, by + b), fill=GOLD_BOT, outline=INK, width=max(3, height // 30))
+        im.alpha_composite(magnifier(int(b * 0.66)), (bx + int(b * 0.17), by + int(b * 0.16)))
+    _boxes[key] = im
+    return im
+
 def watermark(canvas):
-    s = text_sprite('brawlzone.net', 40, GOLD_TOP, stroke=6, shadow=False)
-    pill = Image.new('RGBA', (s.width + 100, 84), (0, 0, 0, 0))
-    ImageDraw.Draw(pill).rounded_rectangle((0, 0, pill.width - 1, 83), 42, fill=(8, 10, 24, 200))
-    pill.alpha_composite(APP, (12, 10)); pill.alpha_composite(s, (82, 4))
-    canvas.alpha_composite(pill, ((W - pill.width) // 2, 196))
+    canvas.alpha_composite(search_box('brawlzone.net', 470, 82), ((W - 470) // 2, 160))
 
 # ---------------------------------------------------------------- timeline
 # Built in beats. Each segment: (start beat, length in beats, kind, payload).
@@ -393,8 +460,9 @@ def follow_button():
 def follow_cta(canvas, u, y, line, sub=None):
     """The follow ask that closes every video: the button pops, pulses, and a
     hand-drawn tap ring goes out from it each beat. u in beats since it starts.
-    With `sub`, `line` is a small white lead-in and `sub` the big gold line
-    under it (the site address, 2026-11-03)."""
+    With `sub` (the site address, 2026-11-03), `line` is a small white lead-in
+    and the address is typed into a big search box under it, a letter a frame
+    group, cursor blinking, the search button pressed at the end (2026-11-13)."""
     if u < 0: return
     pulse = 1 + 0.06 * abs(math.sin(u * math.pi))
     if u > 0.6:
@@ -405,9 +473,132 @@ def follow_cta(canvas, u, y, line, sub=None):
     put(canvas, follow_button(), W / 2, y, scale=out_back(u / 0.45, 2.2) * pulse)
     if sub:
         put(canvas, text_sprite(line, 56, WHITE, stroke=7), W / 2, y + 140, scale=out_back((u - 0.5) / 0.4))
-        put(canvas, text_sprite(sub, 104, gold=True), W / 2, y + 240, scale=out_back((u - 0.7) / 0.4))
+        search_cta(canvas, u - 0.7, y + 262, sub.lower())
     else:
         put(canvas, text_sprite(line, 64, GOLD_TOP, stroke=7), W / 2, y + 150, scale=out_back((u - 0.5) / 0.4))
+
+
+def search_cta(canvas, u, y, text='brawlzone.net', width=940, height=136):
+    """The address typed into a search box; u in beats since it appears."""
+    if u < 0: return
+    n = int(clamp((u - 0.25) / 0.9) * len(text) + 0.5)
+    done = n >= len(text)
+    blink = (not done) or int(u * 3) % 2 == 0
+    box = search_box(text, width, height, typed=n, cursor=blink)
+    press = done and (u - 1.2) % 2.0 < 0.18
+    put(canvas, box, W / 2, y, scale=out_back(u / 0.35, 1.8) * (0.97 if press else 1))
+    if done and u > 1.2:  # a tap on the search button, each couple of beats
+        k = ((u - 1.2) % 2.0) / 0.6
+        if k < 1:
+            bx = W / 2 + width / 2 - height * 0.51; layer = Image.new('RGBA', (400, 400), (0, 0, 0, 0)); rr = 40 + 120 * k
+            ImageDraw.Draw(layer).ellipse((200 - rr, 200 - rr, 200 + rr, 200 + rr), outline=(255, 255, 255, int(220 * (1 - k))), width=8)
+            canvas.alpha_composite(layer, (int(bx - 200), int(y - 200)))
+
+
+_panels = {}
+def panel(w, h, col, r=64, lit=False, inner=None):
+    """A game-style card for a clue or a stat: the colour deep inside with a
+    lit top, a thick dark outline, a light rim and a dark lip under it
+    (2026-11-13). Returns (image, interior box) so callers can clip into it."""
+    key = (w, h, col, r, lit, inner)
+    if key not in _panels:
+        ic = inner or col
+        lip = 16; ow = 10; rim = 6
+        im = Image.new('RGBA', (w, h + lip), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        d.rounded_rectangle((0, lip, w - 1, h + lip - 1), r, fill=(4, 5, 14, 255))
+        d.rounded_rectangle((0, 0, w - 1, h - 1), r, fill=INK)
+        d.rounded_rectangle((ow, ow, w - 1 - ow, h - 1 - ow), r - ow, fill=mixc(col, (255, 255, 255), 0.35) if not lit else GOLD_TOP)
+        ix0 = ow + rim; iw, ih = w - 2 * ix0, h - 2 * ix0
+        inner = vgrad(iw, ih, mixc(shade(ic, 0.5), NAVY, 0.2), mixc(shade(ic, 0.18), NAVY, 0.5)).convert('RGBA')
+        inner.paste(mixc(ic, (255, 255, 255), 0.1), (0, 0), radial_mask(iw, ih, iw / 2, ih * 0.42, iw * 0.75).point(lambda v: int(v * 0.6)))
+        gl = Image.new('L', (iw, ih), 0); ImageDraw.Draw(gl).rounded_rectangle((8, 8, iw - 9, ih * 0.34), r - ix0, fill=22)
+        inner.paste((255, 255, 255), (0, 0), gl)
+        im.paste(inner, (ix0, ix0), rounded_mask(iw, ih, r - ix0))
+        _panels[key] = (im, (ix0, ix0, ix0 + iw, ix0 + ih))
+    return _panels[key]
+
+
+def put_panel(canvas, w, h, col, cx, cy, content=None, scale=1.0, lit=False, inner=None):
+    """A panel with `content` (RGBA, interior-sized or smaller, centred)
+    clipped inside it."""
+    im, (x0, y0, x1, y1) = panel(w, h, col, lit=lit, inner=inner)
+    if content is not None:
+        im = im.copy(); iw, ih = x1 - x0, y1 - y0
+        layer = Image.new('RGBA', (iw, ih), (0, 0, 0, 0))
+        layer.alpha_composite(content, ((iw - content.width) // 2, (ih - content.height) // 2)) if content.width <= iw and content.height <= ih \
+            else layer.alpha_composite(content.crop(((content.width - iw) // 2, (content.height - ih) // 2, (content.width - iw) // 2 + iw, (content.height - ih) // 2 + ih)))
+        m = rounded_mask(iw, ih, 48)
+        layer.putalpha(ImageChops.multiply(layer.getchannel('A'), m))
+        im.alpha_composite(layer, (x0, y0))
+    put(canvas, im, cx, cy, scale=scale)
+
+
+_ribbons = {}
+def ribbon(text, col, size=150, maxw=None):
+    """The answer on a banner with folded tails (2026-11-13)."""
+    key = (text, col, size, maxw)
+    if key not in _ribbons:
+        maxw = maxw or W - 120
+        lab = text_sprite(text, size, WHITE, stroke=9)
+        if lab.width > maxw - 170:
+            k = (maxw - 170) / lab.width; lab = lab.resize((int(lab.width * k), int(lab.height * k)), Image.LANCZOS)
+        bw = lab.width + 120; bh = int(lab.height * 0.86); tail = int(bh * 0.55); drop = int(bh * 0.22)
+        w = bw + 2 * tail; h = bh + drop + 14
+        im = Image.new('RGBA', (w, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        dk = shade(col, 0.55)
+        for side in (0, 1):  # the tails, behind and lower, notched
+            x = 0 if side == 0 else w - tail - 40
+            pts = [(x, drop), (x + tail + 40, drop), (x + tail + 40, bh + drop), (x, bh + drop), (x + tail * 0.45, drop + bh / 2)] if side == 0 else \
+                  [(x, drop), (x + tail + 40, drop), (x + tail + 40 - tail * 0.45, drop + bh / 2), (x + tail + 40, bh + drop), (x, bh + drop)]
+            d.polygon(pts, fill=dk, outline=INK, width=8)
+        d.rounded_rectangle((tail, 10, tail + bw, bh + 10), 18, fill=INK)
+        d.rounded_rectangle((tail, 0, tail + bw, bh), 18, fill=col, outline=INK, width=8)
+        gl = Image.new('L', (bw, bh), 0); ImageDraw.Draw(gl).rectangle((10, 8, bw - 10, bh * 0.4), fill=40)
+        im.paste((255, 255, 255), (tail, 0), gl)
+        im.alpha_composite(lab, ((w - lab.width) // 2, (bh - lab.height) // 2 + 6))
+        _ribbons[key] = im
+    return _ribbons[key]
+
+
+random.seed(11)
+BURST = [(random.uniform(0, 2 * math.pi), random.uniform(380, 760), random.choice((5, 7, 9))) for _ in range(22)]
+def burst(canvas, u, cx, cy, col=GOLD_TOP):
+    """A reveal's pop: a ring going out and glints flying off; u in seconds."""
+    if u < 0 or u > 0.9: return
+    k = u / 0.9; layer = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(layer)
+    rr = 120 + 620 * out_cubic(k)
+    d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), outline=col + (int(230 * (1 - k)),), width=int(26 * (1 - k)) + 2)
+    canvas.alpha_composite(layer)
+    for ang, dist, r in BURST:
+        dd = dist * out_cubic(k)
+        put(canvas, _spark_big[r], cx + math.cos(ang) * dd, cy + math.sin(ang) * dd, alpha=1 - k)
+
+
+def timer_bar(canvas, frac, cx, y, w=700, col=GOLD_TOP):
+    """Time left to guess, draining left to right; frac 1 -> 0."""
+    h = 34; im = Image.new('RGBA', (w, h + 8), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.rounded_rectangle((0, 6, w - 1, h + 7), h // 2, fill=(4, 5, 14, 255))
+    d.rounded_rectangle((0, 0, w - 1, h - 1), h // 2, fill=(30, 32, 60, 255), outline=INK, width=6)
+    if frac > 0.01:
+        fw = max(h, int((w - 12) * clamp(frac)))
+        c = (255, 80, 100) if frac < 0.34 else col
+        d.rounded_rectangle((6, 6, 6 + fw, h - 7), (h - 12) // 2, fill=c)
+        d.rounded_rectangle((12, 8, fw, h // 2 - 2), 6, fill=mixc(c, (255, 255, 255), 0.5))
+    put(canvas, im, cx, y)
+
+
+_badges = {}
+def count_badge(n, col):
+    key = (n, col)
+    if key not in _badges:
+        S = 190; im = Image.new('RGBA', (S, S + 12), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        d.ellipse((0, 12, S - 1, S + 11), fill=(4, 5, 14, 255))
+        d.ellipse((0, 0, S - 1, S - 1), fill=col, outline=INK, width=9)
+        d.ellipse((22, 14, S - 23, S * 0.48), fill=mixc(col, (255, 255, 255), 0.35))
+        lab = text_sprite(str(n), 130, WHITE, stroke=9)
+        im.alpha_composite(lab, ((S - lab.width) // 2, (S - lab.height) // 2 + 8))
+        _badges[key] = im
+    return _badges[key]
 
 
 _art = {}
