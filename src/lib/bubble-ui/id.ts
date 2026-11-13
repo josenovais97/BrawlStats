@@ -169,6 +169,21 @@ const id: UiStrings = {
   'trophies.toNext': "kurang {n}",
   'trophies.empty': "Tidak ada event trofi saat ini.",
   'review.fullSeason': "Seluruh musimmu di brawlzone.net →",
+  'history.open': "Riwayat",
+  'history.title': "Riwayat pertandingan",
+  'history.back': "Kembali",
+  'history.today': "Hari ini",
+  'history.yesterday': "Kemarin",
+  'history.bestStreak': "terbaik {n}",
+  'history.hint': "Ketuk pertandingan untuk melihat ulasannya.",
+  'history.empty': "Belum ada pertandingan Berperingkat di battle terakhirmu.",
+  'history.unavailable': "Pertandinganmu belum bisa dimuat. Coba lagi sebentar lagi.",
+  'history.win': "Menang",
+  'history.loss': "Kalah",
+  'club.place': "#{n} dari {total} di Berperingkat",
+  'club.you': "{name} (kamu)",
+  'club.all': "Lihat semua {n}",
+  'club.less': "Lebih sedikit",
 };
 
 export default id;

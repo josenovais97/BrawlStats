@@ -169,6 +169,21 @@ const he: UiStrings = {
   'trophies.toNext': "עוד {n}",
   'trophies.empty': "אין כרגע אירועי גביעים.",
   'review.fullSeason': "כל העונה שלך ב-brawlzone.net ←",
+  'history.open': "היסטוריה",
+  'history.title': "היסטוריית משחקים",
+  'history.back': "חזרה",
+  'history.today': "היום",
+  'history.yesterday': "אתמול",
+  'history.bestStreak': "הכי טוב {n}",
+  'history.hint': "הקש על משחק כדי לראות את הניתוח שלו.",
+  'history.empty': "עדיין אין משחקים מדורגים בקרבות האחרונים שלך.",
+  'history.unavailable': "אי אפשר לטעון את המשחקים שלך כרגע. נסה שוב עוד רגע.",
+  'history.win': "ניצחון",
+  'history.loss': "הפסד",
+  'club.place': "#{n} מתוך {total} במדורג",
+  'club.you': "{name} (את/ה)",
+  'club.all': "הצג את כל {n}",
+  'club.less': "הצג פחות",
 };
 
 export default he;

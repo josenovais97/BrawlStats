@@ -169,6 +169,21 @@ const de: UiStrings = {
   'trophies.toNext': "noch {n}",
   'trophies.empty': "Gerade keine Trophäen-Events.",
   'review.fullSeason': "Deine ganze Saison auf brawlzone.net →",
+  'history.open': "Verlauf",
+  'history.title': "Spielverlauf",
+  'history.back': "Zurück",
+  'history.today': "Heute",
+  'history.yesterday': "Gestern",
+  'history.bestStreak': "beste {n}",
+  'history.hint': "Tippe ein Spiel an für seine Analyse.",
+  'history.empty': "Noch keine Ranked-Spiele in deinen letzten Kämpfen.",
+  'history.unavailable': "Deine Spiele können gerade nicht geladen werden. Versuch es gleich nochmal.",
+  'history.win': "Sieg",
+  'history.loss': "Niederlage",
+  'club.place': "#{n} von {total} in Ranked",
+  'club.you': "{name} (du)",
+  'club.all': "Alle {n} zeigen",
+  'club.less': "Weniger zeigen",
 };
 
 export default de;

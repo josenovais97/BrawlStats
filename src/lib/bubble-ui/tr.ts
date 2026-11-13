@@ -169,6 +169,21 @@ const tr: UiStrings = {
   'trophies.toNext': "{n} kaldı",
   'trophies.empty': "Şu an kupa etkinliği yok.",
   'review.fullSeason': "Tüm sezonun brawlzone.net’te →",
+  'history.open': "Geçmiş",
+  'history.title': "Maç geçmişi",
+  'history.back': "Geri",
+  'history.today': "Bugün",
+  'history.yesterday': "Dün",
+  'history.bestStreak': "en iyi {n}",
+  'history.hint': "Analizini görmek için bir maça dokun.",
+  'history.empty': "Son savaşlarında henüz Aşamalı maç yok.",
+  'history.unavailable': "Maçların şu an yüklenemiyor. Birazdan tekrar dene.",
+  'history.win': "Galibiyet",
+  'history.loss': "Mağlubiyet",
+  'club.place': "Aşamalı'da {total} kişide #{n}",
+  'club.you': "{name} (sen)",
+  'club.all': "{n} kişinin hepsini göster",
+  'club.less': "Daha az göster",
 };
 
 export default tr;

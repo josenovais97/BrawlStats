@@ -12,6 +12,8 @@ import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { PanelTrophies } from '@/components/bubble/panel-trophies';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
+import { PanelClub } from '@/components/bubble/panel-club';
+import { PanelHistory } from '@/components/bubble/panel-history';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
 import { Check, ChevronDown, X } from 'lucide-react';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
@@ -99,13 +101,16 @@ export function PanelShell({
    * bubble opens the panel on that tab. A fresh page reads `tab=` from the
    * hash; a page the app already holds is switched through this hook.
    */
+  // Match history (2026-11-13): over the panel until closed, like the review.
+  const [historyOpen, setHistoryOpen] = useState(false);
   const chooseRef = useRef(choose);
   useEffect(() => {
     chooseRef.current = choose;
   });
   useEffect(() => {
     const open = (next: string) => {
-      if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters' || next === 'trophies') chooseRef.current(next);
+      if (next === 'history') setHistoryOpen(true);
+      else if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters' || next === 'trophies') chooseRef.current(next);
     };
     (window as unknown as { __bzOpenTab?: (t: string) => void }).__bzOpenTab = open;
     const fromHash = new URLSearchParams(window.location.hash.slice(1)).get('tab');
@@ -176,6 +181,19 @@ export function PanelShell({
   if (review) {
     return (
       <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+    );
+  }
+  if (historyOpen) {
+    return (
+      <PanelHistory
+        roster={roster}
+        modeArt={modeArt}
+        onClose={() => setHistoryOpen(false)}
+        onCounters={(id) => {
+          setHistoryOpen(false);
+          reviewCounters(id);
+        }}
+      />
     );
   }
 
@@ -257,7 +275,7 @@ export function PanelShell({
           <LanguagePicker />
         </div>
       )}
-      {account.tag && cardOpen && (progress || (form && form.byMode.length > 0) || lastGame) ? (
+      {account.tag && cardOpen ? (
         <div className="bz-panel mx-1 -mt-1 mb-2.5 space-y-1.5 px-2 py-1.5 text-[10px]">
           {progress ? (
             <div className="flex items-center gap-2">
@@ -341,6 +359,8 @@ export function PanelShell({
               ) : null}
             </div>
           ) : null}
+          {/* The club by Ranked elo (2026-11-13), loaded only when the card opens. */}
+          <PanelClub tag={account.tag} />
         </div>
       ) : null}
       </div>
@@ -375,6 +395,15 @@ export function PanelShell({
               <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
               <span>&nbsp;{t('record.since', { date: shortDate(record.since) })}</span>
             </span>
+          ) : null}
+          {account.tag ? (
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className={`${record && record.wins + record.losses > 0 ? 'ms-1.5' : 'ms-auto'} bz-chip shrink-0 px-2 py-0.5 text-[10px] leading-tight`}
+            >
+              {t('history.open')}
+            </button>
           ) : null}
         </div>
       ) : null}

@@ -169,6 +169,21 @@ const fr: UiStrings = {
   'trophies.toNext': "encore {n}",
   'trophies.empty': "Aucun événement trophées pour le moment.",
   'review.fullSeason': "Toute ta saison sur brawlzone.net →",
+  'history.open': "Historique",
+  'history.title': "Historique des parties",
+  'history.back': "Retour",
+  'history.today': "Aujourd'hui",
+  'history.yesterday': "Hier",
+  'history.bestStreak': "meilleure {n}",
+  'history.hint': "Touche une partie pour voir son analyse.",
+  'history.empty': "Pas encore de parties Classé dans tes combats récents.",
+  'history.unavailable': "Impossible de charger tes parties pour le moment. Réessaie dans un instant.",
+  'history.win': "Victoire",
+  'history.loss': "Défaite",
+  'club.place': "#{n} sur {total} en Classé",
+  'club.you': "{name} (toi)",
+  'club.all': "Voir les {n}",
+  'club.less': "Voir moins",
 };
 
 export default fr;

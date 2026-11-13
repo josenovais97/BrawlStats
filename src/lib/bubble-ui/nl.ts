@@ -169,6 +169,21 @@ const nl: UiStrings = {
   'trophies.toNext': "nog {n}",
   'trophies.empty': "Nu geen trofeeën-events.",
   'review.fullSeason': "Je hele seizoen op brawlzone.net →",
+  'history.open': "Geschiedenis",
+  'history.title': "Wedstrijdgeschiedenis",
+  'history.back': "Terug",
+  'history.today': "Vandaag",
+  'history.yesterday': "Gisteren",
+  'history.bestStreak': "beste {n}",
+  'history.hint': "Tik op een potje voor de analyse.",
+  'history.empty': "Nog geen ladderpotjes in je recente gevechten.",
+  'history.unavailable': "Je potjes kunnen nu niet worden geladen. Probeer het zo opnieuw.",
+  'history.win': "Winst",
+  'history.loss': "Verlies",
+  'club.place': "#{n} van {total} in de ladder",
+  'club.you': "{name} (jij)",
+  'club.all': "Alle {n} tonen",
+  'club.less': "Minder tonen",
 };
 
 export default nl;

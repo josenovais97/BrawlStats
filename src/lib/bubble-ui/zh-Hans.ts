@@ -169,6 +169,21 @@ const zhHans: UiStrings = {
   'trophies.toNext': "还差{n}",
   'trophies.empty': "现在没有奖杯活动。",
   'review.fullSeason': "在 brawlzone.net 查看整个赛季 →",
+  'history.open': "历史",
+  'history.title': "比赛历史",
+  'history.back': "返回",
+  'history.today': "今天",
+  'history.yesterday': "昨天",
+  'history.bestStreak': "最佳 {n}",
+  'history.hint': "点按一场比赛查看复盘。",
+  'history.empty': "最近的对战中还没有排位赛。",
+  'history.unavailable': "暂时无法加载你的比赛，请稍后再试。",
+  'history.win': "胜利",
+  'history.loss': "失败",
+  'club.place': "排位赛 {total} 人中第 {n}",
+  'club.you': "{name}（你）",
+  'club.all': "显示全部 {n} 人",
+  'club.less': "收起",
 };
 
 export default zhHans;

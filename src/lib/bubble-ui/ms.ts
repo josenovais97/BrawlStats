@@ -169,6 +169,21 @@ const ms: UiStrings = {
   'trophies.toNext': "kurang {n}",
   'trophies.empty': "Tiada acara trofi sekarang.",
   'review.fullSeason': "Seluruh musim anda di brawlzone.net →",
+  'history.open': "Sejarah",
+  'history.title': "Sejarah perlawanan",
+  'history.back': "Kembali",
+  'history.today': "Hari ini",
+  'history.yesterday': "Semalam",
+  'history.bestStreak': "terbaik {n}",
+  'history.hint': "Ketik perlawanan untuk melihat ulasannya.",
+  'history.empty': "Belum ada perlawanan Berperingkat dalam pertempuran terkini anda.",
+  'history.unavailable': "Perlawanan anda tidak dapat dimuatkan sekarang. Cuba sebentar lagi.",
+  'history.win': "Menang",
+  'history.loss': "Kalah",
+  'club.place': "#{n} daripada {total} dalam Berperingkat",
+  'club.you': "{name} (anda)",
+  'club.all': "Tunjuk semua {n}",
+  'club.less': "Tunjuk kurang",
 };
 
 export default ms;

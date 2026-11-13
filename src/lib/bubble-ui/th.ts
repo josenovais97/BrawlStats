@@ -169,6 +169,21 @@ const th: UiStrings = {
   'trophies.toNext': "อีก {n}",
   'trophies.empty': "ตอนนี้ไม่มีอีเวนต์ถ้วย",
   'review.fullSeason': "ดูทั้งซีซันของคุณที่ brawlzone.net →",
+  'history.open': "ประวัติ",
+  'history.title': "ประวัติการแข่ง",
+  'history.back': "กลับ",
+  'history.today': "วันนี้",
+  'history.yesterday': "เมื่อวาน",
+  'history.bestStreak': "ดีที่สุด {n}",
+  'history.hint': "แตะเกมเพื่อดูการวิเคราะห์",
+  'history.empty': "ยังไม่มีเกมจัดอันดับในการต่อสู้ล่าสุดของคุณ",
+  'history.unavailable': "ตอนนี้โหลดเกมของคุณไม่ได้ ลองใหม่อีกครั้งในอีกสักครู่",
+  'history.win': "ชนะ",
+  'history.loss': "แพ้",
+  'club.place': "อันดับ {n} จาก {total} ในโหมดจัดอันดับ",
+  'club.you': "{name} (คุณ)",
+  'club.all': "ดูทั้งหมด {n}",
+  'club.less': "ดูน้อยลง",
 };
 
 export default th;

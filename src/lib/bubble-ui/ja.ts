@@ -169,6 +169,21 @@ const ja: UiStrings = {
   'trophies.toNext': "あと{n}",
   'trophies.empty': "現在トロフィーイベントはありません。",
   'review.fullSeason': "シーズン全体を brawlzone.net で見る →",
+  'history.open': "履歴",
+  'history.title': "試合履歴",
+  'history.back': "戻る",
+  'history.today': "今日",
+  'history.yesterday': "昨日",
+  'history.bestStreak': "最高{n}",
+  'history.hint': "試合をタップすると振り返りが見られます。",
+  'history.empty': "最近のバトルにガチバトルの試合はまだありません。",
+  'history.unavailable': "今は試合を読み込めません。少ししてからもう一度お試しください。",
+  'history.win': "勝利",
+  'history.loss': "敗北",
+  'club.place': "ガチバトルで{total}人中{n}位",
+  'club.you': "{name}（あなた）",
+  'club.all': "{n}人すべて表示",
+  'club.less': "表示を減らす",
 };
 
 export default ja;

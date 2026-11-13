@@ -169,6 +169,21 @@ const it: UiStrings = {
   'trophies.toNext': "mancano {n}",
   'trophies.empty': "Nessun evento trofei in questo momento.",
   'review.fullSeason': "Tutta la tua stagione su brawlzone.net →",
+  'history.open': "Cronologia",
+  'history.title': "Cronologia partite",
+  'history.back': "Indietro",
+  'history.today': "Oggi",
+  'history.yesterday': "Ieri",
+  'history.bestStreak': "migliore {n}",
+  'history.hint': "Tocca una partita per vederne l'analisi.",
+  'history.empty': "Ancora nessuna partita Classificata nelle tue battaglie recenti.",
+  'history.unavailable': "Ora non è possibile caricare le tue partite. Riprova tra poco.",
+  'history.win': "Vittoria",
+  'history.loss': "Sconfitta",
+  'club.place': "#{n} su {total} in Classificata",
+  'club.you': "{name} (tu)",
+  'club.all': "Mostra tutti i {n}",
+  'club.less': "Mostra meno",
 };
 
 export default it;

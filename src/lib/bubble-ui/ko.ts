@@ -169,6 +169,21 @@ const ko: UiStrings = {
   'trophies.toNext': "{n} 남음",
   'trophies.empty': "지금은 트로피 이벤트가 없어요.",
   'review.fullSeason': "brawlzone.net에서 시즌 전체 보기 →",
+  'history.open': "기록",
+  'history.title': "경기 기록",
+  'history.back': "뒤로",
+  'history.today': "오늘",
+  'history.yesterday': "어제",
+  'history.bestStreak': "최고 {n}",
+  'history.hint': "경기를 탭하면 분석을 볼 수 있어요.",
+  'history.empty': "최근 전투에 아직 경쟁전 경기가 없어요.",
+  'history.unavailable': "지금은 경기를 불러올 수 없어요. 잠시 후 다시 시도해 주세요.",
+  'history.win': "승리",
+  'history.loss': "패배",
+  'club.place': "경쟁전 {total}명 중 {n}위",
+  'club.you': "{name} (나)",
+  'club.all': "{n}명 모두 보기",
+  'club.less': "간단히 보기",
 };
 
 export default ko;

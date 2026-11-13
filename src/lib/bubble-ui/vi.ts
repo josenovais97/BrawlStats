@@ -169,6 +169,21 @@ const vi: UiStrings = {
   'trophies.toNext': "còn {n}",
   'trophies.empty': "Hiện không có sự kiện cúp.",
   'review.fullSeason': "Cả mùa của bạn trên brawlzone.net →",
+  'history.open': "Lịch sử",
+  'history.title': "Lịch sử trận đấu",
+  'history.back': "Quay lại",
+  'history.today': "Hôm nay",
+  'history.yesterday': "Hôm qua",
+  'history.bestStreak': "tốt nhất {n}",
+  'history.hint': "Chạm vào một trận để xem phân tích.",
+  'history.empty': "Chưa có trận Xếp hạng nào trong các trận gần đây.",
+  'history.unavailable': "Hiện chưa tải được các trận của bạn. Hãy thử lại sau.",
+  'history.win': "Thắng",
+  'history.loss': "Thua",
+  'club.place': "#{n} trên {total} ở Xếp hạng",
+  'club.you': "{name} (bạn)",
+  'club.all': "Xem cả {n}",
+  'club.less': "Thu gọn",
 };
 
 export default vi;

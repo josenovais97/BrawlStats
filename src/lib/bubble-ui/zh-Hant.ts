@@ -169,6 +169,21 @@ const zhHant: UiStrings = {
   'trophies.toNext': "還差{n}",
   'trophies.empty': "目前沒有獎盃活動。",
   'review.fullSeason': "在 brawlzone.net 查看整個賽季 →",
+  'history.open': "歷史",
+  'history.title': "比賽歷史",
+  'history.back': "返回",
+  'history.today': "今天",
+  'history.yesterday': "昨天",
+  'history.bestStreak': "最佳 {n}",
+  'history.hint': "點按一場比賽查看復盤。",
+  'history.empty': "最近的對戰中還沒有排位賽。",
+  'history.unavailable': "暫時無法載入你的比賽，請稍後再試。",
+  'history.win': "勝利",
+  'history.loss': "失敗",
+  'club.place': "排位賽 {total} 人中第 {n}",
+  'club.you': "{name}（你）",
+  'club.all': "顯示全部 {n} 人",
+  'club.less': "收起",
 };
 
 export default zhHant;

@@ -169,6 +169,21 @@ const ar: UiStrings = {
   'trophies.toNext': "تبقّى {n}",
   'trophies.empty': "لا توجد أحداث كؤوس الآن.",
   'review.fullSeason': "موسمك كاملًا على brawlzone.net ←",
+  'history.open': "السجل",
+  'history.title': "سجل المباريات",
+  'history.back': "رجوع",
+  'history.today': "اليوم",
+  'history.yesterday': "أمس",
+  'history.bestStreak': "الأفضل {n}",
+  'history.hint': "اضغط على مباراة لرؤية مراجعتها.",
+  'history.empty': "لا توجد مباريات مصنفة في معاركك الأخيرة بعد.",
+  'history.unavailable': "تعذّر تحميل مبارياتك الآن. حاول بعد قليل.",
+  'history.win': "فوز",
+  'history.loss': "خسارة",
+  'club.place': "#{n} من {total} في المصنف",
+  'club.you': "{name} (أنت)",
+  'club.all': "عرض الكل {n}",
+  'club.less': "عرض أقل",
 };
 
 export default ar;

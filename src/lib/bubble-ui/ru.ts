@@ -169,6 +169,21 @@ const ru: UiStrings = {
   'trophies.toNext': "ещё {n}",
   'trophies.empty': "Сейчас нет событий на кубки.",
   'review.fullSeason': "Весь твой сезон на brawlzone.net →",
+  'history.open': "История",
+  'history.title': "История матчей",
+  'history.back': "Назад",
+  'history.today': "Сегодня",
+  'history.yesterday': "Вчера",
+  'history.bestStreak': "лучшая {n}",
+  'history.hint': "Нажми на матч, чтобы увидеть разбор.",
+  'history.empty': "В последних боях пока нет ранговых матчей.",
+  'history.unavailable': "Сейчас не удаётся загрузить матчи. Попробуй чуть позже.",
+  'history.win': "Победа",
+  'history.loss': "Поражение",
+  'club.place': "#{n} из {total} в ранговых",
+  'club.you': "{name} (ты)",
+  'club.all': "Показать всех ({n})",
+  'club.less': "Свернуть",
 };
 
 export default ru;

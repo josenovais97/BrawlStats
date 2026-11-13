@@ -169,6 +169,21 @@ const fi: UiStrings = {
   'trophies.toNext': "{n} jäljellä",
   'trophies.empty': "Ei pokaalitapahtumia juuri nyt.",
   'review.fullSeason': "Koko kautesi brawlzone.netissä →",
+  'history.open': "Historia",
+  'history.title': "Otteluhistoria",
+  'history.back': "Takaisin",
+  'history.today': "Tänään",
+  'history.yesterday': "Eilen",
+  'history.bestStreak': "paras {n}",
+  'history.hint': "Napauta peliä nähdäksesi sen analyysin.",
+  'history.empty': "Viimeisissä otteluissasi ei ole vielä rankattuja pelejä.",
+  'history.unavailable': "Pelejäsi ei voi ladata juuri nyt. Yritä hetken päästä.",
+  'history.win': "Voitto",
+  'history.loss': "Tappio",
+  'club.place': "#{n}/{total} rankatussa",
+  'club.you': "{name} (sinä)",
+  'club.all': "Näytä kaikki {n}",
+  'club.less': "Näytä vähemmän",
 };
 
 export default fi;

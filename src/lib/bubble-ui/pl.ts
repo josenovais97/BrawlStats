@@ -169,6 +169,21 @@ const pl: UiStrings = {
   'trophies.toNext': "brakuje {n}",
   'trophies.empty': "Teraz brak wydarzeń pucharowych.",
   'review.fullSeason': "Cały twój sezon na brawlzone.net →",
+  'history.open': "Historia",
+  'history.title': "Historia meczów",
+  'history.back': "Wstecz",
+  'history.today': "Dziś",
+  'history.yesterday': "Wczoraj",
+  'history.bestStreak': "najlepsza {n}",
+  'history.hint': "Dotknij meczu, aby zobaczyć analizę.",
+  'history.empty': "Brak jeszcze meczów rankingowych w ostatnich walkach.",
+  'history.unavailable': "Nie można teraz wczytać meczów. Spróbuj za chwilę.",
+  'history.win': "Wygrana",
+  'history.loss': "Przegrana",
+  'club.place': "#{n} z {total} w rankingu",
+  'club.you': "{name} (ty)",
+  'club.all': "Pokaż wszystkich {n}",
+  'club.less': "Pokaż mniej",
 };
 
 export default pl;

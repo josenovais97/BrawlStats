@@ -51,6 +51,16 @@ export async function GET(request: NextRequest) {
   if (!log) return okResponse({ latest: null, newGames: 0, game: null, games: [] }, 30);
 
   const ranked = rankedGames(log);
+
+  // One game of the match history (2026-11-13): reviewed whenever it was played.
+  const pickedRaw = q.get('game') ?? '';
+  if (BATTLE_TIME.test(pickedRaw)) {
+    const picked = ranked.find((e) => e.battleTime === pickedRaw);
+    if (!picked) return okResponse({ game: null }, 60);
+    const owner = await getPlayer(tag).catch(() => null);
+    const one = await reviewGame(picked, tag, owner?.brawlers ?? [], { ownPickOnly: true });
+    return okResponse({ game: one ? toGame(picked, tag, one, null, null) : null }, 300);
+  }
   const latest = ranked[0]?.battleTime ?? null;
   const me = `#${tag}`;
   const games = ranked.map((e) => {
@@ -75,11 +85,22 @@ export async function GET(request: NextRequest) {
   const player = await getPlayer(tag).catch(() => null);
   const read = await reviewGame(entry, tag, player?.brawlers ?? [], { ownPickOnly: true });
   if (!read) return okResponse({ latest, newGames: fresh.length, elo: player?.rankedElo ?? null, game: null, games }, 30);
-  const { review } = read;
 
   const elo = player?.rankedElo ?? null;
   const moved = elo !== null && Number.isFinite(prevElo) && prevElo > 0 ? elo - prevElo : null;
   const eloChange = fresh.length === 1 && moved !== null && moved !== 0 && Math.abs(moved) < 400 ? moved : null;
+  return okResponse({ latest, newGames: fresh.length, elo, games, game: toGame(entry, tag, read, elo, eloChange) }, 30);
+}
+
+/** The review the panel draws, for one Ranked game of the log. */
+function toGame(
+  entry: Parameters<typeof reviewGame>[0],
+  tag: string,
+  read: NonNullable<Awaited<ReturnType<typeof reviewGame>>>,
+  elo: number | null,
+  eloChange: number | null,
+) {
+  const { review } = read;
   const progress = rankProgress(elo);
   const rankIndex = progress ? RANK_ELO_FLOORS.findIndex(([n]) => n === progress.rank.toUpperCase()) : -1;
   const starTag = normalizeTag(entry.battle.starPlayer?.tag ?? null);
@@ -101,40 +122,31 @@ export async function GET(request: NextRequest) {
             ? 'playLost'
             : 'even';
 
-  return okResponse(
-    {
-      latest,
-      newGames: fresh.length,
-      elo,
-      games,
-      game: {
-        battleTime: entry.battleTime,
-        mapName: entry.event?.map ?? null,
-        mode: entry.event?.mode ?? entry.battle.mode ?? null,
-        result: won ? 'victory' : 'defeat',
-        eloChange,
-        rank: progress?.rank ?? null,
-        rankIcon: rankIndex >= 0 ? absolute(rankedTierIconUrl(rankIndex + 1)) : null,
-        mine: read.mine.map((p) => ({ id: p.id, you: p.tag === tag, star: p.tag === starTag })),
-        theirs: read.theirs.map((p) => ({ id: p.id, star: p.tag === starTag })),
-        winChance: review?.winChance ?? null,
-        verdict,
-        worst: review?.worstMatchup
-          ? {
-              brawlerId: review.worstMatchup.brawlerId,
-              againstId: review.worstMatchup.againstId,
-              edge: Math.round(review.worstMatchup.edge * 10) / 10,
-              battles: review.worstMatchup.battles,
-            }
-          : null,
-        keyEnemy: review?.keyEnemy ? { brawlerId: review.keyEnemy.brawlerId, edge: Math.round(review.keyEnemy.edge * 10) / 10 } : null,
-        better: review?.betterPick
-          ? { outId: review.betterPick.outId, inId: review.betterPick.inId, gain: Math.round(review.betterPick.gain * 10) / 10 }
-          : null,
-      },
-    },
-    30,
-  );
+  return {
+    battleTime: entry.battleTime,
+    mapName: entry.event?.map ?? null,
+    mode: entry.event?.mode ?? entry.battle.mode ?? null,
+    result: won ? 'victory' : 'defeat',
+    eloChange,
+    rank: progress?.rank ?? null,
+    rankIcon: rankIndex >= 0 ? absolute(rankedTierIconUrl(rankIndex + 1)) : null,
+    mine: read.mine.map((p) => ({ id: p.id, you: p.tag === tag, star: p.tag === starTag })),
+    theirs: read.theirs.map((p) => ({ id: p.id, star: p.tag === starTag })),
+    winChance: review?.winChance ?? null,
+    verdict,
+    worst: review?.worstMatchup
+      ? {
+          brawlerId: review.worstMatchup.brawlerId,
+          againstId: review.worstMatchup.againstId,
+          edge: Math.round(review.worstMatchup.edge * 10) / 10,
+          battles: review.worstMatchup.battles,
+        }
+      : null,
+    keyEnemy: review?.keyEnemy ? { brawlerId: review.keyEnemy.brawlerId, edge: Math.round(review.keyEnemy.edge * 10) / 10 } : null,
+    better: review?.betterPick
+      ? { outId: review.betterPick.outId, inId: review.betterPick.inId, gain: Math.round(review.betterPick.gain * 10) / 10 }
+      : null,
+  };
 }
 
 function absolute(url: string | null): string | null {
