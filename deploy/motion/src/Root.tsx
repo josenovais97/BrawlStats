@@ -3,6 +3,7 @@ import {Composition} from 'remotion';
 import {Countdown} from './Countdown';
 import {Drops, Giveaway, Modes, Ranks, Stop} from './Formats';
 import {Quiz} from './Quiz';
+import {RoastMains} from './Roast';
 import {Wrapped} from './Wrapped';
 import {Plan, loadFonts} from './theme';
 
@@ -20,6 +21,7 @@ export const Root: React.FC = () => (
     <Composition id="Stop" component={Stop} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Giveaway" component={Giveaway} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Drops" component={Drops} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="RoastMains" component={RoastMains} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Wrapped" component={Wrapped} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
   </>
 );

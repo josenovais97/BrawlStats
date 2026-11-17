@@ -110,7 +110,7 @@ const winRate = (f: RoastFacts) => (f.log && f.log.decided >= 10 ? f.log.wins / 
  * shouted names. A brawler missing here falls back to its class, which is
  * fine: a weak specific joke is worse than a decent class one.
  */
-const MAINS: Record<string, Line[]> = {
+export const MAINS: Record<string, Line[]> = {
   SHELLY: [
     {
       en: 'You main Shelly. The brawler the tutorial hands you. You just never left the tutorial.',

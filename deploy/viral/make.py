@@ -2119,6 +2119,45 @@ def rr_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ roastmains
+# "What your MAIN says about you" (2026-11-17, the Roast My Account launch;
+# owner: "go for it"): five of the most picked Ranked brawlers, each with one
+# of Roast My Account's own lines for its mains (viral-data `roast`, from
+# lib/roast-jokes MAINS), then "get YOUR roast" on brawlzone.net/roast. No
+# player data at all. Each episode takes the next five by pick rate that the
+# last one did not show, so it can run again. Remotion only (exit 5).
+if KIND == 'roastmains':
+    _lines = data.get('roast') or {}
+    _last = set(state.get('last_shown', {}).get(KIND, []))
+    _cands = [b for b in sorted(data['all'], key=lambda b: -b['use']) if _lines.get(b['n'])]
+    RM = [b for b in _cands if str(b['id']) not in _last][:5]
+    if len(RM) < 5:
+        RM = _cands[:5]
+    if len(RM) < 5:
+        print('not enough brawlers with roast lines'); sys.exit(5)
+    SHOWN = [str(b['id']) for b in RM]
+    tl.add(4, 'rm_intro', faces=RM)
+    for _i, _b in enumerate(RM):
+        tl.add(7, 'rm_main', i=_i, b=_b, line=rnd.choice(_lines[_b['n']]))
+    tl.add(6, 'rm_outro')
+    META = {
+        'title': 'What your MAIN says about you 🔥 #Shorts',
+        'titles': {'pt-BR': 'O que o seu MAIN diz sobre você 🔥 #Shorts',
+                   'es-419': 'Lo que tu MAIN dice de ti 🔥 #Shorts',
+                   **more_titles(id='Apa kata MAIN kamu tentang dirimu 🔥 #Shorts',
+                                 de='Was dein MAIN über dich verrät 🔥 #Shorts',
+                                 tr="MAIN'in senin hakkında ne söylüyor 🔥 #Shorts",
+                                 pl='Co twój MAIN mówi o tobie 🔥 #Shorts')},
+        'description': 'We roasted five of the most picked brawlers in Ranked this week: '
+                       + ', '.join(nice(b['n']) for b in RM) + '.\n\n'
+                       'Want YOUR account roasted? Type your player tag on brawlzone.net/roast: it reads your real '
+                       'stats (your main, your Ranked rank, your last games) and roasts you, with a score out of 10 '
+                       'and a card to share. Free, no login.\n\nWhat is your main? 👇\n\n'
+                       f'https://brawlzone.net/roast{FOOTER}\n'
+                       '#brawlstars #brawlstarsmemes #roast #brawlzone',
+    }
+
+
 # ================================================================ wrapped
 # "Season Wrapped" (2026-11-17, owner: yes to a Short before the Season 50
 # reset): the season's picks from the week's Ranked data, then the site's real
@@ -2184,7 +2223,7 @@ if KIND == 'wrapped':
 # quiz clue already pixelated, shadowed or with its zoom window), so the two
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
-              'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped')
+              'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains')
 
 
 def export_plan(out):
@@ -2333,7 +2372,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'wrapped': None}[KIND]
+         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None}[KIND]
 
 
 def frame(t):

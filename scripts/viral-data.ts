@@ -12,6 +12,7 @@
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getLatestReleaseNotes, updateHeadliners } from '@/lib/release-notes';
 import { getSeasonState } from '@/lib/ranked-seasons';
+import { MAINS } from '@/lib/roast-jokes';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
 import { getStarrDrops } from '@/lib/starr-drops';
@@ -135,6 +136,9 @@ async function main() {
       pool,
       brackets,
       drops,
+      // Roast My Account's per-brawler lines, English, for the "what your
+      // main says about you" Short (2026-11-17). Keyed by the API's name.
+      roast: Object.fromEntries(Object.entries(MAINS).map(([name, lines]) => [name, lines.map((l) => l.en)])),
     });
   await new Promise<void>((resolve, reject) => process.stdout.write(out + '\n', (e) => (e ? reject(e) : resolve())));
 }
