@@ -4,6 +4,7 @@
 #
 #   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
 #   brawlzone-viral [--no-post] extra|everyrank|classrank|stop|drops|whatsnew|rankedrefresh|seasonclimb
+#   WRAPPED_TAG=<tag> brawlzone-viral [--no-post] wrapped
 #   brawlzone-viral [--no-post] newbrawler <dir>
 #   brawlzone-viral [--no-post] daily
 #
@@ -98,8 +99,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh or seasonclimb)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb or wrapped)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -113,7 +114,7 @@ elif [ "$kind" = daily ]; then
   PREV=-
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
      || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
-     || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ]; then
+     || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ] || [ "$kind" = wrapped ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -128,7 +129,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -167,6 +168,16 @@ if [ "$kind" = daily ]; then
   curl -sf --max-time 60 -A 'BrawlZone viral (https://brawlzone.net)' -o "$OUT/shadow.webp" \
     "$SITE/api/brawldle/picture?mode=shadow&step=0&d=$DAY" || die "::error::could not fetch the shadow from the site"
   printf '{"date": "%s", "number": %d}\n' "$DAY" $(( ( $(date -u -d "$DAY" +%s) - $(date -u -d 2026-10-01 +%s) ) / 86400 )) > "$OUT/daily.json"
+fi
+
+if [ "$kind" = wrapped ]; then
+  # The Season Wrapped Short (2026-11-17) shows a real card from the site,
+  # the player's name and tag painted out by make.py. Whose card is the
+  # caller's choice, never written in the repo.
+  [ -n "${WRAPPED_TAG:-}" ] || die "::error::wrapped needs WRAPPED_TAG=<player tag>"
+  # Into the cache, not $OUT: that folder is public and this copy has the name.
+  curl -sf --max-time 90 -A 'BrawlZone viral (https://brawlzone.net)' -o "$CACHE/wrapped-card.png" \
+    "$SITE/player/${WRAPPED_TAG#\#}/season-story/en" || die "::error::could not fetch the Season Wrapped card for that tag"
 fi
 
 if [ "$kind" != newbrawler ] && [ "$kind" != daily ]; then

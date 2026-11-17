@@ -2119,6 +2119,61 @@ def rr_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ wrapped
+# "Season Wrapped" (2026-11-17, owner: yes to a Short before the Season 50
+# reset): the season's picks from the week's Ranked data, then the site's real
+# Season Wrapped card (brawlzone-viral fetches /player/<WRAPPED_TAG>/season-
+# story/en to $ASSETS/wrapped-card.png; the name and tag are painted out in export_plan
+# and taped over in the video), then how to get yours. Run by hand
+# (`brawlzone-viral wrapped`). Remotion only: without it the run fails (exit
+# 5) rather than posting something else. The card 404s once the new season
+# starts (fewer than five Ranked games), so it only runs in a reset week.
+if KIND == 'wrapped':
+    import datetime
+    _today = datetime.date.today()
+    _days = [_today + datetime.timedelta(days=i) for i in range(1, 8)]
+    _end = next((d for d in _days if d.weekday() == 3 and 15 <= d.day <= 21), None)  # the third Thursday
+    if _end is None:
+        print('no Ranked season ends this week'); sys.exit(5)
+    W_CARD = f"{os.environ.get('ASSETS', '.')}/wrapped-card.png"
+    if not os.path.exists(W_CARD):
+        print('no wrapped-card.png'); sys.exit(5)
+    W_DAYS = (_end - _today).days
+    W_ENDS = 'TOMORROW' if W_DAYS == 1 else _end.strftime('%A').upper()
+    W_SEASON = data.get('season') or 0
+    _most = max(data['all'], key=lambda b: b['use'])
+    _best = max([b for b in data['all'] if b.get('battles', 0) >= 10000], key=lambda b: b['wr'])
+    _worst = min([b for b in sorted(data['all'], key=lambda b: -b['use'])[:10] if b['id'] not in (_most['id'], _best['id'])],
+                 key=lambda b: b['wr'])
+    tl.add(4, 'w_intro')
+    tl.add(4, 'w_stat', b=_most, head='MOST PICKED', label='PICK RATE', num=round(_most['use'] * 100, 1),
+           color='#ff9a28', tint='#ffe45a', stamp='#1')
+    tl.add(4, 'w_stat', b=_best, head='BEST WIN RATE', label='WINS', num=round(_best['wr'] * 100, 1),
+           color='#32c46e', tint='#7cff8a', stamp='BROKEN?')
+    tl.add(4, 'w_stat', b=_worst, head='PICKED A LOT', head2='LOSES A LOT', label='WINS ONLY', num=round(_worst['wr'] * 100, 1),
+           color='#ff3750', tint='#ff8a96', stamp='OVERRATED')
+    tl.add(7, 'w_card')
+    tl.add(6, 'w_how')
+    tl.add(5, 'w_outro')
+    _when = 'tomorrow' if W_DAYS == 1 else _end.strftime('%A (%b %-d)')
+    META = {
+        'title': f'Your Season {W_SEASON} WRAPPED 🏆 Get it before the Ranked reset #Shorts',
+        'titles': {'pt-BR': f'Seu WRAPPED da Temporada {W_SEASON} 🏆 Pegue antes do reset do Ranked #Shorts',
+                   'es-419': f'Tu WRAPPED de la Temporada {W_SEASON} 🏆 Consíguelo antes del reinicio del Ranked #Shorts',
+                   **more_titles(id=f'WRAPPED Season {W_SEASON} kamu 🏆 Ambil sebelum Ranked direset #Shorts',
+                                 de=f'Dein Season {W_SEASON} WRAPPED 🏆 Hol es dir vor dem Ranked-Reset #Shorts',
+                                 tr=f'Sezon {W_SEASON} WRAPPED 🏆 Ranked sıfırlanmadan önce al #Shorts',
+                                 pl=f'Twój WRAPPED Sezonu {W_SEASON} 🏆 Odbierz przed resetem Rankedu #Shorts')},
+        'description': f'Ranked Season {W_SEASON} ends {_when}. Get your Season Wrapped on brawlzone.net: type your '
+                       'player tag, open the Ranked tab and tap "Share my season". Rank, Ranked games, win rate, '
+                       'longest win streak and your most played brawlers on one card. Free, any tag, no login.\n\n'
+                       f"Ranked this week: most picked {nice(_most['n'])}, best win rate {nice(_best['n'])}, "
+                       f"picked a lot but losing {nice(_worst['n'])}.\n\n"
+                       f'Get yours: https://brawlzone.net{FOOTER}\n'
+                       '#brawlstars #brawlstarsranked #ranked #seasonwrapped #brawlzone',
+    }
+
+
 # ================================================================ plan
 # --plan <dir> (2026-11-13): the same video as data for deploy/motion, the
 # Remotion renderer that draws the formats it knows instead of the frames
@@ -2129,7 +2184,7 @@ def rr_scene(s, t, bt, lt):
 # quiz clue already pixelated, shadowed or with its zoom window), so the two
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
-              'modes', 'ranks', 'stop', 'giveaway', 'drops')
+              'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped')
 
 
 def export_plan(out):
@@ -2234,6 +2289,22 @@ def export_plan(out):
                     ultraIn=ULTRA_IN, ultras=[bz(b, full=True) for b in ULTRAS])
         if ULTRA_IN:
             plan['art']['UltraGrey'] = save(grey(drop_art('Ultra', 480)), 'c/drop-ultra-grey.png')
+    if KIND == 'wrapped':
+        # The story without its empty foot, and the player's name and tag
+        # painted over with the background beside them, under the video's tape.
+        card = Image.open(W_CARD).convert('RGB').crop((0, 0, 1080, 1700))
+        px = card.load()
+        for y in range(88, 242):
+            c = px[1072, y]
+            for x in range(222, 1078):
+                px[x, y] = c
+        card.save(f'{A}/c/card.jpg', quality=92)
+        leagues = []
+        for n in RR_LEAGUES:
+            p = f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png"
+            if os.path.exists(p):
+                leagues.append(save(Image.open(p).convert('RGBA'), f'c/league-{n}.png'))
+        plan.update(season=W_SEASON, ends=W_ENDS, days=W_DAYS, card='c/card.jpg', leagues=leagues)
     json.dump(plan, open(f'{out}/plan.json', 'w'), ensure_ascii=False)
     print(KIND, 'plan', len(segs), 'segments', round(tl.dur, 2), 's')
 
@@ -2262,7 +2333,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene}[KIND]
+         'rankedrefresh': rr_scene, 'wrapped': None}[KIND]
 
 
 def frame(t):
@@ -2281,6 +2352,8 @@ if __name__ == '__main__':
         if KIND not in PLAN_KINDS:
             print(f'{KIND} has no Remotion design yet'); sys.exit(4)
         export_plan(OUT); sys.exit()
+    if SCENE is None:
+        print(f'{KIND} has only the Remotion design'); sys.exit(5)
     if ONLY is not None:
         for sec in ONLY:
             frame(sec).save(f'{OUT}/{KIND}-{sec}.jpg', quality=85)
