@@ -313,8 +313,8 @@ export const Logo: React.FC<{size: number}> = ({size}) => (
 
 /** The address typed into a search box, the caret blinking, then the search
  *  button pressed: most people find the site by typing its name. */
-export const SearchBar: React.FC<{text?: string; frame: number; at?: number; y: number; width?: number; height?: number; fps?: number}> = ({
-  text = 'brawlzone.net', frame, at = 0, y, width = 940, height = 150, fps = 30,
+export const SearchBar: React.FC<{text?: string; frame: number; at?: number; x?: number; y: number; width?: number; height?: number; fps?: number}> = ({
+  text = 'brawlzone.net', frame, at = 0, x = W / 2, y, width = 940, height = 150, fps = 30,
 }) => {
   const f = frame - at;
   if (f < 0) return null;
@@ -325,7 +325,7 @@ export const SearchBar: React.FC<{text?: string; frame: number; at?: number; y: 
   const tap = done ? ((f - 8 - text.length * 2.2) % (fps * 1.6)) : -1;
   const press = tap >= 0 && tap < 6;
   return (
-    <div style={{position: 'absolute', left: W / 2, top: y, transform: `translate(-50%, -50%) scale(${k * (press ? 0.97 : 1)})`}}>
+    <div style={{position: 'absolute', left: x, top: y, transform: `translate(-50%, -50%) scale(${k * (press ? 0.97 : 1)})`}}>
       <div style={{position: 'relative', width, height, borderRadius: height / 2, background: 'linear-gradient(180deg, #ffffff, #eef1ff)',
         boxShadow: `0 0 0 8px ${INK}, 0 16px 0 8px ${DEEP}`, display: 'flex', alignItems: 'center', paddingLeft: height * 0.16}}>
         <Logo size={height * 0.66} />

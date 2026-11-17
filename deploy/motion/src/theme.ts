@@ -62,4 +62,5 @@ export type Segment = {kind: string; start: number; len: number; [k: string]: an
 export type Plan = {
   kind: string; fps: number; step: number; beats: number; duration: number; period: number; episode: number;
   segments: Segment[]; word?: string; bestLine?: string; season?: number; count?: number; wall?: string[];
+  [k: string]: any;
 };
