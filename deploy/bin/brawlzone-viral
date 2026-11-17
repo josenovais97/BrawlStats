@@ -423,6 +423,11 @@ draw () { # kind
     motion_draw "$1"; mrc=$?
     { [ "$mrc" = 0 ] || [ "$mrc" = 3 ]; } && return "$mrc"
     echo "drawing $1 with Pillow instead"
+    # Say so by mail: the 2026-11-14..16 fallbacks sat in this log for three days.
+    [ -x /usr/local/bin/brawlzone-alert ] && {
+      echo "The $1 Short fell back to the old Pillow look (motion_draw exit $mrc). It still posts."
+      echo; echo "Last lines of $CACHE/motion.log:"; tail -c 1500 "$CACHE/motion.log" 2>/dev/null
+    } | /usr/local/bin/brawlzone-alert "[brawlzone] Short drawn without Remotion: $1" || true
   fi
   # Two halves of the frames in parallel, one core each: the box has two,
   # and the site keeps serving on whatever they leave.
