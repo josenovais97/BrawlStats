@@ -324,6 +324,9 @@ for slug, d in (data.get('drops') or {}).items():
 # The skin quiz's list of Fan Kit skins (it fetches the five it uses), and the
 # ability quiz's icons: every gadget, star power and hypercharge the Fan Kit
 # has, named from BrawlAPI, once each.
+# The Fan Kit's mode icons by key, for the Remotion modes video (make.py mode_icon).
+os.makedirs('/cache/modes', exist_ok=True)
+json.dump(fk.get('modes', {}), open('/cache/modes/index.json', 'w'))
 os.makedirs('/cache/skins', exist_ok=True)
 try:
     with open('/repo/scripts/fankit-skin-sources.json') as f:
@@ -399,7 +402,11 @@ motion_draw () { # kind: 0 drawn into $OUT/silent.mp4, 3 nothing to say today, e
   mkdir -p "$OUT/public/fonts"
   cp "$CACHE/fonts/Nougat-ExtraBlack-tight.ttf" "$OUT/public/fonts/head.ttf" 2>/dev/null
   cp "$CACHE/LilitaOne-Regular.ttf" "$OUT/public/fonts/lilita.ttf" && cp "$CACHE/app-icon.png" "$OUT/public/app-icon.png" || return 1
-  timeout 2700 docker run --rm --cpus=1.9 --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  # Both cores, concurrency 2. Not --cpus=1.9 or a lower --cpu-shares: Node
+  # then reports one core and Remotion refuses concurrency 2 (every render
+  # failed that way 2026-11-14..16). The site rides out the half hour on
+  # Cloudflare's cache, as in the 2026-11-13 test renders.
+  timeout 2700 docker run --rm --cpus=2 -e MOTION_CONCURRENCY=2 --user "$(id -u):$(id -g)" -e HOME=/tmp \
     -v "$MOTION_APP/node_modules:/m/node_modules" -v "$REPO/deploy/motion/src:/m/src:ro" \
     -v "$REPO/deploy/motion/render.mjs:/m/render.mjs:ro" -v "$REPO/deploy/motion/package.json:/m/package.json:ro" \
     -v "$OUT:/out" -w /m "$PLAYWRIGHT_IMAGE" node render.mjs video /out /out/silent.mp4 > "$CACHE/motion.log" 2>&1 \

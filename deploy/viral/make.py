@@ -2128,7 +2128,8 @@ def rr_scene(s, t, bt, lt):
 # and the pictures it names under <dir>/public (brawler art and faces, each
 # quiz clue already pixelated, shadowed or with its zoom window), so the two
 # render paths can never disagree on content.
-PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb')
+PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
+              'modes', 'ranks', 'stop', 'giveaway', 'drops')
 
 
 def export_plan(out):
@@ -2152,6 +2153,13 @@ def export_plan(out):
         if full:
             o['art'] = save(art(b, 1000, 1000), f"b/{b['id']}-art.png")
         return o
+
+    def conv(v):  # anything else a segment carries: brawlers with their art
+        if isinstance(v, dict) and 'n' in v and 'id' in v: return bz(v, full=True)
+        if isinstance(v, (list, tuple)): return [conv(x) for x in v]
+        return v if isinstance(v, (str, int, float, bool)) or v is None else str(v)
+
+    def hexc(c): return '#%02x%02x%02x' % tuple(c[:3])
 
     segs = []
     for s in tl.segments:
@@ -2193,6 +2201,8 @@ def export_plan(out):
             b = s['b']; o.update(rank=s.get('rank', 1), heavy=bool(s.get('heavy')), b=bz(b, full=True))
             if k == 'c_tease':
                 o['sil'] = save(silhouette(art(b, 900, 1000), (255, 200, 60)), f"c/tease-{b['id']}.png")
+        elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
+            o.update({kk: conv(v) for kk, v in s.items() if kk not in ('kind', 'start', 'len')})
         segs.append(o)
     plan = {'kind': KIND, 'fps': FPS, 'step': tl.step, 'beats': tl.beats, 'duration': round(tl.dur, 3), 'period': P,
             'track': os.environ.get('TRACK') or 'fontana', 'episode': episode(KIND), 'segments': segs,
@@ -2200,8 +2210,52 @@ def export_plan(out):
     if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         plan.update(word=WORD, bestLine=BEST_LINE, season=data.get('season'), count=NB,
                     wall=[save(load_face(b).resize((200, 200), Image.LANCZOS), f"b/{b['id']}-face.png") for b in ranked])
+    if KIND == 'modes':
+        plan['modes'] = {mk: {'name': MODE_NAME[mk], 'color': hexc(MODE_COL[mk]), 'icon': mode_icon(mk, A)} for mk in MODE_COL}
+    if KIND == 'ranks':
+        plan.update(low=hexc(LOWC), leg=hexc(LEGC))
+    if KIND == 'stop':
+        for o in segs:
+            if o.get('b'): o['useRank'] = use_rank[int(o['b']['id'])]
+        plan.update(total=TOTAL, over=[{**bz(b), 'useRank': use_rank[b['id']]} for b in over[::-1]])
+    if KIND == 'giveaway':
+        pa = prize_art(700)
+        plan.update(days=DAYS, prize=save(pa, 'c/prize.png') if pa is not None else None)
+    if KIND == 'drops':
+        rars = [o['rarity'] for o in ODDS]
+        plan.update(name=NAME, n=DROP_N, chaos=DROP_KEY == 'chaos-drops',
+                    art={str(r): save(drop_art(r, 520), f"c/drop-{str(r).replace(' ', '-').lower()}.png") for r in rars},
+                    bars=[{'label': l, 'count': c, 'color': hexc(col)} for l, c, col in BARS],
+                    loot=[{'key': kk.upper(), 'total': TOTAL[kk], 'icon': save(dimg(f, 230), f'c/loot-{f}')} for kk, f in LOOT],
+                    good=[{'key': kk, 'count': ITEMS[kk], 'icon': save(dimg(f, 150), f'c/good-{f}'),
+                           'label': {'Skin': 'SKINS', 'Mythic Brawler': 'MYTHIC BRAWLERS', 'Epic Brawler': 'EPIC BRAWLERS'}.get(kk, kk.upper() + 'S')}
+                          for kk, f in GOOD],
+                    canLeg=CAN_LEG, legs=ITEMS.get('Legendary Brawler', 0), legBrawlers=[bz(b, full=True) for b in LEGS],
+                    ultraIn=ULTRA_IN, ultras=[bz(b, full=True) for b in ULTRAS])
+        if ULTRA_IN:
+            plan['art']['UltraGrey'] = save(grey(drop_art('Ultra', 480)), 'c/drop-ultra-grey.png')
     json.dump(plan, open(f'{out}/plan.json', 'w'), ensure_ascii=False)
     print(KIND, 'plan', len(segs), 'segments', round(tl.dur, 2), 's')
+
+
+def mode_icon(mk, A):
+    """The mode's Fan Kit icon, fetched once into ASSETS/modes (2026-11-13)."""
+    rel = f'c/mode-{mk}.png'
+    if os.path.exists(f'{A}/{rel}'): return rel
+    cache = f"{os.environ.get('ASSETS', '.')}/modes/{mk}.png"
+    if not os.path.exists(cache):
+        try:
+            import io, urllib.request
+            urls = json.load(open(f"{os.environ.get('ASSETS', '.')}/modes/index.json"))
+            url = urls.get(mk.lower())
+            if not url: return None
+            body = urllib.request.urlopen(urllib.request.Request(url + '?width=400', headers={'User-Agent': 'BrawlZone (https://brawlzone.net)'}), timeout=30).read()
+            os.makedirs(os.path.dirname(cache), exist_ok=True)
+            Image.open(io.BytesIO(body)).convert('RGBA').save(cache)
+        except Exception as e:
+            print(f'no icon for {mk}: {e}'); return None
+    Image.open(cache).save(f'{A}/{rel}')
+    return rel
 
 
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'skinquiz': quiz_scene, 'iconquiz': quiz_scene,

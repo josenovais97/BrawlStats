@@ -16,7 +16,11 @@ const here = path.dirname(new URL(import.meta.url).pathname);
 const serveUrl = await bundle({entryPoint: path.join(here, 'src/index.ts'), publicDir: path.resolve(dir, 'public')});
 const inputProps = {plan};
 const composition = await selectComposition({serveUrl, id, inputProps});
-const concurrency = Math.max(1, Math.min(2, os.cpus().length));
+// The job sets this to match the container's CPU quota: Remotion refuses a
+// concurrency above floor(--cpus), and os.cpus() reports the host's cores
+// (2026-11-14..16: --cpus=1.9 meant 1, render.mjs asked for 2, every render
+// failed and the job fell back to Pillow).
+const concurrency = Math.max(1, Number(process.env.MOTION_CONCURRENCY || 1));
 if (mode === 'stills') {
   fs.mkdirSync(out, {recursive: true});
   for (const f of frames) {
