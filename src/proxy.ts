@@ -322,17 +322,10 @@ export const config = {
     '/de/account-value/:path*',
     '/ru/account-value/:path*',
     '/fr/account-value/:path*',
-    // Roast My Account, the whole section while it is not public (see
-    // ROAST_PUBLIC): the bare /roast too, so crawlers are refused it.
-    '/roast',
+    // Roast My Account: the tag pages and story cards (the limiter and the
+    // crawler check). The landing page is static and public since 2026-11-17.
     '/roast/:path*',
-    '/es/roast',
     '/es/roast/:path*',
-    '/pt/roast',
-    '/tr/roast',
-    '/de/roast',
-    '/ru/roast',
-    '/fr/roast',
     '/pt/roast/:path*',
     '/tr/roast/:path*',
     '/de/roast/:path*',

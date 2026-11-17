@@ -196,6 +196,9 @@ async function core(add: Add, dataDay: Date | null) {
   add('/cosmetics/icons', 'weekly', 0.5);
   add('/tier-list/maker', 'monthly', 0.75, EVERGREEN);
   add('/account-value', 'monthly', 0.75, EVERGREEN);
+  // Public since 2026-11-17 (lib/roast-data). The landing page only: the tag
+  // pages are one per player, noindex and disallowed, like /account-value's.
+  add('/roast', 'monthly', 0.75, EVERGREEN);
   add('/news', 'daily', 0.6, dataDay);
   add('/release-notes', 'weekly', 0.5, EVERGREEN);
   // The app's download page. Its panel at /bubble/panel is deliberately

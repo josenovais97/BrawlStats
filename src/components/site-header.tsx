@@ -33,6 +33,7 @@ import { CoinIcon,
   StarrDropIcon,
   TierListIcon,
   TrophyGainIcon,
+  WinStreakIcon,
 } from '@/components/game-icons';
 
 interface NavItem {
@@ -78,6 +79,9 @@ const MORE: NavItem[] = [
   // one, so it would earn a permanent slot if there were a seventh. There is
   // not — see above — and the draft helper is the main bar's entry point into
   // the same question.
+  // First in the menu since its launch (2026-11-17): the shareable one. The
+  // win-streak flame, the game's own fire.
+  { href: '/roast', label: 'Roast My Account', icon: WinStreakIcon },
   { href: '/bubble', label: 'Android App', icon: BubbleAppIcon },
   { href: '/daily', label: 'Daily', icon: ClockIcon },
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
@@ -130,6 +134,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Mapas',
     Draft: 'Draft',
     Leaderboard: 'Rankings',
+    'Roast My Account': 'Roast a mi cuenta',
     'Android App': 'App para Android',
     Daily: 'Diario',
     'Team Comps': 'Equipos',
@@ -163,6 +168,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Mapas',
     Draft: 'Draft',
     Leaderboard: 'Rankings',
+    'Roast My Account': 'Roast na minha conta',
     'Android App': 'App para Android',
     Daily: 'Diário',
     'Team Comps': 'Times',
@@ -196,6 +202,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Haritalar',
     Draft: 'Draft',
     Leaderboard: 'Sıralamalar',
+    'Roast My Account': 'Hesabıma kapak at',
     'Android App': 'Android uygulaması',
     Daily: 'Günlük',
     'Team Comps': 'Takımlar',
@@ -229,6 +236,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Maps',
     Draft: 'Draft',
     Leaderboard: 'Bestenliste',
+    'Roast My Account': 'Roaste meinen Account',
     'Android App': 'Android-App',
     Daily: 'Täglich',
     'Team Comps': 'Team-Kombos',
@@ -262,6 +270,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Карты',
     Draft: 'Драфт',
     Leaderboard: 'Рейтинг игроков',
+    'Roast My Account': 'Прожарь мой аккаунт',
     'Android App': 'Приложение для Android',
     Daily: 'Каждый день',
     'Team Comps': 'Составы команд',
@@ -295,6 +304,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Maps: 'Cartes',
     Draft: 'Draft',
     Leaderboard: 'Classement',
+    'Roast My Account': 'Clashe mon compte',
     'Android App': 'Appli Android',
     Daily: 'Quotidien',
     'Team Comps': "Compos d'équipe",

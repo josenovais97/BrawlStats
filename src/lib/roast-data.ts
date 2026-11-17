@@ -9,15 +9,15 @@ import type { BSPlayer } from '@/types/brawlstars';
 import type { Tier } from '@/types/stats';
 
 /**
- * Whether Roast My Account is public (2026-10-27: not yet).
+ * Whether Roast My Account is public: since 2026-11-17 (owner: money first,
+ * so launch it rather than wait for an AdSense review that is not running).
  *
- * It was built while the AdSense review was open, and a new section during a
- * review is a risk worth not taking, so until this flips the pages are
- * `noindex`, `/roast` is disallowed in robots.txt for every crawler (see
- * `CRAWLER_DISALLOW`), nothing links to them and the sitemap leaves them out.
- * Launching is this constant, the robots line, and the links.
+ * Built hidden on 2026-10-27 while the review was open. With this on, the
+ * landing page is indexable and in the sitemap and the nav and home page link
+ * to it; the tag pages stay out of robots.txt (`/roast/` in
+ * `CRAWLER_DISALLOW`, like /account-value's), `noindex`, and limited.
  */
-export const ROAST_PUBLIC = false;
+export const ROAST_PUBLIC = true;
 
 export interface RoastResult {
   player: BSPlayer;

@@ -77,6 +77,7 @@ ${SITE_URL}
 - [Daily](${SITE_URL}/daily): six findings a ranked table does not show, recomputed daily.
 - [Meta report](${SITE_URL}/meta): what moved this week and what the last update changed.
 - [Ranked maps](${SITE_URL}/ranked): the live Ranked rotation with best picks per map.
+- [Roast my account](${SITE_URL}/roast): enter a player tag and get a joke roast written from that account's real stats, with a score out of 10 and a card to share.
 
 ## Data for machines
 

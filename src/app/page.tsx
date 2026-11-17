@@ -12,6 +12,7 @@ import { HomeMetaNow } from '@/components/home/home-meta-now';
 import { HomePlayTest } from '@/components/home/home-play-test';
 import { HomeProof } from '@/components/home/home-proof';
 import { HomeRadarSection } from '@/components/home/home-radar-section';
+import { HomeRoast } from '@/components/home/home-roast';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeTools } from '@/components/home/home-tools';
 import { Skeleton } from '@/components/ui/skeletons';
@@ -143,6 +144,9 @@ export default function HomePage() {
           recruits), right under the hero where every visitor sees it. It sat
           above the footer until 2026-11-06, past where most people scroll. */}
       <HomePlayTest />
+
+      {/* Roast My Account, public since 2026-11-17: the tag box right here. */}
+      <HomeRoast />
 
       {/* Renders nothing until the visitor has saved someone. */}
       <FavoritesList />
