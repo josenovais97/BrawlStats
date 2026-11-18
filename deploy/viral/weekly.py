@@ -26,6 +26,7 @@ from engine import (W, H, FPS, P, WHITE, GOLD_TOP, TIER, F, Timeline, art, arrow
 
 DATA, PREV, OUT = sys.argv[1:4]
 ONLY = [float(x) for x in sys.argv[5:]] if len(sys.argv) > 4 and sys.argv[4] == '--only' else None
+PLAN = len(sys.argv) > 4 and sys.argv[4] == '--plan'  # Remotion (2026-11-18): plan.json + public/ instead of frames
 data = json.load(open(DATA))
 prev = json.load(open(PREV)) if PREV != '-' else None
 by_id = {b['id']: b for b in data['all']}
@@ -205,10 +206,75 @@ def frame(t):
     return scene(s, t, bt, lt)
 
 
+# ------------------------------------------------------------------ plan
+# --plan (2026-11-18, owner: "improve all videos"): the same video as data for
+# deploy/motion's Weekly composition, as make.py --plan does for the Shorts.
+def mode_icon(mk, A):
+    """The mode's Fan Kit icon from ASSETS/modes (fetched there by make.py's modes format)."""
+    rel = f'c/mode-{mk}.png'
+    if os.path.exists(f'{A}/{rel}'): return rel
+    cache = f"{os.environ.get('ASSETS', '.')}/modes/{mk}.png"
+    if not os.path.exists(cache):
+        try:
+            import io, urllib.request
+            url = json.load(open(f"{os.environ.get('ASSETS', '.')}/modes/index.json")).get(mk.lower())
+            if not url: return None
+            body = urllib.request.urlopen(urllib.request.Request(url + '?width=400', headers={'User-Agent': 'BrawlZone (https://brawlzone.net)'}), timeout=30).read()
+            os.makedirs(os.path.dirname(cache), exist_ok=True)
+            Image.open(io.BytesIO(body)).convert('RGBA').save(cache)
+        except Exception as e:
+            print(f'no icon for {mk}: {e}'); return None
+    Image.open(cache).save(f'{A}/{rel}')
+    return rel
+
+
+def export_plan(out):
+    A = f'{out}/public'
+    for d in ('b', 'c'):
+        os.makedirs(f'{A}/{d}', exist_ok=True)
+
+    def save(img, rel):
+        if not os.path.exists(f'{A}/{rel}'):
+            img.save(f'{A}/{rel}')
+        return rel
+
+    def hexc(c): return '#%02x%02x%02x' % tuple(c[:3])
+
+    def bz(b, side=None):
+        o = {'id': str(b['id']), 'name': nice(b['n']).upper(), 'tier': b.get('tier'),
+             'face': save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")}
+        if side: o['art'] = save(art(b, side, side), f"b/{b['id']}-art{side}.png")
+        return o
+
+    segs = []
+    for s in tl.segments:
+        k = s['kind']; o = {'kind': k, 'start': s['start'], 'len': s['len']}
+        if k == 'w_intro':
+            o['faces'] = [bz(b)['face'] for b in top]
+        elif k == 'w_head':
+            o.update(title=s['title'], sub=s['sub'], col=hexc(s['col']))
+        elif k == 'w_top':
+            o.update(rank=s['rank'], b=bz(s['b'], 1000))
+        elif k == 'w_map':
+            o.update(mode=MODE_NAME[s['mode']], col=hexc(MODE_COL[s['mode']]), icon=mode_icon(s['mode'], A), map=s['map'].upper(),
+                     n=s['n'], picks=[bz(b, 560) for b in s['picks']])
+        elif k == 'w_move':
+            r = s['r']; o.update(dir=s['dir'], r={**bz(r, 1000), 'was': r['was'], 'd': r['d']})
+        elif k == 'w_rank':
+            o.update(label=s['label'], top=[bz(b) for b in s['top']])
+        segs.append(o)
+    plan = {'kind': 'weekly', 'fps': FPS, 'step': tl.step, 'beats': tl.beats, 'duration': round(tl.dur, 3), 'period': P,
+            'episode': 0, 'segments': segs, 'season': season, 'week': week, 'title': META['title']}
+    json.dump(plan, open(f'{out}/plan.json', 'w'), ensure_ascii=False)
+    print('weekly plan', len(segs), 'segments', round(tl.dur, 2), 's')
+
+
 if __name__ == '__main__':
     os.makedirs(f'{OUT}/frames', exist_ok=True)
     META['duration'] = round(tl.dur, 3)
     json.dump(META, open(f'{OUT}/meta.json', 'w'), ensure_ascii=False)
+    if PLAN:
+        export_plan(OUT); sys.exit()
     if ONLY is not None:
         for sec in ONLY:
             frame(sec).save(f'{OUT}/w-{sec}.jpg', quality=85)

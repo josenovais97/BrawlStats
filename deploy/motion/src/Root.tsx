@@ -5,6 +5,11 @@ import {Drops, Giveaway, Modes, Ranks, Stop} from './Formats';
 import {Quiz} from './Quiz';
 import {RoastMains} from './Roast';
 import {Wrapped} from './Wrapped';
+import {Daily} from './Daily';
+import {Broken} from './Broken';
+import {NewBrawler} from './NewBrawler';
+import {WhatsNew} from './WhatsNew';
+import {Weekly} from './Weekly';
 import {Plan, loadFonts} from './theme';
 
 loadFonts();
@@ -23,5 +28,10 @@ export const Root: React.FC = () => (
     <Composition id="Drops" component={Drops} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="RoastMains" component={RoastMains} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Wrapped" component={Wrapped} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="Daily" component={Daily} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="Weekly" component={Weekly} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="WhatsNew" component={WhatsNew} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="NewBrawler" component={NewBrawler} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="Broken" component={Broken} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
   </>
 );

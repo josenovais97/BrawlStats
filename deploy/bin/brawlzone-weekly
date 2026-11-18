@@ -18,6 +18,10 @@ PUBLIC=/var/lib/brawlzone/social/viral
 MUSIC="$HOME/youtube-music/Fontana - Ryan Stasik, Kanika Moore.mp3"
 PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
 FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
+# The Remotion renderer (2026-11-18): brawlzone-viral keeps its packages
+# installed here from the repo's lockfile; this job only uses them.
+MOTION_APP=/var/lib/brawlzone/motion/app
+PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
 die() { echo "$*" >&2; exit 1; }
 post=1; [ "${1:-}" = "--no-post" ] && post=0
 DAY=$(date -u +%Y-%m-%d)
@@ -46,28 +50,58 @@ print(f'/data/history/{best[1]}' if best else '-')
 PY
 )
 
-rm -rf "$OUT/frames"
-pids=(); rc=0
-for part in 0 1; do
-  docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
+# The Remotion look (2026-11-18, owner: "improve all videos"): weekly.py
+# --plan, then deploy/motion's Weekly composition. Any failure falls back to
+# the Pillow frames below and says so by mail, as the Shorts do.
+rm -rf "$OUT/frames" "$OUT/public" "$OUT/plan.json" "$OUT/silent.mp4"
+motion=0
+if [ -e "$ROOT/motion-on" ] && [ -x "$MOTION_APP/node_modules/.bin/remotion" ]; then
+  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache \
     -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
-    "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python weekly.py /data/history/$DAY.json $PREV /out" \
-    > "$CACHE/weekly-$part.log" 2>&1 &
-  pids+=($!)
-done
-for p in "${pids[@]}"; do wait "$p" || rc=$?; done
-[ "$rc" = 0 ] || die "::error::weekly.py failed: $(tail -c 600 "$CACHE/weekly-0.log")"
-
+    "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python weekly.py /data/history/$DAY.json $PREV /out --plan" > "$CACHE/weekly-plan.log" 2>&1 \
+  && mkdir -p "$OUT/public/fonts" \
+  && { cp "$CACHE/fonts/Nougat-ExtraBlack-tight.ttf" "$OUT/public/fonts/head.ttf" 2>/dev/null; true; } \
+  && cp "$CACHE/LilitaOne-Regular.ttf" "$OUT/public/fonts/lilita.ttf" && cp "$CACHE/app-icon.png" "$OUT/public/app-icon.png" \
+  && timeout 6000 docker run --rm --cpus=2 -e MOTION_CONCURRENCY=2 --user "$(id -u):$(id -g)" -e HOME=/tmp \
+    -v "$MOTION_APP/node_modules:/m/node_modules" -v "$REPO/deploy/motion/src:/m/src:ro" \
+    -v "$REPO/deploy/motion/render.mjs:/m/render.mjs:ro" -v "$REPO/deploy/motion/package.json:/m/package.json:ro" \
+    -v "$OUT:/out" -w /m "$PLAYWRIGHT_IMAGE" node render.mjs video /out /out/silent.mp4 > "$CACHE/weekly-motion.log" 2>&1 \
+  && [ -s "$OUT/silent.mp4" ] && motion=1
+  if [ "$motion" = 0 ]; then
+    echo "motion: render failed: $(tail -c 400 "$CACHE/weekly-plan.log") $(tail -c 400 "$CACHE/weekly-motion.log")"
+    echo "drawing the weekly video with Pillow instead"
+    { echo "The weekly video fell back to the old Pillow look. It still posts."; echo
+      tail -c 1500 "$CACHE/weekly-motion.log" 2>/dev/null; } | /usr/local/bin/brawlzone-alert "[brawlzone] Weekly video drawn without Remotion" || true
+    rm -f "$OUT/silent.mp4"
+  fi
+fi
+if [ "$motion" = 0 ]; then
+  pids=(); rc=0
+  for part in 0 1; do
+    docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
+      -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
+      "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python weekly.py /data/history/$DAY.json $PREV /out" \
+      > "$CACHE/weekly-$part.log" 2>&1 &
+    pids+=($!)
+  done
+  for p in "${pids[@]}"; do wait "$p" || rc=$?; done
+  [ "$rc" = 0 ] || die "::error::weekly.py failed: $(tail -c 600 "$CACHE/weekly-0.log")"
+fi
 DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/meta.json")
+if [ "$motion" = 1 ]; then  # already H.264 from Remotion: only the music to add
+  video_in=(-i silent.mp4); video_out=(-c:v copy)
+else
+  video_in=(-framerate 30 -i 'frames/%04d.jpg'); video_out=(-c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p)
+fi
 # Three passes of the track, crossfaded: the first from the drop the daily
 # videos use, so the opening lands on the beat.
 docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
-  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' \
+  -hide_banner -loglevel error -y "${video_in[@]}" \
   -ss 63.994 -i "/m/$(basename "$MUSIC")" -i "/m/$(basename "$MUSIC")" -i "/m/$(basename "$MUSIC")" \
   -filter_complex "[1:a][2:a]acrossfade=d=2[ab];[ab][3:a]acrossfade=d=2,volume=0.75,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 2.5))"):d=2.5[a]" \
-  -map 0:v -map '[a]' -t "$DUR" -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k \
+  -map 0:v -map '[a]' -t "$DUR" "${video_out[@]}" -c:a aac -b:a 160k \
   -movflags +faststart video.mp4 || die "::error::ffmpeg could not encode the video"
-rm -rf "$OUT/frames"
+rm -rf "$OUT/frames" "$OUT/public" "$OUT/silent.mp4"
 echo "video: https://brawlzone.net/social/viral/$DAY-weekly/video.mp4 (${DUR}s)"
 [ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
 

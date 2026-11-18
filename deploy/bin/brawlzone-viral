@@ -388,7 +388,7 @@ fi  # not newbrawler or daily
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1

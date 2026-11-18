@@ -2223,7 +2223,8 @@ if KIND == 'wrapped':
 # quiz clue already pixelated, shadowed or with its zoom window), so the two
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
-              'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains')
+              'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
+              'daily', 'broken', 'newbrawler', 'whatsnew')
 
 
 def export_plan(out):
@@ -2295,6 +2296,38 @@ def export_plan(out):
             b = s['b']; o.update(rank=s.get('rank', 1), heavy=bool(s.get('heavy')), b=bz(b, full=True))
             if k == 'c_tease':
                 o['sil'] = save(silhouette(art(b, 900, 1000), (255, 200, 60)), f"c/tease-{b['id']}.png")
+        elif k == 'd_intro' and KIND == 'daily':  # (drops has a d_intro of its own)
+            o.update(n=N)
+        elif k in ('b_up', 'b_down') and KIND == 'broken':  # a brawler, its win-rate change and last week's tier
+            r = s['r']
+            o.update(rank=s.get('rank'), r={**bz(r, full=True), 'was': r['was'], 'd': r['d']})
+            if k == 'b_down':
+                o['r']['grey'] = save(grey(art(r, 1000, 1000)), f"b/{r['id']}-grey.png")
+        elif k == 'n_maps' and KIND == 'newbrawler':
+            o['maps'] = [{'map': m['map'].upper(), 'mode': mode_label(m['mode']), 'wr': m['wr'], 'base': m['base'],
+                          'icon': mode_icon(m['mode'], A) if m['mode'] in MODE_COL else None} for m in s['maps']]
+        elif k == 'n_build' and KIND == 'newbrawler':
+            o['build'] = [{'kind': kk, 'name': b['name'].upper(), 'share': b['share'],
+                           'icon': save(ICONS[kk], f'c/{kk}.png') if ICONS.get(kk) is not None else None} for kk, b in s['build']]
+        elif k == 'w_intro' and KIND == 'whatsnew':  # (wrapped's scenes are w_ too)
+            o['sils'] = [save(silhouette(art(b, 520, 420), (255, 255, 255)), f"c/sil-{b['id']}.png")
+                         for b in [b for b in NEWEST if has_model(b)][:3]]
+        elif k == 'w_part' and KIND == 'whatsnew':
+            o.update(label=s['label'], col=hexc(s['col']))
+        elif k == 'w_brawler' and KIND == 'whatsnew':
+            b = s['b']; tier = b.get('tier') or b.get('trophyTier')
+            word, vcol = VERDICT[tier] if tier else ('BRAND NEW!', (255, 60, 100))
+            line = (f"#{RANK[b['id']]} OF {len(RANK)} IN RANKED" if b.get('tier') and b['id'] in RANK
+                    else 'IN TROPHY GAMES' if tier else 'TOO NEW FOR RANKED')
+            o.update(b={**bz(b, full=True), 'tier': tier}, line=line, verdict=word, vcol=hexc(vcol), party=not tier or tier in 'SA')
+        elif k == 'w_buffie' and KIND == 'whatsnew':
+            b = s['b']
+            o.update(b={**bz(b, full=True), 'tier': b.get('tier') or b.get('trophyTier')},
+                     icons={kk: save(im.resize((250, 250), Image.LANCZOS), f"c/buffie-{b['id']}-{kk}.png") for kk, im in s['icons'].items()},
+                     labels=BUFFIE_LABEL, colors={kk: hexc(c) for kk, c in BUFFIE_COL.items()})
+        elif k == 'w_outro' and KIND == 'whatsnew':
+            o['faces'] = [save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
+                          for b in list(NEWEST) + [b for b, _ in BUFFIES]]
         elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
             o.update({kk: conv(v) for kk, v in s.items() if kk not in ('kind', 'start', 'len')})
         segs.append(o)
@@ -2328,6 +2361,16 @@ def export_plan(out):
                     ultraIn=ULTRA_IN, ultras=[bz(b, full=True) for b in ULTRAS])
         if ULTRA_IN:
             plan['art']['UltraGrey'] = save(grey(drop_art('Ultra', 480)), 'c/drop-ultra-grey.png')
+    if KIND == 'daily':
+        plan.update(number=N, zooms=[save(z, f'c/zoom-{i}.png') for i, z in enumerate(ZOOMS)],
+                    blur=save(ZOOMS[-1].filter(ImageFilter.GaussianBlur(16)), 'c/zoom-blur.png'), shadow=save(SHADOW, 'c/shadow.png'))
+    if KIND == 'broken':
+        plan.update(battles=battles)
+    if KIND == 'newbrawler':
+        word, vcol = VERDICT[R['tier']]
+        plan.update(nb={'name': NAME, 'plain': R['name'], 'tier': R['tier'], 'rank': R['rank'], 'of': R['of'], 'battles': R['battles'],
+                        'tags': [x.upper() for x in (R.get('rarity'), R.get('class')) if x], 'verdict': word, 'vcol': hexc(vcol)},
+                    hero=save(HERO, 'c/hero.png'), mystery=save(MYSTERY, 'c/mystery.png'))
     if KIND == 'wrapped':
         # The story without its empty foot, and the player's name and tag
         # painted over with the background beside them, under the video's tape.

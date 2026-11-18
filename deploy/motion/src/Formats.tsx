@@ -7,11 +7,11 @@ import {Arrow, Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Flare, Fo
 import {SceneProps, Stage} from './Stage';
 import {DEEP, HEAD, INK, TIER, W, clamp, mix, outBack, outCubic, pct, shade, Plan} from './theme';
 
-const ORANGE = '#ff9a28';
-const pop = (frame: number, at: number, len = 9, s = 2) => outBack((frame - at) / len, s);
+export const ORANGE = '#ff9a28';
+export const pop = (frame: number, at: number, len = 9, s = 2) => outBack((frame - at) / len, s);
 
 /** "WIN RATE 54.0%"-style pill. */
-const StatPill: React.FC<{label: string; value: string; color: string; x?: number; y: number; scale?: number}> = ({label, value, color, x = W / 2, y, scale = 1}) => (
+export const StatPill: React.FC<{label: string; value: string; color: string; x?: number; y: number; scale?: number}> = ({label, value, color, x = W / 2, y, scale = 1}) => (
   <div style={{position: 'absolute', left: x, top: y, transform: `translate(-50%,-50%) scale(${scale})`, display: 'flex', alignItems: 'center', gap: 18,
     padding: '14px 34px 16px', borderRadius: 999, background: 'rgba(10,12,30,0.82)', boxShadow: `0 0 0 5px ${INK}, 0 10px 0 5px ${DEEP}`}}>
     <Label text={label} size={44} color="#cfd6ff" stroke={0} />
@@ -20,7 +20,7 @@ const StatPill: React.FC<{label: string; value: string; color: string; x?: numbe
 );
 
 /** A stamped word, rotated, slammed on from big. */
-const Stamp: React.FC<{text: string; color: string; frame: number; at: number; x?: number; y: number}> = ({text, color, frame, at, x = W / 2, y}) => {
+export const Stamp: React.FC<{text: string; color: string; frame: number; at: number; x?: number; y: number}> = ({text, color, frame, at, x = W / 2, y}) => {
   const f = frame - at;
   if (f < 0) return null;
   const k = outBack(f / 8, 1.0);
@@ -33,7 +33,7 @@ const Stamp: React.FC<{text: string; color: string; frame: number; at: number; x
 };
 
 /** A brawler portrait in a rounded frame. */
-const Face: React.FC<{src?: string; size: number; color?: string}> = ({src, size, color = '#3c56c8'}) => (
+export const Face: React.FC<{src?: string; size: number; color?: string}> = ({src, size, color = '#3c56c8'}) => (
   <div style={{width: size, height: size, borderRadius: size * 0.2, overflow: 'hidden', boxShadow: `0 0 0 6px ${INK}, 0 10px 0 6px ${DEEP}`,
     background: `linear-gradient(180deg, ${mix(color, '#fff', 0.35)}, ${shade(color, 0.6)})`}}>
     {src && <Img src={staticFile(src)} style={{width: size, height: size}} />}
@@ -41,7 +41,7 @@ const Face: React.FC<{src?: string; size: number; color?: string}> = ({src, size
 );
 
 /** The ending every data format shares: a question, the follow button, the site typed in. */
-const Ending: React.FC<{frame: number; t: number; spb: number; color?: string; big: string; line1?: string; line2?: string; lead: string; text?: string; arrow?: boolean}> = ({
+export const Ending: React.FC<{frame: number; t: number; spb: number; color?: string; big: string; line1?: string; line2?: string; lead: string; text?: string; arrow?: boolean}> = ({
   frame, t, spb, color = ORANGE, big, line1, line2, lead, text, arrow = true,
 }) => {
   const bounce = Math.abs(Math.sin((frame / spb) * Math.PI)) * 24;
