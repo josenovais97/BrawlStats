@@ -497,7 +497,7 @@ fi
 
 # The cuts are on the beat of $TRACK from its start (tracks.json). The
 # fade-out is the last 1.5 seconds; the music's own loudness is left alone.
-docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
+docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
   -hide_banner -loglevel error -y "${video_in[@]}" -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" \
   -filter_complex "[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 1.5))"):d=1.5[a]" \
   -map 0:v -map '[a]' -t "$DUR" "${video_out[@]}" -c:a aac -b:a 160k \
@@ -505,7 +505,7 @@ docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -v "$(dirname "$MUSIC"):
   || die "::error::ffmpeg could not encode the video"
 # The cover TikTok's manifest points at: a frame from the first reveal.
 if [ -s "$OUT/silent.mp4" ]; then
-  docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -w /w "$FFMPEG_IMAGE" \
+  docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -w /w "$FFMPEG_IMAGE" \
     -hide_banner -loglevel error -y -ss "$(python3 -c "print(round($DUR / 4, 2))")" -i silent.mp4 -frames:v 1 -q:v 3 cover.jpg \
     || die "::error::ffmpeg could not take the cover"
 else
