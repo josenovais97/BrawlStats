@@ -253,6 +253,11 @@
     <string name="tilt_title">Kalah %1$d kali berturut-turut</string>
     <string name="tilt_text">Rehat 5 minit? Berehat lebih membantu daripada satu lagi perlawanan.</string>
     <string name="tilt_ok">Teruskan bermain</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Jangan tunjuk lagi</string>
+    <string name="tilt_off">Peringatan rehat dimatikan. Hidupkan semula dalam aplikasi.</string>
+    <string name="tilt_setting_title">Peringatan rehat</string>
+    <string name="tilt_setting_body">Selepas kalah 3 kali berturut-turut, cadangkan rehat sebentar.</string>
     <string name="widget_goal_name">Sasaran seterusnya</string>
     <string name="widget_goal_description">Kemenangan ke pangkat seterusnya dan sasaran hari ini</string>
     <string name="widget_goal_label">SASARAN SETERUSNYA</string>

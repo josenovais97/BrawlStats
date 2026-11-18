@@ -25,6 +25,8 @@ object BubbleLook {
     const val KEY_SIZE = "size"
     const val KEY_IDLE = "idle"
     const val KEY_TUCK = "tuck"
+    /** The break card after a losing streak (1.42: "never show it again"); on by default. */
+    const val KEY_TILT = "tilt"
 
     const val SIZE_SMALL = "s"
     const val SIZE_NORMAL = "m"
@@ -55,6 +57,8 @@ object BubbleLook {
 
     fun tuck(context: Context): Boolean = prefs(context).getBoolean(KEY_TUCK, false)
 
+    fun tilt(context: Context): Boolean = prefs(context).getBoolean(KEY_TILT, true)
+
     fun setSize(context: Context, size: String) {
         prefs(context).edit().putString(KEY_SIZE, size).apply()
     }
@@ -65,5 +69,9 @@ object BubbleLook {
 
     fun setTuck(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean(KEY_TUCK, on).apply()
+    }
+
+    fun setTilt(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean(KEY_TILT, on).apply()
     }
 }

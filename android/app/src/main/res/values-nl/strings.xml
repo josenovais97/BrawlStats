@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d verliespartijen op rij</string>
     <string name="tilt_text">Even 5 minuten pauze? Dat helpt meer dan nog een potje.</string>
     <string name="tilt_ok">Verder spelen</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Niet meer tonen</string>
+    <string name="tilt_off">Pauzetips staan uit. Zet ze weer aan in de app.</string>
+    <string name="tilt_setting_title">Pauzetips</string>
+    <string name="tilt_setting_body">Stel na 3 nederlagen op rij een korte pauze voor.</string>
     <string name="widget_goal_name">Volgend doel</string>
     <string name="widget_goal_description">Overwinningen tot je volgende rang en het doel van vandaag</string>
     <string name="widget_goal_label">VOLGEND DOEL</string>

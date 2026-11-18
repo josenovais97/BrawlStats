@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d derrotas seguidas</string>
     <string name="tilt_text">Uma pausa de 5 minutos? Descansar ajuda mais que outra partida.</string>
     <string name="tilt_ok">Continuar jogando</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Não mostrar de novo</string>
+    <string name="tilt_off">Lembretes de pausa desligados. Dá para ligar de novo no app.</string>
+    <string name="tilt_setting_title">Lembretes de pausa</string>
+    <string name="tilt_setting_body">Depois de 3 derrotas seguidas, sugerir uma pausa curta.</string>
     <string name="widget_goal_name">Próxima meta</string>
     <string name="widget_goal_description">Vitórias até o próximo rank e a meta de hoje</string>
     <string name="widget_goal_label">PRÓXIMA META</string>

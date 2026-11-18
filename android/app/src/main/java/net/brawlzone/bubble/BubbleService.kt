@@ -971,8 +971,11 @@ class BubbleService : Service() {
      * Three Ranked losses in a row (1.41): a small card beside the bubble
      * suggesting a short break. Once per losing streak (keyed on the newest
      * loss), at most twice a day, gone after 15 s or a tap. Kind, not a nag.
+     * "Don't show again" on the card, or the switch in the app (1.42), turns
+     * it off for good.
      */
     private fun maybeTilt(losses: Pair<Int, Long>?) {
+        if (!BubbleLook.tilt(this)) return
         val (streak, at) = losses ?: return
         if (streak < TILT_AFTER || bubble == null) return
         // Only a streak still being played: not three losses from this morning.
@@ -1024,15 +1027,35 @@ class BubbleService : Service() {
                 maxWidth = dp(200)
             },
         )
-        words.addView(
+        val actions = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, dp(6), 0, 0)
+        }
+        actions.addView(
             TextView(this).apply {
                 text = str(R.string.tilt_ok)
                 setTextColor(0xFFFFC53D.toInt())
                 textSize = 12f
                 typeface = Typeface.DEFAULT_BOLD
-                setPadding(0, dp(6), 0, 0)
             },
         )
+        // Its own tap target: the rest of the card only closes it.
+        actions.addView(
+            TextView(this).apply {
+                text = str(R.string.tilt_never)
+                setTextColor(0xFF8F9AC0.toInt())
+                textSize = 12f
+                setPadding(dp(16), dp(4), dp(4), dp(4))
+                setOnClickListener {
+                    buzz(it)
+                    BubbleLook.setTilt(this@BubbleService, false)
+                    hideTiltCard()
+                    Toast.makeText(this@BubbleService, str(R.string.tilt_off), Toast.LENGTH_LONG).show()
+                }
+            },
+        )
+        words.addView(actions)
         card.addView(words)
         card.setOnClickListener {
             buzz(it)

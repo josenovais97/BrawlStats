@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d Niederlagen in Folge</string>
     <string name="tilt_text">Kurz 5 Minuten Pause? Das hilft mehr als noch ein Spiel.</string>
     <string name="tilt_ok">Weiterspielen</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Nicht mehr anzeigen</string>
+    <string name="tilt_off">Pausen-Hinweise sind aus. Du kannst sie in der App wieder einschalten.</string>
+    <string name="tilt_setting_title">Pausen-Hinweise</string>
+    <string name="tilt_setting_body">Nach 3 Niederlagen in Folge eine kurze Pause vorschlagen.</string>
     <string name="widget_goal_name">Nächstes Ziel</string>
     <string name="widget_goal_description">Siege bis zum nächsten Rang und dein Tagesziel</string>
     <string name="widget_goal_label">NÄCHSTES ZIEL</string>

@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d連敗中</string>
     <string name="tilt_text">5分休憩しませんか？もう1試合より休む方が効きます。</string>
     <string name="tilt_ok">続ける</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">今後表示しない</string>
+    <string name="tilt_off">休憩のお知らせをオフにしました。アプリでオンに戻せます。</string>
+    <string name="tilt_setting_title">休憩のお知らせ</string>
+    <string name="tilt_setting_body">3連敗したら短い休憩をすすめます。</string>
     <string name="widget_goal_name">次の目標</string>
     <string name="widget_goal_description">次のランクまでの勝利数と今日の目標</string>
     <string name="widget_goal_label">次の目標</string>

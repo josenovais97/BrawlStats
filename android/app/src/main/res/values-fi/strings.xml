@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d tappiota putkeen</string>
     <string name="tilt_text">Viiden minuutin tauko? Lepo auttaa enemmän kuin yksi peli lisää.</string>
     <string name="tilt_ok">Jatka pelaamista</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Älä näytä uudelleen</string>
+    <string name="tilt_off">Taukomuistutukset ovat pois päältä. Voit ottaa ne käyttöön sovelluksessa.</string>
+    <string name="tilt_setting_title">Taukomuistutukset</string>
+    <string name="tilt_setting_body">Ehdota lyhyttä taukoa 3 peräkkäisen tappion jälkeen.</string>
     <string name="widget_goal_name">Seuraava tavoite</string>
     <string name="widget_goal_description">Voitot seuraavaan arvoon ja päivän tavoite</string>
     <string name="widget_goal_label">SEURAAVA TAVOITE</string>

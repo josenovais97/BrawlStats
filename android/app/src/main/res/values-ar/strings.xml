@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d خسائر متتالية</string>
     <string name="tilt_text">استراحة 5 دقائق؟ الراحة تفيد أكثر من مباراة أخرى.</string>
     <string name="tilt_ok">تابع اللعب</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">لا تظهر مرة أخرى</string>
+    <string name="tilt_off">تم إيقاف تذكيرات الاستراحة. يمكنك تشغيلها من التطبيق.</string>
+    <string name="tilt_setting_title">تذكيرات الاستراحة</string>
+    <string name="tilt_setting_body">بعد 3 هزائم متتالية، اقترح استراحة قصيرة.</string>
     <string name="widget_goal_name">الهدف التالي</string>
     <string name="widget_goal_description">الانتصارات حتى رتبتك التالية وهدف اليوم</string>
     <string name="widget_goal_label">الهدف التالي</string>

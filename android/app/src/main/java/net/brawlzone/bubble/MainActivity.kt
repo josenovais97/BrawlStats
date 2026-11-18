@@ -1188,6 +1188,12 @@ class MainActivity : AppCompatActivity() {
             paintPreview()
         }
 
+        // The break card after three losses in a row (1.42): off here, or by
+        // "Don't show again" on the card itself; this is the way back on.
+        val tilt = findViewById<Switch>(R.id.look_tilt)
+        tilt.isChecked = BubbleLook.tilt(this)
+        tilt.setOnCheckedChangeListener { _, on -> BubbleLook.setTilt(this, on) }
+
         idleFrame.post { paintPreview() }
         gameType(sizeRow)
         gameType(idleRow)

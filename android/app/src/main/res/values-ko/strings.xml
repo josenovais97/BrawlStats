@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d연패 중</string>
     <string name="tilt_text">5분 쉬어 갈까요? 한 판 더보다 휴식이 도움이 돼요.</string>
     <string name="tilt_ok">계속하기</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">다시 보지 않기</string>
+    <string name="tilt_off">휴식 알림을 껐어요. 앱에서 다시 켤 수 있어요.</string>
+    <string name="tilt_setting_title">휴식 알림</string>
+    <string name="tilt_setting_body">3연패하면 잠깐 쉬어 가기를 권해요.</string>
     <string name="widget_goal_name">다음 목표</string>
     <string name="widget_goal_description">다음 랭크까지 남은 승리와 오늘의 목표</string>
     <string name="widget_goal_label">다음 목표</string>

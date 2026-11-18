@@ -253,6 +253,11 @@
     <string name="tilt_title">Kalah %1$d kali beruntun</string>
     <string name="tilt_text">Istirahat 5 menit? Jeda lebih membantu daripada main lagi.</string>
     <string name="tilt_ok">Lanjut main</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Jangan tampilkan lagi</string>
+    <string name="tilt_off">Pengingat istirahat dimatikan. Nyalakan lagi di aplikasi.</string>
+    <string name="tilt_setting_title">Pengingat istirahat</string>
+    <string name="tilt_setting_body">Setelah kalah 3 kali beruntun, sarankan istirahat sebentar.</string>
     <string name="widget_goal_name">Target berikutnya</string>
     <string name="widget_goal_description">Kemenangan menuju rank berikutnya dan target hari ini</string>
     <string name="widget_goal_label">TARGET BERIKUTNYA</string>

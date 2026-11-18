@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d défaites d\'affilée</string>
     <string name="tilt_text">Une pause de 5 minutes ? Ça aide plus qu\'une partie de plus.</string>
     <string name="tilt_ok">Continuer</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Ne plus afficher</string>
+    <string name="tilt_off">Rappels de pause désactivés. Tu peux les réactiver dans l\'appli.</string>
+    <string name="tilt_setting_title">Rappels de pause</string>
+    <string name="tilt_setting_body">Après 3 défaites d\'affilée, suggérer une courte pause.</string>
     <string name="widget_goal_name">Prochain objectif</string>
     <string name="widget_goal_description">Victoires avant ton prochain rang et l\'objectif du jour</string>
     <string name="widget_goal_label">PROCHAIN OBJECTIF</string>

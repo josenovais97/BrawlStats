@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d derrotas seguidas</string>
     <string name="tilt_text">¿Descansas 5 minutos? Un respiro ayuda más que otra partida.</string>
     <string name="tilt_ok">Seguir jugando</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">No volver a mostrar</string>
+    <string name="tilt_off">Recordatorios de descanso desactivados. Puedes activarlos en la app.</string>
+    <string name="tilt_setting_title">Recordatorios de descanso</string>
+    <string name="tilt_setting_body">Tras 3 derrotas seguidas, sugerir un descanso.</string>
     <string name="widget_goal_name">Próxima meta</string>
     <string name="widget_goal_description">Victorias para tu próximo rango y la meta de hoy</string>
     <string name="widget_goal_label">PRÓXIMA META</string>

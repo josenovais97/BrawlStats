@@ -253,6 +253,11 @@
     <string name="tilt_title">已連輸 %1$d 場</string>
     <string name="tilt_text">休息 5 分鐘？休息比再來一局更有用。</string>
     <string name="tilt_ok">繼續遊戲</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">不再顯示</string>
+    <string name="tilt_off">已關閉休息提醒。可在應用程式中重新開啟。</string>
+    <string name="tilt_setting_title">休息提醒</string>
+    <string name="tilt_setting_body">連輸 3 局後，建議休息一下。</string>
     <string name="widget_goal_name">下一個目標</string>
     <string name="widget_goal_description">距離下一段位的勝場和今日目標</string>
     <string name="widget_goal_label">下一個目標</string>

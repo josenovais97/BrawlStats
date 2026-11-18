@@ -253,6 +253,11 @@
     <string name="tilt_title">Üst üste %1$d mağlubiyet</string>
     <string name="tilt_text">5 dakika mola? Kısa bir ara bir maç daha oynamaktan iyidir.</string>
     <string name="tilt_ok">Oynamaya devam</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Bir daha gösterme</string>
+    <string name="tilt_off">Mola hatırlatmaları kapalı. Uygulamadan tekrar açabilirsin.</string>
+    <string name="tilt_setting_title">Mola hatırlatmaları</string>
+    <string name="tilt_setting_body">Üst üste 3 yenilgiden sonra kısa bir mola öner.</string>
     <string name="widget_goal_name">Sonraki hedef</string>
     <string name="widget_goal_description">Sonraki rütbeye kalan galibiyet ve bugünkü hedef</string>
     <string name="widget_goal_label">SONRAKİ HEDEF</string>

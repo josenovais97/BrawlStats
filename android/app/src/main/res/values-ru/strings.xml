@@ -253,6 +253,11 @@
     <string name="tilt_title">Поражений подряд: %1$d</string>
     <string name="tilt_text">Перерыв 5 минут? Отдых поможет больше, чем ещё один бой.</string>
     <string name="tilt_ok">Играть дальше</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Больше не показывать</string>
+    <string name="tilt_off">Напоминания о перерыве выключены. Их можно включить в приложении.</string>
+    <string name="tilt_setting_title">Напоминания о перерыве</string>
+    <string name="tilt_setting_body">После 3 поражений подряд предлагать короткий перерыв.</string>
     <string name="widget_goal_name">Следующая цель</string>
     <string name="widget_goal_description">Победы до следующего ранга и цель на сегодня</string>
     <string name="widget_goal_label">СЛЕДУЮЩАЯ ЦЕЛЬ</string>

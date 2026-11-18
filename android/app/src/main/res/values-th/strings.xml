@@ -253,6 +253,11 @@
     <string name="tilt_title">แพ้ติดกัน %1$d เกม</string>
     <string name="tilt_text">พัก 5 นาทีไหม การพักช่วยได้มากกว่าเล่นอีกเกม</string>
     <string name="tilt_ok">เล่นต่อ</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">ไม่ต้องแสดงอีก</string>
+    <string name="tilt_off">ปิดการเตือนให้พักแล้ว เปิดใหม่ได้ในแอป</string>
+    <string name="tilt_setting_title">เตือนให้พัก</string>
+    <string name="tilt_setting_body">แพ้ติดกัน 3 เกม แนะนำให้พักสักครู่</string>
     <string name="widget_goal_name">เป้าหมายถัดไป</string>
     <string name="widget_goal_description">จำนวนชนะถึงแรงก์ถัดไปและเป้าหมายวันนี้</string>
     <string name="widget_goal_label">เป้าหมายถัดไป</string>

@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d sconfitte di fila</string>
     <string name="tilt_text">Una pausa di 5 minuti? Aiuta più di un\'altra partita.</string>
     <string name="tilt_ok">Continua a giocare</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Non mostrare più</string>
+    <string name="tilt_off">Promemoria pausa disattivati. Puoi riattivarli nell\'app.</string>
+    <string name="tilt_setting_title">Promemoria pausa</string>
+    <string name="tilt_setting_body">Dopo 3 sconfitte di fila, suggerisci una breve pausa.</string>
     <string name="widget_goal_name">Prossimo obiettivo</string>
     <string name="widget_goal_description">Vittorie per il prossimo grado e l\'obiettivo di oggi</string>
     <string name="widget_goal_label">PROSSIMO OBIETTIVO</string>

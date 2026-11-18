@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d הפסדים ברצף</string>
     <string name="tilt_text">הפסקה של 5 דקות? מנוחה עוזרת יותר ממשחק נוסף.</string>
     <string name="tilt_ok">להמשיך לשחק</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">אל תציג שוב</string>
+    <string name="tilt_off">תזכורות ההפסקה כבויות. אפשר להפעיל אותן מחדש באפליקציה.</string>
+    <string name="tilt_setting_title">תזכורות הפסקה</string>
+    <string name="tilt_setting_body">אחרי 3 הפסדים ברצף, להציע הפסקה קצרה.</string>
     <string name="widget_goal_name">היעד הבא</string>
     <string name="widget_goal_description">ניצחונות עד הדירוג הבא והיעד של היום</string>
     <string name="widget_goal_label">היעד הבא</string>

@@ -253,6 +253,11 @@
     <string name="tilt_title">%1$d porażki z rzędu</string>
     <string name="tilt_text">Przerwa na 5 minut? Odpoczynek pomaga bardziej niż kolejny mecz.</string>
     <string name="tilt_ok">Graj dalej</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Nie pokazuj ponownie</string>
+    <string name="tilt_off">Przypomnienia o przerwie wyłączone. Włączysz je ponownie w aplikacji.</string>
+    <string name="tilt_setting_title">Przypomnienia o przerwie</string>
+    <string name="tilt_setting_body">Po 3 porażkach z rzędu zaproponuj krótką przerwę.</string>
     <string name="widget_goal_name">Następny cel</string>
     <string name="widget_goal_description">Wygrane do następnej rangi i dzisiejszy cel</string>
     <string name="widget_goal_label">NASTĘPNY CEL</string>

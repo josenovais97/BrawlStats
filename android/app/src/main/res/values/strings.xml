@@ -260,6 +260,11 @@
     <string name="tilt_title">%1$d losses in a row</string>
     <string name="tilt_text">Take 5? A short break helps more than one more game.</string>
     <string name="tilt_ok">Keep playing</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Don\'t show again</string>
+    <string name="tilt_off">Break reminders are off. Turn them back on in the app.</string>
+    <string name="tilt_setting_title">Break reminders</string>
+    <string name="tilt_setting_body">After 3 losses in a row, suggest a short break.</string>
     <string name="widget_goal_name">Next goal</string>
     <string name="widget_goal_description">Wins to your next rank and today\'s goal</string>
     <string name="widget_goal_label">NEXT GOAL</string>

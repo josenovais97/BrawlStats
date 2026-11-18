@@ -253,6 +253,11 @@
     <string name="tilt_title">Thua %1$d trận liên tiếp</string>
     <string name="tilt_text">Nghỉ 5 phút nhé? Nghỉ ngơi giúp nhiều hơn chơi thêm một trận.</string>
     <string name="tilt_ok">Chơi tiếp</string>
+    <!-- 1.42: turning the break card off for good -->
+    <string name="tilt_never">Không hiện lại</string>
+    <string name="tilt_off">Đã tắt nhắc nghỉ. Bạn có thể bật lại trong ứng dụng.</string>
+    <string name="tilt_setting_title">Nhắc nghỉ</string>
+    <string name="tilt_setting_body">Sau 3 trận thua liên tiếp, gợi ý nghỉ ngắn.</string>
     <string name="widget_goal_name">Mục tiêu tiếp theo</string>
     <string name="widget_goal_description">Số trận thắng đến hạng tiếp theo và mục tiêu hôm nay</string>
     <string name="widget_goal_label">MỤC TIÊU TIẾP THEO</string>
