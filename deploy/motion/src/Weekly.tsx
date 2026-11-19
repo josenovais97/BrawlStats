@@ -31,7 +31,7 @@ const Intro: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
       })}
       <Title text="RANKED META" size={150} frame={frame} y={470} glow="#a03000" />
       <Title text="THIS WEEK" size={210} gold frame={frame} at={spb} y={680} glow="#a03000" />
-      {frame > spb * 2 && <Chip text={`SEASON ${plan.season} · ${plan.week}`} color="#16182a" textColor="#ffe45a" size={56} x={W / 2} y={900} scale={pop(frame, spb * 2)} />}
+      {frame > spb * 2 && <Chip text={plan.season ? `SEASON ${plan.season} · ${plan.week}` : plan.week} color="#16182a" textColor="#ffe45a" size={56} x={W / 2} y={900} scale={pop(frame, spb * 2)} />}
       {frame > spb * 3.2 && <div style={{position: 'absolute', left: W / 2, top: 1060, transform: `translate(-50%,-50%) scale(${pop(frame, spb * 3.2)})`}}>
         <Label text="TOP 10 · EVERY MAP · CLIMBERS · BY RANK" size={50} /></div>}
     </AbsoluteFill>

@@ -5265,4 +5265,15 @@ export const DE: Record<string, string> = {
     "Hol dir dein eigenes Season Wrapped",
   "MOST PLAYED":
     "AM MEISTEN GESPIELT",
+  // 2026-11-19: the new-season banner (components/season-banner)
+  "New Ranked season":
+    "Neue Ranked-Saison",
+  "Season {n} is live":
+    "Saison {n} läuft",
+  "Everyone dropped 2 ranks at the reset, and every rank needs Power 11 brawlers. Here is what is winning since the reset, from real Ranked games.":
+    "Beim Reset sind alle 2 Ränge gefallen, und jeder Rang verlangt Brawler auf Power 11. Hier siehst du, was seit dem Reset gewinnt, aus echten Ranked-Spielen.",
+  "What's winning right now":
+    "Was gerade gewinnt",
+  "Best picks for every Ranked map":
+    "Die besten Picks für jede Ranked-Map",
 };

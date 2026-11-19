@@ -70,7 +70,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
-          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}}
+          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -1125,9 +1125,22 @@ GROUP_L10N = {
 }
 COUNT_HASHTAGS = '#brawlstars #brawlstarstierlist #brawlstarsranked #tierlist #brawlzone'
 
-if KIND in ('everyrank', 'classrank', 'seasonclimb'):
+if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
     N_EP = episode(KIND)
-    if KIND in ('everyrank', 'seasonclimb'):
+    OLD_RANK = {}
+    if KIND == 'newseason':
+        # "The new season so far" (2026-11-19, owner: "we need to do content on
+        # the new season"): the top ten on the games since the reset only
+        # (viral-data seasonStart), each with its rank in the week-ago
+        # snapshot, which is the old season's last week.
+        SS = data.get('seasonStart') or {}
+        ranked = sorted(SS.get('all') or [], key=lambda b: -(b['score'] or 0))
+        if len(ranked) < 10 or (SS.get('games') or 0) < 20000:
+            print('not enough games since the reset yet'); sys.exit(3)
+        WORD, BEST_LINE = 'BRAWLER', 'WINNING THE NEW SEASON'
+        if prev:
+            OLD_RANK = {b['id']: i + 1 for i, b in enumerate(sorted(prev['all'], key=lambda b: -(b['score'] or 0)))}
+    elif KIND in ('everyrank', 'seasonclimb'):
         ranked = sorted(data['all'], key=lambda b: -(b['score'] or 0))
         WORD, BEST_LINE = 'BRAWLER', 'THE BEST IN RANKED'
     else:
@@ -1145,7 +1158,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         BEST_LINE = f'THE BEST {WORD}'
     NB = len(ranked)
     tl.add(6, 'c_intro')
-    if KIND == 'seasonclimb':  # only the top ten, one at a time
+    if KIND in ('seasonclimb', 'newseason'):  # only the top ten, one at a time
         singles = range(10, 1, -1)
     elif NB > 20:  # the original's shape: tier pages, then the top 20 in rows, then one at a time
         bottom = [(i + 1, b) for i, b in enumerate(ranked) if i + 1 > 20][::-1]
@@ -1170,9 +1183,9 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         tl.add(1, 'c_slam', tier=ranked[1]['tier'], label='TOP 5')
         singles = range(5, 1, -1)
     for r in singles:
-        tl.add(3 if r <= 3 else 2, 'c_big', rank=r, b=ranked[r - 1], heavy=r <= 3)
+        tl.add(3 if r <= 3 else 2, 'c_big', rank=r, b=ranked[r - 1], heavy=r <= 3, was=OLD_RANK.get(ranked[r - 1]['id']))
     tl.add(4, 'c_tease', b=ranked[0])
-    tl.add(7, 'c_one', b=ranked[0])
+    tl.add(7, 'c_one', b=ranked[0], was=OLD_RANK.get(ranked[0]['id']))
     tl.add(7, 'c_outro')
     top3 = ', '.join(nice(b['n']) for b in ranked[:3])
     if KIND == 'seasonclimb':
@@ -1192,6 +1205,24 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
                            + f"The 10 best brawlers to climb with, from this week's Ranked games. Top 3: {top3}. "
                              f'Who are you climbing with? Comment below 👇\n\n'
                              f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
+        }
+    elif KIND == 'newseason':
+        climbers = sorted(((OLD_RANK[b['id']] - (i + 1), b, OLD_RANK[b['id']], i + 1) for i, b in enumerate(ranked[:10]) if b['id'] in OLD_RANK),
+                          key=lambda x: -x[0])
+        big = climbers[0] if climbers and climbers[0][0] >= 3 else None
+        META = {
+            'title': "NEW Ranked season: what's actually winning so far 🔥 #Shorts",
+            'titles': {'pt-BR': 'NOVA temporada do Ranqueado: o que está ganhando até agora 🔥 #Shorts',
+                       'es-419': 'NUEVA temporada de Competitivo: lo que está ganando hasta ahora 🔥 #Shorts',
+                       **more_titles(id='Season Ranked BARU: yang paling menang sejauh ini 🔥 #Shorts',
+                                     de='NEUE Ranked-Saison: was bisher wirklich gewinnt 🔥 #Shorts',
+                                     tr='YENİ Ranked sezonu: şu ana kadar ne kazanıyor 🔥 #Shorts',
+                                     pl='NOWY sezon Ranked: co naprawdę wygrywa do tej pory 🔥 #Shorts')},
+            'description': f"The new Ranked season started on {SS.get('startedOn')}. The 10 brawlers winning most since the reset, "
+                           f"from {SS.get('games', 0):,} Ranked games. Top 3: {top3}. "
+                           + (f"Biggest climber against last season: {nice(big[1]['n'])} (#{big[2]} → #{big[3]}). " if big else '')
+                           + f'Who are you climbing with? Comment below 👇\n\n'
+                             f'Tier list for the last 24 hours: https://brawlzone.net/tier-list/ranked/24h{FOOTER}\n{COUNT_HASHTAGS}',
         }
     elif KIND == 'everyrank':
         META = {
@@ -2224,7 +2255,7 @@ if KIND == 'wrapped':
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
-              'daily', 'broken', 'newbrawler', 'whatsnew')
+              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2234,7 +2265,7 @@ PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyra
 # answer, giveaway, drops, newbrawler, roastmains, wrapped.
 HOOKS = [{'lead': 'GET YOUR ACCOUNT ROASTED', 'url': 'brawlzone.net/roast'},
          {'lead': 'SEE WHAT YOUR ACCOUNT IS WORTH', 'url': 'brawlzone.net/account-value'}]
-HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
+HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb', 'newseason',
               'modes', 'ranks', 'stop', 'broken', 'whatsnew')
 
 
@@ -2305,6 +2336,7 @@ def export_plan(out):
             o.update(tier=s.get('tier'), label=s.get('label'), items=[{'rank': r, **bz(b)} for r, b in s['items']])
         elif k in ('c_big', 'c_one', 'c_tease'):
             b = s['b']; o.update(rank=s.get('rank', 1), heavy=bool(s.get('heavy')), b=bz(b, full=True))
+            if s.get('was'): o['was'] = s['was']  # newseason: the old season's rank
             if k == 'c_tease':
                 o['sil'] = save(silhouette(art(b, 900, 1000), (255, 200, 60)), f"c/tease-{b['id']}.png")
         elif k == 'd_intro' and KIND == 'daily':  # (drops has a d_intro of its own)
@@ -2345,7 +2377,9 @@ def export_plan(out):
     plan = {'kind': KIND, 'fps': FPS, 'step': tl.step, 'beats': tl.beats, 'duration': round(tl.dur, 3), 'period': P,
             'track': os.environ.get('TRACK') or 'fontana', 'episode': episode(KIND), 'segments': segs,
             'title': META.get('title')}
-    if KIND in ('everyrank', 'classrank', 'seasonclimb'):
+    if KIND == 'newseason':
+        plan.update(games=SS.get('games'), day=SS.get('day'))
+    if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
         plan.update(word=WORD, bestLine=BEST_LINE, season=data.get('season'), count=NB,
                     wall=[save(load_face(b).resize((200, 200), Image.LANCZOS), f"b/{b['id']}-face.png") for b in ranked])
     if KIND == 'modes':
@@ -2433,7 +2467,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None}[KIND]
+         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None}[KIND]
 
 
 def frame(t):

@@ -69,6 +69,29 @@ async function main() {
     }),
   }));
 
+  // The new season's own numbers (2026-11-19, owner: "we need to do content on
+  // the new season"): in a season's first week, the Ranked roster scored on
+  // the days since the reset only, for the "day 1 of the new season" Short.
+  // Ranked closes overnight before a reset, so the reset day's games are all
+  // new-season games. The season that started is the one the wiki has not
+  // listed yet when `current` is empty (see the season field below).
+  const startedOn = season.current?.startsOn ?? season.latest?.endsOn ?? null;
+  const daysIn = startedOn
+    ? Math.floor((Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`) - Date.parse(`${startedOn}T00:00:00Z`)) / 86_400_000)
+    : -1;
+  const seasonStart =
+    daysIn >= 0 && daysIn <= 6
+      ? await getScoredRoster(daysIn + 1, undefined, 'ranked')
+          .then((roster) => roster.filter((b) => b.tier))
+          .then((roster) => ({
+            startedOn,
+            day: daysIn + 1,
+            games: Math.round(roster.reduce((n, b) => n + b.decidedSampleSize, 0) / 6),
+            all: roster.map(row),
+          }))
+          .catch(() => null)
+      : null;
+
   const brackets: Record<string, unknown> = {};
   for (const [name, id] of BRACKETS) {
     const r = await getBracketRoster(id);
@@ -116,7 +139,11 @@ async function main() {
   // grew past that (2026-11-03), and every video of the day failed to parse.
   const out = JSON.stringify({
       date: new Date().toISOString().slice(0, 10),
-      season: season.current?.number ?? null,
+      // On reset day the wiki can lag a day behind the game (2026-11-19: Season
+      // 50 ended, 51 not listed yet): seasons run back to back, so the one
+      // being played is the next number, not none -- videos said "Season None".
+      season: season.current?.number ?? (season.latest ? season.latest.number + 1 : null),
+      seasonStart,
       all: week.filter((b) => b.tier).map(row),
       recent: recent.filter((b) => b.tier).map(row),
       update: notes ? headliners(notes, catalog?.all ?? []) : null,

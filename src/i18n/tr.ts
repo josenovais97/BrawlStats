@@ -5264,4 +5264,15 @@ export const TR: Record<string, string> = {
     "Kendi Season Wrapped'ini al",
   "MOST PLAYED":
     "EN ÇOK OYNANAN",
+  // 2026-11-19: the new-season banner (components/season-banner)
+  "New Ranked season":
+    "Yeni Aşamalı sezonu",
+  "Season {n} is live":
+    "{n}. sezon başladı",
+  "Everyone dropped 2 ranks at the reset, and every rank needs Power 11 brawlers. Here is what is winning since the reset, from real Ranked games.":
+    "Sıfırlamada herkes 2 rütbe düştü ve her rütbe güç 11 brawler istiyor. Sıfırlamadan bu yana gerçek Aşamalı maçlarında kazananlar burada.",
+  "What's winning right now":
+    "Şu an kazananlar",
+  "Best picks for every Ranked map":
+    "Her Aşamalı haritası için en iyi seçimler",
 };

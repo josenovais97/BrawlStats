@@ -1,4 +1,4 @@
-// The countdowns (everyrank, classrank, seasonclimb) in the Remotion look
+// The countdowns (everyrank, classrank, seasonclimb, newseason) in the Remotion look
 // (2026-11-13): tier slams, pages of cards dealt in, the top 20 in rows, then
 // the top ten one at a time on a sports-graphics stage, and #1 with a crown.
 import React from 'react';
@@ -10,7 +10,9 @@ import {DEEP, HEAD, INK, TIER, W, hookOf, mix, outBack, outCubic, pct, shade, Pl
 const ORANGE = '#ff9a28';
 
 const Intro: React.FC<SceneProps> = ({plan, frame, t, spb}) => {
-  const climb = plan.kind === 'seasonclimb';
+  // newseason (2026-11-19): the same top ten, on the games since the reset.
+  const fresh = plan.kind === 'newseason';
+  const climb = plan.kind === 'seasonclimb' || fresh;
   const word = plan.word || 'BRAWLER';
   const wall = plan.wall || [];
   const cols = 8, size = 180;
@@ -29,13 +31,13 @@ const Intro: React.FC<SceneProps> = ({plan, frame, t, spb}) => {
       <Title text={climb ? 'SEASON' : word} size={word.length > 8 ? 150 : 190} frame={frame} at={spb} y={560} />
       <Title text={climb ? 'TOP 10' : 'RANKED'} size={250} frame={frame} at={spb * 2} gold y={800} />
       {frame > spb * 3 && (climb
-        ? <Chip text="BEST TO CLIMB" color="#3cd26e" size={80} x={W / 2} y={1050} scale={outBack((frame - spb * 3) / 9, 2)} />
+        ? <Chip text={fresh ? 'WINNING SO FAR' : 'BEST TO CLIMB'} color={fresh ? '#ff3c64' : '#3cd26e'} size={80} x={W / 2} y={1050} scale={outBack((frame - spb * 3) / 9, 2)} />
         : <>
             <Chip text="WORST" color="#ff3c5a" size={78} x={W / 2 - 250 - 260 * (1 - outBack((frame - spb * 3) / 10))} y={1050} />
             <Arrow x={W / 2} y={1050} size={120} color="#fff" />
             <Chip text="BEST" color="#3cd26e" size={78} x={W / 2 + 260 + 260 * (1 - outBack((frame - spb * 3) / 10))} y={1050} />
           </>)}
-      {frame > spb * 4 && <Title text={climb ? "FROM THIS WEEK'S RANKED GAMES" : `THIS WEEK IN RANKED · SEASON ${plan.season}`} size={52} gold frame={frame} at={spb * 4} stagger={0.4} y={1220} />}
+      {frame > spb * 4 && <Title text={fresh ? `FROM ${Math.max(1, Math.round((plan.games || 0) / 1000))}K GAMES SINCE THE RESET` : climb ? "FROM THIS WEEK'S RANKED GAMES" : `THIS WEEK IN RANKED · SEASON ${plan.season}`} size={52} gold frame={frame} at={spb * 4} stagger={0.4} y={1220} />}
       {frame > spb * 4.5 && <div style={{position: 'absolute', left: W / 2, top: 1390, transform: `translate(-50%,-50%) scale(${1 + 0.06 * Math.sin(t * 10)})`}}>
         <Label text="wait for #1..." size={90} /></div>}
     </AbsoluteFill>
@@ -166,6 +168,9 @@ const Big: React.FC<SceneProps> = ({seg, frame, t, plan}) => {
           <Chip text={`${b.tier} TIER`} color={col} size={60} x={W - 230} y={450} scale={outBack((frame - 3) / 9, 2)} rot={6} />
         </>
       )}
+      {/* newseason: where it stood in the old season's last week */}
+      {seg.was ? <Chip text={seg.was === seg.rank ? `SAME AS LAST SEASON` : `WAS #${seg.was}`} size={52} x={one ? W / 2 : W - 230} y={one ? 1440 : 560}
+        color={seg.was > seg.rank ? '#2fbf5c' : seg.was < seg.rank ? '#d8344c' : '#3c4a8a'} rot={one ? -3 : 6} scale={outBack((frame - 12) / 9, 2)} /> : null}
       <Banner text={b.name} color={one ? '#ff3c64' : col} size={b.name.length <= 7 ? 140 : 118} y={1560} frame={frame} at={4} />
       {b.wr != null && (
         <div style={{position: 'absolute', left: W / 2, top: 1715, transform: `translate(-50%,-50%) scale(${outBack((frame - 9) / 9, 1.8)})`,

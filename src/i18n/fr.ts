@@ -5265,4 +5265,15 @@ export const FR: Record<string, string> = {
     "Obtiens ton propre Season Wrapped",
   "MOST PLAYED":
     "LES PLUS JOUÉS",
+  // 2026-11-19: the new-season banner (components/season-banner)
+  "New Ranked season":
+    "Nouvelle saison de Classé",
+  "Season {n} is live":
+    "La saison {n} a commencé",
+  "Everyone dropped 2 ranks at the reset, and every rank needs Power 11 brawlers. Here is what is winning since the reset, from real Ranked games.":
+    "Tout le monde a perdu 2 rangs au reset, et chaque rang demande des brawlers au niveau 11. Voici ce qui gagne depuis le reset, d'après de vraies parties de Classé.",
+  "What's winning right now":
+    "Ce qui gagne en ce moment",
+  "Best picks for every Ranked map":
+    "Les meilleurs choix sur chaque carte de Classé",
 };

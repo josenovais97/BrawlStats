@@ -96,7 +96,7 @@ week = data.get('date', '')
 season = data.get('season')
 top3 = ', '.join(nice(b['n']) for b in top[:3])
 META = {
-    'title': f'Brawl Stars Ranked meta this week: best picks for every map (Season {season})',
+    'title': 'Brawl Stars Ranked meta this week: best picks for every map' + (f' (Season {season})' if season else ''),
     'description': (
         f'The Ranked meta for the week of {week}, from hundreds of thousands of real Ranked battles: '
         f'the top 10 brawlers (top 3: {top3}), the 3 best picks on every live map'
@@ -130,7 +130,7 @@ def scene(s, t, bt, lt):
         put_rays(canvas, (255, 170, 40), t, W / 2, 1400, speed=12, alpha=0.5)
         slam(canvas, 'RANKED META', 150, WHITE, W / 2, 470, bt)
         slam(canvas, 'THIS WEEK', 210, None, W / 2, 680, bt - 1, gold=True)
-        if bt > 2: put(canvas, pill(f'SEASON {season} · {week}', (16, 20, 42), fg=GOLD_TOP, size=56), W / 2, 900, scale=out_back((bt - 2) / 0.4, 2.0))
+        if bt > 2: put(canvas, pill(f'SEASON {season} · {week}' if season else week, (16, 20, 42), fg=GOLD_TOP, size=56), W / 2, 900, scale=out_back((bt - 2) / 0.4, 2.0))
         if bt > 3.2: put(canvas, text_sprite('top 10 · every map · climbers · by rank', 52, WHITE, stroke=6), W / 2, 1060, scale=out_back((bt - 3.2) / 0.4))
         shake, flash = hits(bt, (0, 1, 2), 1.0, 0.4)
     elif k == 'w_head':

@@ -5265,4 +5265,15 @@ export const RU: Record<string, string> = {
     "Получи свой Season Wrapped",
   "MOST PLAYED":
     "ЧАЩЕ ВСЕГО",
+  // 2026-11-19: the new-season banner (components/season-banner)
+  "New Ranked season":
+    "Новый сезон ранговых боёв",
+  "Season {n} is live":
+    "Сезон {n} начался",
+  "Everyone dropped 2 ranks at the reset, and every rank needs Power 11 brawlers. Here is what is winning since the reset, from real Ranked games.":
+    "При сбросе все опустились на 2 ранга, а каждый ранг требует бойцов 11 силы. Вот кто побеждает после сброса — по реальным ранговым боям.",
+  "What's winning right now":
+    "Кто побеждает сейчас",
+  "Best picks for every Ranked map":
+    "Лучшие бойцы для каждой карты ранговых боёв",
 };

@@ -17,6 +17,7 @@ import { formatDate, formatNumber, formatPercent, humanizeMode, relativeTime, ti
 import { getActiveMaps } from '@/lib/game-maps';
 import { rotationKey, rotationMaps } from '@/lib/ranked-rotation';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
+import { SeasonBanner } from '@/components/season-banner';
 import { getRankedMapLastSeen, getRankedRecentMaps } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
 import {
@@ -300,6 +301,8 @@ export default async function RankedPage() {
         {/* The top three at each rank (2026-11-11), filling the empty half. */}
         <RankedHeroRanks brawlerMeta={brawlerMeta} />
       </header>
+      {/* The first week of a Ranked season (2026-11-19); nothing otherwise. */}
+      <SeasonBanner className="mt-6" mapsLink={false} />
 
       {/* Which season it is decides which maps are in the pool at all, so it
           leads. Compressed to a summary row with the detail folded, which is

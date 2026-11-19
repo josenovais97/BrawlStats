@@ -13,6 +13,7 @@ import { HomePlayTest } from '@/components/home/home-play-test';
 import { HomeProof } from '@/components/home/home-proof';
 import { HomeRadarSection } from '@/components/home/home-radar-section';
 import { HomeRoast } from '@/components/home/home-roast';
+import { SeasonBanner } from '@/components/season-banner';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeTools } from '@/components/home/home-tools';
 import { Skeleton } from '@/components/ui/skeletons';
@@ -139,6 +140,9 @@ export default function HomePage() {
           </Suspense>
         }
       />
+
+      {/* The first week of a Ranked season (2026-11-19): renders nothing otherwise. */}
+      <SeasonBanner />
 
       {/* The Google Play launch banner (or the tester card while a closed test
           recruits), right under the hero where every visitor sees it. It sat

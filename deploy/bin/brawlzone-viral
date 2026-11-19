@@ -93,15 +93,19 @@ if [ "$kind" = extra ]; then
     2) kind=stop ;;
     3) kind=ranks ;;
     4) if [ "$(date -u +%-d)" -ge 15 ] && [ "$(date -u +%-d)" -le 21 ]; then kind=seasonclimb; else kind=whatsnew; fi ;;
-    5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway; else kind=broken; fi ;;
+    # The Friday after a reset (the third Thursday), from December: the new
+    # season's top ten so far (newseason, 2026-11-19); else broken.
+    5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway
+       elif [ "$(date -u +%-d)" -ge 16 ] && [ "$(date -u +%-d)" -le 22 ]; then kind=newseason
+       else kind=broken; fi ;;
     6) kind=modes ;;
     7) kind=everyrank ;;
     *) kind=classrank ;;
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped or roastmains)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains or newseason)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -115,7 +119,8 @@ elif [ "$kind" = daily ]; then
   PREV=-
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
      || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
-     || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ] || [ "$kind" = wrapped ] || [ "$kind" = roastmains ]; then
+     || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ] || [ "$kind" = wrapped ] || [ "$kind" = roastmains ] \
+     || [ "$kind" = newseason ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -130,7 +135,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -388,7 +393,7 @@ fi  # not newbrawler or daily
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1
@@ -464,7 +469,7 @@ recent () { # kind: drawn in the last three days, whichever folder it went to
 }
 
 draw "$kind"; rc=$?
-if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] || [ "$kind" = whatsnew ] || [ "$kind" = seasonclimb ]; }; then
+if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] || [ "$kind" = whatsnew ] || [ "$kind" = seasonclimb ] || [ "$kind" = newseason ]; }; then
   # The 14:00 slot never falls back to the quiz the 15:30 slot may already be
   # posting today. From 2026-11-04 (make.py fresh_or_exit: a format that
   # would repeat itself steps aside) it takes the next drop or box simulation,
