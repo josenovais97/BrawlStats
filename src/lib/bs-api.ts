@@ -149,10 +149,14 @@ function mapStatus(status: number): BrawlApiError {
   }
 }
 
-/** Rejects malformed tags before spending an API call on them. */
-function assertTag(tag: string): string {
-  if (!isValidTag(tag)) throw new BrawlApiError('invalidTag');
-  return encodeTagForApi(tag);
+/**
+ * Malformed tags are refused before spending an API call on them, as a
+ * rejected promise rather than a throw: callers guard with `.catch`, which a
+ * synchronous throw skips (2026-11-19: a name typed into the app's tag field
+ * made every /api/bubble/* call answer 500 instead of "no such tag").
+ */
+function badTag(tag: string): Promise<never> | null {
+  return isValidTag(tag) ? null : Promise.reject(new BrawlApiError('invalidTag'));
 }
 
 /* --------------------------------- players -------------------------------- */
@@ -166,21 +170,27 @@ function assertTag(tag: string): string {
  */
 export function getPlayer(tag: string): Promise<BSPlayer> {
   if (isOptedOut(tag)) return Promise.reject(new BrawlApiError('notFound'));
-  const t = assertTag(tag);
+  const bad = badTag(tag);
+  if (bad) return bad;
+  const t = encodeTagForApi(tag);
   // Unbounded key space; see FetchOptions.persist.
   return bsFetch<BSPlayer>(`/players/${t}`, { persist: false });
 }
 
 export function getBattleLog(tag: string): Promise<BSBattleLog> {
   if (isOptedOut(tag)) return Promise.reject(new BrawlApiError('notFound'));
-  const t = assertTag(tag);
+  const bad = badTag(tag);
+  if (bad) return bad;
+  const t = encodeTagForApi(tag);
   return bsFetch<BSBattleLog>(`/players/${t}/battlelog`, { persist: false });
 }
 
 /* ---------------------------------- clubs --------------------------------- */
 
 export function getClub(tag: string): Promise<BSClub> {
-  const t = assertTag(tag);
+  const bad = badTag(tag);
+  if (bad) return bad;
+  const t = encodeTagForApi(tag);
   // Opted-out players are left out of the member list, so no club page, club
   // snapshot or activity chart shows them.
   return bsFetch<BSClub>(`/clubs/${t}`, { persist: false }).then((club) =>
