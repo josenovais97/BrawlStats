@@ -61,7 +61,9 @@ const Phone: React.FC<{w: number; h: number; cx?: number; cy?: number; rot?: num
   );
 };
 
-/** The voice's words: the current chunk, keywords in gold; the feature's number as its own big slam. */
+/** The voice's words: the current chunk whole, each word lighting up (and popping) the moment it is
+ *  said (make.py times them on the voice's own pauses), keywords in gold; the feature's number as
+ *  its own big slam. */
 const CaptionTrack: React.FC<{seg: any; frame: number; fps: number}> = ({seg, frame, fps}) => {
   const chunks: any[] = seg.vo?.chunks || [];
   let i = -1;
@@ -72,20 +74,30 @@ const CaptionTrack: React.FC<{seg: any; frame: number; fps: number}> = ({seg, fr
   if (c.num) {
     const k = outBack(f / 6, 2.4);
     return (
-      <div style={{position: 'absolute', left: W / 2, top: 400, transform: `translate(-50%,-50%) scale(${0.4 + 0.6 * k}) rotate(-4deg)`, fontFamily: HEAD, fontSize: 190, lineHeight: 1,
-        color: MARK, WebkitTextStroke: `26px ${INK}`, paintOrder: 'stroke fill', textShadow: `0 16px 0 ${DEEP}, 0 24px 30px rgba(0,0,0,0.45)`}}>{`#${seg.num}`}</div>
+      <>
+        <Burst f={f} x={W / 2} y={400} color="#fff6b0" />
+        <div style={{position: 'absolute', left: W / 2, top: 400, transform: `translate(-50%,-50%) scale(${0.4 + 0.6 * k}) rotate(-4deg)`, fontFamily: HEAD, fontSize: 190, lineHeight: 1,
+          color: MARK, WebkitTextStroke: `26px ${INK}`, paintOrder: 'stroke fill', textShadow: `0 16px 0 ${DEEP}, 0 24px 30px rgba(0,0,0,0.45)`}}>{`#${seg.num}`}</div>
+      </>
     );
   }
   const text = c.words.map((w: any) => w.w).join(' ');
-  const size = Math.min(104, 980 / Math.max(6, text.length * 0.58));
+  const size = Math.min(108, 980 / Math.max(6, text.length * 0.58));
+  const said = c.words.map((w: any) => (w.t ?? c.t0) * fps);
   const k = outBack(f / 6, 2.6);
   return (
-    <div style={{position: 'absolute', left: W / 2, top: 400, transform: `translate(-50%,-50%) scale(${0.55 + 0.45 * k}) rotate(${i % 2 ? 1.5 : -1.5}deg)`, whiteSpace: 'nowrap',
+    <div style={{position: 'absolute', left: W / 2, top: 400, transform: `translate(-50%,-50%) scale(${0.6 + 0.4 * k}) rotate(${i % 2 ? 1.5 : -1.5}deg)`, whiteSpace: 'nowrap',
       fontFamily: HEAD, fontSize: size, lineHeight: 1, letterSpacing: size * 0.01}}>
-      {c.words.map((w: any, j: number) => (
-        <span key={j} style={{color: w.hi ? MARK : '#fff', WebkitTextStroke: `${size * 0.16}px ${INK}`, paintOrder: 'stroke fill',
-          textShadow: `0 ${size * 0.09}px 0 ${DEEP}, 0 ${size * 0.14}px 18px rgba(0,0,0,0.45)`, marginRight: j < c.words.length - 1 ? size * 0.28 : 0}}>{w.w}</span>
-      ))}
+      {c.words.map((w: any, j: number) => {
+        const wf = frame - said[j];
+        const on = wf >= -1;
+        const big = on ? 1 + 0.16 * Math.max(0, 1 - (wf + 1) / 7) : 0.92;
+        return (
+          <span key={j} style={{display: 'inline-block', opacity: on ? 1 : 0.5, transform: `scale(${big})`,
+            color: on ? (w.hi ? MARK : '#fff') : '#dfe3ff', WebkitTextStroke: `${size * 0.16}px ${INK}`, paintOrder: 'stroke fill',
+            textShadow: `0 ${size * 0.09}px 0 ${DEEP}, 0 ${size * 0.14}px 18px rgba(0,0,0,0.45)`, marginRight: j < c.words.length - 1 ? size * 0.28 : 0}}>{w.w}</span>
+        );
+      })}
     </div>
   );
 };
@@ -279,9 +291,11 @@ const tourAt = (steps: Step[], frame: number, g: Geo) => {
   return {cur, prev, shotF, v};
 };
 
-const PanelCard: React.FC<{plan: Plan; frame: number; t: number; steps: Step[]; rings?: Ring[]; g?: Geo; enter?: number; bubble?: boolean; children?: React.ReactNode}> = ({
-  plan, frame, t, steps, rings = [], g = CARD, enter = -999, bubble = true, children,
+const PanelCard: React.FC<{plan: Plan; frame: number; t: number; steps: Step[]; rings?: Ring[]; g?: Geo; enter?: number; bubble?: boolean; swing?: number; children?: React.ReactNode}> = ({
+  plan, frame, t, steps, rings = [], g = CARD, enter = -999, bubble = true, swing = 0, children,
 }) => {
+  // a flick on the cut, so a new feature reads as a new beat even when the card stays
+  const flick = swing * 10 * Math.max(0, 1 - frame / 9) ** 2;
   const {cur, prev, shotF, v} = tourAt(steps, frame, g);
   const k = kOf(g);
   const ek = enter > -999 ? outBack(clamp((frame - enter) / 10), 1.5) : 1;
@@ -291,7 +305,7 @@ const PanelCard: React.FC<{plan: Plan; frame: number; t: number; steps: Step[]; 
     <Img src={shot(plan, name)} style={{position: 'absolute', left: 0, top: 0, width: 460 * k, opacity: o}} />
   );
   return (
-    <div style={{position: 'absolute', left: g.cx - g.cw / 2, top: g.ct, width: g.cw, height: g.ch, transform: `perspective(2600px) rotateX(${1.5}deg) rotateY(${1.6 * Math.sin(t * 0.9)}deg) scale(${0.86 + 0.14 * ek})`,
+    <div style={{position: 'absolute', left: g.cx - g.cw / 2, top: g.ct, width: g.cw, height: g.ch, transform: `perspective(2600px) rotateX(${1.5}deg) rotateY(${1.6 * Math.sin(t * 0.9) + flick}deg) scale(${0.86 + 0.14 * ek})`,
       opacity: clamp(ek * 3)}}>
       <div style={{position: 'absolute', inset: 0, borderRadius: 40, overflow: 'hidden', background: APP.bg, boxShadow: `0 0 0 7px ${INK}, 0 0 0 12px ${APP.borderStrong}, 0 0 0 18px ${INK}, 0 36px 70px rgba(0,0,0,0.55)`}}>
         <div style={{position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `translate(${g.cw / 2 - v.x * k * v.z}px, ${g.ch / 2 - v.y * k * v.z}px) scale(${v.z})`}}>
@@ -315,11 +329,11 @@ const PanelCard: React.FC<{plan: Plan; frame: number; t: number; steps: Step[]; 
 
 /** A scene of the tour: backdrop, the card, the progress bar. */
 const TourScene: React.FC<SceneProps & {color: string; steps: Step[]; rings?: Ring[]; enter?: number; g?: Geo; children?: React.ReactNode}> = ({
-  plan, frame, t, color, steps, rings, enter, g, children,
+  plan, seg, frame, t, color, steps, rings, enter, g, children,
 }) => (
   <AbsoluteFill>
     <Backdrop color={color} t={t} rays={0.6} cy={1100} />
-    <PanelCard plan={plan} frame={frame} t={t} steps={steps} rings={rings} enter={enter} g={g} />
+    <PanelCard plan={plan} frame={frame} t={t} steps={steps} rings={rings} enter={enter} g={g} swing={enter === undefined ? (((seg as any).num || 0) % 2 ? 1 : -1) : 0} />
     {children}
   </AbsoluteFill>
 );
@@ -910,6 +924,7 @@ const withVoice = (Scene: React.FC<SceneProps>): React.FC<SceneProps> => (props)
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{transform: `scale(${punch})`}}><Scene {...props} /></AbsoluteFill>
+      <AbsoluteFill style={{background: 'radial-gradient(120% 85% at 50% 50%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.38) 100%)', pointerEvents: 'none'}} />
       {(num > 0 || props.seg.kind === 'bp_take5') && <Progress num={num} u={props.frame / len} bonus={props.seg.kind === 'bp_take5'} />}
       <CaptionTrack seg={props.seg} frame={props.frame} fps={fps} />
     </AbsoluteFill>

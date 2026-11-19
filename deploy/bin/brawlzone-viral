@@ -409,7 +409,7 @@ motion_ready () {
 }
 motion_draw () { # kind: 0 drawn into $OUT/silent.mp4, 3 nothing to say today, else failed
   rm -rf "$OUT/public" "$OUT/plan.json" "$OUT/silent.mp4"
-  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" \
+  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" -e VOICE="${VOICE:-}" -e VOICE_SPEED="${VOICE_SPEED:-}" \
     -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
     "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out --plan" \
     > "$CACHE/make-0.log" 2>&1
@@ -507,13 +507,16 @@ audio_in=(); graph="[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5
 if [ -s "$OUT/voice.wav" ]; then
   # A narrated video (the Bubble promo, 2026-11-19): the voice on top, the
   # music ducking under it (sidechain), make.py's sound effects in between.
+  # The voice is shaped like a voice-over (low cut, presence, compressor,
+  # de-esser) and the whole mix mastered to -14 LUFS, the level the
+  # platforms play everything at (v4, 2026-11-19).
   audio_in=(-i voice.wav)
-  music="[1:a]aresample=44100,volume=0.55,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5[m];[2:a]aresample=44100,volume=1.0,asplit=2[v][vk];[m][vk]sidechaincompress=threshold=0.02:ratio=9:attack=10:release=380[md]"
+  music="[1:a]aresample=44100,volume=0.55,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5[m];[2:a]aresample=44100,highpass=f=85,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3200:t=q:w=1.3:g=3,equalizer=f=10000:t=h:w=4000:g=2,acompressor=threshold=-21dB:ratio=3:attack=4:release=90:makeup=5dB,deesser=i=0.35,asplit=2[v][vk];[m][vk]sidechaincompress=threshold=0.02:ratio=9:attack=10:release=380[md]"
   if [ -s "$OUT/sfx.wav" ]; then
     audio_in+=(-i sfx.wav)
-    graph="$music;[3:a]aresample=44100,volume=0.9[s];[md][v][s]amix=inputs=3:normalize=0:duration=first,alimiter=limit=0.95[a]"
+    graph="$music;[3:a]aresample=44100,volume=0.9[s];[md][v][s]amix=inputs=3:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]"
   else
-    graph="$music;[md][v]amix=inputs=2:normalize=0:duration=first,alimiter=limit=0.95[a]"
+    graph="$music;[md][v]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]"
   fi
 fi
 docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \

@@ -2169,50 +2169,111 @@ if KIND == 'bubblepromo':
     BP_ME = by_id.get(16000000) or _top[8]  # Shelly: the brawler everyone has
     BP_TOP = [b for b in _top if b['id'] != BP_ME['id']]
     # v2 (owner: "make it real pro... lets make this go VIRAL"): a narrated
-    # story, problem first. Each line is voiced by Piper (en_US-ryan-high, on
-    # the box, cached by text in ASSETS/vo); its length sets the scene's
-    # length on the beat grid, and `hits` (beats into the scene) time both the
-    # animation in BubblePromo.tsx and the sound effects below.
-    import hashlib, subprocess
+    # story; each line's voice sets its scene's length on the beat grid, and
+    # `hits` (beats into the scene) time both the animation in
+    # BubblePromo.tsx and the sound effects below.
+    # v4 (owner: "make sure the voice is nice"): Kokoro instead of Piper
+    # (tts.py, on the box; VOICE / VOICE_SPEED override), cached by voice and
+    # text in ASSETS/vo, and the captions timed to the voice's own pauses.
+    import hashlib, re, subprocess
+    import numpy as np
     ASSETS = os.environ.get('ASSETS', '.')
     VO_LEAD = 0.12
+    TTS_VOICE, TTS_SPEED = os.environ.get('VOICE') or 'af_heart', os.environ.get('VOICE_SPEED') or '1.1'
+
+    def vo_path(text):
+        return f"{ASSETS}/vo/{hashlib.sha1(f'kokoro/{TTS_VOICE}/{TTS_SPEED}/{text}'.encode()).hexdigest()[:16]}.wav"
+
+    def synth(texts):
+        """Voices every line not in the cache, in one run (the model loads once)."""
+        todo = [(vo_path(t), t) for t in dict.fromkeys(texts) if not os.path.exists(vo_path(t))]
+        if todo:
+            os.makedirs(f'{ASSETS}/vo', exist_ok=True)
+            subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tts.py'), f'{ASSETS}/kokoro', TTS_VOICE, TTS_SPEED],
+                           input=''.join(f'{p}\t{t}\n' for p, t in todo).encode(), check=True, capture_output=True,
+                           env={**os.environ, 'PYTHONPATH': f'{ASSETS}/kokoro-py'})
 
     def voice(text):
-        path = f"{ASSETS}/vo/{hashlib.sha1(f'ryan-high/0.86/{text}'.encode()).hexdigest()[:16]}.wav"
-        if not os.path.exists(path):
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            subprocess.run([f'{ASSETS}/piper/piper/piper', '--model', f'{ASSETS}/piper/en_US-ryan-high.onnx', '--length_scale', '0.86',
-                            '--output_file', path], input=text.encode(), check=True, capture_output=True)
+        path = vo_path(text)
         with wave.open(path) as w:
             return path, w.getnframes() / w.getframerate()
 
-    def chunks(caption, dur, lead=''):
-        """Caption words in chunks of up to three, timed by length across the line.
-        `lead` is spoken first and not captioned (the feature's number, which
-        the video shows as its own big number): a chunk with no words."""
-        words, hi = [], False
+    def spans(path, parts):
+        """The voice cut into one stretch of speech per spoken phrase
+        (seconds): each cut is the pause nearest where the phrase lengths put
+        it, longer pauses preferred; None when a stretch comes out far from
+        its phrase's share (then the caller times by length)."""
+        with wave.open(path) as w:
+            rate = w.getframerate()
+            pcm = np.frombuffer(w.readframes(w.getnframes()), dtype='<i2').astype(np.float32) / 32768
+        hop = rate // 100; fr = len(pcm) // hop
+        rms = np.sqrt(np.mean(pcm[:fr * hop].reshape(fr, hop) ** 2, axis=1))
+        on = rms > max(0.01, float(rms.max()) * 0.06)
+        idx = np.nonzero(on)[0]
+        if not len(idx): return None
+        first, last = int(idx[0]), int(idx[-1]) + 1
+        gaps, i = [], first
+        while i < last:
+            if on[i]: i += 1; continue
+            j = i
+            while j < last and not on[j]: j += 1
+            if j - i >= 3: gaps.append((i, j))
+            i = j
+        size = [len(x) for x in parts]; total = sum(size); D = last - first
+        cuts, prev, acc = [], first, 0
+        for n in size[:-1]:
+            acc += n; want = first + D * acc / total
+            best = None
+            for g in gaps:
+                if g[0] <= prev: continue
+                score = abs((g[0] + g[1]) / 2 - want) / D - 0.25 * min(g[1] - g[0], 25) / 25
+                if best is None or score < best[0]: best = (score, g)
+            if best is None: return None
+            cuts.append(best[1]); prev = best[1][1]
+        out, s0 = [], first
+        for x, y in cuts: out.append((s0 / 100, x / 100)); s0 = y
+        out.append((s0 / 100, last / 100))
+        for (x, y), n in zip(out, size):
+            share = (y - x) * 100 / D / (n / total)
+            if not 0.45 < share < 2.2: return None
+        return out
+
+    PHRASE = re.compile(r'(?<=[?!,:.]) ')  # a space, not \s: "MR.\u00a0P" is one word
+
+    def chunks(caption, said, path, dur, lead=''):
+        """Caption words in chunks of up to three, each word with the moment
+        it is said: phrases (split at punctuation) sit on the voice's own
+        stretches of speech when the counts agree, words inside a phrase by
+        length; otherwise everything by length across the line. `lead` is
+        spoken first and not captioned (the feature's number, shown as its
+        own big number): a chunk with no words."""
         for pair in ('MR. P', 'POWER 11', '21 LANGUAGES', 'TAKE 5'):  # one word each, never split across captions
             caption = caption.replace(pair, pair.replace(' ', '\u00a0'))
-        for raw in caption.split(' '):  # split(' '), not split(): that splits on NBSP
-            hi = hi or raw.startswith('*')
-            words.append((raw.replace('*', ''), hi))
-            if raw.rstrip('?:,.!').endswith('*'): hi = False
-        out, cur = [], []
-        for w, h in words:
-            cur.append((w, h))
-            if len(cur) == 3 or w[-1] in '?:,!':  # not '.': "MR. P" stays together
-                out.append(cur); cur = []
-        if cur: out.append(cur)
-        size = lambda c: len(' '.join(w for w, _ in c))
-        total = sum(size(c) for c in out) + (len(lead) + 4 if lead else 0) or 1  # the pause after the number
-        t, res = VO_LEAD, []
+        phrases = [ph.split(' ') for ph in PHRASE.split(caption)]
+        sp = spans(path, PHRASE.split(said))
+        if sp and len(sp) == len(phrases) + (1 if lead else 0):
+            lead_span, places = (sp[0] if lead else None), sp[1:] if lead else sp
+        else:
+            size = [len(' '.join(ph)) for ph in phrases]
+            total = sum(size) + (len(lead) + 4 if lead else 0)
+            t = 0.0; lead_span = None; places = []
+            if lead:
+                lead_span = (0.0, dur * (len(lead) + 4) / total); t = lead_span[1]
+            for n in size:
+                places.append((t, t + dur * n / total)); t += dur * n / total
+        res, hi = [], False
         if lead:
-            d = dur * (len(lead) + 4) / total
-            res.append({'t0': round(t, 3), 't1': round(t + d, 3), 'words': [], 'num': True}); t += d
-        for c in out:
-            d = dur * size(c) / total
-            res.append({'t0': round(t, 3), 't1': round(t + d, 3), 'words': [{'w': w, 'hi': h} for w, h in c]})
-            t += d
+            res.append({'t0': round(VO_LEAD + lead_span[0], 3), 't1': round(VO_LEAD + lead_span[1], 3), 'words': [], 'num': True})
+        for ph, (a, b) in zip(phrases, places):
+            total = sum(len(w) + 1 for w in ph); t = a; words = []
+            for raw in ph:
+                hi = hi or raw.startswith('*')
+                words.append({'w': raw.replace('*', ''), 'hi': hi, 't': round(VO_LEAD + t, 3)})
+                if raw.rstrip('?:,.!').endswith('*'): hi = False
+                t += (b - a) * (len(raw) + 1) / total
+            for k in range(0, len(words), 3):
+                c = words[k:k + 3]
+                res.append({'t0': c[0]['t'], 't1': round(words[k + 3]['t'] if k + 3 < len(words) else VO_LEAD + b, 3), 'words': c})
         return res
 
     # v3 (owner: "show everything we can do, and also the panel, with
@@ -2223,9 +2284,9 @@ if KIND == 'bubblepromo':
     # seg.hits by index, so the order of a scene's cues is its storyboard).
     NUMS = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve']
     SCRIPT = [
-        ('bp_hook', 0, "Here's everything this free app does, inside Brawl Stars.", 'EVERYTHING THIS *FREE* APP DOES IN *BRAWL STARS*', 4,
+        ('bp_hook', 0, "Here's everything this free app does, inside Brawl Stars.", 'EVERYTHING THIS *FREE* APP DOES, IN *BRAWL STARS*', 4,
          [(0, 'impact'), (0.9, 'whoosh'), (1.15, 'pop'), (1.4, 'pop'), (1.65, 'pop'), (1.9, 'pop'), (2.6, 'impact')]),
-        ('bp_float', 1, 'It floats over your game. Tap it, mid draft.', 'IT FLOATS OVER YOUR GAME: *TAP IT* MID-DRAFT', 4,
+        ('bp_float', 1, 'It floats over your game. Tap it mid draft.', 'IT FLOATS OVER YOUR GAME: *TAP IT* MID-DRAFT', 4,
          [(0.5, 'whoosh'), (1.7, 'tap'), (1.9, 'whoosh'), (3.0, 'pop')]),
         ('bp_meta', 2, 'The best picks for every map, from real Ranked games.', 'THE *BEST PICKS* FOR EVERY MAP, FROM REAL *RANKED* GAMES', 4,
          [(0.5, 'tap'), (1.3, 'tap'), (2.2, 'pop')]),
@@ -2241,25 +2302,26 @@ if KIND == 'bubblepromo':
          [(0.3, 'whoosh'), (1.3, 'tap'), (2.3, 'tap'), (3.3, 'tap')]),
         ('bp_trophies', 8, 'Pushing trophies? Your best brawler for every live map.', 'PUSHING TROPHIES? YOUR *BEST BRAWLER* FOR EVERY LIVE MAP', 4,
          [(0.4, 'tap'), (1.3, 'pop'), (2.2, 'whoosh')]),
-        ('bp_review', 9, 'After every game, it tells you why you won, or lost.', 'AFTER EVERY GAME: *WHY* YOU WON OR LOST', 4,
+        ('bp_review', 9, 'After every game, it tells you why you won or lost.', 'AFTER EVERY GAME: *WHY* YOU WON OR LOST', 4,
          [(0.4, 'chime'), (1.2, 'tap'), (1.9, 'pop'), (2.7, 'pop')]),
         ('bp_season', 10, 'Your rank, a daily goal, and your friends.', 'YOUR *RANK*, A *DAILY GOAL*, AND YOUR *FRIENDS*', 4,
          [(0.3, 'whoosh'), (0.9, 'pop'), (1.5, 'pop'), (2.2, 'whoosh'), (3.0, 'ding')]),
-        ('bp_home', 11, 'Widgets, free reward alerts, and nerf warnings.', '*WIDGETS*, FREE REWARD ALERTS AND *NERF* WARNINGS', 4,
+        ('bp_home', 11, 'Widgets, free reward alerts, and nerf warnings.', '*WIDGETS*, FREE REWARD ALERTS, AND *NERF* WARNINGS', 4,
          [(0.35, 'pop'), (0.6, 'pop'), (0.85, 'pop'), (1.1, 'pop'), (1.9, 'ding'), (2.4, 'ding'), (2.9, 'ding')]),
         ('bp_style', 12, 'Make it yours. Any size, in twenty one languages.', 'MAKE IT YOURS: ANY SIZE, IN *21 LANGUAGES*', 5,
          [(0.5, 'tap'), (1.0, 'tap'), (1.5, 'tap'), (2.3, 'whoosh')] + [(2.5 + 0.22 * i, 'tap') for i in range(10)]),
         ('bp_take5', 0, "And if you're tilted, it tells you to take five.", "AND IF YOU'RE *TILTED*, IT TELLS YOU TO *TAKE 5*", 3,
          [(0.5, 'buzz')]),
-        ('bp_outro', 0, "All free. Search Brawl Zone Bubble, on Google Play.", "ALL *FREE*: SEARCH *BRAWLZONE BUBBLE*", 4,
+        ('bp_outro', 0, "All free. Search Brawl Zone Bubble on Google Play.", "ALL *FREE*: SEARCH *BRAWLZONE BUBBLE*", 4,
          [(0, 'impact'), (1.2, 'pop'), (2.0, 'tap'), (3.2, 'pop')]),
     ]
-    BP_VO = []
-    for kind, num, said, caption, least, cues in SCRIPT:
+    spoken = [f"{NUMS[num] + '.' if num else ''} {said}".strip() for _, num, said, *_ in SCRIPT]
+    synth(spoken)
+    for (kind, num, said, caption, least, cues), line in zip(SCRIPT, spoken):
         lead = f'{NUMS[num]}.' if num else ''
-        path, dur = voice(f'{lead} {said}'.strip())
+        path, dur = voice(line)
         beats = max(least, math.ceil((VO_LEAD + dur + 0.3) / tl.step))
-        tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, dur, lead)},
+        tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, line, path, dur, lead)},
                hits=[h for h, _ in cues], sounds=[n for _, n in cues], num=num)
     META = {
         'title': 'This app coaches you INSIDE Brawl Stars 🤯 (free) #Shorts',
@@ -2552,19 +2614,21 @@ def export_plan(out):
         # The voice and the sound effects as two WAVs next to the plan; the
         # job lays them with the music (the music ducks under the voice).
         import numpy as np, sfx
-        vo = np.zeros(int(tl.dur * 22050) + 22050, dtype=np.int16)
+        with wave.open(tl.segments[0]['vo']['path']) as w:
+            VR = w.getframerate()
+        vo = np.zeros(int(tl.dur * VR) + VR, dtype=np.int16)
         cues = []
         for sg in tl.segments:
             t0 = sg['start'] * tl.step
             with wave.open(sg['vo']['path']) as w:
                 pcm = np.frombuffer(w.readframes(w.getnframes()), dtype='<i2')
-            i = int((t0 + VO_LEAD) * 22050); vo[i:i + len(pcm)] = pcm[:max(0, len(vo) - i)]
+            i = int((t0 + VO_LEAD) * VR); vo[i:i + len(pcm)] = pcm[:max(0, len(vo) - i)]
             if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.6))
             for h, name in zip(sg['hits'], sg['sounds']):
                 cues.append((t0 + h * tl.step, name, 0.55 if name in ('tap', 'whoosh') else 0.85))
             if sg['kind'] == 'bp_outro': cues.append((max(0, t0 - 1.0), 'riser', 0.7))
         with wave.open(f'{out}/voice.wav', 'wb') as w:
-            w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050); w.writeframes(vo[:int(tl.dur * 22050)].tobytes())
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(VR); w.writeframes(vo[:int(tl.dur * VR)].tobytes())
         sfx.track(cues, tl.dur, f'{out}/sfx.wav')
         BPA = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
         # The panel as the app shows it, captured headless (v3/: every state
