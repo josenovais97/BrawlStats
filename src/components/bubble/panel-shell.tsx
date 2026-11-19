@@ -18,6 +18,7 @@ import { PanelReview, type PostGameReview } from '@/components/bubble/panel-revi
 import { Check, ChevronDown, X } from 'lucide-react';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
+import { usePanelTheme } from '@/components/bubble/panel-theme';
 
 /**
  * Two views of the same draft, and which one is showing.
@@ -72,6 +73,7 @@ export function PanelShell({
    * remembered, so every later opening goes straight to it.
    */
   const [tab, setTab] = useState<Tab | null>(null);
+  usePanelTheme();
 
   useEffect(() => {
     try {

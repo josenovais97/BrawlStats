@@ -5275,4 +5275,10 @@ export const PT: Record<string, string> = {
     "O que está ganhando agora",
   "Best picks for every Ranked map":
     "Os melhores picks em cada mapa do Ranqueado",
+  "New best: above last season!":
+    "Novo recorde: acima da temporada passada!",
+  "Level with last season":
+    "Igual à temporada passada",
+  "Reach {rank} to beat last season":
+    "Chegue a {rank} para superar a temporada passada",
 };

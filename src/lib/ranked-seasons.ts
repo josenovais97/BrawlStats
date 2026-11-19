@@ -386,3 +386,40 @@ export async function getSeasonState(now: Date = new Date()): Promise<SeasonStat
     source: wiki ? 'wiki' : 'fallback',
   };
 }
+
+/* ------------------------------ season windows ------------------------------ */
+
+export interface SeasonWindow {
+  number: number;
+  /** First day, ISO date. */
+  from: string;
+  /** First day of the next season (exclusive), ISO date. */
+  to: string;
+}
+
+/**
+ * The running season and the one before it as date windows, for "this
+ * season vs last season" in the Bubble app (1.42).
+ *
+ * The same wiki lag rule as everywhere else: on reset day the wiki can still
+ * end at the season that just finished, and then the running one is the next
+ * number, starting where the newest listed one ended.
+ */
+export async function getSeasonPair(now: Date = new Date()): Promise<{ now: SeasonWindow | null; last: SeasonWindow | null }> {
+  const wiki = await fetchWiki();
+  const seasons = wiki?.seasons.length ? wiki.seasons : FALLBACK_SEASONS;
+  const today = new Date(startOfUtcDay(now)).toISOString().slice(0, 10);
+  const window = (i: number): SeasonWindow => ({
+    number: seasons[i].number,
+    from: seasons[i].startsOn,
+    to: seasons[i + 1]?.startsOn ?? nextBoundary(seasons[i].startsOn),
+  });
+  let i = -1;
+  for (let k = 0; k < seasons.length; k++) if (seasons[k].startsOn <= today) i = k;
+  if (i < 0) return { now: null, last: null };
+  const newest = window(i);
+  if (newest.to <= today) {
+    return { now: { number: newest.number + 1, from: newest.to, to: nextBoundary(newest.to) }, last: newest };
+  }
+  return { now: newest, last: i > 0 ? window(i - 1) : null };
+}

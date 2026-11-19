@@ -22,6 +22,11 @@ import type { BABrawler } from '@/types/brawlapi';
  *   ?kind=rank&tag=…&lang=…     "My rank": badge, elo, progress, recent record
  *   ?kind=season&tag=…&lang=…   "Season N Wrapped": peak, games, win rate,
  *                                best brawler, elo gained, longest streak
+ *   ?kind=versus&tag=…&lang=…   "Season N vs Season N-1" (1.42): peak, games,
+ *                                win rate and best brawler side by side, from
+ *                                what the app merged (/api/bubble/seasons plus
+ *                                its own count): n g w pk b bid, and ln lg lw
+ *                                lpk lb lbid for the last season
  *
  * Season numbers come from player_battle_daily for sampled players; the app
  * sends what it counted itself (g, w, best, streak, gain, peak) for everyone
@@ -50,7 +55,7 @@ export async function GET(request: NextRequest) {
   const base = lang.split('-')[0];
   const locale: Locale = isIntlLocale(base) ? base : 'en';
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
-  const kind = q.get('kind') === 'season' ? 'season' : 'rank';
+  const kind = q.get('kind') === 'season' ? 'season' : q.get('kind') === 'versus' ? 'versus' : 'rank';
 
   const [fonts, player, name, rates, season, logo] = await Promise.all([
     slideFonts(),
@@ -123,6 +128,90 @@ export async function GET(request: NextRequest) {
             {t('Last {n}: {w}–{l}', { n: games.length, w: wins, l: games.length - wins })}
           </div>
         ) : null}
+      </div>
+    );
+  } else if (kind === 'versus') {
+    const art = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
+    const side = (p: string) => {
+      const games = Math.max(0, int(q.get(`${p}g`)) ?? 0);
+      const wins = Math.min(games, Math.max(0, int(q.get(`${p}w`)) ?? 0));
+      const peak = int(q.get(`${p}pk`)) ?? -1;
+      const bestId = int(q.get(`${p}bid`));
+      return {
+        number: int(q.get(`${p}n`)),
+        games,
+        wins,
+        peak: peak >= 0 && peak < RANK_ELO_FLOORS.length ? peak : -1,
+        best: (q.get(`${p}b`) ?? '').slice(0, 24) || null,
+        bestId: bestId !== null && art.has(bestId) ? bestId : null,
+      };
+    };
+    const now = side('');
+    const last = side('l');
+    const [nowBadge, lastBadge, nowBest, lastBest] = await Promise.all([
+      now.peak >= 0 ? loadIcon(rankedTierIconUrl(now.peak + 1) ?? '', 220) : Promise.resolve(null),
+      last.peak >= 0 ? loadIcon(rankedTierIconUrl(last.peak + 1) ?? '', 220) : Promise.resolve(null),
+      now.bestId !== null ? loadIcon(art.get(now.bestId)?.imageUrl ?? brawlerIconUrl(now.bestId), 160) : Promise.resolve(null),
+      last.bestId !== null ? loadIcon(art.get(last.bestId)?.imageUrl ?? brawlerIconUrl(last.bestId), 160) : Promise.resolve(null),
+    ]);
+    const rankName = (i: number) => (i >= 0 ? localRank(rankProgress(RANK_ELO_FLOORS[i][1])?.rank, name) : null);
+    const verdict =
+      now.peak < 0 || last.peak < 0
+        ? null
+        : now.peak > last.peak
+          ? t('New best: above last season!')
+          : now.peak === last.peak
+            ? t('Level with last season')
+            : t('Reach {rank} to beat last season', { rank: rankName(last.peak + 1) ?? rankName(last.peak) ?? '' });
+    const column = (
+      x: ReturnType<typeof side>,
+      badge: string | null,
+      best: string | null,
+      lit: boolean,
+    ) => (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: 440,
+          padding: '30px 20px 34px',
+          gap: 14,
+          borderRadius: 40,
+          background: lit ? 'rgba(255,197,61,0.12)' : 'rgba(255,255,255,0.06)',
+          border: `4px solid ${lit ? 'rgba(255,197,61,0.6)' : 'rgba(255,255,255,0.12)'}`,
+        }}
+      >
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 58, color: lit ? BRAND : FG }}>
+          {x.number ? t('SEASON {n}', { n: x.number }) : '–'}
+        </div>
+        {badge ? <img alt="" src={badge} width={220} height={220} /> : <div style={{ display: 'flex', width: 220, height: 220 }} />}
+        <div style={{ display: 'flex', fontSize: 30, color: DIM }}>{t('Peak')}</div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 54, color: FG, lineHeight: 1 }}>{rankName(x.peak) ?? '–'}</div>
+        <div style={{ display: 'flex', width: 360, height: 3, background: 'rgba(255,255,255,0.1)', margin: '10px 0' }} />
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 76, color: FG, lineHeight: 1 }}>{x.games.toLocaleString(locale)}</div>
+        <div style={{ display: 'flex', fontSize: 30, color: DIM }}>{t('Ranked games')}</div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 76, color: FG, lineHeight: 1, marginTop: 8 }}>
+          {x.games > 0 ? `${Math.round((x.wins / x.games) * 100)}%` : '–'}
+        </div>
+        <div style={{ display: 'flex', fontSize: 30, color: DIM }}>{t('Win rate')}</div>
+        {best || x.best ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12 }}>
+            {best ? <img alt="" src={best} width={84} height={84} style={{ borderRadius: 20, border: `4px solid ${BRAND}` }} /> : null}
+            <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 40, color: FG }}>{x.best ?? ''}</div>
+          </div>
+        ) : null}
+      </div>
+    );
+    body = (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, marginTop: 40, width: '100%' }}>
+        <div style={{ display: 'flex', marginTop: 10 }}>{who}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 20 }}>
+          {column(last, lastBadge, lastBest, false)}
+          <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 84, color: BRAND, margin: '0 -10px', zIndex: 2 }}>VS</div>
+          {column(now, nowBadge, nowBest, true)}
+        </div>
+        {verdict ? <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 56, color: BRAND, textAlign: 'center', marginTop: 10 }}>{verdict}</div> : null}
       </div>
     );
   } else {

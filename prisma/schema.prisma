@@ -808,3 +808,29 @@ model BubbleLastRead {
 
   @@map("bubble_last_reads")
 }
+
+/// Friend invites from the Bubble app (1.42): one code per inviting tag,
+/// shared as brawlzone.net/bubble/invite#<code>. The landing page shows who
+/// invited you; the app that opens the link adds the inviter as a friend.
+model BubbleInvite {
+  code      String   @id
+  inviter   String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  accepts BubbleInviteAccept[]
+
+  @@map("bubble_invites")
+}
+
+/// Who opened an invite in the app (1.42), so the inviter's app adds them
+/// back on its next hourly check: both end up on each other's ladder.
+model BubbleInviteAccept {
+  code      String
+  invitee   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  invite BubbleInvite @relation(fields: [code], references: [code], onDelete: Cascade)
+
+  @@id([code, invitee])
+  @@map("bubble_invite_accepts")
+}

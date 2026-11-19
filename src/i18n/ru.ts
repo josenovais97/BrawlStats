@@ -5276,4 +5276,10 @@ export const RU: Record<string, string> = {
     "Кто побеждает сейчас",
   "Best picks for every Ranked map":
     "Лучшие бойцы для каждой карты ранговых боёв",
+  "New best: above last season!":
+    "Новый рекорд: выше прошлого сезона!",
+  "Level with last season":
+    "Наравне с прошлым сезоном",
+  "Reach {rank} to beat last season":
+    "Достигни {rank}, чтобы превзойти прошлый сезон",
 };

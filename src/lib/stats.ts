@@ -5816,6 +5816,27 @@ export async function getPlayerSeasonStats(
   }
 }
 
+/**
+ * The highest Ranked elo read for a player inside a season window (1.42,
+ * "this season vs last season"): the daily profile reads in
+ * player_trophy_points, kept 120 days. Null when the sampler never read them.
+ */
+export async function getPlayerPeakElo(tag: string, from: string, to: string): Promise<number | null> {
+  const prisma = getPrisma();
+  if (!prisma || isOptedOut(tag)) return null;
+  try {
+    const rows = await prisma.$queryRaw<{ peak: number | null }[]>`
+      SELECT MAX(ranked_elo) AS peak FROM player_trophy_points
+      WHERE player_tag = ${tag} AND recorded_on >= ${from}::date AND recorded_on < ${to}::date AND ranked_elo IS NOT NULL
+    `;
+    const peak = rows[0]?.peak;
+    return peak === null || peak === undefined ? null : Number(peak);
+  } catch (error) {
+    swallow('getPlayerPeakElo', error);
+    return null;
+  }
+}
+
 /** Days from `from` up to today or the exclusive `to`, whichever is first. */
 function seasonDays(from: string, to: string): string[] {
   const today = new Date().toISOString().slice(0, 10);

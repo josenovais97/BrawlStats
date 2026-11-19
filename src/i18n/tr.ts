@@ -5275,4 +5275,10 @@ export const TR: Record<string, string> = {
     "Şu an kazananlar",
   "Best picks for every Ranked map":
     "Her Aşamalı haritası için en iyi seçimler",
+  "New best: above last season!":
+    "Yeni rekor: geçen sezonun üstünde!",
+  "Level with last season":
+    "Geçen sezonla aynı seviyede",
+  "Reach {rank} to beat last season":
+    "Geçen sezonu geçmek için {rank} seviyesine ulaş",
 };
