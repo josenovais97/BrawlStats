@@ -101,6 +101,11 @@ class BubbleService : Service() {
             handler.post {
                 when (key) {
                     BubbleLook.KEY_SIZE -> rebuildBubble()
+                    // 1.42: a new theme repaints the ring and the panel's accent.
+                    BubbleLook.KEY_THEME -> {
+                        rebuildBubble()
+                        panelWeb?.evaluateJavascript("window.__bzTheme&&window.__bzTheme('${BubbleLook.theme(this).id}')", null)
+                    }
                     BubbleLook.KEY_IDLE, BubbleLook.KEY_TUCK -> {
                         wakeBubble(animate = false)
                         scheduleRest()
@@ -526,7 +531,7 @@ class BubbleService : Service() {
          */
         val playerIcon = Account.savedIcon(this)
         val art = ImageView(this).apply {
-            setBackgroundResource(R.drawable.bubble_badge)
+            background = BubbleLook.badge(this@BubbleService)
             if (playerIcon != null) {
                 setImageDrawable(
                     androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
@@ -1405,7 +1410,7 @@ class BubbleService : Service() {
         // The same face as the bubble that opened it, so the two read as one.
         val headerIcon = Account.savedIcon(this)
         header.addView(ImageView(this).apply {
-            setBackgroundResource(R.drawable.bubble_badge)
+            background = BubbleLook.badge(this@BubbleService)
             if (headerIcon != null) {
                 setImageDrawable(
                     androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
@@ -1678,7 +1683,8 @@ class BubbleService : Service() {
         panelFromCache = !isOnline()
         web.settings.cacheMode =
             if (panelFromCache) WebSettings.LOAD_CACHE_ELSE_NETWORK else WebSettings.LOAD_DEFAULT
-        web.loadUrl(PANEL_URL)
+        // 1.42: the bubble's theme rides in the hash too, so the panel opens in it.
+        web.loadUrl(PANEL_URL + "&th=" + BubbleLook.theme(this).id)
     }
 
     /**

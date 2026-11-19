@@ -87,6 +87,11 @@ class AlertJob : JobService() {
                 Season.update(context, me, alerts, fresh, post)
             }
             Friends.refresh(context, me, season, post)
+            // 1.42: invites both ways, Monday's duel verdict, this season vs last.
+            Invite.finish(context)
+            Invite.poll(context, post)
+            Duel.settle(context, post)
+            if (me != null) Versus.fetch(context)
             Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)
         }

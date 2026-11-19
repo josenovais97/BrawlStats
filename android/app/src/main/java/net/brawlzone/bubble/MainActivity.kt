@@ -74,6 +74,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 1.42: an invite link, or an install that came from one, waits for
+        // the app screen (after the setup, on a first run) to ask about it.
+        Invite.fromIntent(intent)?.let { Invite.receive(this, it) }
+        Referrer.check(this)
         /*
          * A shortcut, the widget or a season notification asked for the bubble
          * (1.40). When it could start, there is nothing to show here.
@@ -117,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         wireFollow()
         wireSeason()
         wireFriends()
+        wireVersus()
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -239,6 +244,11 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Invite.fromIntent(intent)?.let {
+            Invite.receive(this, it)
+            askInvite()
+            return
+        }
         if (intent.action == Share.ACTION_WRAPPED) {
             Share.wrapped(this) { busy -> shareBusy(null, busy) }
             return
@@ -329,6 +339,7 @@ class MainActivity : AppCompatActivity() {
         }
         Store.maybeAskForReview(this)
         refreshStanding()
+        askInvite()
         val granted =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
@@ -352,6 +363,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun refreshStanding(force: Boolean = false) {
         paintSeason()
+        paintVersus()
         paintFriends()
         if (!force && !AlertJob.isStale(this)) return
         val app = applicationContext
@@ -360,6 +372,7 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
                 paintSeason()
+                paintVersus()
                 paintFriends()
             }
         }.start()
@@ -484,6 +497,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun wireFriends() {
+        val invite = findViewById<TextView>(R.id.friends_invite)
+        invite.setOnClickListener {
+            Invite.share(this) { busy ->
+                invite.isEnabled = !busy
+                invite.setText(if (busy) R.string.invite_making else R.string.invite_button)
+            }
+        }
         val editor = findViewById<View>(R.id.friends_editor)
         val add = findViewById<TextView>(R.id.friends_add)
         val field = findViewById<EditText>(R.id.friends_field)
@@ -561,6 +581,121 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------- 1.42: invites, season vs last
+
+    private var inviteAsking = false
+
+    /** An invite waiting (a link or the install referrer): "add them to your friends?" once. */
+    private fun askInvite() {
+        val code = Invite.toAsk(this) ?: return
+        if (inviteAsking) return
+        inviteAsking = true
+        val app = applicationContext
+        Thread {
+            val from = Invite.lookup(app, code)
+            runOnUiThread {
+                inviteAsking = false
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                Invite.markAsked(app, code)
+                if (from == null || from.tag == Account.tag(app)) {
+                    Invite.drop(app)
+                    return@runOnUiThread
+                }
+                val name = from.name ?: "#${from.tag}"
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.invite_add_title, name))
+                    .setMessage(getString(R.string.invite_add_body, name))
+                    .setPositiveButton(R.string.invite_add) { _, _ ->
+                        Thread {
+                            val result = Invite.accept(app, code, from)
+                            runOnUiThread {
+                                if (isFinishing || isDestroyed) return@runOnUiThread
+                                val message = when (result) {
+                                    Friends.AddResult.ADDED, Friends.AddResult.ALREADY -> getString(R.string.invite_added, name)
+                                    Friends.AddResult.FULL -> getString(R.string.friends_full)
+                                    else -> getString(R.string.friends_failed)
+                                }
+                                android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
+                                paintFriends()
+                                Thread { Widgets.updateAll(app) }.start()
+                            }
+                        }.start()
+                    }
+                    .setNegativeButton(R.string.invite_later) { _, _ -> Invite.drop(app) }
+                    .show()
+            }
+        }.start()
+    }
+
+    private fun wireVersus() {
+        val share = findViewById<TextView>(R.id.versus_share)
+        share.setOnClickListener {
+            Share.versus(this) { busy ->
+                share.isEnabled = !busy
+                share.setText(if (busy) R.string.share_making else R.string.versus_share)
+            }
+        }
+    }
+
+    /** This season against the last one, once there is a last one to beat. */
+    private fun paintVersus() {
+        val caption = findViewById<View>(R.id.versus_caption)
+        val card = findViewById<View>(R.id.versus_card)
+        val data = Versus.last(this)
+        if (Account.tag(this).isEmpty() || data == null || !Versus.worthShowing(data)) {
+            caption.visibility = View.GONE
+            card.visibility = View.GONE
+            return
+        }
+        val last = data.last ?: return
+        caption.visibility = View.VISIBLE
+        card.visibility = View.VISIBLE
+        val density = resources.displayMetrics.density
+        val app = applicationContext
+        val columns = findViewById<LinearLayout>(R.id.versus_columns)
+        columns.removeAllViews()
+        fun column(s: Versus.Side, lit: Boolean): View {
+            val v = layoutInflater.inflate(R.layout.versus_side, columns, false)
+            v.findViewById<TextView>(R.id.versus_season).apply {
+                text = getString(R.string.versus_season, s.number)
+                setTextColor(getColor(if (lit) R.color.brand else R.color.muted))
+            }
+            v.findViewById<TextView>(R.id.versus_rank).text = s.peakRank ?: "–"
+            v.findViewById<TextView>(R.id.versus_games).text = getString(R.string.versus_games, s.games)
+            v.findViewById<TextView>(R.id.versus_rate).text =
+                if (s.games > 0) getString(R.string.versus_rate, Math.round(s.wins * 100f / s.games)) else "–"
+            v.findViewById<TextView>(R.id.versus_best).apply {
+                text = s.best?.let { getString(R.string.versus_best, it) } ?: ""
+                visibility = if (s.best == null) View.INVISIBLE else View.VISIBLE
+            }
+            if (lit) v.setBackgroundResource(R.drawable.chip_active)
+            val badge = v.findViewById<ImageView>(R.id.versus_badge)
+            Thread {
+                val bitmap = Widgets.badge(app, s.peakIcon)
+                runOnUiThread { if (bitmap != null) badge.setImageBitmap(bitmap) }
+            }.start()
+            return v
+        }
+        columns.addView(column(last, false))
+        columns.addView(TextView(this).apply {
+            text = "VS"
+            textSize = 18f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(getColor(R.color.brand))
+            val pad = (8 * density).toInt()
+            setPadding(pad, 0, pad, 0)
+        })
+        columns.addView(column(data.now, true))
+        findViewById<TextView>(R.id.versus_verdict).text = when {
+            data.now.peak >= 0 && last.peak >= 0 && data.now.peak > last.peak -> getString(R.string.versus_new_best)
+            data.now.peak >= 0 && data.now.peak == last.peak -> getString(R.string.versus_level)
+            data.now.peak >= 0 && last.peakRank != null -> getString(R.string.versus_pass, last.peakRank)
+            last.peakRank != null -> getString(R.string.versus_challenge, last.peakRank)
+            else -> ""
+        }
+        gameType(card)
+    }
+
     private fun paintFriends() {
         val caption = findViewById<View>(R.id.friends_caption)
         val card = findViewById<View>(R.id.friends_card)
@@ -581,6 +716,14 @@ class MainActivity : AppCompatActivity() {
             if (Friends.tags(this).size >= Friends.MAX) View.GONE
             else if (findViewById<View>(R.id.friends_editor).visibility == View.VISIBLE) View.GONE
             else View.VISIBLE
+        // 1.42: invite while there is room; the weekly duel once there are friends.
+        findViewById<View>(R.id.friends_invite).visibility =
+            if (Friends.tags(this).size >= Friends.MAX) View.GONE else View.VISIBLE
+        val duel = findViewById<TextView>(R.id.friends_duel)
+        val week = if (hasFriends) Duel.thisWeek(this) else emptyList()
+        duel.visibility = if (hasFriends) View.VISIBLE else View.GONE
+        if (hasFriends) duel.text = getString(R.string.duel_week, Duel.line(this, week))
+        val crown = Duel.leader(week)
         if (!hasFriends) return
         val fmt = java.text.NumberFormat.getIntegerInstance()
         val app = applicationContext
@@ -588,7 +731,8 @@ class MainActivity : AppCompatActivity() {
             val view = layoutInflater.inflate(R.layout.row_friend, rows, false)
             view.findViewById<TextView>(R.id.friend_pos).text = (index + 1).toString()
             val name = view.findViewById<TextView>(R.id.friend_name)
-            name.text = if (row.you) getString(R.string.friends_you, row.data.name) else row.data.name
+            name.text = (if (row.data.tag == crown) "\uD83D\uDC51 " else "") +
+                if (row.you) getString(R.string.friends_you, row.data.name) else row.data.name
             if (row.you) name.setTextColor(getColor(R.color.brand))
             view.findViewById<TextView>(R.id.friend_rank).text = row.data.rank ?: ""
             view.findViewById<TextView>(R.id.friend_elo).text = row.data.elo?.let { fmt.format(it) } ?: "–"
@@ -1096,6 +1240,7 @@ class MainActivity : AppCompatActivity() {
         fun paintPreview() {
             val badge = px(BubbleLook.badgeDp(BubbleLook.size(this)))
             for (view in listOf(touched, idle)) {
+                view.background = BubbleLook.badge(this) // 1.42: in the chosen theme
                 val inset = if (icon != null) px(4) else badge / 4
                 view.setPadding(inset, inset, inset, inset)
                 view.layoutParams = (view.layoutParams as android.widget.FrameLayout.LayoutParams).apply {
@@ -1181,6 +1326,39 @@ class MainActivity : AppCompatActivity() {
             { BubbleLook.idle(this) },
             { BubbleLook.setIdle(this, it) },
         )
+
+        // 1.42: themes, a swatch each, the chosen one ringed and named.
+        val themeRow = findViewById<LinearLayout>(R.id.look_theme)
+        val themeLabel = findViewById<TextView>(R.id.look_theme_label)
+        fun paintThemes() {
+            themeRow.removeAllViews()
+            val chosen = BubbleLook.theme(this)
+            themeLabel.text = getString(R.string.look_theme_named, getString(chosen.label))
+            for (theme in BubbleLook.THEMES) {
+                val on = theme.id == chosen.id
+                val ring = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.OVAL
+                    setColor(android.graphics.Color.TRANSPARENT)
+                    setStroke(px(3), if (on) getColor(R.color.foreground) else android.graphics.Color.TRANSPARENT)
+                }
+                val layers = android.graphics.drawable.LayerDrawable(arrayOf(ring, BubbleLook.badge(this, theme))).apply {
+                    setLayerInset(1, px(6), px(6), px(6), px(6))
+                }
+                val swatch = View(this).apply {
+                    background = layers
+                    contentDescription = getString(theme.label)
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        BubbleLook.setTheme(this@MainActivity, theme.id)
+                        paintThemes()
+                        paintPreview()
+                    }
+                }
+                themeRow.addView(swatch, LinearLayout.LayoutParams(px(48), px(48)).apply { marginEnd = px(6) })
+            }
+        }
+        paintThemes()
 
         tuck.isChecked = BubbleLook.tuck(this)
         tuck.setOnCheckedChangeListener { _, on ->

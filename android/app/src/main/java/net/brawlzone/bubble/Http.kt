@@ -47,6 +47,22 @@ object Http {
         Reply(code, stream?.use { it.readBytes().decodeToString() })
     }.getOrElse { Reply(-1, null) }
 
+    /** POST a JSON body (1.42, friend invites); the same status rules as get(). */
+    fun postJson(url: String, json: String): Reply = runCatching {
+        val c = (URL(url).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 10_000
+            readTimeout = 10_000
+            requestMethod = "POST"
+            doOutput = true
+            setRequestProperty("User-Agent", "BrawlZoneBubble")
+            setRequestProperty("Content-Type", "application/json")
+        }
+        c.outputStream.use { it.write(json.toByteArray()) }
+        val code = c.responseCode
+        val stream = if (code in 200..299) c.inputStream else c.errorStream
+        Reply(code, stream?.use { it.readBytes().decodeToString() })
+    }.getOrElse { Reply(-1, null) }
+
     /** A drawn share card can take several seconds on the server (1.40). */
     fun bytes(url: String): ByteArray = open(url, readTimeoutMs = 30_000).use { it.readBytes() }
 }

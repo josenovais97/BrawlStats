@@ -1,6 +1,7 @@
 package net.brawlzone.bubble
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 
 /**
  * How the bubble looks over the game: its size, how far it fades when left
@@ -27,6 +28,27 @@ object BubbleLook {
     const val KEY_TUCK = "tuck"
     /** The break card after a losing streak (1.42: "never show it again"); on by default. */
     const val KEY_TILT = "tilt"
+    /** The bubble's colours (1.42), which the panel's accent follows. */
+    const val KEY_THEME = "theme"
+
+    /**
+     * A theme: the ring's gradient (top to bottom) and its outline, and the
+     * swatch's name. Gold is the bubble every earlier version wore. The panel
+     * side lives in the site's components/bubble/panel-theme.ts; keep the two
+     * lists in step.
+     */
+    data class Theme(val id: String, val top: Int, val bottom: Int, val edge: Int, val label: Int)
+
+    val THEMES = listOf(
+        Theme("gold", 0xFFFFD96B.toInt(), 0xFFF2A81C.toInt(), 0xFF6B4A00.toInt(), R.string.theme_gold),
+        Theme("diamond", 0xFFA6F4FF.toInt(), 0xFF1FB4E6.toInt(), 0xFF0B4F6B.toInt(), R.string.theme_diamond),
+        Theme("mythic", 0xFFECC2FF.toInt(), 0xFFA64DF0.toInt(), 0xFF4B1680.toInt(), R.string.theme_mythic),
+        Theme("legendary", 0xFFFFC0A8.toInt(), 0xFFF0523C.toInt(), 0xFF6E1A0E.toInt(), R.string.theme_legendary),
+        Theme("masters", 0xFFFFD0E8.toInt(), 0xFFFF4FA3.toInt(), 0xFF6B0F3D.toInt(), R.string.theme_masters),
+        Theme("emerald", 0xFFB4F7CC.toInt(), 0xFF26C26A.toInt(), 0xFF0D5A2C.toInt(), R.string.theme_emerald),
+        Theme("frost", 0xFFFFFFFF.toInt(), 0xFFB7C3E6.toInt(), 0xFF3C4766.toInt(), R.string.theme_frost),
+        Theme("midnight", 0xFF6F86F0.toInt(), 0xFF1A2350.toInt(), 0xFF9FB0FF.toInt(), R.string.theme_midnight),
+    )
 
     const val SIZE_SMALL = "s"
     const val SIZE_NORMAL = "m"
@@ -59,6 +81,18 @@ object BubbleLook {
 
     fun tilt(context: Context): Boolean = prefs(context).getBoolean(KEY_TILT, true)
 
+    fun theme(context: Context): Theme {
+        val id = prefs(context).getString(KEY_THEME, null)
+        return THEMES.firstOrNull { it.id == id } ?: THEMES[0]
+    }
+
+    /** The ring behind the bubble's face, in the chosen theme (was drawable/bubble_badge). */
+    fun badge(context: Context, theme: Theme = theme(context)): GradientDrawable =
+        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(theme.top, theme.bottom)).apply {
+            shape = GradientDrawable.OVAL
+            setStroke((2 * context.resources.displayMetrics.density).toInt(), theme.edge)
+        }
+
     fun setSize(context: Context, size: String) {
         prefs(context).edit().putString(KEY_SIZE, size).apply()
     }
@@ -73,5 +107,9 @@ object BubbleLook {
 
     fun setTilt(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean(KEY_TILT, on).apply()
+    }
+
+    fun setTheme(context: Context, id: String) {
+        prefs(context).edit().putString(KEY_THEME, id).apply()
     }
 }

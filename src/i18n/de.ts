@@ -5282,4 +5282,6 @@ export const DE: Record<string, string> = {
     "Gleichauf mit letzter Saison",
   "Reach {rank} to beat last season":
     "Erreiche {rank}, um letzte Saison zu schlagen",
+  "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
+    "Wenn du eine Freundeseinladung teilst, speichert brawlzone.net deinen Spieler-Tag mit dem Einladungscode und den Tag jedes Spielers, der sie in der App öffnet, damit ihr euch gegenseitig als Freunde hinzufügt. Sonst wird über keinen der beiden etwas gespeichert.",
 };

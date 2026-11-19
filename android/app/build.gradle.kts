@@ -170,4 +170,6 @@ dependencies {
    */
   "playImplementation"("com.google.android.play:review:2.0.2")
   "playImplementation"("com.google.android.play:app-update:2.1.0")
+  // Friend invites (1.42): a code in the Play install referrer, read once on first open.
+  "playImplementation"("com.android.installreferrer:installreferrer:2.2")
 }

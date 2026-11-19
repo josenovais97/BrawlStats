@@ -143,6 +143,12 @@ object Season {
         return stats(j)
     }
 
+    /** The season before this one, however long ago it ended (1.42: "this season vs last"). */
+    fun previous(context: Context, tag: String): Stats? {
+        val j = prefs(context).getString(KEY_LAST, null)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return null
+        return if (j.optString("tag") == tag) stats(j) else null
+    }
+
     /** What the Wrapped button shares: the finished season while the new one is barely started. */
     fun forCard(context: Context, tag: String): Stats? {
         val now = current(context, tag)

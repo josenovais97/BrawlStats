@@ -44,6 +44,13 @@ object Share {
         card(activity, wrappedUrl(activity, tag), "season-wrapped", onBusy)
     }
 
+    /** This season against the last one (1.42, Versus). */
+    fun versus(activity: Activity, onBusy: (Boolean) -> Unit = {}) {
+        val tag = Account.tag(activity).ifEmpty { return }
+        val data = Versus.last(activity) ?: return
+        card(activity, Versus.cardUrl(activity, tag, data), "season-vs", onBusy)
+    }
+
     /** Both cards for the current tag, drawn ahead of a tap. Off the main thread. */
     fun prefetch(context: Context) {
         val tag = Account.tag(context)

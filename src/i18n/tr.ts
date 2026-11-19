@@ -5281,4 +5281,6 @@ export const TR: Record<string, string> = {
     "Geçen sezonla aynı seviyede",
   "Reach {rank} to beat last season":
     "Geçen sezonu geçmek için {rank} seviyesine ulaş",
+  "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
+    "Bir arkadaş daveti paylaşırsan brawlzone.net oyuncu etiketini davet koduyla birlikte, daveti uygulamada açan her oyuncunun etiketini de saklar; böylece birbirinizin arkadaş listesine eklenirsiniz. İki oyuncu hakkında başka hiçbir şey saklanmaz.",
 };

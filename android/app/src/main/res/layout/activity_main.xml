@@ -592,6 +592,65 @@
         </LinearLayout>
 
         <!--
+          This season against the last one (1.42, Versus.kt): peak rank, games,
+          win rate and best brawler side by side, and what it takes to beat
+          last season. Columns are added in code (versus_side.xml).
+        -->
+        <TextView
+            android:id="@+id/versus_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:letterSpacing="0.12"
+            android:text="@string/versus_caption"
+            android:textColor="@color/muted"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/versus_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_surface"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/versus_columns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:id="@+id/versus_verdict"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:textColor="@color/brand"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/versus_share"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_outline"
+                android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="15dp"
+                android:text="@string/versus_share"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!--
           Friends and rivals (1.40): up to five tags, a ladder by elo with each
           one's week, and a notification when one of them ranks up. Rows are
           added in code; long-press one to remove it.
@@ -626,6 +685,21 @@
                 android:text="@string/friends_body"
                 android:textColor="@color/muted"
                 android:textSize="13sp" />
+
+            <!-- 1.42: the weekly duel, most Ranked wins from Monday to Sunday. -->
+            <TextView
+                android:id="@+id/friends_duel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/chip"
+                android:paddingStart="12dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/foreground"
+                android:textSize="13sp"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/friends_rows"
@@ -688,6 +762,21 @@
                 android:layout_marginTop="6dp"
                 android:orientation="vertical"
                 android:visibility="gone" />
+
+            <!-- 1.42: a link that puts both players on each other's ladder. -->
+            <TextView
+                android:id="@+id/friends_invite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_gold"
+                android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="15dp"
+                android:text="@string/invite_button"
+                android:textColor="@color/brand_ink"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/friends_add"
@@ -1598,6 +1687,32 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal" />
+
+            <!-- 1.42: the bubble's colours (and the panel's accent); swatches added in code. -->
+            <TextView
+                android:id="@+id/look_theme_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/look_theme"
+                android:textColor="@color/foreground"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/look_theme"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
+            </HorizontalScrollView>
 
             <TextView
                 android:layout_width="wrap_content"

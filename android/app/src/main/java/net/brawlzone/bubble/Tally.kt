@@ -61,9 +61,9 @@ object Tally {
         return fresh
     }
 
-    /** Wins and losses in the last seven days. */
+    /** Wins and losses this week, Monday to now (1.42: the weekly duel's week; was the last seven days). */
     fun week(context: Context, tag: String): Pair<Int, Int> {
-        val since = System.currentTimeMillis() - 7 * DAY_MS
+        val since = Duel.weekStart().toInstant().toEpochMilli()
         val list = battles(context, tag).filter { it.at >= since }
         val wins = list.count { it.win }
         return wins to list.size - wins

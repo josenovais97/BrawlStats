@@ -240,6 +240,8 @@ export default function PrivacyPage() {
               {/* What the 1.40 app sends on its own (2026-11-09): the hourly check, the post-game check, friends, name search, share cards. */}
               <p>{t("With a tag set, the app asks brawlzone.net for that player's public Ranked standing about once an hour, and for the newest Ranked game every two minutes while the bubble is on screen. The widgets, the daily goal, the post-game review and the notifications are made from those answers; the notifications are created on your phone, with no push service.")}</p>
               <p>{t("Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.")}</p>
+              {/* 1.42 friend invites: the only friends data the server keeps. */}
+              <p>{t("If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.")}</p>
               <p>{t('Its panel is a web view of')}{' '}
                 <Link
                   href={lp('/bubble/panel')}

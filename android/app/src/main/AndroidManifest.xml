@@ -59,6 +59,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--
+              Friend invites (1.42): brawlzone.net/bubble/invite opens
+              brawlzonebubble://invite/CODE when the app is installed (Invite).
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="brawlzonebubble" android:host="invite" />
+            </intent-filter>
         </activity>
 
         <!--
