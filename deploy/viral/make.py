@@ -70,7 +70,8 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
-          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2}}
+          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
+          'bubblepromo': {'pace': 2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -2150,6 +2151,42 @@ def rr_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ bubblepromo
+# The Bubble app's features since launch (2026-11-19, owner: "the bubble app
+# has a lot of new features that we never covered... do everything from
+# footage to editing"): one-off, Remotion only (src/BubblePromo.tsx). The
+# panel is the site's own page, captured headless as the Play app opens it
+# into $ASSETS/bubble-promo (p-draft, p-counters...; the owner's name painted
+# over as "YOU"); the native parts (bubble, review, menu, widgets, alerts,
+# break card) are drawn from the app's own layouts and strings.
+if KIND == 'bubblepromo':
+    BP = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
+    if not all(os.path.exists(f'{BP}/{f}') for f in ('p-draft.png', 'p-counters.png', 'map-15000026.png')):
+        print('no panel captures in', BP); sys.exit(5)
+    _top = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
+    BP_ME = by_id.get(16000000) or _top[8]  # Shelly: the brawler everyone has
+    BP_TOP = [b for b in _top if b['id'] != BP_ME['id']]
+    for n, k in ((5, 'bp_hook'), (5, 'bp_draft'), (4, 'bp_counters'), (6, 'bp_review'), (4, 'bp_session'), (4, 'bp_menu'),
+                 (6, 'bp_widgets'), (5, 'bp_alerts'), (3, 'bp_take5'), (6, 'bp_outro')):
+        tl.add(n, k)
+    META = {
+        'title': 'This app coaches you INSIDE Brawl Stars 🤯 (free) #Shorts',
+        'titles': {'pt-BR': 'Esse app te treina DENTRO do Brawl Stars 🤯 (grátis) #Shorts',
+                   'es-419': 'Esta app te entrena DENTRO de Brawl Stars 🤯 (gratis) #Shorts',
+                   **more_titles(id='Aplikasi ini melatihmu DI DALAM Brawl Stars 🤯 (gratis) #Shorts',
+                                 de='Diese App coacht dich IN Brawl Stars 🤯 (kostenlos) #Shorts',
+                                 tr="Bu uygulama sana Brawl Stars'ın İÇİNDE koçluk yapıyor 🤯 (ücretsiz) #Shorts",
+                                 pl='Ta aplikacja trenuje cię W ŚRODKU Brawl Stars 🤯 (za darmo) #Shorts')},
+        'description': 'BrawlZone Bubble floats over the game: tap it in the draft for the best picks on your map and who '
+                       'beats their pick, get a review after every Ranked game (your draft vs theirs, the star player, what '
+                       'countered you, the better pick), your session score live on the bubble, a quick menu, home-screen '
+                       'widgets for your rank, trophy maps and next goal, and alerts for balance changes to your brawlers, '
+                       'friends ranking up and free rewards. Free on Google Play: search "BrawlZone Bubble" 👇\n\n'
+                       f'https://play.google.com/store/apps/details?id=net.brawlzone.bubble{FOOTER}\n'
+                       '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone #app',
+    }
+
+
 # ================================================================ roastmains
 # "What your MAIN says about you" (2026-11-17, the Roast My Account launch;
 # owner: "go for it"): five of the most picked Ranked brawlers, each with one
@@ -2255,7 +2292,7 @@ if KIND == 'wrapped':
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
-              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason')
+              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2416,6 +2453,22 @@ def export_plan(out):
         plan.update(nb={'name': NAME, 'plain': R['name'], 'tier': R['tier'], 'rank': R['rank'], 'of': R['of'], 'battles': R['battles'],
                         'tags': [x.upper() for x in (R.get('rarity'), R.get('class')) if x], 'verdict': word, 'vcol': hexc(vcol)},
                     hero=save(HERO, 'c/hero.png'), mystery=save(MYSTERY, 'c/mystery.png'))
+    if KIND == 'bubblepromo':
+        BPA = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
+        RKA = f"{os.environ.get('ASSETS', '.')}/ranked"
+        cp = lambda src, rel: save(Image.open(src).convert('RGBA'), rel)
+        T = BP_TOP
+        plan.update(
+            map=cp(f'{BPA}/map-15000026.png', 'c/map.png'),
+            panels={k: cp(f'{BPA}/p-{k}.png', f'c/p-{k}.png') for k in ('draft', 'counters', 'meta', 'trophies')
+                    if os.path.exists(f'{BPA}/p-{k}.png')},
+            leagues={k: cp(f'{RKA}/league-{k}.png', f'c/league-{k}.png') for k in ('diamond', 'mythic')
+                     if os.path.exists(f'{RKA}/league-{k}.png')},
+            trophy=cp(f'{RKA}/trophy.png', 'c/trophy.png') if os.path.exists(f'{RKA}/trophy.png') else None,
+            me=bz(BP_ME, full=True),
+            blue=[bz(b, full=True) for b in (BP_ME, T[1], T[2])], red=[bz(b, full=True) for b in (T[0], T[3], T[4])],
+            counter=bz(T[0]), better=bz(T[1]), top5=[bz(b) for b in T[:5]], push=[bz(T[5]), bz(T[6])],
+        )
     if KIND == 'wrapped':
         # The story without its empty foot, and the player's name and tag
         # painted over with the background beside them, under the video's tape.
@@ -2467,7 +2520,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None}[KIND]
+         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None}[KIND]
 
 
 def frame(t):

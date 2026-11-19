@@ -104,8 +104,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains or newseason)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason or bubblepromo)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -120,7 +120,7 @@ elif [ "$kind" = daily ]; then
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
      || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
      || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ] || [ "$kind" = wrapped ] || [ "$kind" = roastmains ] \
-     || [ "$kind" = newseason ]; then
+     || [ "$kind" = newseason ] || [ "$kind" = bubblepromo ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -135,7 +135,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason', 'bubblepromo')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -393,7 +393,7 @@ fi  # not newbrawler or daily
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1
