@@ -2156,12 +2156,14 @@ def rr_scene(s, t, bt, lt):
 # has a lot of new features that we never covered... do everything from
 # footage to editing"): one-off, Remotion only (src/BubblePromo.tsx). The
 # panel is the site's own page, captured headless as the Play app opens it
-# into $ASSETS/bubble-promo (p-draft, p-counters...; the owner's name painted
-# over as "YOU"); the native parts (bubble, review, menu, widgets, alerts,
-# break card) are drawn from the app's own layouts and strings.
+# into $ASSETS/bubble-promo/v3 (every state the video taps through, JPEG at
+# 2.5x; the owner's name painted over as "YOU", club mates' names replaced;
+# the settings demo on a made-up mid account); the native parts (bubble,
+# settings, My season, friends, widgets, alerts, break card) are drawn from
+# the app's own layouts and strings.
 if KIND == 'bubblepromo':
     BP = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
-    if not all(os.path.exists(f'{BP}/{f}') for f in ('p-draft.png', 'p-counters.png', 'map-15000026.png')):
+    if not all(os.path.exists(f'{BP}/{f}') for f in ('v3/meta.jpg', 'v3/review.jpg', 'nunito.woff2', 'map-15000026.png')):
         print('no panel captures in', BP); sys.exit(5)
     _top = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
     BP_ME = by_id.get(16000000) or _top[8]  # Shelly: the brawler everyone has
@@ -2184,10 +2186,14 @@ if KIND == 'bubblepromo':
         with wave.open(path) as w:
             return path, w.getnframes() / w.getframerate()
 
-    def chunks(caption, dur):
-        """Caption words in chunks of up to three, timed by length across the line."""
+    def chunks(caption, dur, lead=''):
+        """Caption words in chunks of up to three, timed by length across the line.
+        `lead` is spoken first and not captioned (the feature's number, which
+        the video shows as its own big number): a chunk with no words."""
         words, hi = [], False
-        for raw in caption.replace('MR. P', 'MR.\u00a0P').split(' '):  # a name is one word (split(), not: it splits on NBSP)
+        for pair in ('MR. P', 'POWER 11', '21 LANGUAGES', 'TAKE 5'):  # one word each, never split across captions
+            caption = caption.replace(pair, pair.replace(' ', '\u00a0'))
+        for raw in caption.split(' '):  # split(' '), not split(): that splits on NBSP
             hi = hi or raw.startswith('*')
             words.append((raw.replace('*', ''), hi))
             if raw.rstrip('?:,.!').endswith('*'): hi = False
@@ -2197,32 +2203,64 @@ if KIND == 'bubblepromo':
             if len(cur) == 3 or w[-1] in '?:,!':  # not '.': "MR. P" stays together
                 out.append(cur); cur = []
         if cur: out.append(cur)
-        total = sum(len(' '.join(w for w, _ in c)) for c in out) or 1
+        size = lambda c: len(' '.join(w for w, _ in c))
+        total = sum(size(c) for c in out) + (len(lead) + 4 if lead else 0) or 1  # the pause after the number
         t, res = VO_LEAD, []
+        if lead:
+            d = dur * (len(lead) + 4) / total
+            res.append({'t0': round(t, 3), 't1': round(t + d, 3), 'words': [], 'num': True}); t += d
         for c in out:
-            d = dur * len(' '.join(w for w, _ in c)) / total
+            d = dur * size(c) / total
             res.append({'t0': round(t, 3), 't1': round(t + d, 3), 'words': [{'w': w, 'hi': h} for w, h in c]})
             t += d
         return res
 
-    SCRIPT = [  # scene, what the voice says, the caption (*highlighted*), minimum beats, hits (beats into the scene)
-        ('bp_hook', 'Losing in Ranked again?', 'LOSING IN *RANKED* AGAIN?', 3, [0, 0.7, 1.4]),
-        ('bp_blind', "You're probably picking blind.", "YOU'RE PICKING *BLIND*", 2, [0.25, 0.55, 0.85]),
-        ('bp_reveal', 'This free app sits right on top of Brawl Stars.', 'THIS *FREE* APP SITS ON TOP OF *BRAWL STARS*', 3, [0.45]),
-        ('bp_draft', 'Tap it in the draft, and it shows the best picks for your map.', 'TAP IT IN THE DRAFT: *BEST PICKS* FOR YOUR MAP', 4, [0.15, 0.4, 2.3]),
-        ('bp_counters', 'They picked Mister P? It tells you exactly who beats him.', 'THEY PICKED MR. P? IT SHOWS *WHO BEATS HIM*', 4, [0.0, 0.9, 2.2]),
-        ('bp_review', 'After every game, it tells you why you won, or lost.', 'AFTER EVERY GAME: *WHY* YOU WON OR LOST', 4, [0.2, 1.0, 1.8, 2.05, 2.3, 3.0]),
-        ('bp_session', 'Your session score lives right on the bubble.', 'YOUR *SESSION SCORE*, LIVE ON THE BUBBLE', 3, [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1]),
-        ('bp_widgets', 'Your rank and next goal, on your home screen.', 'YOUR *RANK* AND *NEXT GOAL* ON YOUR HOME SCREEN', 3, [0.6, 1.0, 1.4, 1.8]),
-        ('bp_alerts', 'And it warns you when your brawlers get nerfed.', 'IT WARNS YOU WHEN YOUR BRAWLERS GET *NERFED*', 3, [0.3, 0.8, 1.3, 1.8]),
-        ('bp_take5', "It even tells you when you're tilted.", "IT EVEN KNOWS WHEN YOU'RE *TILTED*", 3, [0.4]),
-        ('bp_outro', "It's free. Search Brawl Zone Bubble, on Google Play.", "IT'S *FREE*: SEARCH *BRAWLZONE BUBBLE*", 5, [0, 1.2, 2.0, 3.2]),
+    # v3 (owner: "show everything we can do, and also the panel, with
+    # different settings"): every feature, numbered, on the real panel. Each
+    # line: scene, number (0 = none), what the voice says, the caption
+    # (*highlighted*), minimum beats, and cues -- (beats into the scene,
+    # sound) -- which also time the animation (BubblePromo.tsx reads
+    # seg.hits by index, so the order of a scene's cues is its storyboard).
+    NUMS = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve']
+    SCRIPT = [
+        ('bp_hook', 0, "Here's everything this free app does, inside Brawl Stars.", 'EVERYTHING THIS *FREE* APP DOES IN *BRAWL STARS*', 4,
+         [(0, 'impact'), (0.9, 'whoosh'), (1.15, 'pop'), (1.4, 'pop'), (1.65, 'pop'), (1.9, 'pop'), (2.6, 'impact')]),
+        ('bp_float', 1, 'It floats over your game. Tap it, mid draft.', 'IT FLOATS OVER YOUR GAME: *TAP IT* MID-DRAFT', 4,
+         [(0.5, 'whoosh'), (1.7, 'tap'), (1.9, 'whoosh'), (3.0, 'pop')]),
+        ('bp_meta', 2, 'The best picks for every map, from real Ranked games.', 'THE *BEST PICKS* FOR EVERY MAP, FROM REAL *RANKED* GAMES', 4,
+         [(0.5, 'tap'), (1.3, 'tap'), (2.2, 'pop')]),
+        ('bp_bans', 3, 'Who to ban on that map.', 'WHO TO *BAN* ON THAT MAP', 3,
+         [(0.6, 'tap'), (1.4, 'pop')]),
+        ('bp_draft', 4, 'A live draft board. Add their picks, and it updates.', 'A LIVE *DRAFT BOARD*: ADD THEIR PICKS, IT *UPDATES*', 4,
+         [(0.4, 'tap'), (1.0, 'tap'), (1.6, 'tap'), (2.3, 'pop'), (3.0, 'tap')]),
+        ('bp_counters', 5, 'They picked Mister P? It shows who beats him.', 'THEY PICKED MR. P? IT SHOWS *WHO BEATS HIM*', 4,
+         [(0.5, 'tap'), (1.2, 'tap'), (2.0, 'pop')]),
+        ('bp_comps', 6, 'The best trios, and the build for any brawler.', 'THE BEST *TRIOS*, AND THE *BUILD* FOR ANY BRAWLER', 4,
+         [(0.4, 'tap'), (1.0, 'pop'), (1.9, 'tap'), (2.3, 'tap'), (3.0, 'pop')]),
+        ('bp_yours', 7, 'Add your tag, and it marks what you own. Or only Power eleven.', 'ADD YOUR TAG: IT MARKS *WHAT YOU OWN*, OR ONLY *POWER 11*', 5,
+         [(0.3, 'whoosh'), (1.3, 'tap'), (2.3, 'tap'), (3.3, 'tap')]),
+        ('bp_trophies', 8, 'Pushing trophies? Your best brawler for every live map.', 'PUSHING TROPHIES? YOUR *BEST BRAWLER* FOR EVERY LIVE MAP', 4,
+         [(0.4, 'tap'), (1.3, 'pop'), (2.2, 'whoosh')]),
+        ('bp_review', 9, 'After every game, it tells you why you won, or lost.', 'AFTER EVERY GAME: *WHY* YOU WON OR LOST', 4,
+         [(0.4, 'chime'), (1.2, 'tap'), (1.9, 'pop'), (2.7, 'pop')]),
+        ('bp_season', 10, 'Your rank, a daily goal, and your friends.', 'YOUR *RANK*, A *DAILY GOAL*, AND YOUR *FRIENDS*', 4,
+         [(0.3, 'whoosh'), (0.9, 'pop'), (1.5, 'pop'), (2.2, 'whoosh'), (3.0, 'ding')]),
+        ('bp_home', 11, 'Widgets, free reward alerts, and nerf warnings.', '*WIDGETS*, FREE REWARD ALERTS AND *NERF* WARNINGS', 4,
+         [(0.35, 'pop'), (0.6, 'pop'), (0.85, 'pop'), (1.1, 'pop'), (1.9, 'ding'), (2.4, 'ding'), (2.9, 'ding')]),
+        ('bp_style', 12, 'Make it yours. Any size, in twenty one languages.', 'MAKE IT YOURS: ANY SIZE, IN *21 LANGUAGES*', 5,
+         [(0.5, 'tap'), (1.0, 'tap'), (1.5, 'tap'), (2.3, 'whoosh')] + [(2.5 + 0.22 * i, 'tap') for i in range(10)]),
+        ('bp_take5', 0, "And if you're tilted, it tells you to take five.", "AND IF YOU'RE *TILTED*, IT TELLS YOU TO *TAKE 5*", 3,
+         [(0.5, 'buzz')]),
+        ('bp_outro', 0, "All free. Search Brawl Zone Bubble, on Google Play.", "ALL *FREE*: SEARCH *BRAWLZONE BUBBLE*", 4,
+         [(0, 'impact'), (1.2, 'pop'), (2.0, 'tap'), (3.2, 'pop')]),
     ]
     BP_VO = []
-    for kind, said, caption, least, hits in SCRIPT:
-        path, dur = voice(said)
+    for kind, num, said, caption, least, cues in SCRIPT:
+        lead = f'{NUMS[num]}.' if num else ''
+        path, dur = voice(f'{lead} {said}'.strip())
         beats = max(least, math.ceil((VO_LEAD + dur + 0.3) / tl.step))
-        tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, dur)}, hits=hits)
+        tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, dur, lead)},
+               hits=[h for h, _ in cues], sounds=[n for _, n in cues], num=num)
     META = {
         'title': 'This app coaches you INSIDE Brawl Stars 🤯 (free) #Shorts',
         'titles': {'pt-BR': 'Esse app te treina DENTRO do Brawl Stars 🤯 (grátis) #Shorts',
@@ -2231,11 +2269,12 @@ if KIND == 'bubblepromo':
                                  de='Diese App coacht dich IN Brawl Stars 🤯 (kostenlos) #Shorts',
                                  tr="Bu uygulama sana Brawl Stars'ın İÇİNDE koçluk yapıyor 🤯 (ücretsiz) #Shorts",
                                  pl='Ta aplikacja trenuje cię W ŚRODKU Brawl Stars 🤯 (za darmo) #Shorts')},
-        'description': 'BrawlZone Bubble floats over the game: tap it in the draft for the best picks on your map and who '
-                       'beats their pick, get a review after every Ranked game (your draft vs theirs, the star player, what '
-                       'countered you, the better pick), your session score live on the bubble, a quick menu, home-screen '
-                       'widgets for your rank, trophy maps and next goal, and alerts for balance changes to your brawlers, '
-                       'friends ranking up and free rewards. Free on Google Play: search "BrawlZone Bubble" 👇\n\n'
+        'description': 'Everything BrawlZone Bubble does, free: it floats over Brawl Stars, and one tap in the draft shows '
+                       'the best picks for every map, who to ban, a live draft board, who beats their pick, the best trios and '
+                       'the build for any brawler. Add your tag and it marks what you own (or only Power 11), finds your best '
+                       'brawler for every trophy map, reviews every Ranked game, tracks your rank, daily goal and friends, puts '
+                       'widgets on your home screen, warns you about free rewards and nerfs, and speaks 21 languages. '
+                       'Search "BrawlZone Bubble" on Google Play 👇\n\n'
                        f'https://play.google.com/store/apps/details?id=net.brawlzone.bubble{FOOTER}\n'
                        '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone #app',
     }
@@ -2463,7 +2502,7 @@ def export_plan(out):
             o['faces'] = [save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
                           for b in list(NEWEST) + [b for b, _ in BUFFIES]]
         elif KIND == 'bubblepromo':
-            o.update(vo={kk: v for kk, v in s['vo'].items() if kk != 'path'}, hits=s.get('hits', []))
+            o.update(vo={kk: v for kk, v in s['vo'].items() if kk != 'path'}, hits=s.get('hits', []), num=s.get('num', 0))
         elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
             o.update({kk: conv(v) for kk, v in s.items() if kk not in ('kind', 'start', 'len')})
         segs.append(o)
@@ -2520,28 +2559,33 @@ def export_plan(out):
             with wave.open(sg['vo']['path']) as w:
                 pcm = np.frombuffer(w.readframes(w.getnframes()), dtype='<i2')
             i = int((t0 + VO_LEAD) * 22050); vo[i:i + len(pcm)] = pcm[:max(0, len(vo) - i)]
-            if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.7))
-            per = {'bp_hook': ['buzz', 'buzz', 'buzz'], 'bp_blind': ['pop', 'pop', 'pop'], 'bp_reveal': ['impact'],
-                   'bp_draft': ['tap', 'whoosh', 'pop'], 'bp_counters': ['whoosh', 'tap', 'pop'],
-                   'bp_review': ['chime', 'whoosh', 'pop', 'pop', 'pop', 'pop'], 'bp_session': ['tap'] * 6 + ['chime'],
-                   'bp_widgets': ['pop'] * 4, 'bp_alerts': ['ding'] * 4, 'bp_take5': ['buzz'], 'bp_outro': ['impact', 'pop', 'tap', 'pop']}[sg['kind']]
-            for h, name in zip(sg['hits'], per):
-                cues.append((t0 + h * tl.step, name, 0.6 if name in ('tap', 'whoosh') else 0.85))
-            if sg['kind'] == 'bp_reveal': cues.append((max(0, t0 - 1.0), 'riser', 0.7))
+            if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.6))
+            for h, name in zip(sg['hits'], sg['sounds']):
+                cues.append((t0 + h * tl.step, name, 0.55 if name in ('tap', 'whoosh') else 0.85))
+            if sg['kind'] == 'bp_outro': cues.append((max(0, t0 - 1.0), 'riser', 0.7))
         with wave.open(f'{out}/voice.wav', 'wb') as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050); w.writeframes(vo[:int(tl.dur * 22050)].tobytes())
         sfx.track(cues, tl.dur, f'{out}/sfx.wav')
         BPA = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
+        # The panel as the app shows it, captured headless (v3/: every state
+        # the video taps through, JPEG at 2.5x), copied as they are.
+        import shutil
+        os.makedirs(f'{A}/c/s', exist_ok=True); os.makedirs(f'{A}/fonts', exist_ok=True)
+        BP_SHOTS = {}
+        for f in sorted(os.listdir(f'{BPA}/v3')):
+            if f.endswith('.jpg'):
+                shutil.copy(f'{BPA}/v3/{f}', f'{A}/c/s/{f}'); BP_SHOTS[f[:-4]] = f'c/s/{f}'
+        shutil.copy(f'{BPA}/nunito.woff2', f'{A}/fonts/nunito.woff2')
         RKA = f"{os.environ.get('ASSETS', '.')}/ranked"
         cp = lambda src, rel: save(Image.open(src).convert('RGBA'), rel)
         T = BP_TOP
         plan.update(
             map=cp(f'{BPA}/map-15000026.png', 'c/map.png'),
-            panels={k: cp(f'{BPA}/p-{k}.png', f'c/p-{k}.png') for k in ('draft', 'counters', 'meta', 'trophies')
-                    if os.path.exists(f'{BPA}/p-{k}.png')},
-            leagues={k: cp(f'{RKA}/league-{k}.png', f'c/league-{k}.png') for k in ('diamond', 'mythic')
+            shots=BP_SHOTS,
+            leagues={k: cp(f'{RKA}/league-{k}.png', f'c/league-{k}.png') for k in ('gold', 'diamond', 'mythic', 'legendary', 'masters')
                      if os.path.exists(f'{RKA}/league-{k}.png')},
             trophy=cp(f'{RKA}/trophy.png', 'c/trophy.png') if os.path.exists(f'{RKA}/trophy.png') else None,
+            power11=cp(f'{RKA}/power-11.png', 'c/power-11.png') if os.path.exists(f'{RKA}/power-11.png') else None,
             me=bz(BP_ME, full=True),
             blue=[bz(b, full=True) for b in (BP_ME, T[1], T[2])], red=[bz(b, full=True) for b in (T[0], T[3], T[4])],
             counter=bz(T[0]), better=bz(T[1]), top5=[bz(b) for b in T[:5]], push=[bz(T[5]), bz(T[6])],
