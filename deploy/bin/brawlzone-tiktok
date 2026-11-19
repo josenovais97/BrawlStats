@@ -561,8 +561,16 @@ if [ "$FORMAT" = "video" ] && [ "$MODE" = viral ] && [ "${TIKTOK:-1}" = 0 ]; the
   FORMAT="none"
 elif [ "$FORMAT" = "video" ]; then
   VIDEO_WORK=$(mktemp -d)
+  VIDEO_ERR=""
   if post_video "$VIDEO_WORK"; then
     :
+  elif [ "${VIDEO_ERR#TikTok has 5 uploads}" = "$VIDEO_ERR" ] \
+       && echo "::warning::TikTok upload failed (${VIDEO_ERR:-unknown}); trying once more in three minutes" \
+       && sleep 180 && rm -rf "$VIDEO_WORK" && VIDEO_WORK=$(mktemp -d) && VIDEO_ERR="" && post_video "$VIDEO_WORK"; then
+    # One retry (2026-11-19): the 15:30 Short of 2026-11-18 lost TikTok to a
+    # one-off HTTP 500 on the upload. Not when the inbox is full: that waits
+    # for a person, not for TikTok.
+    echo "TikTok upload worked on the second try"
   elif [ "$MODE" = viral ]; then
     # No carousel: the viral manifest lists only the cover, and a one-image
     # post of it would be worse than none. YouTube and Instagram still go.
@@ -851,8 +859,22 @@ if [ "${INSTAGRAM:-1}" = "1" ] && [ -r "$HOME/.brawlzone-instagram.json" ]; then
   IG_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   VIDEO_ERR=""
   # The script's last line is the outcome; a token-refresh warning may precede it.
+  ig_ok=0
   if make_video "$IG_WORK" "$IG_MUSIC" \
      && INSTAGRAM_RESULT=$(/usr/local/bin/brawlzone-instagram "${IG_WORK}/out.mp4" "${IG_WORK}/caption.txt" 2>&1 | tail -n 1); then
+    ig_ok=1
+  elif [ -z "$VIDEO_ERR" ]; then
+    # One retry (2026-11-19: the 14:00 Reel of 2026-11-18 came back "status
+    # ERROR" from Meta's processing), only for failures before the publish
+    # call, so a retry can never post the same Reel twice.
+    case "$INSTAGRAM_RESULT" in
+      *"did not finish processing"*|*"refused the container"*|*"does not serve the video"*)
+        echo "::warning::Instagram Reel failed (${INSTAGRAM_RESULT}); trying once more in three minutes"
+        sleep 180
+        INSTAGRAM_RESULT=$(/usr/local/bin/brawlzone-instagram "${IG_WORK}/out.mp4" "${IG_WORK}/caption.txt" 2>&1 | tail -n 1) && ig_ok=1 ;;
+    esac
+  fi
+  if [ "$ig_ok" = 1 ]; then
     echo "$INSTAGRAM_RESULT"
   else
     INSTAGRAM_RESULT="failed: ${VIDEO_ERR:-$INSTAGRAM_RESULT}"
