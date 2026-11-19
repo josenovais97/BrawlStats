@@ -15,7 +15,8 @@ import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/compon
 import { PanelClub } from '@/components/bubble/panel-club';
 import { PanelHistory } from '@/components/bubble/panel-history';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
-import { Check, ChevronDown, X } from 'lucide-react';
+import { Check, ChevronDown, Sparkles, X } from 'lucide-react';
+import { PanelAsk } from '@/components/bubble/panel-ask';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 import { usePanelTheme } from '@/components/bubble/panel-theme';
@@ -127,6 +128,8 @@ export function PanelShell({
    * pulsed after a Ranked game is tapped, and it covers the panel until closed.
    */
   const [review, setReview] = useState<PostGameReview | null>(null);
+  // Ask Bubble (2026-11-19): the question box, over the whole panel like the review.
+  const [askOpen, setAskOpen] = useState(false);
   useEffect(() => {
     const w = window as unknown as { __bzShowReview?: (r: PostGameReview) => void };
     w.__bzShowReview = (r) => {
@@ -184,6 +187,22 @@ export function PanelShell({
     return (
       <div data-panel-overlay>
         <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+      </div>
+    );
+  }
+  if (askOpen) {
+    return (
+      <div data-panel-overlay>
+        <PanelAsk
+          modes={modes}
+          roster={roster}
+          comps={comps}
+          onClose={() => setAskOpen(false)}
+          onCounters={(id) => {
+            setAskOpen(false);
+            reviewCounters(id);
+          }}
+        />
       </div>
     );
   }
@@ -439,6 +458,19 @@ export function PanelShell({
             {label}
           </button>
         ))}
+        {/* Ask Bubble: violet, so it never reads as a selected tab. */}
+        <button
+          type="button"
+          onClick={() => {
+            setAskOpen(true);
+            panelTrack('panel_ask_open', { from: 'tabs' });
+          }}
+          aria-label={t('ask.title')}
+          title={t('ask.title')}
+          className="grid w-9 shrink-0 place-items-center rounded-[10px] border-2 border-[#050a1f] bg-gradient-to-b from-[#c9a8ff] to-[#7a4cff] text-white shadow-[inset_0_2px_0_rgb(255_255_255/0.45),0_3px_0_#050a1f]"
+        >
+          <Sparkles className="size-4" aria-hidden />
+        </button>
       </div>
 
       {tab === null ? (
@@ -469,6 +501,20 @@ export function PanelShell({
               </li>
             ))}
           </ul>
+          <button
+            type="button"
+            onClick={() => {
+              setAskOpen(true);
+              panelTrack('panel_ask_open', { from: 'chooser' });
+            }}
+            className="mt-2 flex w-full items-center gap-2 rounded-[10px] border-2 border-[#050a1f] bg-gradient-to-b from-[#9f7bff] to-[#5b34d6] px-3 py-2 text-start text-white"
+          >
+            <Sparkles className="size-4 shrink-0" aria-hidden />
+            <span className="flex flex-col">
+              <span className="display text-[14px] leading-tight">{t('ask.title')}</span>
+              <span className="mt-0.5 font-sans text-[11px] font-normal leading-snug text-white/80 [text-shadow:none]">{t('chooser.ask')}</span>
+            </span>
+          </button>
           {/* The first screen anyone sees, so the language setting is spelled
               out here as well as sitting in the corner as a flag. */}
           <div className="mt-3 border-t border-border pt-2.5">
