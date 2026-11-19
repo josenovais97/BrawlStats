@@ -310,4 +310,5 @@
     <string name="online_alert_text">Hyppää mukaan ja kisaa!</string>
     <string name="online_switch">Kerro, kun kaveri aloittaa Rankedin</string>
     <string name="channel_online">Kaverit pelaamassa</string>
+    <string name="graph_desc">Elo tällä kaudella</string>
 </resources>

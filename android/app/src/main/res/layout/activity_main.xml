@@ -449,6 +449,15 @@
                 android:textColor="@color/foreground"
                 android:textSize="13sp"
                 android:textStyle="bold" />
+
+            <!-- 1.42: elo through the season (EloLog, EloGraph). -->
+            <ImageView
+                android:id="@+id/season_graph"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginTop="10dp"
+                android:contentDescription="@string/graph_desc"
+                android:visibility="gone" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

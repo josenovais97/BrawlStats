@@ -310,4 +310,5 @@
     <string name="online_alert_text">הצטרף ותתחרה בו!</string>
     <string name="online_switch">תודיע לי כשחבר מתחיל לשחק בדירוג</string>
     <string name="channel_online">חברים שמשחקים</string>
+    <string name="graph_desc">Elo בעונה הזו</string>
 </resources>

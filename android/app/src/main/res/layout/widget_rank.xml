@@ -157,6 +157,16 @@
             android:max="100"
             android:progressDrawable="@drawable/widget_progress" />
 
+        <!-- 1.42: the season graph, when the widget is tall enough (Widgets.rank). -->
+        <ImageView
+            android:id="@+id/widget_rank_graph"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="@string/graph_desc"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/widget_rank_next"
             android:layout_width="match_parent"

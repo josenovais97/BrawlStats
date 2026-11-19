@@ -88,6 +88,19 @@ object Versus {
         Data(now, side(j.optJSONObject("last")))
     }.getOrNull()
 
+    /** The site's daily elo readings for this season (1.42, the season graph): (day, elo). */
+    fun series(context: Context, season: Int): List<Pair<String, Int>> {
+        val p = prefs(context)
+        if (p.getString(KEY_TAG, null) != Account.tag(context)) return emptyList()
+        val now = p.getString(KEY, null)?.let { runCatching { JSONObject(it).optJSONObject("now") }.getOrNull() } ?: return emptyList()
+        if (now.optInt("number") != season) return emptyList()
+        val a = now.optJSONArray("series") ?: return emptyList()
+        return (0 until a.length()).mapNotNull { i ->
+            val row = a.optJSONArray(i) ?: return@mapNotNull null
+            row.optString(0).takeIf { it.isNotEmpty() }?.let { it to row.optInt(1) }
+        }
+    }
+
     /** Whether there is anything to compare: a last season with games or a rank. */
     fun worthShowing(d: Data?): Boolean = d?.last != null && (d.last.games > 0 || d.last.peak >= 0)
 

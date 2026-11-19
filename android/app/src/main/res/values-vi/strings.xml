@@ -310,4 +310,5 @@
     <string name="online_alert_text">Vào chơi cùng và đua hạng nào!</string>
     <string name="online_switch">Báo khi bạn bè bắt đầu chơi Xếp hạng</string>
     <string name="channel_online">Bạn bè đang chơi</string>
+    <string name="graph_desc">Elo mùa này</string>
 </resources>

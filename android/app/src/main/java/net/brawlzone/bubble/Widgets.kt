@@ -244,6 +244,22 @@ object Widgets {
         v.setTextViewText(R.id.widget_rank_elo, eloText)
         cached(context, me.rankIcon)?.let { v.setImageViewBitmap(R.id.widget_rank_badge, it) }
         v.setProgressBar(R.id.widget_rank_bar, 100, ((me.share ?: 1.0) * 100).toInt().coerceIn(0, 100), false)
+        // 1.42: the season graph, when the widget has the height for it.
+        val options = AppWidgetManager.getInstance(context).getAppWidgetOptions(id)
+        val tallDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
+        val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
+        val points = EloLog.points(context, me.tag, Alerts.last(context)?.season?.number)
+        val window = EloGraph.window(context, me.tag)
+        val density = context.resources.displayMetrics.density
+        val graph = if (tallDp >= 170 && widthDp > 60 && window != null) {
+            EloGraph.bitmap(context, ((widthDp - 26) * density).toInt(), (44 * density).toInt(), points, window.first, window.second)
+        } else null
+        if (graph != null) {
+            v.setImageViewBitmap(R.id.widget_rank_graph, graph)
+            v.setViewVisibility(R.id.widget_rank_graph, View.VISIBLE)
+        } else {
+            v.setViewVisibility(R.id.widget_rank_graph, View.GONE)
+        }
         val next = when {
             me.next == null -> local.getString(R.string.widget_rank_top)
             me.winsToNext != null && me.winsToNext >= 2 -> local.getString(R.string.widget_rank_wins, me.winsToNext, me.next)

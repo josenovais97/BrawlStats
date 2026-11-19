@@ -450,6 +450,18 @@ class MainActivity : AppCompatActivity() {
         card.visibility = View.VISIBLE
         // Both share cards drawn ahead of a tap, so Share usually opens at once.
         Share.prefetch(this)
+        // 1.42: elo through the season, drawn once the card has its width.
+        val graph = findViewById<ImageView>(R.id.season_graph)
+        val points = EloLog.points(this, me.tag, Alerts.last(this)?.season?.number)
+        val window = EloGraph.window(this, me.tag)
+        if (points.size >= 2 && window != null) {
+            graph.visibility = View.VISIBLE
+            graph.post {
+                EloGraph.bitmap(this, graph.width, graph.height, points, window.first, window.second)?.let { graph.setImageBitmap(it) }
+            }
+        } else {
+            graph.visibility = View.GONE
+        }
         val fmt = java.text.NumberFormat.getIntegerInstance()
         findViewById<TextView>(R.id.season_rank).text = me.rank
         findViewById<TextView>(R.id.season_elo).text = me.elo?.let { getString(R.string.widget_elo, fmt.format(it)) } ?: ""

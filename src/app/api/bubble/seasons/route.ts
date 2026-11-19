@@ -9,7 +9,7 @@ import { RANK_ELO_FLOORS, rankProgress } from '@/lib/ranked-elo';
 import { getSeasonPair, type SeasonWindow } from '@/lib/ranked-seasons';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
-import { getPlayerPeakElo, getPlayerSeasonStats } from '@/lib/stats';
+import { getPlayerEloSeries, getPlayerPeakElo, getPlayerSeasonStats } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
 
 /**
@@ -86,8 +86,13 @@ export async function GET(request: NextRequest) {
 
   // The game's own "highest this season" (reset with the season) belongs to the running one.
   const high = Math.max(player?.highestSeasonRankedElo ?? -1, player?.rankedElo ?? -1);
-  const [now, last] = await Promise.all([side(pair.now, high >= 0 ? high : null, ''), side(pair.last, null, 'l')]);
-  return okResponse({ tag, now, last }, 900);
+  const [now, last, series] = await Promise.all([
+    side(pair.now, high >= 0 ? high : null, ''),
+    side(pair.last, null, 'l'),
+    hidden ? Promise.resolve([]) : getPlayerEloSeries(tag, pair.now.from, pair.now.to),
+  ]);
+  // The season graph (1.42): daily readings, the app adds its own hourly ones.
+  return okResponse({ tag, now: now ? { ...now, series: series.map((r) => [r.day, r.elo]) } : null, last }, 900);
 }
 
 function absolute(url: string | null): string | null {

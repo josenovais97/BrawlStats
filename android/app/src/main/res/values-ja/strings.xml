@@ -310,4 +310,5 @@
     <string name="online_alert_text">参加して勝負しよう！</string>
     <string name="online_switch">フレンドがガチバトルを始めたら通知する</string>
     <string name="channel_online">プレイ中のフレンド</string>
+    <string name="graph_desc">今シーズンのElo</string>
 </resources>

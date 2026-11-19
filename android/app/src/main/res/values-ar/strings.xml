@@ -310,4 +310,5 @@
     <string name="online_alert_text">انضم وتنافس معه!</string>
     <string name="online_switch">أخبرني عندما يبدأ صديق المباريات المصنّفة</string>
     <string name="channel_online">أصدقاء يلعبون</string>
+    <string name="graph_desc">نقاط Elo هذا الموسم</string>
 </resources>

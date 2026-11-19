@@ -104,6 +104,7 @@ class AlertJob : JobService() {
                 val fresh = Tally.merge(context, me.tag, me.list)
                 Goal.record(context, me.tag, fresh, firstLook, post)
                 Season.update(context, me, alerts, fresh, post)
+                EloLog.record(context, me.tag, season, me.elo)
             }
             Friends.refresh(context, me, season, post)
             // 1.42: invites both ways, Monday's duel verdict, this season vs last.

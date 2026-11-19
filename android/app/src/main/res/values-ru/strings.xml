@@ -310,4 +310,5 @@
     <string name="online_alert_text">Заходи и соревнуйся с ним!</string>
     <string name="online_switch">Сообщать, когда друг начинает Рейтинговые бои</string>
     <string name="channel_online">Друзья в игре</string>
+    <string name="graph_desc">Эло в этом сезоне</string>
 </resources>

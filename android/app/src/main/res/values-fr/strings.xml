@@ -310,4 +310,5 @@
     <string name="online_alert_text">Lance-toi et affronte-le !</string>
     <string name="online_switch">Me prévenir quand un ami lance le Classé</string>
     <string name="channel_online">Amis en jeu</string>
+    <string name="graph_desc">Elo cette saison</string>
 </resources>

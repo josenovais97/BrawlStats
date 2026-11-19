@@ -310,4 +310,5 @@
     <string name="online_alert_text">Entra e sfidalo!</string>
     <string name="online_switch">Avvisami quando un amico inizia la Classificata</string>
     <string name="channel_online">Amici in gioco</string>
+    <string name="graph_desc">Elo in questa stagione</string>
 </resources>

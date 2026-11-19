@@ -36,6 +36,11 @@ abstract class BubbleWidget(private val kind: Widgets.Kind) : AppWidgetProvider(
         super.onReceive(context, intent)
     }
 
+    /** Resized (1.42): the My rank widget shows the season graph once it is tall enough. */
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: android.os.Bundle) {
+        Widgets.draw(context, manager, id, kind, Alerts.last(context), Me.last(context))
+    }
+
     override fun onDeleted(context: Context, ids: IntArray) {
         Widgets.forget(context, ids)
     }

@@ -310,4 +310,5 @@
     <string name="online_alert_text">Wskakuj i ścigaj się z nim!</string>
     <string name="online_switch">Daj znać, gdy znajomy zacznie grać w Rankingu</string>
     <string name="channel_online">Znajomi w grze</string>
+    <string name="graph_desc">Elo w tym sezonie</string>
 </resources>

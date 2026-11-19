@@ -310,4 +310,5 @@
     <string name="online_alert_text">Sen de gir ve yarış!</string>
     <string name="online_switch">Bir arkadaşım Dereceli\'ye başlayınca haber ver</string>
     <string name="channel_online">Oynayan arkadaşlar</string>
+    <string name="graph_desc">Bu sezonki elo</string>
 </resources>

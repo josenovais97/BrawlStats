@@ -310,4 +310,5 @@
     <string name="online_alert_text">Ayo ikut dan adu!</string>
     <string name="online_switch">Beri tahu saat teman mulai main Ranked</string>
     <string name="channel_online">Teman sedang main</string>
+    <string name="graph_desc">Elo musim ini</string>
 </resources>

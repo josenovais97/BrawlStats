@@ -317,4 +317,5 @@
     <string name="online_alert_text">Jump in and race them up!</string>
     <string name="online_switch">Tell me when a friend starts Ranked</string>
     <string name="channel_online">Friends playing</string>
+    <string name="graph_desc">Elo this season</string>
 </resources>

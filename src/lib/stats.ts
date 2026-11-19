@@ -5837,6 +5837,26 @@ export async function getPlayerPeakElo(tag: string, from: string, to: string): P
   }
 }
 
+/**
+ * A player's daily Ranked elo readings inside a season window (1.42, the
+ * app's season graph), oldest first. Only players the sampler reads daily.
+ */
+export async function getPlayerEloSeries(tag: string, from: string, to: string): Promise<{ day: string; elo: number }[]> {
+  const prisma = getPrisma();
+  if (!prisma || isOptedOut(tag)) return [];
+  try {
+    const rows = await prisma.$queryRaw<{ day: string; elo: number }[]>`
+      SELECT recorded_on::text AS day, ranked_elo AS elo FROM player_trophy_points
+      WHERE player_tag = ${tag} AND recorded_on >= ${from}::date AND recorded_on < ${to}::date AND ranked_elo IS NOT NULL
+      ORDER BY recorded_on
+    `;
+    return rows.map((r) => ({ day: r.day, elo: Number(r.elo) }));
+  } catch (error) {
+    swallow('getPlayerEloSeries', error);
+    return [];
+  }
+}
+
 /** Days from `from` up to today or the exclusive `to`, whichever is first. */
 function seasonDays(from: string, to: string): string[] {
   const today = new Date().toISOString().slice(0, 10);

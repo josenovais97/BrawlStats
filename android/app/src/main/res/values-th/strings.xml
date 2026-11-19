@@ -310,4 +310,5 @@
     <string name="online_alert_text">เข้าไปแข่งด้วยกันเลย!</string>
     <string name="online_switch">แจ้งเมื่อเพื่อนเริ่มเล่นแรงก์</string>
     <string name="channel_online">เพื่อนที่กำลังเล่น</string>
+    <string name="graph_desc">Elo ซีซันนี้</string>
 </resources>

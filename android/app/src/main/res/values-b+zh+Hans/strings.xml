@@ -310,4 +310,5 @@
     <string name="online_alert_text">快上线一起冲分！</string>
     <string name="online_switch">好友开始排位赛时通知我</string>
     <string name="channel_online">正在游戏的好友</string>
+    <string name="graph_desc">本赛季 Elo</string>
 </resources>
