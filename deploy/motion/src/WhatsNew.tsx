@@ -7,7 +7,7 @@ import {Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Flare, FollowBut
 import {Face, Stamp, pop} from './Formats';
 import {SceneProps, Stage} from './Stage';
 import {TierBadge} from './Tier';
-import {TIER, W, clamp, mix, outBack, Plan} from './theme';
+import {TIER, W, clamp, hookOf, mix, outBack, Plan} from './theme';
 
 const PINK = '#ff3c64', BUFFIE = '#8b6bff', ORANGE = '#ff9a28';
 
@@ -118,8 +118,9 @@ const BuffieOne: React.FC<SceneProps> = ({seg, frame, t, spb}) => {
   );
 };
 
-const Outro: React.FC<SceneProps> = ({seg, frame, t, spb}) => {
+const Outro: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
   const faces: string[] = seg.faces || [];
+  const hook = hookOf(plan, 'EVERY TIER, FROM REAL BATTLES');
   const bounce = Math.abs(Math.sin((frame / spb) * Math.PI)) * 22;
   return (
     <AbsoluteFill>
@@ -139,8 +140,8 @@ const Outro: React.FC<SceneProps> = ({seg, frame, t, spb}) => {
       <Title text="YOUR FAVOURITE?" size={130} gold frame={frame} at={spb * 1.3} y={940 - bounce} glow="#a03000" />
       {frame > spb * 1.9 && <Title text="TELL US IN THE COMMENTS" size={62} frame={frame} at={spb * 1.9} stagger={0.5} y={1075} />}
       <FollowButton frame={frame} at={spb * 2.6} y={1290} />
-      {frame > spb * 3 && <div style={{position: 'absolute', left: W / 2, top: 1440, transform: 'translate(-50%,-50%)'}}><Label text="EVERY TIER, FROM REAL BATTLES" size={50} /></div>}
-      <SearchBar frame={frame} at={spb * 3.2} y={1570} />
+      {frame > spb * 3 && <div style={{position: 'absolute', left: W / 2, top: 1440, transform: 'translate(-50%,-50%)'}}><Label text={hook.lead} size={50} /></div>}
+      <SearchBar frame={frame} at={spb * 3.2} y={1570} text={hook.text} />
       {[0, 1].map((i) => <Star key={i} size={80} color="#fff6b0" style={{position: 'absolute', left: i ? 900 : 90, top: 1180 + 30 * Math.sin(t * 3 + i), transform: `rotate(${t * 70}deg)`}} />)}
     </AbsoluteFill>
   );

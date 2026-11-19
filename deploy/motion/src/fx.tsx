@@ -329,7 +329,7 @@ export const SearchBar: React.FC<{text?: string; frame: number; at?: number; x?:
       <div style={{position: 'relative', width, height, borderRadius: height / 2, background: 'linear-gradient(180deg, #ffffff, #eef1ff)',
         boxShadow: `0 0 0 8px ${INK}, 0 16px 0 8px ${DEEP}`, display: 'flex', alignItems: 'center', paddingLeft: height * 0.16}}>
         <Logo size={height * 0.66} />
-        <span style={{marginLeft: height * 0.2, fontFamily: BODY, fontSize: height * 0.46, color: INK}}>{text.slice(0, n)}</span>
+        <span style={{marginLeft: height * 0.2, fontFamily: BODY, fontSize: Math.min(height * 0.46, (width - height * 1.95) / (text.length * 0.5)), color: INK, whiteSpace: 'nowrap'}}>{text.slice(0, n)}</span>
         {caret && <span style={{width: 7, height: height * 0.5, marginLeft: 4, background: '#2f7bff', borderRadius: 3}} />}
         <div style={{position: 'absolute', right: height * 0.11, top: height * 0.11, width: height * 0.78, height: height * 0.78, borderRadius: '50%',
           background: 'linear-gradient(180deg, #ffe45a, #ff9f1a)', boxShadow: `0 0 0 6px ${INK}, 0 7px 0 6px ${shade('#ff9f1a', 0.55)}`,

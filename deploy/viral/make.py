@@ -2227,6 +2227,17 @@ PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyra
               'daily', 'broken', 'newbrawler', 'whatsnew')
 
 
+# The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
+# a week sent ~10 visits while every ending typed a bare "brawlzone.net").
+# A different hook each day, each with its own page, so Umami shows which one
+# brings people. Formats with a reason of their own keep theirs: the daily's
+# answer, giveaway, drops, newbrawler, roastmains, wrapped.
+HOOKS = [{'lead': 'GET YOUR ACCOUNT ROASTED', 'url': 'brawlzone.net/roast'},
+         {'lead': 'SEE WHAT YOUR ACCOUNT IS WORTH', 'url': 'brawlzone.net/account-value'}]
+HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
+              'modes', 'ranks', 'stop', 'broken', 'whatsnew')
+
+
 def export_plan(out):
     A = f'{out}/public'
     for d in ('b', 'c'):
@@ -2387,6 +2398,13 @@ def export_plan(out):
             if os.path.exists(p):
                 leagues.append(save(Image.open(p).convert('RGBA'), f'c/league-{n}.png'))
         plan.update(season=W_SEASON, ends=W_ENDS, days=W_DAYS, card='c/card.jpg', leagues=leagues)
+    if KIND in HOOK_KINDS:
+        import datetime
+        try:
+            day = datetime.date.fromisoformat(str(data.get('date'))[:10])
+        except ValueError:
+            day = datetime.date.today()
+        plan['hook'] = HOOKS[day.toordinal() % len(HOOKS)]
     json.dump(plan, open(f'{out}/plan.json', 'w'), ensure_ascii=False)
     print(KIND, 'plan', len(segs), 'segments', round(tl.dur, 2), 's')
 

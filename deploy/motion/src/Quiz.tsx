@@ -5,7 +5,7 @@ import React from 'react';
 import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {Art, Backdrop, BrandBug, Burst, Banner, Chip, Confetti, Flare, FollowButton, Halo, HoloCard, Label, Ring, SearchBar, SpeedLines, Star, Title} from './fx';
 import {SceneProps, Stage} from './Stage';
-import {DEEP, INK, LEVEL, TIER, W, clamp, mix, outBack, outCubic, Plan} from './theme';
+import {DEEP, INK, LEVEL, TIER, W, clamp, hookOf, mix, outBack, outCubic, Plan} from './theme';
 
 const VIOLET = '#6a3cff';
 const INTRO: Record<string, [string, string]> = {
@@ -135,7 +135,9 @@ const Round: React.FC<SceneProps> = ({seg, frame, beat, t, spb}) => {
   );
 };
 
-const Outro: React.FC<SceneProps> = ({seg, frame, t, spb}) => (
+const Outro: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
+  const hook = hookOf(plan, "PLAY TODAY'S PUZZLE ON");
+  return (
   <AbsoluteFill>
     <Backdrop color={VIOLET} t={t} rays={0.6} cy={800} />
     <Confetti t={frame / 30} />
@@ -159,12 +161,13 @@ const Outro: React.FC<SceneProps> = ({seg, frame, t, spb}) => (
     <Title text="COMMENT YOUR SCORE" size={86} frame={frame} at={spb * 2.2} stagger={0.6} y={1010} />
     <FollowButton frame={frame} at={spb * 3.2} y={1200} />
     {frame > spb * 3.6 && <div style={{position: 'absolute', left: W / 2, top: 1340, transform: 'translate(-50%, -50%)'}}>
-      <Label text="PLAY TODAY'S PUZZLE ON" size={50} /></div>}
-    <SearchBar frame={frame} at={spb * 3.8} y={1470} />
+      <Label text={hook.lead} size={50} /></div>}
+    <SearchBar frame={frame} at={spb * 3.8} y={1470} text={hook.text} />
     {[0, 1, 2].map((i) => <Star key={i} size={70} color="#ffe45a" style={{position: 'absolute', left: 140 + i * 360, top: 1640 + 20 * Math.sin(t * 3 + i),
       transform: `rotate(${t * 60 + i * 40}deg)`, opacity: clamp((frame - spb * 4) / 10)}} />)}
   </AbsoluteFill>
-);
+  );
+};
 
 export const Quiz: React.FC<{plan: Plan}> = ({plan}) => (
   <Stage plan={plan} scenes={{q_intro: Intro, q: Round, q_outro: Outro}} swipeInto={['q', 'q_outro']} />

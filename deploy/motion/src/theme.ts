@@ -64,3 +64,13 @@ export type Plan = {
   segments: Segment[]; word?: string; bestLine?: string; season?: number; count?: number; wall?: string[];
   [k: string]: any;
 };
+
+/**
+ * The ending's reason to visit (2026-11-19, owner approved: the Shorts got
+ * ~30k views a week and sent ~10 visits, every ending typing a bare
+ * "brawlzone.net"). make.py --plan picks the day's hook; formats with a
+ * reason of their own (the daily's answer, giveaway, drops, a new brawler)
+ * keep theirs. Falls back to the format's own line without one.
+ */
+export const hookOf = (plan: Plan, lead: string, text?: string): {lead: string; text?: string} =>
+  plan.hook ? {lead: plan.hook.lead, text: plan.hook.url} : {lead, text};

@@ -5,7 +5,7 @@ import React from 'react';
 import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {Arrow, Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Flare, FollowButton, Halo, HoloCard, InlineTitle, Label, SearchBar, SpeedLines, Star, Title} from './fx';
 import {SceneProps, Stage} from './Stage';
-import {DEEP, HEAD, INK, TIER, W, clamp, mix, outBack, outCubic, pct, shade, Plan} from './theme';
+import {DEEP, HEAD, INK, TIER, W, clamp, hookOf, mix, outBack, outCubic, pct, shade, Plan} from './theme';
 
 export const ORANGE = '#ff9a28';
 export const pop = (frame: number, at: number, len = 9, s = 2) => outBack((frame - at) / len, s);
@@ -112,8 +112,8 @@ const ModesMode: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
   );
 };
 
-const ModesOutro: React.FC<SceneProps> = ({frame, t, spb}) => (
-  <Ending frame={frame} t={t} spb={spb} big="SAVE THIS" line1="FOR YOUR NEXT GAME" line2="WHO DO YOU MAIN?" lead="BEST PICKS FOR EVERY MAP ON" arrow={false} />
+const ModesOutro: React.FC<SceneProps> = ({plan, frame, t, spb}) => (
+  <Ending frame={frame} t={t} spb={spb} big="SAVE THIS" line1="FOR YOUR NEXT GAME" line2="WHO DO YOU MAIN?" {...hookOf(plan, "BEST PICKS FOR EVERY MAP ON")} arrow={false} />
 );
 
 export const Modes: React.FC<{plan: Plan}> = ({plan}) => (
@@ -207,8 +207,8 @@ const RanksReveal: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
   );
 };
 
-const RanksOutro: React.FC<SceneProps> = ({frame, t, spb}) => (
-  <Ending frame={frame} t={t} spb={spb} big="WHAT RANK" line1="ARE YOU?" line2="TELL US + YOUR MAIN" lead="TIER LIST FOR YOUR RANK ON" arrow={false} />
+const RanksOutro: React.FC<SceneProps> = ({plan, frame, t, spb}) => (
+  <Ending frame={frame} t={t} spb={spb} big="WHAT RANK" line1="ARE YOU?" line2="TELL US + YOUR MAIN" {...hookOf(plan, "TIER LIST FOR YOUR RANK ON")} arrow={false} />
 );
 
 export const Ranks: React.FC<{plan: Plan}> = ({plan}) => (
@@ -285,8 +285,8 @@ const StopSwitch: React.FC<SceneProps> = ({frame, t, spb}) => (
   </AbsoluteFill>
 );
 
-const StopOutro: React.FC<SceneProps> = ({frame, t, spb}) => (
-  <Ending frame={frame} t={t} spb={spb} big="AGREE?" line1="DEFEND YOUR MAIN" line2="IN THE COMMENTS" lead="THE HIDDEN META ON" />
+const StopOutro: React.FC<SceneProps> = ({plan, frame, t, spb}) => (
+  <Ending frame={frame} t={t} spb={spb} big="AGREE?" line1="DEFEND YOUR MAIN" line2="IN THE COMMENTS" {...hookOf(plan, "THE HIDDEN META ON")} />
 );
 
 export const Stop: React.FC<{plan: Plan}> = ({plan}) => (

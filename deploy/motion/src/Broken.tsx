@@ -7,7 +7,7 @@ import {Arrow, Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Flare, Ha
 import {Ending, Stamp, pop} from './Formats';
 import {SceneProps, Stage} from './Stage';
 import {TierChange} from './Tier';
-import {INK, TIER, W, clamp, mix, outBack, outCubic, Plan} from './theme';
+import {INK, TIER, W, clamp, hookOf, mix, outBack, outCubic, Plan} from './theme';
 
 const UP = '#3cdc78', DOWN = '#ff465a', SLATE = '#4a4e78';
 const signed = (d: number) => `${d >= 0 ? '+' : '−'}${Math.abs(d * 100).toFixed(1)}%`;
@@ -123,8 +123,8 @@ const Faller: React.FC<SceneProps> = ({seg, frame, t, spb}) => {
   );
 };
 
-const Outro: React.FC<SceneProps> = ({frame, t, spb}) => (
-  <Ending frame={frame} t={t} spb={spb} big="AGREE?" line1="WHO'S BROKEN NEXT?" line2="TELL US IN THE COMMENTS" lead="LIVE RANKED TIER LIST ON" />
+const Outro: React.FC<SceneProps> = ({plan, frame, t, spb}) => (
+  <Ending frame={frame} t={t} spb={spb} big="AGREE?" line1="WHO'S BROKEN NEXT?" line2="TELL US IN THE COMMENTS" {...hookOf(plan, 'LIVE RANKED TIER LIST ON')} />
 );
 
 export const Broken: React.FC<{plan: Plan}> = ({plan}) => (

@@ -5,7 +5,7 @@ import React from 'react';
 import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {Arrow, Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Crown, FollowButton, Label, SearchBar, Star, Title} from './fx';
 import {SceneProps, Stage} from './Stage';
-import {DEEP, HEAD, INK, TIER, W, mix, outBack, outCubic, pct, shade, Plan} from './theme';
+import {DEEP, HEAD, INK, TIER, W, hookOf, mix, outBack, outCubic, pct, shade, Plan} from './theme';
 
 const ORANGE = '#ff9a28';
 
@@ -198,8 +198,9 @@ const Tease: React.FC<SceneProps> = ({plan, seg, frame, beat, t}) => {
   );
 };
 
-const Outro: React.FC<SceneProps> = ({frame, t, spb}) => {
+const Outro: React.FC<SceneProps> = ({plan, frame, t, spb}) => {
   const bounce = Math.abs(Math.sin((frame / spb) * Math.PI)) * 26;
+  const hook = hookOf(plan, 'FULL TIER LIST ON');
   return (
     <AbsoluteFill>
       <Backdrop color={ORANGE} t={t} rays={0.6} cy={700} />
@@ -208,8 +209,8 @@ const Outro: React.FC<SceneProps> = ({frame, t, spb}) => {
       <Title text="COMMENT BELOW" size={96} frame={frame} at={spb} stagger={0.6} y={960} />
       {frame > spb * 1.3 && <Arrow x={W / 2} y={1120 + Math.abs(Math.sin(t * 6)) * 30} size={150} />}
       <FollowButton frame={frame} at={spb * 2.2} y={1320} />
-      {frame > spb * 2.6 && <div style={{position: 'absolute', left: W / 2, top: 1460, transform: 'translate(-50%,-50%)'}}><Label text="FULL TIER LIST ON" size={52} /></div>}
-      <SearchBar frame={frame} at={spb * 2.8} y={1590} />
+      {frame > spb * 2.6 && <div style={{position: 'absolute', left: W / 2, top: 1460, transform: 'translate(-50%,-50%)'}}><Label text={hook.lead} size={52} /></div>}
+      <SearchBar frame={frame} at={spb * 2.8} y={1590} text={hook.text} />
       {[0, 1].map((i) => <Star key={i} size={80} color="#fff6b0" style={{position: 'absolute', left: i ? 900 : 90, top: 700 + 30 * Math.sin(t * 3 + i), transform: `rotate(${t * 70}deg)`}} />)}
     </AbsoluteFill>
   );
