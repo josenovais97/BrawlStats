@@ -311,4 +311,27 @@
     <string name="online_switch">Сообщать, когда друг начинает Рейтинговые бои</string>
     <string name="channel_online">Друзья в игре</string>
     <string name="graph_desc">Эло в этом сезоне</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Лицо пузыря</string>
+    <string name="look_face_player">Мой значок игрока</string>
+    <string name="look_face_named">Лицо пузыря · %1$s</string>
+    <string name="look_face_title">Выбери лицо пузыря</string>
+    <string name="session_title">Сессия окончена: %1$d–%2$d</string>
+    <string name="session_elo">%1$s эло</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">лучшая серия %1$d</string>
+    <string name="records_caption">ЛИЧНЫЕ РЕКОРДЫ</string>
+    <string name="record_streak">Серия побед</string>
+    <string name="record_day">Лучший день</string>
+    <string name="record_elo">Максимум эло</string>
+    <string name="record_streak_title">🔥 Новый рекорд: %1$d побед подряд!</string>
+    <string name="record_day_title">📅 Новый рекорд: %1$d побед в Рейтинговых за день!</string>
+    <string name="record_elo_title">⭐ Новый рекорд: %1$s эло!</string>
+    <string name="record_text">Твой лучший результат. Так держать!</string>
+    <string name="ask_voice_prompt">Спроси Bubble: кто побеждает Мортиса?</string>
+    <string name="ask_voice_missing">Голосовой ввод недоступен на этом телефоне.</string>
+    <string name="shortcut_ask">Спроси Bubble</string>
+    <string name="widget_ask_name">Спроси Bubble</string>
+    <string name="widget_ask_description">Спрашивай про любого бойца, карту или режим — текстом или голосом</string>
+    <string name="widget_ask_hint">Спроси Bubble…</string>
 </resources>

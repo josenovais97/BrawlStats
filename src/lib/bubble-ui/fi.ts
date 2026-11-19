@@ -217,6 +217,7 @@ const fi: UiStrings = {
   "ask.build": "Buildi",
   "ask.noTag": "Lisää pelaajatunnuksesi sovelluksessa saadaksesi vastauksia omista brawlereistasi.",
   "ask.tier": "Tier {t}",
+  "ask.voice": "Kysy äänellä",
   "chooser.ask": "Kysy mitä vain: counterit, parhaat valinnat, bannit, buildit",
 };
 

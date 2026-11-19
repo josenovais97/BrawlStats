@@ -30,6 +30,8 @@ object BubbleLook {
     const val KEY_TILT = "tilt"
     /** The bubble's colours (1.42), which the panel's accent follows. */
     const val KEY_THEME = "theme"
+    /** A brawler portrait as the bubble's face (1.42, Face): its URL, or unset for the player's icon. */
+    const val KEY_FACE = "face_url"
 
     /**
      * A theme: the ring's gradient (top to bottom) and its outline, and the

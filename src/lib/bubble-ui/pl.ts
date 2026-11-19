@@ -217,6 +217,7 @@ const pl: UiStrings = {
   "ask.build": "Build",
   "ask.noTag": "Dodaj tag gracza w aplikacji, aby dostawać odpowiedzi o swoich zadymiarzach.",
   "ask.tier": "Tier {t}",
+  "ask.voice": "Zapytaj głosem",
   "chooser.ask": "Pytaj o wszystko: kontry, najlepsze wybory, bany, buildy",
 };
 

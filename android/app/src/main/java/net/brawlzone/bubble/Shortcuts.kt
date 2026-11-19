@@ -28,6 +28,9 @@ object Shortcuts {
     const val ACTION_COUNTERS = "net.brawlzone.bubble.COUNTERS"
     /** The panel on its Trophies tab (1.41): the Trophies widget and the prestige heads-up. */
     const val ACTION_TROPHIES = "net.brawlzone.bubble.TROPHIES"
+    /** Ask Bubble (1.42): the panel open on Ask; the _VOICE one asks by voice first (shortcut, widget). */
+    const val ACTION_ASK = "net.brawlzone.bubble.ASK"
+    const val ACTION_ASK_VOICE = "net.brawlzone.bubble.ASK_VOICE"
 
     /** With ACTION_COUNTERS: open that brawler's counters (a widget tap). */
     const val EXTRA_BRAWLER = "brawler"
@@ -46,11 +49,12 @@ object Shortcuts {
         val list = listOf(
             app("bubble", ACTION_PLAY, R.string.shortcut_bubble, R.drawable.shortcut_bubble, 0),
             app("counters", ACTION_COUNTERS, R.string.shortcut_counters, R.drawable.shortcut_counters, 1),
+            app("ask", ACTION_ASK, R.string.shortcut_ask, R.drawable.shortcut_ask, 2),
             ShortcutInfoCompat.Builder(context, "rewards")
                 .setShortLabel(local.getString(R.string.shortcut_rewards))
                 .setIcon(IconCompat.createWithResource(context, R.drawable.shortcut_rewards))
                 .setIntent(Intent(Intent.ACTION_VIEW, Uri.parse("${Http.SITE}/rewards")))
-                .setRank(2)
+                .setRank(3)
                 .build(),
         )
         runCatching { ShortcutManagerCompat.setDynamicShortcuts(context, list) }
@@ -69,6 +73,13 @@ object Shortcuts {
         }
         ACTION_COUNTERS -> startBubble(activity, "counters", intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
         ACTION_TROPHIES -> startBubble(activity, "trophies")
+        ACTION_ASK -> startBubble(activity, "ask")
+        ACTION_ASK_VOICE -> {
+            if (startBubble(activity, null)) {
+                VoiceActivity.start(activity, AppLang.current(activity))
+                true
+            } else false
+        }
         else -> false
     }
 

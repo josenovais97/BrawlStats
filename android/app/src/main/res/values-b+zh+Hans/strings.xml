@@ -311,4 +311,27 @@
     <string name="online_switch">好友开始排位赛时通知我</string>
     <string name="channel_online">正在游戏的好友</string>
     <string name="graph_desc">本赛季 Elo</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">气泡头像</string>
+    <string name="look_face_player">我的玩家头像</string>
+    <string name="look_face_named">气泡头像 · %1$s</string>
+    <string name="look_face_title">选择气泡头像</string>
+    <string name="session_title">本局结束：%1$d胜%2$d负</string>
+    <string name="session_elo">Elo %1$s</string>
+    <string name="session_mvp">MVP：%1$s</string>
+    <string name="session_streak">最佳连胜 %1$d</string>
+    <string name="records_caption">个人纪录</string>
+    <string name="record_streak">连胜</string>
+    <string name="record_day">最佳单日</string>
+    <string name="record_elo">最高 Elo</string>
+    <string name="record_streak_title">🔥 新纪录：%1$d连胜！</string>
+    <string name="record_day_title">📅 新纪录：一天排位%1$d胜！</string>
+    <string name="record_elo_title">⭐ 新纪录：Elo %1$s！</string>
+    <string name="record_text">你的最佳成绩，继续保持！</string>
+    <string name="ask_voice_prompt">问 Bubble：谁克制莫提斯？</string>
+    <string name="ask_voice_missing">此手机不支持语音输入。</string>
+    <string name="shortcut_ask">问 Bubble</string>
+    <string name="widget_ask_name">问 Bubble</string>
+    <string name="widget_ask_description">用文字或语音询问任何英雄、地图或模式</string>
+    <string name="widget_ask_hint">问 Bubble…</string>
 </resources>

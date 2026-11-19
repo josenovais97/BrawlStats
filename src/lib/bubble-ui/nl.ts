@@ -217,6 +217,7 @@ const nl: UiStrings = {
   "ask.build": "Build",
   "ask.noTag": "Voeg je spelerstag toe in de app voor antwoorden over je eigen brawlers.",
   "ask.tier": "{t}-tier",
+  "ask.voice": "Vraag met je stem",
   "chooser.ask": "Vraag alles: counters, beste picks, bans, builds",
 };
 

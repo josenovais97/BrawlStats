@@ -311,4 +311,27 @@
     <string name="online_switch">친구가 경쟁전을 시작하면 알려 주기</string>
     <string name="channel_online">플레이 중인 친구</string>
     <string name="graph_desc">이번 시즌 Elo</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">버블 얼굴</string>
+    <string name="look_face_player">내 플레이어 아이콘</string>
+    <string name="look_face_named">버블 얼굴 · %1$s</string>
+    <string name="look_face_title">버블 얼굴 고르기</string>
+    <string name="session_title">세션 종료: %1$d승 %2$d패</string>
+    <string name="session_elo">Elo %1$s</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">최고 연승 %1$d</string>
+    <string name="records_caption">개인 기록</string>
+    <string name="record_streak">연승</string>
+    <string name="record_day">최고의 하루</string>
+    <string name="record_elo">최고 Elo</string>
+    <string name="record_streak_title">🔥 신기록: %1$d연승!</string>
+    <string name="record_day_title">📅 신기록: 하루 경쟁전 %1$d승!</string>
+    <string name="record_elo_title">⭐ 신기록: Elo %1$s!</string>
+    <string name="record_text">역대 최고 기록이에요. 계속 가 봐요!</string>
+    <string name="ask_voice_prompt">Bubble에게 물어보기: 모티스 카운터는?</string>
+    <string name="ask_voice_missing">이 휴대폰에서는 음성 입력을 쓸 수 없어요.</string>
+    <string name="shortcut_ask">Bubble에게 물어보기</string>
+    <string name="widget_ask_name">Bubble에게 물어보기</string>
+    <string name="widget_ask_description">브롤러, 맵, 모드에 대해 글이나 음성으로 물어보세요</string>
+    <string name="widget_ask_hint">Bubble에게 물어보기…</string>
 </resources>

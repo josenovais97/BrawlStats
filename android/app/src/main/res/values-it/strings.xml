@@ -311,4 +311,27 @@
     <string name="online_switch">Avvisami quando un amico inizia la Classificata</string>
     <string name="channel_online">Amici in gioco</string>
     <string name="graph_desc">Elo in questa stagione</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Faccia della bolla</string>
+    <string name="look_face_player">La mia icona giocatore</string>
+    <string name="look_face_named">Faccia della bolla · %1$s</string>
+    <string name="look_face_title">Scegli la faccia della bolla</string>
+    <string name="session_title">Sessione finita: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">miglior serie %1$d</string>
+    <string name="records_caption">RECORD PERSONALI</string>
+    <string name="record_streak">Serie di vittorie</string>
+    <string name="record_day">Giorno migliore</string>
+    <string name="record_elo">Elo più alto</string>
+    <string name="record_streak_title">🔥 Nuovo record: %1$d vittorie di fila!</string>
+    <string name="record_day_title">📅 Nuovo record: %1$d vittorie in Classificata in un giorno!</string>
+    <string name="record_elo_title">⭐ Nuovo record: %1$s elo!</string>
+    <string name="record_text">Il tuo meglio di sempre. Continua così!</string>
+    <string name="ask_voice_prompt">Chiedi a Bubble: chi batte Mortis?</string>
+    <string name="ask_voice_missing">L\'input vocale non è disponibile su questo telefono.</string>
+    <string name="shortcut_ask">Chiedi a Bubble</string>
+    <string name="widget_ask_name">Chiedi a Bubble</string>
+    <string name="widget_ask_description">Chiedi di qualsiasi brawler, mappa o modalità, scrivendo o a voce</string>
+    <string name="widget_ask_hint">Chiedi a Bubble…</string>
 </resources>

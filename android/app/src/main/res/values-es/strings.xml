@@ -311,4 +311,27 @@
     <string name="online_switch">Avísame cuando un amigo empiece Clasificatoria</string>
     <string name="channel_online">Amigos jugando</string>
     <string name="graph_desc">Elo esta temporada</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Cara de Bubble</string>
+    <string name="look_face_player">Mi icono de jugador</string>
+    <string name="look_face_named">Cara de Bubble · %1$s</string>
+    <string name="look_face_title">Elige la cara de Bubble</string>
+    <string name="session_title">Sesión terminada: %1$d–%2$d</string>
+    <string name="session_elo">%1$s de elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">mejor racha %1$d</string>
+    <string name="records_caption">RÉCORDS PERSONALES</string>
+    <string name="record_streak">Racha de victorias</string>
+    <string name="record_day">Mejor día</string>
+    <string name="record_elo">Elo máximo</string>
+    <string name="record_streak_title">🔥 Nuevo récord: ¡%1$d victorias seguidas!</string>
+    <string name="record_day_title">📅 Nuevo récord: ¡%1$d victorias en Competitivo en un día!</string>
+    <string name="record_elo_title">⭐ Nuevo récord: ¡%1$s de elo!</string>
+    <string name="record_text">Tu mejor marca. ¡Sigue así!</string>
+    <string name="ask_voice_prompt">Pregunta a Bubble: ¿quién le gana a Mortis?</string>
+    <string name="ask_voice_missing">La entrada de voz no está disponible en este móvil.</string>
+    <string name="shortcut_ask">Pregunta a Bubble</string>
+    <string name="widget_ask_name">Pregunta a Bubble</string>
+    <string name="widget_ask_description">Pregunta por cualquier brawler, mapa o modo, por texto o voz</string>
+    <string name="widget_ask_hint">Pregunta a Bubble…</string>
 </resources>

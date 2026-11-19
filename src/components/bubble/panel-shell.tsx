@@ -106,6 +106,8 @@ export function PanelShell({
    */
   // Match history (2026-11-13): over the panel until closed, like the review.
   const [historyOpen, setHistoryOpen] = useState(false);
+  // Ask Bubble (2026-11-19): the question box, over the whole panel like the review.
+  const [askOpen, setAskOpen] = useState(false);
   const chooseRef = useRef(choose);
   useEffect(() => {
     chooseRef.current = choose;
@@ -113,6 +115,7 @@ export function PanelShell({
   useEffect(() => {
     const open = (next: string) => {
       if (next === 'history') setHistoryOpen(true);
+      else if (next === 'ask') setAskOpen(true);
       else if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters' || next === 'trophies') chooseRef.current(next);
     };
     (window as unknown as { __bzOpenTab?: (t: string) => void }).__bzOpenTab = open;
@@ -128,8 +131,7 @@ export function PanelShell({
    * pulsed after a Ranked game is tapped, and it covers the panel until closed.
    */
   const [review, setReview] = useState<PostGameReview | null>(null);
-  // Ask Bubble (2026-11-19): the question box, over the whole panel like the review.
-  const [askOpen, setAskOpen] = useState(false);
+
   useEffect(() => {
     const w = window as unknown as { __bzShowReview?: (r: PostGameReview) => void };
     w.__bzShowReview = (r) => {

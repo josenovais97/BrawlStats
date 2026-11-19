@@ -311,4 +311,27 @@
     <string name="online_switch">أخبرني عندما يبدأ صديق المباريات المصنّفة</string>
     <string name="channel_online">أصدقاء يلعبون</string>
     <string name="graph_desc">نقاط Elo هذا الموسم</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">وجه الفقاعة</string>
+    <string name="look_face_player">أيقونة اللاعب الخاصة بي</string>
+    <string name="look_face_named">وجه الفقاعة · %1$s</string>
+    <string name="look_face_title">اختر وجه الفقاعة</string>
+    <string name="session_title">انتهت الجلسة: %1$d–%2$d</string>
+    <string name="session_elo">%1$s نقطة Elo</string>
+    <string name="session_mvp">الأفضل: %1$s</string>
+    <string name="session_streak">أفضل سلسلة %1$d</string>
+    <string name="records_caption">أرقامك القياسية</string>
+    <string name="record_streak">سلسلة الانتصارات</string>
+    <string name="record_day">أفضل يوم</string>
+    <string name="record_elo">أعلى Elo</string>
+    <string name="record_streak_title">🔥 رقم قياسي جديد: %1$d انتصارات متتالية!</string>
+    <string name="record_day_title">📅 رقم قياسي جديد: %1$d انتصارات مصنّفة في يوم!</string>
+    <string name="record_elo_title">⭐ رقم قياسي جديد: %1$s Elo!</string>
+    <string name="record_text">أفضل ما حققته. واصل!</string>
+    <string name="ask_voice_prompt">اسأل Bubble: من يهزم مورتيس؟</string>
+    <string name="ask_voice_missing">الإدخال الصوتي غير متاح على هذا الهاتف.</string>
+    <string name="shortcut_ask">اسأل Bubble</string>
+    <string name="widget_ask_name">اسأل Bubble</string>
+    <string name="widget_ask_description">اسأل عن أي مقاتل أو خريطة أو طور، كتابةً أو بالصوت</string>
+    <string name="widget_ask_hint">اسأل Bubble…</string>
 </resources>

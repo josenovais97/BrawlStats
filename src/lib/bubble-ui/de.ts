@@ -217,6 +217,7 @@ const de: UiStrings = {
   "ask.build": "Build",
   "ask.noTag": "Füge in der App deinen Spieler-Tag hinzu, um Antworten zu deinen Brawlern zu bekommen.",
   "ask.tier": "{t}-Tier",
+  "ask.voice": "Per Sprache fragen",
   "chooser.ask": "Frag alles: Konter, beste Picks, Bans, Builds",
 };
 

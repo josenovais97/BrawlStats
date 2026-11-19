@@ -217,6 +217,7 @@ const zhHant: UiStrings = {
   "ask.build": "配裝",
   "ask.noTag": "在應用程式裡加入玩家標籤，即可按你的英雄回答。",
   "ask.tier": "{t}級",
+  "ask.voice": "語音提問",
   "chooser.ask": "隨便問：克制、最佳選擇、禁用、配裝",
 };
 

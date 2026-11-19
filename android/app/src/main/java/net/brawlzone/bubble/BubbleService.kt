@@ -100,7 +100,7 @@ class BubbleService : Service() {
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             handler.post {
                 when (key) {
-                    BubbleLook.KEY_SIZE -> rebuildBubble()
+                    BubbleLook.KEY_SIZE, BubbleLook.KEY_FACE -> rebuildBubble()
                     // 1.42: a new theme repaints the ring and the panel's accent.
                     BubbleLook.KEY_THEME -> {
                         rebuildBubble()
@@ -425,6 +425,19 @@ class BubbleService : Service() {
         panelWeb?.evaluateJavascript(script, null)
     }
 
+    /** A spoken question for Ask (1.42), waiting for the page's hook. */
+    private var pendingHeard: String? = null
+
+    private fun applyPendingHeard() {
+        val text = pendingHeard ?: return
+        pendingHeard = null
+        if (text.isEmpty()) return
+        val script = "(function(q){var n=0;var i=setInterval(function(){" +
+            "if(window.__bzAskHear){window.__bzAskHear(q);clearInterval(i)}" +
+            "else if(++n>60){clearInterval(i)}},100)})(" + org.json.JSONObject.quote(text) + ")"
+        panelWeb?.evaluateJavascript(script, null)
+    }
+
     /** A tab the panel should switch to once its page can hear it (1.40). */
     private var pendingTab: String? = null
 
@@ -432,7 +445,7 @@ class BubbleService : Service() {
     private var pendingBrawler: Int? = null
 
     private fun openPanelOn(tab: String?, brawler: Int? = null) {
-        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters", "trophies", "history") }
+        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters", "trophies", "history", "ask") }
         pendingBrawler = brawler
         if (panel == null) showPanel()
         if (panelLoaded) applyPendingTab()
@@ -472,6 +485,12 @@ class BubbleService : Service() {
             // The "Counters" shortcut (1.40): the panel open on that tab.
             ACTION_OPEN_PANEL -> if (bubble != null) {
                 openPanelOn(intent?.getStringExtra(EXTRA_TAB), intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
+            }
+            // Ask Bubble by voice (1.42, VoiceActivity): Ask opens with what was said.
+            ACTION_ASK_HEARD -> if (bubble != null) {
+                pendingHeard = intent?.getStringExtra(EXTRA_TEXT).orEmpty()
+                openPanelOn("ask")
+                if (panelLoaded) applyPendingHeard()
             }
             ACTION_TEST_REVIEW -> if (bubble != null && BuildConfig.BUILD_TYPE == "qa") {
                 val app = applicationContext
@@ -529,7 +548,7 @@ class BubbleService : Service() {
          * circle so it sits inside the ring rather than over it; the ring is
          * the badge, which stays the brand's mark around any face.
          */
-        val playerIcon = Account.savedIcon(this)
+        val playerIcon = Face.bitmap(this)
         val art = ImageView(this).apply {
             background = BubbleLook.badge(this@BubbleService)
             if (playerIcon != null) {
@@ -1408,7 +1427,7 @@ class BubbleService : Service() {
             setPadding(dp(16), dp(8), dp(8), dp(12))
         }
         // The same face as the bubble that opened it, so the two read as one.
-        val headerIcon = Account.savedIcon(this)
+        val headerIcon = Face.bitmap(this)
         header.addView(ImageView(this).apply {
             background = BubbleLook.badge(this@BubbleService)
             if (headerIcon != null) {
@@ -1510,6 +1529,7 @@ class BubbleService : Service() {
                     panelLoaded = true
                     applyPendingTab()
                     applyPendingReview()
+                    applyPendingHeard()
                     offline.visibility = if (panelFromCache) View.VISIBLE else View.GONE
                     // Back to normal caching for the next load: the cache-only
                     // mode is for this one fallback, never a setting that sticks.
@@ -2103,6 +2123,18 @@ class BubbleService : Service() {
             }
         }
 
+        /**
+         * Ask Bubble's mic (1.42): the panel folds away so the phone's voice
+         * input can show, and comes back on Ask with the question.
+         */
+        @JavascriptInterface
+        fun listen(lang: String) {
+            handler.post {
+                if (panel != null) collapsePanel()
+                VoiceActivity.start(this@BubbleService, lang.ifEmpty { AppLang.current(this@BubbleService) })
+            }
+        }
+
         @JavascriptInterface
         fun setLanguage(code: String) {
             handler.post {
@@ -2221,6 +2253,8 @@ class BubbleService : Service() {
 
         /** The test build's button: replay the newest Ranked game as a post-game review. */
         const val ACTION_TEST_REVIEW = "net.brawlzone.bubble.TEST_REVIEW"
+        const val ACTION_ASK_HEARD = "net.brawlzone.bubble.ASK_HEARD"
+        const val EXTRA_TEXT = "text"
         const val EXTRA_TAB = "tab"
         const val EXTRA_BRAWLER = "brawler"
 

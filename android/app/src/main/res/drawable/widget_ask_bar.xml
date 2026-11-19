@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Ask widget (1.42): a search bar. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#F21A2759" />
+    <stroke android:width="2dp" android:color="#7A4CFF" />
+    <corners android:radius="28dp" />
+</shape>

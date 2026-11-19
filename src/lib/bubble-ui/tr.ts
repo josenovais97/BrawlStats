@@ -217,6 +217,7 @@ const tr: UiStrings = {
   "ask.build": "Yapı",
   "ask.noTag": "Kendi savaşçıların hakkında cevaplar için uygulamaya oyuncu etiketini ekle.",
   "ask.tier": "{t} seviyesi",
+  "ask.voice": "Sesle sor",
   "chooser.ask": "Her şeyi sor: kontralar, en iyi seçimler, banlar, yapılar",
 };
 

@@ -311,4 +311,27 @@
     <string name="online_switch">Beritahu saya apabila rakan mula bermain Ranked</string>
     <string name="channel_online">Rakan sedang bermain</string>
     <string name="graph_desc">Elo musim ini</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Wajah bubble</string>
+    <string name="look_face_player">Ikon pemain saya</string>
+    <string name="look_face_named">Wajah bubble · %1$s</string>
+    <string name="look_face_title">Pilih wajah bubble</string>
+    <string name="session_title">Sesi tamat: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">rentetan terbaik %1$d</string>
+    <string name="records_caption">REKOD PERIBADI</string>
+    <string name="record_streak">Rentetan menang</string>
+    <string name="record_day">Hari terbaik</string>
+    <string name="record_elo">Elo tertinggi</string>
+    <string name="record_streak_title">🔥 Rekod baru: %1$d menang berturut-turut!</string>
+    <string name="record_day_title">📅 Rekod baru: %1$d kemenangan Ranked dalam sehari!</string>
+    <string name="record_elo_title">⭐ Rekod baru: %1$s elo!</string>
+    <string name="record_text">Terbaik anda setakat ini. Teruskan!</string>
+    <string name="ask_voice_prompt">Tanya Bubble: siapa kalahkan Mortis?</string>
+    <string name="ask_voice_missing">Input suara tidak tersedia pada telefon ini.</string>
+    <string name="shortcut_ask">Tanya Bubble</string>
+    <string name="widget_ask_name">Tanya Bubble</string>
+    <string name="widget_ask_description">Tanya tentang mana-mana brawler, peta atau mod, dengan teks atau suara</string>
+    <string name="widget_ask_hint">Tanya Bubble…</string>
 </resources>

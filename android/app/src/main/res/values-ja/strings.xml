@@ -311,4 +311,27 @@
     <string name="online_switch">フレンドがガチバトルを始めたら通知する</string>
     <string name="channel_online">プレイ中のフレンド</string>
     <string name="graph_desc">今シーズンのElo</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">バブルの顔</string>
+    <string name="look_face_player">自分のプレイヤーアイコン</string>
+    <string name="look_face_named">バブルの顔・%1$s</string>
+    <string name="look_face_title">バブルの顔を選ぶ</string>
+    <string name="session_title">セッション終了：%1$d勝%2$d敗</string>
+    <string name="session_elo">%1$s Elo</string>
+    <string name="session_mvp">MVP：%1$s</string>
+    <string name="session_streak">最高連勝 %1$d</string>
+    <string name="records_caption">自己ベスト</string>
+    <string name="record_streak">連勝記録</string>
+    <string name="record_day">最高の1日</string>
+    <string name="record_elo">最高Elo</string>
+    <string name="record_streak_title">🔥 新記録：%1$d連勝！</string>
+    <string name="record_day_title">📅 新記録：1日でガチバトル%1$d勝！</string>
+    <string name="record_elo_title">⭐ 新記録：Elo %1$s！</string>
+    <string name="record_text">自己ベスト更新。この調子！</string>
+    <string name="ask_voice_prompt">Bubbleに聞く：モーティスに強いのは？</string>
+    <string name="ask_voice_missing">この端末では音声入力を使えません。</string>
+    <string name="shortcut_ask">Bubbleに聞く</string>
+    <string name="widget_ask_name">Bubbleに聞く</string>
+    <string name="widget_ask_description">キャラ、マップ、モードについて文字や声で質問</string>
+    <string name="widget_ask_hint">Bubbleに聞く…</string>
 </resources>

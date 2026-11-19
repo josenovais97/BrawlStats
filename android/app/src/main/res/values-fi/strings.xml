@@ -311,4 +311,27 @@
     <string name="online_switch">Kerro, kun kaveri aloittaa Rankedin</string>
     <string name="channel_online">Kaverit pelaamassa</string>
     <string name="graph_desc">Elo tällä kaudella</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Kuplan kasvot</string>
+    <string name="look_face_player">Pelaajakuvakkeeni</string>
+    <string name="look_face_named">Kuplan kasvot · %1$s</string>
+    <string name="look_face_title">Valitse kuplan kasvot</string>
+    <string name="session_title">Sessio ohi: %1$d–%2$d</string>
+    <string name="session_elo">%1$s eloa</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">paras putki %1$d</string>
+    <string name="records_caption">OMAT ENNÄTYKSET</string>
+    <string name="record_streak">Voittoputki</string>
+    <string name="record_day">Paras päivä</string>
+    <string name="record_elo">Korkein elo</string>
+    <string name="record_streak_title">🔥 Uusi ennätys: %1$d voittoa putkeen!</string>
+    <string name="record_day_title">📅 Uusi ennätys: %1$d Ranked-voittoa päivässä!</string>
+    <string name="record_elo_title">⭐ Uusi ennätys: %1$s eloa!</string>
+    <string name="record_text">Paras tuloksesi. Jatka samaan malliin!</string>
+    <string name="ask_voice_prompt">Kysy Bubblelta: kuka voittaa Mortisin?</string>
+    <string name="ask_voice_missing">Puheohjaus ei ole käytettävissä tässä puhelimessa.</string>
+    <string name="shortcut_ask">Kysy Bubblelta</string>
+    <string name="widget_ask_name">Kysy Bubblelta</string>
+    <string name="widget_ask_description">Kysy mistä tahansa brawlerista, kartasta tai pelimuodosta, tekstillä tai äänellä</string>
+    <string name="widget_ask_hint">Kysy Bubblelta…</string>
 </resources>

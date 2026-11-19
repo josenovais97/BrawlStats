@@ -318,4 +318,27 @@
     <string name="online_switch">Tell me when a friend starts Ranked</string>
     <string name="channel_online">Friends playing</string>
     <string name="graph_desc">Elo this season</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Bubble face</string>
+    <string name="look_face_player">My player icon</string>
+    <string name="look_face_named">Bubble face · %1$s</string>
+    <string name="look_face_title">Choose the bubble\'s face</string>
+    <string name="session_title">Session done: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">best streak %1$d</string>
+    <string name="records_caption">PERSONAL RECORDS</string>
+    <string name="record_streak">Win streak</string>
+    <string name="record_day">Best day</string>
+    <string name="record_elo">Highest elo</string>
+    <string name="record_streak_title">🔥 New record: %1$d wins in a row!</string>
+    <string name="record_day_title">📅 New record: %1$d Ranked wins in a day!</string>
+    <string name="record_elo_title">⭐ New record: %1$s elo!</string>
+    <string name="record_text">Your best ever. Keep it going!</string>
+    <string name="ask_voice_prompt">Ask Bubble: who beats Mortis?</string>
+    <string name="ask_voice_missing">Voice input isn\'t available on this phone.</string>
+    <string name="shortcut_ask">Ask Bubble</string>
+    <string name="widget_ask_name">Ask Bubble</string>
+    <string name="widget_ask_description">Ask about any brawler, map or mode, by text or voice</string>
+    <string name="widget_ask_hint">Ask Bubble…</string>
 </resources>

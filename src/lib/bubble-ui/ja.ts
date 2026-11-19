@@ -217,6 +217,7 @@ const ja: UiStrings = {
   "ask.build": "ビルド",
   "ask.noTag": "アプリでプレイヤータグを登録すると、自分のキャラで答えます。",
   "ask.tier": "{t}ティア",
+  "ask.voice": "音声で聞く",
   "chooser.ask": "何でも聞いて：カウンター、おすすめ、バン、ビルド",
 };
 

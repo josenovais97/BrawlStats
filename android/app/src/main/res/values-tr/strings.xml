@@ -311,4 +311,27 @@
     <string name="online_switch">Bir arkadaşım Dereceli\'ye başlayınca haber ver</string>
     <string name="channel_online">Oynayan arkadaşlar</string>
     <string name="graph_desc">Bu sezonki elo</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Baloncuk yüzü</string>
+    <string name="look_face_player">Oyuncu simgem</string>
+    <string name="look_face_named">Baloncuk yüzü · %1$s</string>
+    <string name="look_face_title">Baloncuğun yüzünü seç</string>
+    <string name="session_title">Oturum bitti: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">en iyi seri %1$d</string>
+    <string name="records_caption">KİŞİSEL REKORLAR</string>
+    <string name="record_streak">Galibiyet serisi</string>
+    <string name="record_day">En iyi gün</string>
+    <string name="record_elo">En yüksek elo</string>
+    <string name="record_streak_title">🔥 Yeni rekor: üst üste %1$d galibiyet!</string>
+    <string name="record_day_title">📅 Yeni rekor: bir günde %1$d Dereceli galibiyet!</string>
+    <string name="record_elo_title">⭐ Yeni rekor: %1$s elo!</string>
+    <string name="record_text">Şimdiye kadarki en iyin. Devam et!</string>
+    <string name="ask_voice_prompt">Bubble\'a sor: Mortis\'i kim yener?</string>
+    <string name="ask_voice_missing">Bu telefonda sesli giriş yok.</string>
+    <string name="shortcut_ask">Bubble\'a sor</string>
+    <string name="widget_ask_name">Bubble\'a sor</string>
+    <string name="widget_ask_description">Herhangi bir savaşçı, harita ya da mod hakkında yazarak veya sesle sor</string>
+    <string name="widget_ask_hint">Bubble\'a sor…</string>
 </resources>

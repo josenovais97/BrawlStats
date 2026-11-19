@@ -217,6 +217,7 @@ const fr: UiStrings = {
   "ask.build": "Build",
   "ask.noTag": "Ajoute ton tag de joueur dans l'appli pour des réponses sur tes brawlers.",
   "ask.tier": "Tier {t}",
+  "ask.voice": "Demander à voix haute",
   "chooser.ask": "Pose ta question : counters, meilleurs choix, bans, builds",
 };
 

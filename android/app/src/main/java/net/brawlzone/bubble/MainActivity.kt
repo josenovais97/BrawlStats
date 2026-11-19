@@ -450,6 +450,19 @@ class MainActivity : AppCompatActivity() {
         card.visibility = View.VISIBLE
         // Both share cards drawn ahead of a tap, so Share usually opens at once.
         Share.prefetch(this)
+        // 1.42: personal records.
+        val records = Records.get(this, me.tag)
+        findViewById<View>(R.id.season_records).visibility =
+            if (records.streak + records.day + records.elo > 0) View.VISIBLE else View.GONE
+        fun tile(id: Int, icon: String, value: String, label: Int) {
+            val text = android.text.SpannableString("$icon $value\n${getString(label)}")
+            text.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, icon.length + 1 + value.length, 0)
+            text.setSpan(android.text.style.RelativeSizeSpan(1.35f), 0, icon.length + 1 + value.length, 0)
+            findViewById<TextView>(id).text = text
+        }
+        tile(R.id.record_streak_tile, "\uD83D\uDD25", records.streak.toString(), R.string.record_streak)
+        tile(R.id.record_day_tile, "\uD83D\uDCC5", records.day.toString(), R.string.record_day)
+        tile(R.id.record_elo_tile, "\u2B50", if (records.elo > 0) java.text.NumberFormat.getIntegerInstance().format(records.elo) else "–", R.string.record_elo)
         // 1.42: elo through the season, drawn once the card has its width.
         val graph = findViewById<ImageView>(R.id.season_graph)
         val points = EloLog.points(this, me.tag, Alerts.last(this)?.season?.number)
@@ -1259,18 +1272,26 @@ class MainActivity : AppCompatActivity() {
         val density = resources.displayMetrics.density
         fun px(dp: Int) = (dp * density).toInt()
 
-        // The player's icon when there is one, as the bubble itself wears it.
-        val icon = Account.savedIcon(this)
-        for (view in listOf(touched, idle)) {
-            if (icon != null) {
-                view.setImageDrawable(
-                    androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
-                        .create(resources, icon)
-                        .apply { isCircular = true },
-                )
-                view.scaleType = ImageView.ScaleType.CENTER_CROP
+        // The bubble's face (1.42: a chosen brawler, else the player's icon), as the bubble wears it.
+        var icon = Face.bitmap(this)
+        fun paintFace() {
+            icon = Face.bitmap(this)
+            for (view in listOf(touched, idle)) {
+                val face = icon
+                if (face != null) {
+                    view.setImageDrawable(
+                        androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+                            .create(resources, face)
+                            .apply { isCircular = true },
+                    )
+                    view.scaleType = ImageView.ScaleType.CENTER_CROP
+                } else {
+                    view.setImageResource(R.drawable.bubble_glyph)
+                    view.scaleType = ImageView.ScaleType.FIT_CENTER
+                }
             }
         }
+        paintFace()
 
         fun paintPreview() {
             val badge = px(BubbleLook.badgeDp(BubbleLook.size(this)))
@@ -1361,6 +1382,20 @@ class MainActivity : AppCompatActivity() {
             { BubbleLook.idle(this) },
             { BubbleLook.setIdle(this, it) },
         )
+
+        // 1.42: the bubble's face, any brawler or the player's own icon.
+        val faceRow = findViewById<TextView>(R.id.look_face)
+        fun paintFaceLabel() {
+            faceRow.text = getString(R.string.look_face_named, Face.name(this) ?: getString(R.string.look_face_player)) + "  ›"
+        }
+        paintFaceLabel()
+        faceRow.setOnClickListener {
+            Face.pick(this) {
+                paintFace()
+                paintFaceLabel()
+                paintPreview()
+            }
+        }
 
         // 1.42: themes, a swatch each, the chosen one ringed and named.
         val themeRow = findViewById<LinearLayout>(R.id.look_theme)

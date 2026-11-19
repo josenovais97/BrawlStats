@@ -311,4 +311,27 @@
     <string name="online_switch">Me prévenir quand un ami lance le Classé</string>
     <string name="channel_online">Amis en jeu</string>
     <string name="graph_desc">Elo cette saison</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Visage de la bulle</string>
+    <string name="look_face_player">Mon icône de joueur</string>
+    <string name="look_face_named">Visage de la bulle · %1$s</string>
+    <string name="look_face_title">Choisis le visage de la bulle</string>
+    <string name="session_title">Session terminée : %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP : %1$s</string>
+    <string name="session_streak">meilleure série %1$d</string>
+    <string name="records_caption">RECORDS PERSONNELS</string>
+    <string name="record_streak">Série de victoires</string>
+    <string name="record_day">Meilleur jour</string>
+    <string name="record_elo">Elo max</string>
+    <string name="record_streak_title">🔥 Nouveau record : %1$d victoires d\'affilée !</string>
+    <string name="record_day_title">📅 Nouveau record : %1$d victoires en Classé en un jour !</string>
+    <string name="record_elo_title">⭐ Nouveau record : %1$s elo !</string>
+    <string name="record_text">Ton meilleur score. Continue comme ça !</string>
+    <string name="ask_voice_prompt">Demande à Bubble : qui bat Mortis ?</string>
+    <string name="ask_voice_missing">La saisie vocale n\'est pas disponible sur ce téléphone.</string>
+    <string name="shortcut_ask">Demande à Bubble</string>
+    <string name="widget_ask_name">Demande à Bubble</string>
+    <string name="widget_ask_description">Pose ta question sur un brawler, une carte ou un mode, à l\'écrit ou à voix haute</string>
+    <string name="widget_ask_hint">Demande à Bubble…</string>
 </resources>

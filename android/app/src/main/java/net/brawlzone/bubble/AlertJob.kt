@@ -22,8 +22,13 @@ class AlertJob : JobService() {
         Thread {
             runCatching {
                 // 1.42: the 15-minute "playing now" look at the friends, or the hourly check.
-                if (params.jobId == ONLINE_JOB_ID) Online.check(applicationContext, Alerts.enabled(applicationContext))
-                else run(applicationContext)
+                if (params.jobId == ONLINE_JOB_ID) {
+                    val post = Alerts.enabled(applicationContext)
+                    Online.check(applicationContext, post)
+                    SessionRecap.quick(applicationContext, post)
+                } else {
+                    run(applicationContext)
+                }
             }.onFailure { Log.w(TAG, "check failed", it) }
             jobFinished(params, false)
         }.start()
@@ -105,6 +110,9 @@ class AlertJob : JobService() {
                 Goal.record(context, me.tag, fresh, firstLook, post)
                 Season.update(context, me, alerts, fresh, post)
                 EloLog.record(context, me.tag, season, me.elo)
+                // 1.42: personal records, and the recap once a session has ended.
+                Records.update(context, me, fresh, post)
+                SessionRecap.check(context, me, post)
             }
             Friends.refresh(context, me, season, post)
             // 1.42: invites both ways, Monday's duel verdict, this season vs last.

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUp, Sparkles, X } from 'lucide-react';
+import { ArrowUp, Mic, Sparkles, X } from 'lucide-react';
 
 import type { PanelModeComps } from '@/components/bubble/panel-comps';
 import { recall, useModeLabel } from '@/components/bubble/panel-chips';
@@ -158,6 +158,30 @@ export function PanelAsk({
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [turns.length]);
 
+  /*
+   * By voice (app 1.42): the app's bridge opens the phone's speech input and
+   * comes back through window.__bzAskHear with what was said. Older apps and
+   * the browser have no bridge method, and no mic button.
+   */
+  const askRef = useRef(ask);
+  useEffect(() => {
+    askRef.current = ask;
+  });
+  const [canListen, setCanListen] = useState(false);
+  useEffect(() => {
+    const w = window as unknown as { BrawlZoneApp?: { listen?: unknown }; __bzAskHear?: (q: string) => void };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCanListen(typeof w.BrawlZoneApp?.listen === 'function');
+    w.__bzAskHear = (q: string) => askRef.current(q);
+    return () => {
+      delete w.__bzAskHear;
+    };
+  }, []);
+  const listen = () => {
+    panelTrack('panel_ask_voice');
+    (window as unknown as { BrawlZoneApp?: { listen?: (l: string) => void } }).BrawlZoneApp?.listen?.(lang);
+  };
+
   const P = (over: Partial<AskParsed>): AskParsed => ({ brawlers: [], map: null, mode: null, intent: null, mine: false, ...over });
   const local = (id: number) => name(byId.get(id)?.brawlerName ?? '');
   const suggestions: Chip[] = useMemo(() => {
@@ -229,9 +253,20 @@ export function PanelAsk({
           autoComplete="off"
           className="min-w-0 flex-1 rounded-full border-2 border-border bg-surface-2 px-3 py-2 text-[13px] outline-none focus:border-brand"
         />
-        <button type="submit" disabled={!text.trim()} className="bz-chip-on grid size-9 shrink-0 place-items-center rounded-full disabled:opacity-40" aria-label={t('ask.send')}>
-          <ArrowUp className="size-4" aria-hidden />
-        </button>
+        {canListen && !text.trim() ? (
+          <button
+            type="button"
+            onClick={listen}
+            className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-[#050a1f] bg-gradient-to-b from-[#c9a8ff] to-[#7a4cff] text-white"
+            aria-label={t('ask.voice')}
+          >
+            <Mic className="size-4" aria-hidden />
+          </button>
+        ) : (
+          <button type="submit" disabled={!text.trim()} className="bz-chip-on grid size-9 shrink-0 place-items-center rounded-full disabled:opacity-40" aria-label={t('ask.send')}>
+            <ArrowUp className="size-4" aria-hidden />
+          </button>
+        )}
       </form>
     </div>
   );

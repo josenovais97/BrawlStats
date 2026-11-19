@@ -311,4 +311,27 @@
     <string name="online_switch">תודיע לי כשחבר מתחיל לשחק בדירוג</string>
     <string name="channel_online">חברים שמשחקים</string>
     <string name="graph_desc">Elo בעונה הזו</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">הפרצוף של הבועה</string>
+    <string name="look_face_player">סמל השחקן שלי</string>
+    <string name="look_face_named">הפרצוף של הבועה · %1$s</string>
+    <string name="look_face_title">בחר פרצוף לבועה</string>
+    <string name="session_title">הסשן הסתיים: %1$d–%2$d</string>
+    <string name="session_elo">%1$s Elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">רצף הכי טוב %1$d</string>
+    <string name="records_caption">שיאים אישיים</string>
+    <string name="record_streak">רצף ניצחונות</string>
+    <string name="record_day">היום הכי טוב</string>
+    <string name="record_elo">Elo הכי גבוה</string>
+    <string name="record_streak_title">🔥 שיא חדש: %1$d ניצחונות ברצף!</string>
+    <string name="record_day_title">📅 שיא חדש: %1$d ניצחונות בדירוג ביום!</string>
+    <string name="record_elo_title">⭐ שיא חדש: %1$s Elo!</string>
+    <string name="record_text">השיא שלך. תמשיך ככה!</string>
+    <string name="ask_voice_prompt">שאל את Bubble: מי מנצח את מורטיס?</string>
+    <string name="ask_voice_missing">הקלדה קולית לא זמינה בטלפון הזה.</string>
+    <string name="shortcut_ask">שאל את Bubble</string>
+    <string name="widget_ask_name">שאל את Bubble</string>
+    <string name="widget_ask_description">שאל על כל לוחם, מפה או מצב, בכתב או בקול</string>
+    <string name="widget_ask_hint">שאל את Bubble…</string>
 </resources>

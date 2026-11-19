@@ -311,4 +311,27 @@
     <string name="online_switch">Laat het weten als een vriend Ranked start</string>
     <string name="channel_online">Vrienden aan het spelen</string>
     <string name="graph_desc">Elo dit seizoen</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Bubble-gezicht</string>
+    <string name="look_face_player">Mijn spelersicoon</string>
+    <string name="look_face_named">Bubble-gezicht · %1$s</string>
+    <string name="look_face_title">Kies het gezicht van de bubble</string>
+    <string name="session_title">Sessie klaar: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">beste reeks %1$d</string>
+    <string name="records_caption">PERSOONLIJKE RECORDS</string>
+    <string name="record_streak">Winstreeks</string>
+    <string name="record_day">Beste dag</string>
+    <string name="record_elo">Hoogste elo</string>
+    <string name="record_streak_title">🔥 Nieuw record: %1$d keer op rij gewonnen!</string>
+    <string name="record_day_title">📅 Nieuw record: %1$d Ranked-overwinningen op één dag!</string>
+    <string name="record_elo_title">⭐ Nieuw record: %1$s elo!</string>
+    <string name="record_text">Je beste ooit. Ga zo door!</string>
+    <string name="ask_voice_prompt">Vraag het Bubble: wie verslaat Mortis?</string>
+    <string name="ask_voice_missing">Spraakinvoer is niet beschikbaar op deze telefoon.</string>
+    <string name="shortcut_ask">Vraag het Bubble</string>
+    <string name="widget_ask_name">Vraag het Bubble</string>
+    <string name="widget_ask_description">Vraag naar elke brawler, map of modus, met tekst of je stem</string>
+    <string name="widget_ask_hint">Vraag het Bubble…</string>
 </resources>

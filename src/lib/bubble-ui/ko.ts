@@ -217,6 +217,7 @@ const ko: UiStrings = {
   "ask.build": "빌드",
   "ask.noTag": "앱에 플레이어 태그를 추가하면 내 브롤러 기준으로 답해요.",
   "ask.tier": "{t} 티어",
+  "ask.voice": "음성으로 물어보기",
   "chooser.ask": "무엇이든 물어보세요: 카운터, 최고의 픽, 밴, 빌드",
 };
 

@@ -72,6 +72,30 @@
         </activity>
 
         <!--
+          Ask Bubble by voice (1.42): a see-through screen that opens the
+          phone's speech input and hands the words to the bubble.
+        -->
+        <activity
+            android:name=".VoiceActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- "Ask Bubble" home-screen widget (1.42). -->
+        <receiver
+            android:name=".AskWidget"
+            android:exported="false"
+            android:label="@string/widget_ask_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_ask_info" />
+        </receiver>
+
+        <!--
           First-run setup (1.40): three steps instead of a long screen, because
           most installs never finished setting up (34 installs, 8 first opens).
         -->

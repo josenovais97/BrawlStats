@@ -311,4 +311,27 @@
     <string name="online_switch">Báo khi bạn bè bắt đầu chơi Xếp hạng</string>
     <string name="channel_online">Bạn bè đang chơi</string>
     <string name="graph_desc">Elo mùa này</string>
+    <!-- 1.42: bubble face, session recap, records, Ask by voice and widget -->
+    <string name="look_face">Mặt bong bóng</string>
+    <string name="look_face_player">Biểu tượng người chơi của tôi</string>
+    <string name="look_face_named">Mặt bong bóng · %1$s</string>
+    <string name="look_face_title">Chọn mặt cho bong bóng</string>
+    <string name="session_title">Hết phiên: %1$d–%2$d</string>
+    <string name="session_elo">%1$s elo</string>
+    <string name="session_mvp">MVP: %1$s</string>
+    <string name="session_streak">chuỗi thắng dài nhất %1$d</string>
+    <string name="records_caption">KỶ LỤC CÁ NHÂN</string>
+    <string name="record_streak">Chuỗi thắng</string>
+    <string name="record_day">Ngày tốt nhất</string>
+    <string name="record_elo">Elo cao nhất</string>
+    <string name="record_streak_title">🔥 Kỷ lục mới: thắng %1$d trận liên tiếp!</string>
+    <string name="record_day_title">📅 Kỷ lục mới: %1$d trận thắng Xếp hạng trong một ngày!</string>
+    <string name="record_elo_title">⭐ Kỷ lục mới: %1$s elo!</string>
+    <string name="record_text">Thành tích tốt nhất của bạn. Tiếp tục nhé!</string>
+    <string name="ask_voice_prompt">Hỏi Bubble: ai khắc chế Mortis?</string>
+    <string name="ask_voice_missing">Điện thoại này không hỗ trợ nhập bằng giọng nói.</string>
+    <string name="shortcut_ask">Hỏi Bubble</string>
+    <string name="widget_ask_name">Hỏi Bubble</string>
+    <string name="widget_ask_description">Hỏi về brawler, bản đồ hay chế độ bất kỳ, bằng chữ hoặc giọng nói</string>
+    <string name="widget_ask_hint">Hỏi Bubble…</string>
 </resources>

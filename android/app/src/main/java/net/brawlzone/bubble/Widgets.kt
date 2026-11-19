@@ -566,6 +566,9 @@ object Widgets {
         runCatching { target.outputStream().use { out.compress(Bitmap.CompressFormat.PNG, 100, it) } }
     }
 
+    /** A saved image, never a download (1.42: the bubble's face draws on the main thread). */
+    fun cachedImage(context: Context, url: String?): Bitmap? = cached(context, url)
+
     private fun cached(context: Context, url: String?): Bitmap? = url?.let {
         runCatching {
             val f = file(context, it)

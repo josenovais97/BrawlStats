@@ -217,6 +217,7 @@ const vi: UiStrings = {
   "ask.build": "Build",
   "ask.noTag": "Thêm thẻ người chơi trong ứng dụng để nhận câu trả lời về brawler của bạn.",
   "ask.tier": "Hạng {t}",
+  "ask.voice": "Hỏi bằng giọng nói",
   "chooser.ask": "Hỏi gì cũng được: khắc chế, lựa chọn, cấm, build",
 };
 
