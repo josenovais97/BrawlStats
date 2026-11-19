@@ -127,7 +127,8 @@ export function PanelAsk({
   );
   const context = useMemo(() => {
     const saved = typeof window === 'undefined' ? { mode: null, map: null } : recall();
-    const map = saved.map && maps.has(saved.map) ? saved.map : null;
+    // The map the player last chose on any tab (case-blind: older saves wrote display names).
+    const map = saved.map ? ([...maps.keys()].find((m) => m.toLowerCase() === saved.map!.toLowerCase()) ?? null) : null;
     const top = (combined?.entries ?? []).filter((e) => e.metaScore !== null).sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
     return { map, top };
   }, [maps, combined]);
@@ -480,7 +481,8 @@ function VersusAnswer({ a, b, map, ctx }: { a: number; b: number; map: string | 
   const scoreA = ma?.score ?? (ta?.metaScore ?? 0) / 10;
   const scoreB = mb?.score ?? (tb?.metaScore ?? 0) / 10;
   const gap = Math.abs(scoreA - scoreB);
-  const close = map && ma?.score != null && mb?.score != null ? gap < 0.01 : gap < 0.03;
+  // Within a point on the map, or half a meta point overall, is a coin flip, not a verdict.
+  const close = map && ma?.score != null && mb?.score != null ? gap < 0.01 : gap < 0.05;
   const winner = scoreA >= scoreB ? a : b;
   const side = (id: number, tier: ReturnType<typeof tierOf>, onMap: ReturnType<typeof onMapOf>, lit: boolean) => (
     <div className={`flex flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2 ${lit ? 'bg-brand/15 ring-2 ring-brand' : 'bg-surface-2/60'}`}>
