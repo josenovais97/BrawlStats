@@ -304,4 +304,10 @@
     <string name="versus_pass">Ohita %1$s voittaaksesi viime kauden</string>
     <string name="versus_challenge">Viime kauden paras: %1$s. Päihitä se!</string>
     <string name="versus_share">Jaa vertailu</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Pelaa nyt</string>
+    <string name="online_alert_title">%1$s pelaa nyt Rankedia</string>
+    <string name="online_alert_text">Hyppää mukaan ja kisaa!</string>
+    <string name="online_switch">Kerro, kun kaveri aloittaa Rankedin</string>
+    <string name="channel_online">Kaverit pelaamassa</string>
 </resources>

@@ -304,4 +304,10 @@
     <string name="versus_pass">%1$s을(를) 넘으면 지난 시즌 돌파</string>
     <string name="versus_challenge">지난 시즌 최고: %1$s. 넘어 보세요!</string>
     <string name="versus_share">비교 공유</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● 플레이 중</string>
+    <string name="online_alert_title">%1$s님이 지금 경쟁전을 하고 있어요</string>
+    <string name="online_alert_text">들어가서 같이 겨뤄 보세요!</string>
+    <string name="online_switch">친구가 경쟁전을 시작하면 알려 주기</string>
+    <string name="channel_online">플레이 중인 친구</string>
 </resources>

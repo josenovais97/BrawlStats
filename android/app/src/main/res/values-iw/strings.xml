@@ -304,4 +304,10 @@
     <string name="versus_pass">עבור את %1$s כדי לנצח את העונה הקודמת</string>
     <string name="versus_challenge">השיא בעונה הקודמת: %1$s. תשבור אותו!</string>
     <string name="versus_share">שיתוף ההשוואה</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● משחק עכשיו</string>
+    <string name="online_alert_title">%1$s משחק בדירוג עכשיו</string>
+    <string name="online_alert_text">הצטרף ותתחרה בו!</string>
+    <string name="online_switch">תודיע לי כשחבר מתחיל לשחק בדירוג</string>
+    <string name="channel_online">חברים שמשחקים</string>
 </resources>

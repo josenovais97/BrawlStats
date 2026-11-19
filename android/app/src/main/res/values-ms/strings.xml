@@ -304,4 +304,10 @@
     <string name="versus_pass">Lepasi %1$s untuk mengalahkan musim lepas</string>
     <string name="versus_challenge">Terbaik musim lepas: %1$s. Kalahkan!</string>
     <string name="versus_share">Kongsi perbandingan</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Sedang bermain</string>
+    <string name="online_alert_title">%1$s sedang bermain Ranked sekarang</string>
+    <string name="online_alert_text">Jom sertai dan berlawan!</string>
+    <string name="online_switch">Beritahu saya apabila rakan mula bermain Ranked</string>
+    <string name="channel_online">Rakan sedang bermain</string>
 </resources>

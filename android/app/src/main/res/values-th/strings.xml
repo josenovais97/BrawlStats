@@ -304,4 +304,10 @@
     <string name="versus_pass">ผ่าน %1$s เพื่อชนะซีซันก่อน</string>
     <string name="versus_challenge">ดีที่สุดซีซันก่อน: %1$s ทำให้ได้มากกว่า!</string>
     <string name="versus_share">แชร์การเปรียบเทียบ</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● กำลังเล่น</string>
+    <string name="online_alert_title">%1$s กำลังเล่นแรงก์อยู่</string>
+    <string name="online_alert_text">เข้าไปแข่งด้วยกันเลย!</string>
+    <string name="online_switch">แจ้งเมื่อเพื่อนเริ่มเล่นแรงก์</string>
+    <string name="channel_online">เพื่อนที่กำลังเล่น</string>
 </resources>

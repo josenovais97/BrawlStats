@@ -304,4 +304,10 @@
     <string name="versus_pass">Komm über %1$s hinaus, um letzte Saison zu schlagen</string>
     <string name="versus_challenge">Bestwert letzte Saison: %1$s. Schlag ihn!</string>
     <string name="versus_share">Vergleich teilen</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Spielt gerade</string>
+    <string name="online_alert_title">%1$s spielt gerade Ranked</string>
+    <string name="online_alert_text">Steig ein und häng dich dran!</string>
+    <string name="online_switch">Sag mir, wenn ein Freund Ranked startet</string>
+    <string name="channel_online">Freunde spielen</string>
 </resources>

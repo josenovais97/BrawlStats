@@ -304,4 +304,10 @@
     <string name="versus_pass">Passe de %1$s para superar a temporada passada</string>
     <string name="versus_challenge">Melhor da temporada passada: %1$s. Supere!</string>
     <string name="versus_share">Compartilhar a comparação</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Jogando agora</string>
+    <string name="online_alert_title">%1$s está jogando Ranqueado agora</string>
+    <string name="online_alert_text">Entra também e disputa com ele!</string>
+    <string name="online_switch">Me avise quando um amigo começar a jogar Ranqueado</string>
+    <string name="channel_online">Amigos jogando</string>
 </resources>

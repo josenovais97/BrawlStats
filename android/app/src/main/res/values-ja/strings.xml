@@ -304,4 +304,10 @@
     <string name="versus_pass">%1$sを超えれば前シーズン超え</string>
     <string name="versus_challenge">前シーズンのベスト：%1$s。超えよう！</string>
     <string name="versus_share">比較をシェア</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● プレイ中</string>
+    <string name="online_alert_title">%1$sさんがガチバトルをプレイ中</string>
+    <string name="online_alert_text">参加して勝負しよう！</string>
+    <string name="online_switch">フレンドがガチバトルを始めたら通知する</string>
+    <string name="channel_online">プレイ中のフレンド</string>
 </resources>

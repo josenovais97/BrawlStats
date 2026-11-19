@@ -304,4 +304,10 @@
     <string name="versus_pass">Dépasse %1$s pour battre la saison dernière</string>
     <string name="versus_challenge">Ton meilleur la saison dernière : %1$s. Bats-le !</string>
     <string name="versus_share">Partager la comparaison</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● En jeu</string>
+    <string name="online_alert_title">%1$s joue en Classé en ce moment</string>
+    <string name="online_alert_text">Lance-toi et affronte-le !</string>
+    <string name="online_switch">Me prévenir quand un ami lance le Classé</string>
+    <string name="channel_online">Amis en jeu</string>
 </resources>

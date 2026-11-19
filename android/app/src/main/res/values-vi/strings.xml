@@ -304,4 +304,10 @@
     <string name="versus_pass">Vượt %1$s để hơn mùa trước</string>
     <string name="versus_challenge">Tốt nhất mùa trước: %1$s. Vượt qua nhé!</string>
     <string name="versus_share">Chia sẻ so sánh</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Đang chơi</string>
+    <string name="online_alert_title">%1$s đang chơi Xếp hạng</string>
+    <string name="online_alert_text">Vào chơi cùng và đua hạng nào!</string>
+    <string name="online_switch">Báo khi bạn bè bắt đầu chơi Xếp hạng</string>
+    <string name="channel_online">Bạn bè đang chơi</string>
 </resources>

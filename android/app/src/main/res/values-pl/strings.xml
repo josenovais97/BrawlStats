@@ -304,4 +304,10 @@
     <string name="versus_pass">Przebij %1$s, żeby pobić poprzedni sezon</string>
     <string name="versus_challenge">Najlepiej w poprzednim sezonie: %1$s. Pobij to!</string>
     <string name="versus_share">Udostępnij porównanie</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Gra teraz</string>
+    <string name="online_alert_title">%1$s gra teraz w Rankingu</string>
+    <string name="online_alert_text">Wskakuj i ścigaj się z nim!</string>
+    <string name="online_switch">Daj znać, gdy znajomy zacznie grać w Rankingu</string>
+    <string name="channel_online">Znajomi w grze</string>
 </resources>

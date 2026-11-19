@@ -365,6 +365,14 @@ class MainActivity : AppCompatActivity() {
         paintSeason()
         paintVersus()
         paintFriends()
+        // 1.42: who is playing now, if the last look is more than a few minutes old.
+        if (Friends.tags(this).isNotEmpty() && Online.isStale(this)) {
+            val app = applicationContext
+            Thread {
+                Online.check(app, post = false)
+                runOnUiThread { if (!isFinishing && !isDestroyed) paintFriends() }
+            }.start()
+        }
         if (!force && !AlertJob.isStale(this)) return
         val app = applicationContext
         Thread {
@@ -497,6 +505,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun wireFriends() {
+        val online = findViewById<Switch>(R.id.friends_online)
+        online.isChecked = Online.alerts(this)
+        online.setOnCheckedChangeListener { _, on -> Online.setAlerts(this, on) }
         val invite = findViewById<TextView>(R.id.friends_invite)
         invite.setOnClickListener {
             Invite.share(this) { busy ->
@@ -724,6 +735,7 @@ class MainActivity : AppCompatActivity() {
         duel.visibility = if (hasFriends) View.VISIBLE else View.GONE
         if (hasFriends) duel.text = getString(R.string.duel_week, Duel.line(this, week))
         val crown = Duel.leader(week)
+        findViewById<View>(R.id.friends_online).visibility = if (hasFriends) View.VISIBLE else View.GONE
         if (!hasFriends) return
         val fmt = java.text.NumberFormat.getIntegerInstance()
         val app = applicationContext
@@ -736,8 +748,19 @@ class MainActivity : AppCompatActivity() {
             if (row.you) name.setTextColor(getColor(R.color.brand))
             view.findViewById<TextView>(R.id.friend_rank).text = row.data.rank ?: ""
             view.findViewById<TextView>(R.id.friend_elo).text = row.data.elo?.let { fmt.format(it) } ?: "–"
-            view.findViewById<TextView>(R.id.friend_week).text =
-                if (row.weekWins + row.weekLosses > 0) getString(R.string.friends_week, row.weekWins, row.weekLosses) else ""
+            // 1.42: a game in the last 20 minutes beats the week's record on the right.
+            val playing = !row.you && Online.playingNow(this, row.data.tag)
+            view.findViewById<TextView>(R.id.friend_week).apply {
+                text = when {
+                    playing -> getString(R.string.online_now)
+                    row.weekWins + row.weekLosses > 0 -> getString(R.string.friends_week, row.weekWins, row.weekLosses)
+                    else -> ""
+                }
+                if (playing) {
+                    setTextColor(getColor(R.color.victory))
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                }
+            }
             val badge = view.findViewById<ImageView>(R.id.friend_badge)
             Thread {
                 val bitmap = Widgets.badge(app, row.data.rankIcon)

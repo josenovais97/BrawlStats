@@ -792,6 +792,17 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
+            <!-- 1.42: "Leo is playing Ranked now" (Online), on by default. -->
+            <Switch
+                android:id="@+id/friends_online"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/online_switch"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/friends_remove_hint"
                 android:layout_width="match_parent"

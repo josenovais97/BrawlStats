@@ -20,7 +20,11 @@ class AlertJob : JobService() {
 
     override fun onStartJob(params: JobParameters): Boolean {
         Thread {
-            runCatching { run(applicationContext) }.onFailure { Log.w(TAG, "check failed", it) }
+            runCatching {
+                // 1.42: the 15-minute "playing now" look at the friends, or the hourly check.
+                if (params.jobId == ONLINE_JOB_ID) Online.check(applicationContext, Alerts.enabled(applicationContext))
+                else run(applicationContext)
+            }.onFailure { Log.w(TAG, "check failed", it) }
             jobFinished(params, false)
         }.start()
         return true
@@ -31,16 +35,31 @@ class AlertJob : JobService() {
     companion object {
         private const val TAG = "BrawlZoneAlerts"
         private const val JOB_ID = 4711
+        /** "Playing now" (1.42, Online): friends' last games every 15 minutes, the shortest period Android allows. */
+        const val ONLINE_JOB_ID = 4712
         private const val HOUR = 60 * 60 * 1000L
         private const val STALE_MS = 30 * 60 * 1000L
 
         /** Registers the hourly check once; later calls leave it alone. */
         fun schedule(context: Context) {
+            scheduleOnline(context)
             val scheduler = context.getSystemService(JobScheduler::class.java) ?: return
             if (scheduler.getPendingJob(JOB_ID) != null) return
             val job = JobInfo.Builder(JOB_ID, ComponentName(context, AlertJob::class.java))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(HOUR, 15 * 60 * 1000L)
+                .setPersisted(true)
+                .build()
+            runCatching { scheduler.schedule(job) }.onFailure { Log.w(TAG, "schedule refused", it) }
+        }
+
+        /** The 15-minute friends look (1.42), registered once like the hourly one. */
+        fun scheduleOnline(context: Context) {
+            val scheduler = context.getSystemService(JobScheduler::class.java) ?: return
+            if (scheduler.getPendingJob(ONLINE_JOB_ID) != null) return
+            val job = JobInfo.Builder(ONLINE_JOB_ID, ComponentName(context, AlertJob::class.java))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(15 * 60 * 1000L)
                 .setPersisted(true)
                 .build()
             runCatching { scheduler.schedule(job) }.onFailure { Log.w(TAG, "schedule refused", it) }
@@ -91,6 +110,7 @@ class AlertJob : JobService() {
             Invite.finish(context)
             Invite.poll(context, post)
             Duel.settle(context, post)
+            Online.check(context, post)
             if (me != null) Versus.fetch(context)
             Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)

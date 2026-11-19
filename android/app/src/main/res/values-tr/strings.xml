@@ -304,4 +304,10 @@
     <string name="versus_pass">Geçen sezonu geçmek için %1$s seviyesini aş</string>
     <string name="versus_challenge">Geçen sezonki en iyin: %1$s. Geç onu!</string>
     <string name="versus_share">Karşılaştırmayı paylaş</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Şu an oynuyor</string>
+    <string name="online_alert_title">%1$s şu an Dereceli oynuyor</string>
+    <string name="online_alert_text">Sen de gir ve yarış!</string>
+    <string name="online_switch">Bir arkadaşım Dereceli\'ye başlayınca haber ver</string>
+    <string name="channel_online">Oynayan arkadaşlar</string>
 </resources>

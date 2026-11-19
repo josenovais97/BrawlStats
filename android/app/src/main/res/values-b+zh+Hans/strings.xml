@@ -304,4 +304,10 @@
     <string name="versus_pass">超过 %1$s 即可超越上赛季</string>
     <string name="versus_challenge">上赛季最佳：%1$s。超越它！</string>
     <string name="versus_share">分享对比</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● 正在游戏</string>
+    <string name="online_alert_title">%1$s 正在打排位赛</string>
+    <string name="online_alert_text">快上线一起冲分！</string>
+    <string name="online_switch">好友开始排位赛时通知我</string>
+    <string name="channel_online">正在游戏的好友</string>
 </resources>

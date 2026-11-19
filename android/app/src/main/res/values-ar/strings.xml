@@ -304,4 +304,10 @@
     <string name="versus_pass">تجاوز %1$s لتتفوق على الموسم الماضي</string>
     <string name="versus_challenge">أفضل ما حققته الموسم الماضي: %1$s. تفوّق عليه!</string>
     <string name="versus_share">مشاركة المقارنة</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● يلعب الآن</string>
+    <string name="online_alert_title">%1$s يلعب المباريات المصنّفة الآن</string>
+    <string name="online_alert_text">انضم وتنافس معه!</string>
+    <string name="online_switch">أخبرني عندما يبدأ صديق المباريات المصنّفة</string>
+    <string name="channel_online">أصدقاء يلعبون</string>
 </resources>

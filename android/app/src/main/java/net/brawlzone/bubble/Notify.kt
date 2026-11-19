@@ -32,6 +32,7 @@ object Notify {
     private const val CH_GOAL = "brawlzone-goal"
     private const val CH_FRIENDS = "brawlzone-friends"
     private const val CH_PATCH = "brawlzone-patch"
+    private const val CH_ONLINE = "brawlzone-online"
     private const val KEY_PATCH_SEEN = "seen_patch"
     private const val KEY_PATCH_TAG = "seen_patch_tag"
     private const val KEY_PRESTIGE_SEEN = "seen_prestige"
@@ -67,6 +68,9 @@ object Notify {
         m.createNotificationChannel(
             NotificationChannel(CH_PATCH, local.getString(R.string.channel_patch), NotificationManager.IMPORTANCE_DEFAULT),
         )
+        m.createNotificationChannel(
+            NotificationChannel(CH_ONLINE, local.getString(R.string.channel_online), NotificationManager.IMPORTANCE_DEFAULT),
+        )
     }
 
     /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
@@ -80,6 +84,10 @@ object Notify {
     /** A friend's rank-up (1.40, Friends). Tapping opens the app, where the ladder is. */
     fun postFriend(context: Context, id: Int, title: String, text: String) =
         post(context, CH_FRIENDS, id, title, text, null)
+
+    /** A friend started a Ranked session (1.42, Online): tapping starts the bubble and the game. */
+    fun postOnline(context: Context, id: Int, title: String, text: String) =
+        post(context, CH_ONLINE, id, title, text, Shortcuts.ACTION_PLAY)
 
     /** A finished season's Wrapped (1.40, Season). Tapping makes the card and opens the share sheet. */
     /**

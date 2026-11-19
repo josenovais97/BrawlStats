@@ -304,4 +304,10 @@
     <string name="versus_pass">Поднимись выше %1$s, чтобы превзойти прошлый сезон</string>
     <string name="versus_challenge">Лучшее в прошлом сезоне: %1$s. Побей!</string>
     <string name="versus_share">Поделиться сравнением</string>
+    <!-- 1.42: friends playing now -->
+    <string name="online_now">● Играет сейчас</string>
+    <string name="online_alert_title">%1$s сейчас играет в Рейтинговые бои</string>
+    <string name="online_alert_text">Заходи и соревнуйся с ним!</string>
+    <string name="online_switch">Сообщать, когда друг начинает Рейтинговые бои</string>
+    <string name="channel_online">Друзья в игре</string>
 </resources>
