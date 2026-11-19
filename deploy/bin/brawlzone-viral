@@ -502,9 +502,23 @@ fi
 
 # The cuts are on the beat of $TRACK from its start (tracks.json). The
 # fade-out is the last 1.5 seconds; the music's own loudness is left alone.
+FADE=$(python3 -c "print(max(0, $DUR - 1.5))")
+audio_in=(); graph="[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5[a]"
+if [ -s "$OUT/voice.wav" ]; then
+  # A narrated video (the Bubble promo, 2026-11-19): the voice on top, the
+  # music ducking under it (sidechain), make.py's sound effects in between.
+  audio_in=(-i voice.wav)
+  music="[1:a]aresample=44100,volume=0.55,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5[m];[2:a]aresample=44100,volume=1.0,asplit=2[v][vk];[m][vk]sidechaincompress=threshold=0.02:ratio=9:attack=10:release=380[md]"
+  if [ -s "$OUT/sfx.wav" ]; then
+    audio_in+=(-i sfx.wav)
+    graph="$music;[3:a]aresample=44100,volume=0.9[s];[md][v][s]amix=inputs=3:normalize=0:duration=first,alimiter=limit=0.95[a]"
+  else
+    graph="$music;[md][v]amix=inputs=2:normalize=0:duration=first,alimiter=limit=0.95[a]"
+  fi
+fi
 docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
-  -hide_banner -loglevel error -y "${video_in[@]}" -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" \
-  -filter_complex "[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 1.5))"):d=1.5[a]" \
+  -hide_banner -loglevel error -y "${video_in[@]}" -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" "${audio_in[@]}" \
+  -filter_complex "$graph" \
   -map 0:v -map '[a]' -t "$DUR" "${video_out[@]}" -c:a aac -b:a 160k \
   -movflags +faststart video.mp4 \
   || die "::error::ffmpeg could not encode the video"
@@ -517,7 +531,7 @@ else
   cp "$OUT/frames/$(printf '%04d' $((frames / 4)))".jpg "$OUT/cover.jpg"
 fi
 rm -rf "$OUT/frames" "$OUT/public" "$OUT/silent.mp4"
-rm -f "$OUT"/zoom-*.webp "$OUT/shadow.webp"
+rm -f "$OUT"/zoom-*.webp "$OUT/shadow.webp" "$OUT/voice.wav" "$OUT/sfx.wav"
 
 # The manifest brawlzone-tiktok reads, and the YouTube titles in Portuguese
 # and Spanish (descriptions stay English, like the video).

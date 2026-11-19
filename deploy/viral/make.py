@@ -49,7 +49,7 @@ draw the quiz instead. --only draws preview stills at those seconds.
 
 The selection is seeded with the data's date, so parallel PARTs agree on it.
 """
-import json, math, os, random, sys
+import json, math, os, random, sys, wave
 from PIL import Image, ImageDraw, ImageFilter
 
 from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, card, clamp,
@@ -2166,9 +2166,63 @@ if KIND == 'bubblepromo':
     _top = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
     BP_ME = by_id.get(16000000) or _top[8]  # Shelly: the brawler everyone has
     BP_TOP = [b for b in _top if b['id'] != BP_ME['id']]
-    for n, k in ((5, 'bp_hook'), (5, 'bp_draft'), (4, 'bp_counters'), (6, 'bp_review'), (4, 'bp_session'), (4, 'bp_menu'),
-                 (6, 'bp_widgets'), (5, 'bp_alerts'), (3, 'bp_take5'), (6, 'bp_outro')):
-        tl.add(n, k)
+    # v2 (owner: "make it real pro... lets make this go VIRAL"): a narrated
+    # story, problem first. Each line is voiced by Piper (en_US-ryan-high, on
+    # the box, cached by text in ASSETS/vo); its length sets the scene's
+    # length on the beat grid, and `hits` (beats into the scene) time both the
+    # animation in BubblePromo.tsx and the sound effects below.
+    import hashlib, subprocess
+    ASSETS = os.environ.get('ASSETS', '.')
+    VO_LEAD = 0.12
+
+    def voice(text):
+        path = f"{ASSETS}/vo/{hashlib.sha1(f'ryan-high/0.86/{text}'.encode()).hexdigest()[:16]}.wav"
+        if not os.path.exists(path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            subprocess.run([f'{ASSETS}/piper/piper/piper', '--model', f'{ASSETS}/piper/en_US-ryan-high.onnx', '--length_scale', '0.86',
+                            '--output_file', path], input=text.encode(), check=True, capture_output=True)
+        with wave.open(path) as w:
+            return path, w.getnframes() / w.getframerate()
+
+    def chunks(caption, dur):
+        """Caption words in chunks of up to three, timed by length across the line."""
+        words, hi = [], False
+        for raw in caption.replace('MR. P', 'MR.\u00a0P').split(' '):  # a name is one word (split(), not: it splits on NBSP)
+            hi = hi or raw.startswith('*')
+            words.append((raw.replace('*', ''), hi))
+            if raw.rstrip('?:,.!').endswith('*'): hi = False
+        out, cur = [], []
+        for w, h in words:
+            cur.append((w, h))
+            if len(cur) == 3 or w[-1] in '?:,!':  # not '.': "MR. P" stays together
+                out.append(cur); cur = []
+        if cur: out.append(cur)
+        total = sum(len(' '.join(w for w, _ in c)) for c in out) or 1
+        t, res = VO_LEAD, []
+        for c in out:
+            d = dur * len(' '.join(w for w, _ in c)) / total
+            res.append({'t0': round(t, 3), 't1': round(t + d, 3), 'words': [{'w': w, 'hi': h} for w, h in c]})
+            t += d
+        return res
+
+    SCRIPT = [  # scene, what the voice says, the caption (*highlighted*), minimum beats, hits (beats into the scene)
+        ('bp_hook', 'Losing in Ranked again?', 'LOSING IN *RANKED* AGAIN?', 3, [0, 0.7, 1.4]),
+        ('bp_blind', "You're probably picking blind.", "YOU'RE PICKING *BLIND*", 2, [0.25, 0.55, 0.85]),
+        ('bp_reveal', 'This free app sits right on top of Brawl Stars.', 'THIS *FREE* APP SITS ON TOP OF *BRAWL STARS*', 3, [0.45]),
+        ('bp_draft', 'Tap it in the draft, and it shows the best picks for your map.', 'TAP IT IN THE DRAFT: *BEST PICKS* FOR YOUR MAP', 4, [0.15, 0.4, 2.3]),
+        ('bp_counters', 'They picked Mister P? It tells you exactly who beats him.', 'THEY PICKED MR. P? IT SHOWS *WHO BEATS HIM*', 4, [0.0, 0.9, 2.2]),
+        ('bp_review', 'After every game, it tells you why you won, or lost.', 'AFTER EVERY GAME: *WHY* YOU WON OR LOST', 4, [0.2, 1.0, 1.8, 2.05, 2.3, 3.0]),
+        ('bp_session', 'Your session score lives right on the bubble.', 'YOUR *SESSION SCORE*, LIVE ON THE BUBBLE', 3, [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1]),
+        ('bp_widgets', 'Your rank and next goal, on your home screen.', 'YOUR *RANK* AND *NEXT GOAL* ON YOUR HOME SCREEN', 3, [0.6, 1.0, 1.4, 1.8]),
+        ('bp_alerts', 'And it warns you when your brawlers get nerfed.', 'IT WARNS YOU WHEN YOUR BRAWLERS GET *NERFED*', 3, [0.3, 0.8, 1.3, 1.8]),
+        ('bp_take5', "It even tells you when you're tilted.", "IT EVEN KNOWS WHEN YOU'RE *TILTED*", 3, [0.4]),
+        ('bp_outro', "It's free. Search Brawl Zone Bubble, on Google Play.", "IT'S *FREE*: SEARCH *BRAWLZONE BUBBLE*", 5, [0, 1.2, 2.0, 3.2]),
+    ]
+    BP_VO = []
+    for kind, said, caption, least, hits in SCRIPT:
+        path, dur = voice(said)
+        beats = max(least, math.ceil((VO_LEAD + dur + 0.3) / tl.step))
+        tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, dur)}, hits=hits)
     META = {
         'title': 'This app coaches you INSIDE Brawl Stars 🤯 (free) #Shorts',
         'titles': {'pt-BR': 'Esse app te treina DENTRO do Brawl Stars 🤯 (grátis) #Shorts',
@@ -2408,6 +2462,8 @@ def export_plan(out):
         elif k == 'w_outro' and KIND == 'whatsnew':
             o['faces'] = [save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
                           for b in list(NEWEST) + [b for b, _ in BUFFIES]]
+        elif KIND == 'bubblepromo':
+            o.update(vo={kk: v for kk, v in s['vo'].items() if kk != 'path'}, hits=s.get('hits', []))
         elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
             o.update({kk: conv(v) for kk, v in s.items() if kk not in ('kind', 'start', 'len')})
         segs.append(o)
@@ -2454,6 +2510,27 @@ def export_plan(out):
                         'tags': [x.upper() for x in (R.get('rarity'), R.get('class')) if x], 'verdict': word, 'vcol': hexc(vcol)},
                     hero=save(HERO, 'c/hero.png'), mystery=save(MYSTERY, 'c/mystery.png'))
     if KIND == 'bubblepromo':
+        # The voice and the sound effects as two WAVs next to the plan; the
+        # job lays them with the music (the music ducks under the voice).
+        import numpy as np, sfx
+        vo = np.zeros(int(tl.dur * 22050) + 22050, dtype=np.int16)
+        cues = []
+        for sg in tl.segments:
+            t0 = sg['start'] * tl.step
+            with wave.open(sg['vo']['path']) as w:
+                pcm = np.frombuffer(w.readframes(w.getnframes()), dtype='<i2')
+            i = int((t0 + VO_LEAD) * 22050); vo[i:i + len(pcm)] = pcm[:max(0, len(vo) - i)]
+            if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.7))
+            per = {'bp_hook': ['buzz', 'buzz', 'buzz'], 'bp_blind': ['pop', 'pop', 'pop'], 'bp_reveal': ['impact'],
+                   'bp_draft': ['tap', 'whoosh', 'pop'], 'bp_counters': ['whoosh', 'tap', 'pop'],
+                   'bp_review': ['chime', 'whoosh', 'pop', 'pop', 'pop', 'pop'], 'bp_session': ['tap'] * 6 + ['chime'],
+                   'bp_widgets': ['pop'] * 4, 'bp_alerts': ['ding'] * 4, 'bp_take5': ['buzz'], 'bp_outro': ['impact', 'pop', 'tap', 'pop']}[sg['kind']]
+            for h, name in zip(sg['hits'], per):
+                cues.append((t0 + h * tl.step, name, 0.6 if name in ('tap', 'whoosh') else 0.85))
+            if sg['kind'] == 'bp_reveal': cues.append((max(0, t0 - 1.0), 'riser', 0.7))
+        with wave.open(f'{out}/voice.wav', 'wb') as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050); w.writeframes(vo[:int(tl.dur * 22050)].tobytes())
+        sfx.track(cues, tl.dur, f'{out}/sfx.wav')
         BPA = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
         RKA = f"{os.environ.get('ASSETS', '.')}/ranked"
         cp = lambda src, rel: save(Image.open(src).convert('RGBA'), rel)
