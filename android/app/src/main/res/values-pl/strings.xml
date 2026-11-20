@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Zapytaj Bubble</string>
     <string name="widget_ask_description">Pytaj o dowolnego zadymiarza, mapę lub tryb, tekstem lub głosem</string>
     <string name="widget_ask_hint">Zapytaj Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Pierwsze kroki</string>
+    <string name="welcome_tag_title">Dodaj swój tag gracza</string>
+    <string name="welcome_tag_text">Wtedy Bubble oznaczy twoich zadymiarzy i będzie śledzić twoje mecze rankingowe.</string>
+    <string name="welcome_bubble_title">Wypróbuj bańkę w następnym drafcie</string>
+    <string name="welcome_bubble_text">Stuknij, żeby otworzyć Brawl Stars z bańką. Stuknij bańkę w trakcie draftu, żeby zobaczyć najlepsze wybory.</string>
+    <string name="welcome_friend_title">Dodaj znajomego</string>
+    <string name="welcome_friend_text">Rywalizujcie w tygodniowym pojedynku i zobacz, kiedy gra.</string>
+    <string name="welcome_widget_title">Twoja ranga na ekranie głównym</string>
+    <string name="welcome_widget_text">Stuknij, żeby dodać widżet Moja ranga: ranga, elo i wykres sezonu.</string>
+    <string name="welcome_ask_title">Zapytaj Bubble o cokolwiek</string>
+    <string name="welcome_ask_text">Kto wygrywa z Edgarem? Najlepsze wybory na tej mapie? Co ulepszyć? Stuknij, żeby zapytać.</string>
+    <string name="roast_me">🔥 Zroastuj moje konto</string>
+    <string name="roast_friend">Zroastuj %1$s</string>
+    <string name="roast_title">Dzisiejszy roast</string>
+    <string name="roast_loading">Roastowanie…</string>
+    <string name="roast_share">Udostępnij</string>
+    <string name="roast_close">Zamknij</string>
+    <string name="roast_failed">Teraz brak roastu. Spróbuj za minutę.</string>
+    <string name="roast_share_text">Zroastuj też swoje konto: brawlzone.net/bubble</string>
 </resources>

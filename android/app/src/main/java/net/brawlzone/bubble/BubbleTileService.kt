@@ -3,6 +3,7 @@ package net.brawlzone.bubble
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.provider.Settings
 import android.service.quicksettings.Tile
@@ -67,6 +68,8 @@ class BubbleTileService : TileService() {
         val tile = qsTile ?: return
         tile.state = if (BubbleService.running) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         tile.label = "BrawlZone"
+        // Set here as well as in the manifest, so a tile added before 1.42 swaps its old icon too.
+        tile.icon = Icon.createWithResource(this, R.drawable.ic_bubble_mono)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val local = AppLang.wrap(this)
             tile.subtitle = local.getString(

@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Pregunta a Bubble</string>
     <string name="widget_ask_description">Pregunta por cualquier brawler, mapa o modo, por texto o voz</string>
     <string name="widget_ask_hint">Pregunta a Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Primeros pasos</string>
+    <string name="welcome_tag_title">Añade tu ID de jugador</string>
+    <string name="welcome_tag_text">Así Bubble marca los brawlers que tienes y sigue tus partidas de Competitivo.</string>
+    <string name="welcome_bubble_title">Prueba la burbuja en tu próximo draft</string>
+    <string name="welcome_bubble_text">Toca aquí para abrir Brawl Stars con la burbuja. Toca la burbuja durante el draft para ver las mejores elecciones.</string>
+    <string name="welcome_friend_title">Añade a un amigo</string>
+    <string name="welcome_friend_text">Compite con él en el duelo semanal y mira cuándo está jugando.</string>
+    <string name="welcome_widget_title">Tu rango en la pantalla de inicio</string>
+    <string name="welcome_widget_text">Toca para añadir el widget Mi rango: rango, elo y la gráfica de tu temporada.</string>
+    <string name="welcome_ask_title">Pregúntale lo que quieras a Bubble</string>
+    <string name="welcome_ask_text">¿Quién le gana a Edgar? ¿Mejores elecciones en este mapa? ¿Qué mejoro? Toca para preguntar.</string>
+    <string name="roast_me">🔥 Humilla mi cuenta</string>
+    <string name="roast_friend">Humillar a %1$s</string>
+    <string name="roast_title">La humillación de hoy</string>
+    <string name="roast_loading">Preparando la humillación…</string>
+    <string name="roast_share">Compartir</string>
+    <string name="roast_close">Cerrar</string>
+    <string name="roast_failed">Ahora no hay humillación. Prueba en un minuto.</string>
+    <string name="roast_share_text">Que humillen tu cuenta también: brawlzone.net/bubble</string>
 </resources>

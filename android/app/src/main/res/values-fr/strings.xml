@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Demande à Bubble</string>
     <string name="widget_ask_description">Pose ta question sur un brawler, une carte ou un mode, à l\'écrit ou à voix haute</string>
     <string name="widget_ask_hint">Demande à Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Premiers pas</string>
+    <string name="welcome_tag_title">Ajoute ton tag de joueur</string>
+    <string name="welcome_tag_text">Bubble marque alors les brawlers que tu as et suit tes parties en Classé.</string>
+    <string name="welcome_bubble_title">Essaie la bulle à ta prochaine draft</string>
+    <string name="welcome_bubble_text">Touche ici pour ouvrir Brawl Stars avec la bulle. Touche la bulle pendant la draft pour les meilleurs choix.</string>
+    <string name="welcome_friend_title">Ajoute un ami</string>
+    <string name="welcome_friend_text">Affronte-le dans le duel de la semaine et vois quand il joue.</string>
+    <string name="welcome_widget_title">Ton rang sur l\'écran d\'accueil</string>
+    <string name="welcome_widget_text">Touche pour ajouter le widget Mon rang : rang, elo et ta courbe de la saison.</string>
+    <string name="welcome_ask_title">Demande n\'importe quoi à Bubble</string>
+    <string name="welcome_ask_text">Qui bat Edgar ? Meilleurs choix sur cette carte ? Quoi améliorer ? Touche pour demander.</string>
+    <string name="roast_me">🔥 Clashe mon compte</string>
+    <string name="roast_friend">Clasher %1$s</string>
+    <string name="roast_title">Le clash du jour</string>
+    <string name="roast_loading">Préparation du clash…</string>
+    <string name="roast_share">Partager</string>
+    <string name="roast_close">Fermer</string>
+    <string name="roast_failed">Pas de clash pour l\'instant. Réessaie dans une minute.</string>
+    <string name="roast_share_text">Fais clasher ton compte aussi : brawlzone.net/bubble</string>
 </resources>

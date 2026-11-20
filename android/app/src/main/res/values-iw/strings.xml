@@ -334,4 +334,25 @@
     <string name="widget_ask_name">שאל את Bubble</string>
     <string name="widget_ask_description">שאל על כל לוחם, מפה או מצב, בכתב או בקול</string>
     <string name="widget_ask_hint">שאל את Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">צעדים ראשונים</string>
+    <string name="welcome_tag_title">הוסיפו את תג השחקן שלכם</string>
+    <string name="welcome_tag_text">כך Bubble יסמן את הבראולרים שיש לכם ויעקוב אחרי המשחקים המדורגים שלכם.</string>
+    <string name="welcome_bubble_title">נסו את הבועה בדראפט הבא</string>
+    <string name="welcome_bubble_text">הקישו כאן כדי לפתוח את Brawl Stars עם הבועה. הקישו על הבועה בזמן הדראפט לבחירות הטובות ביותר.</string>
+    <string name="welcome_friend_title">הוסיפו חבר</string>
+    <string name="welcome_friend_text">התחרו בדו־קרב השבועי וראו מתי הוא משחק.</string>
+    <string name="welcome_widget_title">הדרגה שלכם במסך הבית</string>
+    <string name="welcome_widget_text">הקישו כדי להוסיף את הווידג׳ט הדרגה שלי: דרגה, elo וגרף העונה.</string>
+    <string name="welcome_ask_title">שאלו את Bubble כל דבר</string>
+    <string name="welcome_ask_text">מי מנצח את אדגר? הבחירות הטובות ביותר במפה הזו? מה לשדרג? הקישו כדי לשאול.</string>
+    <string name="roast_me">🔥 תצלו לי את החשבון</string>
+    <string name="roast_friend">לצלות את %1$s</string>
+    <string name="roast_title">הצלייה של היום</string>
+    <string name="roast_loading">צולים…</string>
+    <string name="roast_share">שיתוף</string>
+    <string name="roast_close">סגירה</string>
+    <string name="roast_failed">אין צלייה כרגע. נסו שוב בעוד דקה.</string>
+    <string name="roast_share_text">גם החשבון שלכם יכול להיצלות: brawlzone.net/bubble</string>
 </resources>

@@ -334,4 +334,25 @@
     <string name="widget_ask_name">اسأل Bubble</string>
     <string name="widget_ask_description">اسأل عن أي مقاتل أو خريطة أو طور، كتابةً أو بالصوت</string>
     <string name="widget_ask_hint">اسأل Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">البداية</string>
+    <string name="welcome_tag_title">أضف وسم اللاعب الخاص بك</string>
+    <string name="welcome_tag_text">عندها يحدد Bubble الأبطال الذين تملكهم ويتابع مبارياتك في المصنف.</string>
+    <string name="welcome_bubble_title">جرّب الفقاعة في اختيارك القادم</string>
+    <string name="welcome_bubble_text">المس هنا لفتح Brawl Stars مع الفقاعة. المس الفقاعة أثناء الاختيار لرؤية أفضل الخيارات.</string>
+    <string name="welcome_friend_title">أضف صديقًا</string>
+    <string name="welcome_friend_text">تنافسا في مبارزة الأسبوع واعرف متى يلعب.</string>
+    <string name="welcome_widget_title">رتبتك على الشاشة الرئيسية</string>
+    <string name="welcome_widget_text">المس لإضافة أداة رتبتي: الرتبة والنقاط ومنحنى موسمك.</string>
+    <string name="welcome_ask_title">اسأل Bubble عن أي شيء</string>
+    <string name="welcome_ask_text">من يتغلب على إدغار؟ أفضل الخيارات في هذه الخريطة؟ ماذا أطوّر؟ المس لتسأل.</string>
+    <string name="roast_me">🔥 اسخر من حسابي</string>
+    <string name="roast_friend">اسخر من %1$s</string>
+    <string name="roast_title">سخرية اليوم</string>
+    <string name="roast_loading">جارٍ تحضير السخرية…</string>
+    <string name="roast_share">مشاركة</string>
+    <string name="roast_close">إغلاق</string>
+    <string name="roast_failed">لا توجد سخرية الآن. حاول بعد دقيقة.</string>
+    <string name="roast_share_text">اجعلهم يسخرون من حسابك أيضًا: brawlzone.net/bubble</string>
 </resources>

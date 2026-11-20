@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Bubble에게 물어보기</string>
     <string name="widget_ask_description">브롤러, 맵, 모드에 대해 글이나 음성으로 물어보세요</string>
     <string name="widget_ask_hint">Bubble에게 물어보기…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">시작하기</string>
+    <string name="welcome_tag_title">플레이어 태그를 추가하세요</string>
+    <string name="welcome_tag_text">그러면 Bubble이 보유한 브롤러를 표시하고 경쟁전 경기를 기록해요.</string>
+    <string name="welcome_bubble_title">다음 밴픽에서 버블을 써 보세요</string>
+    <string name="welcome_bubble_text">탭하면 버블과 함께 브롤스타즈가 열려요. 밴픽 중에 버블을 탭하면 최고의 픽이 보여요.</string>
+    <string name="welcome_friend_title">친구를 추가하세요</string>
+    <string name="welcome_friend_text">주간 대결로 겨루고 친구가 언제 플레이하는지 확인하세요.</string>
+    <string name="welcome_widget_title">홈 화면에 내 랭크</string>
+    <string name="welcome_widget_text">탭해서 내 랭크 위젯 추가: 랭크, 엘로, 시즌 그래프.</string>
+    <string name="welcome_ask_title">Bubble에게 뭐든 물어보세요</string>
+    <string name="welcome_ask_text">에드거 카운터는? 이 맵 최고의 픽은? 뭘 강화할까? 탭해서 물어보기.</string>
+    <string name="roast_me">🔥 내 계정 디스하기</string>
+    <string name="roast_friend">%1$s 디스하기</string>
+    <string name="roast_title">오늘의 디스</string>
+    <string name="roast_loading">디스 준비 중…</string>
+    <string name="roast_share">공유</string>
+    <string name="roast_close">닫기</string>
+    <string name="roast_failed">지금은 디스할 수 없어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="roast_share_text">내 계정도 디스 받아 보기: brawlzone.net/bubble</string>
 </resources>

@@ -334,4 +334,25 @@
     <string name="widget_ask_name">ถาม Bubble</string>
     <string name="widget_ask_description">ถามเรื่องบรอว์เลอร์ แมพ หรือโหมดใดก็ได้ ด้วยข้อความหรือเสียง</string>
     <string name="widget_ask_hint">ถาม Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">เริ่มต้นใช้งาน</string>
+    <string name="welcome_tag_title">เพิ่มแท็กผู้เล่นของคุณ</string>
+    <string name="welcome_tag_text">แล้ว Bubble จะทำเครื่องหมายบรอว์เลอร์ที่คุณมีและติดตามแมตช์จัดอันดับของคุณ</string>
+    <string name="welcome_bubble_title">ลองใช้บับเบิลในดราฟต์ถัดไป</string>
+    <string name="welcome_bubble_text">แตะที่นี่เพื่อเปิด Brawl Stars พร้อมบับเบิล แตะบับเบิลระหว่างดราฟต์เพื่อดูตัวเลือกที่ดีที่สุด</string>
+    <string name="welcome_friend_title">เพิ่มเพื่อน</string>
+    <string name="welcome_friend_text">แข่งกันในดวลประจำสัปดาห์และดูว่าเพื่อนกำลังเล่นอยู่ไหม</string>
+    <string name="welcome_widget_title">แรงก์ของคุณบนหน้าจอหลัก</string>
+    <string name="welcome_widget_text">แตะเพื่อเพิ่มวิดเจ็ตแรงก์ของฉัน: แรงก์ elo และกราฟซีซั่น</string>
+    <string name="welcome_ask_title">ถาม Bubble ได้ทุกเรื่อง</string>
+    <string name="welcome_ask_text">ใครชนะ Edgar? ตัวเลือกที่ดีที่สุดในแมพนี้? ควรอัปเกรดอะไร? แตะเพื่อถาม</string>
+    <string name="roast_me">🔥 แซวบัญชีของฉัน</string>
+    <string name="roast_friend">แซว %1$s</string>
+    <string name="roast_title">คำแซวประจำวัน</string>
+    <string name="roast_loading">กำลังแซว…</string>
+    <string name="roast_share">แชร์</string>
+    <string name="roast_close">ปิด</string>
+    <string name="roast_failed">ตอนนี้ยังแซวไม่ได้ ลองใหม่ในอีกสักครู่</string>
+    <string name="roast_share_text">ให้บัญชีของคุณโดนแซวบ้าง: brawlzone.net/bubble</string>
 </resources>

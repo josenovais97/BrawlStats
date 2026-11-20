@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Vraag het Bubble</string>
     <string name="widget_ask_description">Vraag naar elke brawler, map of modus, met tekst of je stem</string>
     <string name="widget_ask_hint">Vraag het Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Aan de slag</string>
+    <string name="welcome_tag_title">Voeg je spelerstag toe</string>
+    <string name="welcome_tag_text">Dan markeert Bubble de knokkers die je hebt en volgt het je ladderpotjes.</string>
+    <string name="welcome_bubble_title">Probeer de bubbel in je volgende draft</string>
+    <string name="welcome_bubble_text">Tik hier om Brawl Stars met de bubbel te openen. Tik tijdens de draft op de bubbel voor de beste picks.</string>
+    <string name="welcome_friend_title">Voeg een vriend toe</string>
+    <string name="welcome_friend_text">Strijd tegen elkaar in het weekduel en zie wanneer ze spelen.</string>
+    <string name="welcome_widget_title">Je rang op je startscherm</string>
+    <string name="welcome_widget_text">Tik om de widget Mijn rang toe te voegen: rang, elo en je seizoensgrafiek.</string>
+    <string name="welcome_ask_title">Vraag Bubble wat je wilt</string>
+    <string name="welcome_ask_text">Wie verslaat Edgar? Beste picks op deze map? Wat moet ik upgraden? Tik om te vragen.</string>
+    <string name="roast_me">🔥 Roast mijn account</string>
+    <string name="roast_friend">%1$s roasten</string>
+    <string name="roast_title">De roast van vandaag</string>
+    <string name="roast_loading">Roasten…</string>
+    <string name="roast_share">Delen</string>
+    <string name="roast_close">Sluiten</string>
+    <string name="roast_failed">Nu even geen roast. Probeer het zo opnieuw.</string>
+    <string name="roast_share_text">Laat je eigen account ook roasten: brawlzone.net/bubble</string>
 </resources>

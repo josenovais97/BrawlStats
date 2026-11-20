@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Tanya Bubble</string>
     <string name="widget_ask_description">Tanya tentang brawler, map, atau mode apa pun, dengan teks atau suara</string>
     <string name="widget_ask_hint">Tanya Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Mulai</string>
+    <string name="welcome_tag_title">Tambahkan tag pemainmu</string>
+    <string name="welcome_tag_text">Lalu Bubble menandai jagoan yang kamu punya dan mengikuti pertandingan Berperingkat-mu.</string>
+    <string name="welcome_bubble_title">Coba gelembung di draft berikutnya</string>
+    <string name="welcome_bubble_text">Ketuk di sini untuk membuka Brawl Stars dengan gelembung. Ketuk gelembung saat draft untuk pilihan terbaik.</string>
+    <string name="welcome_friend_title">Tambahkan teman</string>
+    <string name="welcome_friend_text">Bersaing di duel mingguan dan lihat kapan mereka bermain.</string>
+    <string name="welcome_widget_title">Peringkatmu di layar utama</string>
+    <string name="welcome_widget_text">Ketuk untuk menambahkan widget Peringkatku: peringkat, elo, dan grafik musimmu.</string>
+    <string name="welcome_ask_title">Tanya Bubble apa saja</string>
+    <string name="welcome_ask_text">Siapa yang mengalahkan Edgar? Pilihan terbaik di map ini? Apa yang harus kuupgrade? Ketuk untuk bertanya.</string>
+    <string name="roast_me">🔥 Roasting akunku</string>
+    <string name="roast_friend">Roasting %1$s</string>
+    <string name="roast_title">Roasting hari ini</string>
+    <string name="roast_loading">Sedang roasting…</string>
+    <string name="roast_share">Bagikan</string>
+    <string name="roast_close">Tutup</string>
+    <string name="roast_failed">Belum ada roasting sekarang. Coba lagi sebentar lagi.</string>
+    <string name="roast_share_text">Roasting akunmu juga: brawlzone.net/bubble</string>
 </resources>

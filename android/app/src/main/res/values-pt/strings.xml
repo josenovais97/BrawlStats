@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Pergunte ao Bubble</string>
     <string name="widget_ask_description">Pergunte sobre qualquer brawler, mapa ou modo, por texto ou voz</string>
     <string name="widget_ask_hint">Pergunte ao Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Primeiros passos</string>
+    <string name="welcome_tag_title">Adicione sua tag de jogador</string>
+    <string name="welcome_tag_text">Assim o Bubble marca os brawlers que você tem e acompanha suas partidas do Ranqueado.</string>
+    <string name="welcome_bubble_title">Teste a bolha no próximo draft</string>
+    <string name="welcome_bubble_text">Toque aqui para abrir o Brawl Stars com a bolha. Toque na bolha durante o draft para ver as melhores escolhas.</string>
+    <string name="welcome_friend_title">Adicione um amigo</string>
+    <string name="welcome_friend_text">Dispute o duelo da semana com ele e veja quando ele está jogando.</string>
+    <string name="welcome_widget_title">Seu rank na tela inicial</string>
+    <string name="welcome_widget_text">Toque para adicionar o widget Meu rank: rank, elo e o gráfico da temporada.</string>
+    <string name="welcome_ask_title">Pergunte qualquer coisa ao Bubble</string>
+    <string name="welcome_ask_text">Quem ganha do Edgar? Melhores escolhas neste mapa? O que devo melhorar? Toque para perguntar.</string>
+    <string name="roast_me">🔥 Zoar minha conta</string>
+    <string name="roast_friend">Zoar %1$s</string>
+    <string name="roast_title">A zoeira de hoje</string>
+    <string name="roast_loading">Preparando a zoeira…</string>
+    <string name="roast_share">Compartilhar</string>
+    <string name="roast_close">Fechar</string>
+    <string name="roast_failed">Sem zoeira agora. Tente daqui a um minuto.</string>
+    <string name="roast_share_text">Zoe a sua conta também: brawlzone.net/bubble</string>
 </resources>

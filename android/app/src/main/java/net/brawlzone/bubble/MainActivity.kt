@@ -122,6 +122,8 @@ class MainActivity : AppCompatActivity() {
         wireSeason()
         wireFriends()
         wireVersus()
+        // 1.42: a welcome-week tip that lands here (the Friends card, or adding a widget).
+        Welcome.handle(this, intent)
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -194,7 +196,7 @@ class MainActivity : AppCompatActivity() {
             bar.requestAddTileService(
                 ComponentName(this, BubbleTileService::class.java),
                 "BrawlZone",
-                Icon.createWithResource(this, R.drawable.bubble_glyph),
+                Icon.createWithResource(this, R.drawable.ic_bubble_mono),
                 mainExecutor,
             ) { result ->
                 if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED ||
@@ -253,6 +255,7 @@ class MainActivity : AppCompatActivity() {
             Share.wrapped(this) { busy -> shareBusy(null, busy) }
             return
         }
+        if (Welcome.handle(this, intent)) return
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
@@ -411,6 +414,8 @@ class MainActivity : AppCompatActivity() {
         val wrapped = findViewById<TextView>(R.id.share_wrapped)
         rank.setOnClickListener { Share.rank(this) { busy -> shareBusy(rank, busy) } }
         wrapped.setOnClickListener { Share.wrapped(this) { busy -> shareBusy(wrapped, busy) } }
+        // 1.42: today's roast of this account.
+        findViewById<TextView>(R.id.roast_me).setOnClickListener { Roast.show(this, Account.tag(this)) }
         // The whole season on brawlzone.net (1.41): the profile's Ranked tab.
         findViewById<TextView>(R.id.open_site_season).setOnClickListener {
             val tag = Account.tag(this)
@@ -792,6 +797,12 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread { if (bitmap != null) badge.setImageBitmap(bitmap) }
             }.start()
             if (!row.you) {
+                // 1.42: the flame (or a tap on the row) roasts the friend.
+                val roast = view.findViewById<TextView>(R.id.friend_roast)
+                roast.visibility = View.VISIBLE
+                roast.contentDescription = getString(R.string.roast_friend, row.data.name)
+                roast.setOnClickListener { Roast.show(this, row.data.tag) }
+                view.setOnClickListener { Roast.show(this, row.data.tag) }
                 view.setOnLongClickListener {
                     androidx.appcompat.app.AlertDialog.Builder(this)
                         .setMessage(getString(R.string.friends_remove_confirm, row.data.name))

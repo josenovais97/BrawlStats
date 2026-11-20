@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Chiedi a Bubble</string>
     <string name="widget_ask_description">Chiedi di qualsiasi brawler, mappa o modalità, scrivendo o a voce</string>
     <string name="widget_ask_hint">Chiedi a Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Primi passi</string>
+    <string name="welcome_tag_title">Aggiungi il tuo tag giocatore</string>
+    <string name="welcome_tag_text">Così Bubble segna i brawler che hai e segue le tue partite in Classificata.</string>
+    <string name="welcome_bubble_title">Prova la bolla al prossimo draft</string>
+    <string name="welcome_bubble_text">Tocca qui per aprire Brawl Stars con la bolla. Tocca la bolla durante il draft per le scelte migliori.</string>
+    <string name="welcome_friend_title">Aggiungi un amico</string>
+    <string name="welcome_friend_text">Sfidalo nel duello della settimana e guarda quando sta giocando.</string>
+    <string name="welcome_widget_title">Il tuo grado nella schermata Home</string>
+    <string name="welcome_widget_text">Tocca per aggiungere il widget Il mio grado: grado, elo e il grafico della stagione.</string>
+    <string name="welcome_ask_title">Chiedi qualsiasi cosa a Bubble</string>
+    <string name="welcome_ask_text">Chi batte Edgar? Scelte migliori su questa mappa? Cosa potenzio? Tocca per chiedere.</string>
+    <string name="roast_me">🔥 Insulta il mio account</string>
+    <string name="roast_friend">Insulta %1$s</string>
+    <string name="roast_title">L\'insulto di oggi</string>
+    <string name="roast_loading">Preparo gli insulti…</string>
+    <string name="roast_share">Condividi</string>
+    <string name="roast_close">Chiudi</string>
+    <string name="roast_failed">Niente insulti adesso. Riprova tra un minuto.</string>
+    <string name="roast_share_text">Fatti insultare l\'account anche tu: brawlzone.net/bubble</string>
 </resources>

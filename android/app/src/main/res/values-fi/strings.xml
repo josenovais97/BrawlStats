@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Kysy Bubblelta</string>
     <string name="widget_ask_description">Kysy mistä tahansa brawlerista, kartasta tai pelimuodosta, tekstillä tai äänellä</string>
     <string name="widget_ask_hint">Kysy Bubblelta…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Aloitus</string>
+    <string name="welcome_tag_title">Lisää pelaajatunnuksesi</string>
+    <string name="welcome_tag_text">Silloin Bubble merkitsee omat rämäpääsi ja seuraa rankattuja pelejäsi.</string>
+    <string name="welcome_bubble_title">Kokeile kuplaa seuraavassa draftissa</string>
+    <string name="welcome_bubble_text">Napauta avataksesi Brawl Starsin kuplan kanssa. Napauta kuplaa draftin aikana nähdäksesi parhaat valinnat.</string>
+    <string name="welcome_friend_title">Lisää kaveri</string>
+    <string name="welcome_friend_text">Kisatkaa viikon kaksintaistelussa ja näe, milloin hän pelaa.</string>
+    <string name="welcome_widget_title">Tasosi aloitusnäytölle</string>
+    <string name="welcome_widget_text">Napauta lisätäksesi Oma taso -widgetin: taso, elo ja kauden käyrä.</string>
+    <string name="welcome_ask_title">Kysy Bubblelta mitä vain</string>
+    <string name="welcome_ask_text">Kuka voittaa Edgarin? Parhaat valinnat tällä kartalla? Mitä päivitän? Napauta kysyäksesi.</string>
+    <string name="roast_me">🔥 Roastaa tilini</string>
+    <string name="roast_friend">Roastaa %1$s</string>
+    <string name="roast_title">Päivän roast</string>
+    <string name="roast_loading">Roastataan…</string>
+    <string name="roast_share">Jaa</string>
+    <string name="roast_close">Sulje</string>
+    <string name="roast_failed">Ei roastia juuri nyt. Yritä hetken päästä.</string>
+    <string name="roast_share_text">Roastauta oma tilisi: brawlzone.net/bubble</string>
 </resources>

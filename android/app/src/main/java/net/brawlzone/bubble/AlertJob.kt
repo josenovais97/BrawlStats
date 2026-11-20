@@ -120,6 +120,8 @@ class AlertJob : JobService() {
             Invite.poll(context, post)
             Duel.settle(context, post)
             Online.check(context, post)
+            // 1.42: the first week's tips for a new install.
+            Welcome.check(context, post)
             if (me != null) Versus.fetch(context)
             Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)

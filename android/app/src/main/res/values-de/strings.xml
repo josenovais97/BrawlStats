@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Frag Bubble</string>
     <string name="widget_ask_description">Frag nach jedem Brawler, jeder Map oder jedem Modus, per Text oder Stimme</string>
     <string name="widget_ask_hint">Frag Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Erste Schritte</string>
+    <string name="welcome_tag_title">Füge deinen Spieler-Tag hinzu</string>
+    <string name="welcome_tag_text">Dann markiert Bubble deine Brawler und verfolgt deine Ranked-Spiele.</string>
+    <string name="welcome_bubble_title">Teste die Bubble im nächsten Draft</string>
+    <string name="welcome_bubble_text">Tippe hier, um Brawl Stars mit der Bubble zu öffnen. Tippe im Draft auf die Bubble für die besten Picks.</string>
+    <string name="welcome_friend_title">Füge einen Freund hinzu</string>
+    <string name="welcome_friend_text">Tritt im Wochenduell gegen ihn an und sieh, wann er spielt.</string>
+    <string name="welcome_widget_title">Dein Rang auf dem Startbildschirm</string>
+    <string name="welcome_widget_text">Tippe, um das Widget Mein Rang hinzuzufügen: Rang, Elo und deine Saisonkurve.</string>
+    <string name="welcome_ask_title">Frag Bubble, was du willst</string>
+    <string name="welcome_ask_text">Wer schlägt Edgar? Beste Picks auf dieser Map? Was soll ich verbessern? Zum Fragen tippen.</string>
+    <string name="roast_me">🔥 Roaste meinen Account</string>
+    <string name="roast_friend">%1$s roasten</string>
+    <string name="roast_title">Der Roast von heute</string>
+    <string name="roast_loading">Wird geroastet…</string>
+    <string name="roast_share">Teilen</string>
+    <string name="roast_close">Schließen</string>
+    <string name="roast_failed">Gerade kein Roast. Versuch es gleich nochmal.</string>
+    <string name="roast_share_text">Lass deinen Account auch roasten: brawlzone.net/bubble</string>
 </resources>

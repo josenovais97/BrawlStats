@@ -641,6 +641,24 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- 1.42: today's roast of this account, to share (Roast). -->
+            <TextView
+                android:id="@+id/roast_me"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_outline"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="8dp"
+                android:paddingTop="13dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="15dp"
+                android:text="@string/roast_me"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
             <!-- 1.41: the whole season on the profile's Ranked tab, in the browser. -->
             <TextView
                 android:id="@+id/open_site_season"

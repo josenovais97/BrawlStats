@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Bubble\'a sor</string>
     <string name="widget_ask_description">Herhangi bir savaşçı, harita ya da mod hakkında yazarak veya sesle sor</string>
     <string name="widget_ask_hint">Bubble\'a sor…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Başlarken</string>
+    <string name="welcome_tag_title">Oyuncu etiketini ekle</string>
+    <string name="welcome_tag_text">Böylece Bubble sahip olduğun savaşçıları işaretler ve Dereceli maçlarını takip eder.</string>
+    <string name="welcome_bubble_title">Baloncuğu bir sonraki seçimde dene</string>
+    <string name="welcome_bubble_text">Brawl Stars’ı baloncukla açmak için dokun. Seçim sırasında en iyi seçimler için baloncuğa dokun.</string>
+    <string name="welcome_friend_title">Bir arkadaş ekle</string>
+    <string name="welcome_friend_text">Haftalık düelloda yarışın ve ne zaman oynadığını gör.</string>
+    <string name="welcome_widget_title">Rütben ana ekranında</string>
+    <string name="welcome_widget_text">Rütbem widget’ını eklemek için dokun: rütbe, elo ve sezon grafiğin.</string>
+    <string name="welcome_ask_title">Bubble’a ne istersen sor</string>
+    <string name="welcome_ask_text">Edgar’ı kim yener? Bu haritada en iyi seçimler? Neyi yükselteyim? Sormak için dokun.</string>
+    <string name="roast_me">🔥 Hesabımı kızart</string>
+    <string name="roast_friend">%1$s adlı oyuncuyu kızart</string>
+    <string name="roast_title">Bugünün kızartması</string>
+    <string name="roast_loading">Kızartılıyor…</string>
+    <string name="roast_share">Paylaş</string>
+    <string name="roast_close">Kapat</string>
+    <string name="roast_failed">Şu an kızartma yok. Bir dakika sonra tekrar dene.</string>
+    <string name="roast_share_text">Sen de hesabını kızart: brawlzone.net/bubble</string>
 </resources>

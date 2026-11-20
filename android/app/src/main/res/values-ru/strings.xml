@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Спроси Bubble</string>
     <string name="widget_ask_description">Спрашивай про любого бойца, карту или режим — текстом или голосом</string>
     <string name="widget_ask_hint">Спроси Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Первые шаги</string>
+    <string name="welcome_tag_title">Добавь свой тег игрока</string>
+    <string name="welcome_tag_text">Тогда Bubble отметит твоих бойцов и будет следить за твоими ранговыми боями.</string>
+    <string name="welcome_bubble_title">Попробуй пузырь на следующем драфте</string>
+    <string name="welcome_bubble_text">Нажми, чтобы открыть Brawl Stars с пузырём. Во время драфта нажми на пузырь — увидишь лучшие пики.</string>
+    <string name="welcome_friend_title">Добавь друга</string>
+    <string name="welcome_friend_text">Соревнуйтесь в дуэли недели и смотри, когда он играет.</string>
+    <string name="welcome_widget_title">Твой ранг на главном экране</string>
+    <string name="welcome_widget_text">Нажми, чтобы добавить виджет «Мой ранг»: ранг, эло и график сезона.</string>
+    <string name="welcome_ask_title">Спроси Bubble о чём угодно</string>
+    <string name="welcome_ask_text">Кто контрит Эдгара? Лучшие пики на этой карте? Что прокачать? Нажми, чтобы спросить.</string>
+    <string name="roast_me">🔥 Прожарь мой аккаунт</string>
+    <string name="roast_friend">Прожарить %1$s</string>
+    <string name="roast_title">Прожарка дня</string>
+    <string name="roast_loading">Прожариваем…</string>
+    <string name="roast_share">Поделиться</string>
+    <string name="roast_close">Закрыть</string>
+    <string name="roast_failed">Сейчас прожарки нет. Попробуй через минуту.</string>
+    <string name="roast_share_text">Прожарь и свой аккаунт: brawlzone.net/bubble</string>
 </resources>

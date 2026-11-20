@@ -334,4 +334,25 @@
     <string name="widget_ask_name">問 Bubble</string>
     <string name="widget_ask_description">用文字或語音詢問任何英雄、地圖或模式</string>
     <string name="widget_ask_hint">問 Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">新手入門</string>
+    <string name="welcome_tag_title">新增你的玩家標籤</string>
+    <string name="welcome_tag_text">這樣 Bubble 會標出你擁有的英雄，並記錄你的排位賽對局。</string>
+    <string name="welcome_bubble_title">下次選角時試試懸浮球</string>
+    <string name="welcome_bubble_text">點這裡，開啟荒野亂鬥並顯示懸浮球。選角時點懸浮球就能看到最佳選擇。</string>
+    <string name="welcome_friend_title">新增好友</string>
+    <string name="welcome_friend_text">在每週對決中一較高下，還能看到他什麼時候在玩。</string>
+    <string name="welcome_widget_title">把段位放到主畫面</string>
+    <string name="welcome_widget_text">點按新增「我的段位」小工具：段位、分數和賽季曲線。</string>
+    <string name="welcome_ask_title">有問題就問 Bubble</string>
+    <string name="welcome_ask_text">誰能剋制艾德加？這張地圖選誰最好？接下來該升級誰？點按提問。</string>
+    <string name="roast_me">🔥 吐槽我的帳號</string>
+    <string name="roast_friend">吐槽 %1$s</string>
+    <string name="roast_title">今日吐槽</string>
+    <string name="roast_loading">正在吐槽…</string>
+    <string name="roast_share">分享</string>
+    <string name="roast_close">關閉</string>
+    <string name="roast_failed">暫時無法吐槽，請稍後再試。</string>
+    <string name="roast_share_text">也來吐槽你的帳號：brawlzone.net/bubble</string>
 </resources>

@@ -33,6 +33,7 @@ object Notify {
     private const val CH_FRIENDS = "brawlzone-friends"
     private const val CH_PATCH = "brawlzone-patch"
     private const val CH_ONLINE = "brawlzone-online"
+    private const val CH_WELCOME = "brawlzone-welcome"
     private const val KEY_PATCH_SEEN = "seen_patch"
     private const val KEY_PATCH_TAG = "seen_patch_tag"
     private const val KEY_PRESTIGE_SEEN = "seen_prestige"
@@ -71,6 +72,9 @@ object Notify {
         m.createNotificationChannel(
             NotificationChannel(CH_ONLINE, local.getString(R.string.channel_online), NotificationManager.IMPORTANCE_DEFAULT),
         )
+        m.createNotificationChannel(
+            NotificationChannel(CH_WELCOME, local.getString(R.string.channel_welcome), NotificationManager.IMPORTANCE_DEFAULT),
+        )
     }
 
     /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
@@ -84,6 +88,10 @@ object Notify {
     /** A friend's rank-up (1.40, Friends). Tapping opens the app, where the ladder is. */
     fun postFriend(context: Context, id: Int, title: String, text: String) =
         post(context, CH_FRIENDS, id, title, text, null)
+
+    /** The welcome week's tip of the day (1.42, Welcome); the tap does what the tip says. */
+    fun postWelcome(context: Context, id: Int, title: String, text: String, action: String?) =
+        post(context, CH_WELCOME, id, title, text, action)
 
     /** A friend started a Ranked session (1.42, Online): tapping starts the bubble and the game. */
     fun postOnline(context: Context, id: Int, title: String, text: String) =
@@ -153,7 +161,7 @@ object Notify {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val notification = Notification.Builder(context, channel)
-            .setSmallIcon(R.drawable.bubble_glyph)
+            .setSmallIcon(R.drawable.ic_bubble_mono)
             .setColor(context.getColor(R.color.brand))
             .setContentTitle(title)
             .setContentText(text)
@@ -218,7 +226,7 @@ object Notify {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val builder = Notification.Builder(context, CH_PATCH)
-            .setSmallIcon(R.drawable.bubble_glyph)
+            .setSmallIcon(R.drawable.ic_bubble_mono)
             .setColor(context.getColor(R.color.brand))
             .setContentTitle(local.getString(R.string.patch_title))
             .setContentText(lines.joinToString(" · "))
@@ -239,7 +247,7 @@ object Notify {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
             val builder = Notification.Builder(context, CH_REWARDS)
-                .setSmallIcon(R.drawable.bubble_glyph)
+                .setSmallIcon(R.drawable.ic_bubble_mono)
                 .setColor(context.getColor(R.color.brand))
                 .setContentTitle(local.getString(R.string.alert_reward_title))
                 .setContentText(local.getString(R.string.alert_reward_text, reward.name))
@@ -303,7 +311,7 @@ object Notify {
                 local.getString(R.string.alert_season_end_text)
         }
         val notification = Notification.Builder(context, CH_SEASON)
-            .setSmallIcon(R.drawable.bubble_glyph)
+            .setSmallIcon(R.drawable.ic_bubble_mono)
             .setColor(context.getColor(R.color.brand))
             .setContentTitle(title)
             .setContentText(text)

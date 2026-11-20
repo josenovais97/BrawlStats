@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One line of the friends ladder (1.40): place, rank badge, name and rank, elo, this week. -->
+<!-- One line of the friends ladder (1.40): place, rank badge, name and rank, elo, this week;
+     1.42: a flame on friends' rows that roasts them (Roast). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -73,4 +74,15 @@
             android:textColor="@color/muted"
             android:textSize="11sp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/friend_roast"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:gravity="center"
+        android:text="🔥"
+        android:textSize="18sp"
+        android:visibility="gone" />
 </LinearLayout>

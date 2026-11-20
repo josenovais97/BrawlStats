@@ -241,6 +241,7 @@ class BubbleService : Service() {
         AppLang.prefs(this).registerOnSharedPreferenceChangeListener(langListener)
         running = true
         BubbleTileService.refresh(this)
+        Welcome.bubbleUsed(this)
 
         /*
          * Start loading the panel now, so the first tap opens a list rather
@@ -2221,7 +2222,7 @@ class BubbleService : Service() {
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle(str(R.string.notification_title))
             .setContentText(str(R.string.notification_text))
-            .setSmallIcon(R.drawable.bubble_glyph)
+            .setSmallIcon(R.drawable.ic_bubble_mono)
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null as Icon?, str(R.string.notification_panel), panel).build())
             .addAction(Notification.Action.Builder(null as Icon?, str(R.string.stop), stop).build())

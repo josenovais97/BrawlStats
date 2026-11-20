@@ -77,6 +77,15 @@ object Share {
 
     private fun fresh(file: File) = file.exists() && System.currentTimeMillis() - file.lastModified() < FRESH_MS
 
+    /** A card from the cache when fresh, else drawn now (Roast). Off the main thread. */
+    fun fetch(context: Context, url: String): File? {
+        val ready = cached(context, url)
+        return if (fresh(ready)) ready else download(context, url)
+    }
+
+    /** The share sheet for a card already on disk (Roast), with its own line of text. */
+    fun sendFile(activity: Activity, file: File, name: String, text: String) = send(activity, file, name, text)
+
     private fun download(context: Context, url: String): File? = runCatching {
         val bytes = Http.bytes(url)
         require(bytes.size > 8 && bytes[0] == PNG_MAGIC)
@@ -110,13 +119,13 @@ object Share {
     }
 
     /** A copy under a readable name ("season-wrapped.png"), then the share sheet. */
-    private fun send(activity: Activity, source: File, name: String) {
+    private fun send(activity: Activity, source: File, name: String, text: String = activity.getString(R.string.share_text)) {
         val file = runCatching { source.copyTo(File(dir(activity), "$name.png"), overwrite = true) }.getOrNull() ?: return
         val uri: Uri = FileProvider.getUriForFile(activity, "${activity.packageName}.share", file)
         val send = Intent(Intent.ACTION_SEND)
             .setType("image/png")
             .putExtra(Intent.EXTRA_STREAM, uri)
-            .putExtra(Intent.EXTRA_TEXT, activity.getString(R.string.share_text))
+            .putExtra(Intent.EXTRA_TEXT, text)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         send.clipData = ClipData.newRawUri("", uri)
         runCatching { activity.startActivity(Intent.createChooser(send, null)) }

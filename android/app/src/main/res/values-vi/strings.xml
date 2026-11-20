@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Hỏi Bubble</string>
     <string name="widget_ask_description">Hỏi về brawler, bản đồ hay chế độ bất kỳ, bằng chữ hoặc giọng nói</string>
     <string name="widget_ask_hint">Hỏi Bubble…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">Bắt đầu</string>
+    <string name="welcome_tag_title">Thêm thẻ người chơi của bạn</string>
+    <string name="welcome_tag_text">Khi đó Bubble đánh dấu các chiến binh bạn có và theo dõi các trận Xếp hạng của bạn.</string>
+    <string name="welcome_bubble_title">Thử bong bóng ở lượt chọn tiếp theo</string>
+    <string name="welcome_bubble_text">Chạm vào đây để mở Brawl Stars cùng bong bóng. Chạm vào bong bóng khi chọn tướng để xem lựa chọn tốt nhất.</string>
+    <string name="welcome_friend_title">Thêm bạn bè</string>
+    <string name="welcome_friend_text">Đua nhau trong cuộc đấu tuần và xem khi nào họ đang chơi.</string>
+    <string name="welcome_widget_title">Hạng của bạn trên màn hình chính</string>
+    <string name="welcome_widget_text">Chạm để thêm tiện ích Hạng của tôi: hạng, elo và biểu đồ mùa giải.</string>
+    <string name="welcome_ask_title">Hỏi Bubble bất cứ điều gì</string>
+    <string name="welcome_ask_text">Ai khắc chế Edgar? Lựa chọn tốt nhất trên bản đồ này? Nên nâng cấp gì? Chạm để hỏi.</string>
+    <string name="roast_me">🔥 Roast tài khoản của tôi</string>
+    <string name="roast_friend">Roast %1$s</string>
+    <string name="roast_title">Màn roast hôm nay</string>
+    <string name="roast_loading">Đang roast…</string>
+    <string name="roast_share">Chia sẻ</string>
+    <string name="roast_close">Đóng</string>
+    <string name="roast_failed">Chưa roast được lúc này. Thử lại sau một phút nhé.</string>
+    <string name="roast_share_text">Roast cả tài khoản của bạn: brawlzone.net/bubble</string>
 </resources>

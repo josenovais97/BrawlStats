@@ -334,4 +334,25 @@
     <string name="widget_ask_name">Bubbleに聞く</string>
     <string name="widget_ask_description">キャラ、マップ、モードについて文字や声で質問</string>
     <string name="widget_ask_hint">Bubbleに聞く…</string>
+
+    <!-- 1.42: welcome week (Welcome) and roasts in the app (Roast) -->
+    <string name="channel_welcome">はじめに</string>
+    <string name="welcome_tag_title">プレイヤータグを追加しよう</string>
+    <string name="welcome_tag_text">Bubbleが所持キャラクターに印を付け、ガチバトルの試合を記録します。</string>
+    <string name="welcome_bubble_title">次のドラフトでバブルを試そう</string>
+    <string name="welcome_bubble_text">タップするとバブルと一緒にブロスタが開きます。ドラフト中にバブルをタップすると最適なピックが見られます。</string>
+    <string name="welcome_friend_title">フレンドを追加しよう</string>
+    <string name="welcome_friend_text">今週の対決で競い合い、プレイ中かどうかも分かります。</string>
+    <string name="welcome_widget_title">ホーム画面にランクを表示</string>
+    <string name="welcome_widget_text">タップで「自分のランク」ウィジェットを追加：ランク、エロ、シーズングラフ。</string>
+    <string name="welcome_ask_title">Bubbleに何でも聞こう</string>
+    <string name="welcome_ask_text">エドガーに勝てるのは？このマップのおすすめは？次に強化するのは？タップして質問。</string>
+    <string name="roast_me">🔥 アカウントをイジる</string>
+    <string name="roast_friend">%1$sをイジる</string>
+    <string name="roast_title">今日のイジり</string>
+    <string name="roast_loading">イジり中…</string>
+    <string name="roast_share">共有</string>
+    <string name="roast_close">閉じる</string>
+    <string name="roast_failed">今はイジれません。少し待ってからもう一度お試しください。</string>
+    <string name="roast_share_text">あなたのアカウントもイジってもらおう：brawlzone.net/bubble</string>
 </resources>
