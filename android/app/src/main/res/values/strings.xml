@@ -362,4 +362,43 @@
     <string name="roast_close">Close</string>
     <string name="roast_failed">No roast right now. Try again in a minute.</string>
     <string name="roast_share_text">Get your own account roasted: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">SQUAD FEED</string>
+    <string name="feed_title">Squad feed</string>
+    <string name="feed_intro">Made from your and your friends\' real Ranked games. React to cheer them on, or to roast them.</string>
+    <string name="feed_empty">Nothing here yet. Rank-ups, streaks, the weekly duel and Sunday\'s squad awards show up here as you and your friends play Ranked.</string>
+    <string name="feed_see_all">See the whole feed</string>
+    <string name="feed_new">%1$d new</string>
+    <string name="feed_pass">%1$s passed %2$s on the squad ladder</string>
+    <string name="feed_pass_sub">%1$s elo ahead now 👀</string>
+    <string name="feed_streak">%1$s is on a %2$d-win streak</string>
+    <string name="feed_streak_sub">Can anyone stop this?</string>
+    <string name="feed_tilt">%1$s lost %2$d in a row</string>
+    <string name="feed_tilt_sub">Someone check on them 🫠</string>
+    <string name="feed_session">%1$s went %2$d–%3$d in one session</string>
+    <string name="feed_session_hot">Unstoppable</string>
+    <string name="feed_session_cold">The grind is real 😵</string>
+    <string name="feed_lead">%1$s took the lead in the weekly duel</string>
+    <string name="feed_wins_week">%1$d Ranked wins this week</string>
+    <string name="feed_duel">%1$s won the weekly duel</string>
+    <string name="feed_duel_sub">%1$d Ranked wins, Monday to Sunday</string>
+    <string name="feed_mvp">Yesterday\'s MVP: %1$s</string>
+    <string name="feed_awards">Squad awards</string>
+    <string name="feed_awards_sub">Week of %1$s</string>
+    <string name="feed_award_brawler">Best %1$s</string>
+    <string name="feed_award_wr">%1$s · %2$d%% wins in %3$d games</string>
+    <string name="feed_award_mode">Best in %1$s</string>
+    <string name="feed_award_grind">Most games 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d games. Touch grass?</string>
+    <string name="feed_award_one">One-trick 🎯</string>
+    <string name="feed_award_one_v">%1$s · %2$s in %3$d%% of games</string>
+    <string name="feed_award_owl">Night owl 🦉</string>
+    <string name="feed_award_owl_v">%1$s · %2$d games after midnight</string>
+    <string name="feed_award_star">Star player ⭐</string>
+    <string name="feed_award_star_v">%1$s · star player %2$d times</string>
+    <string name="feed_react_title">%1$s reacted %2$s</string>
+    <string name="feed_react_many">%1$d reactions on your posts</string>
+    <string name="feed_reacted">%1$s reacted</string>
+    <string name="feed_reacted_more">%1$s and %2$d more reacted</string>
 </resources>

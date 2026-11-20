@@ -355,4 +355,43 @@
     <string name="roast_close">Kapat</string>
     <string name="roast_failed">Şu an kızartma yok. Bir dakika sonra tekrar dene.</string>
     <string name="roast_share_text">Sen de hesabını kızart: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">EKİP AKIŞI</string>
+    <string name="feed_title">Ekip akışı</string>
+    <string name="feed_intro">Senin ve arkadaşlarının gerçek Dereceli maçlarından oluşur. Onları desteklemek ya da tiye almak için tepki ver.</string>
+    <string name="feed_empty">Henüz bir şey yok. Rütbe atlamaları, seriler, haftalık düello ve pazar günkü ekip ödülleri sen ve arkadaşların Dereceli oynadıkça burada görünür.</string>
+    <string name="feed_see_all">Tüm akışı gör</string>
+    <string name="feed_new">%1$d yeni</string>
+    <string name="feed_pass">%1$s ekip sıralamasında %2$s adlı oyuncuyu geçti</string>
+    <string name="feed_pass_sub">Şimdi %1$s elo önde 👀</string>
+    <string name="feed_streak">%1$s üst üste %2$d galibiyet serisinde</string>
+    <string name="feed_streak_sub">Bunu durduran çıkar mı?</string>
+    <string name="feed_tilt">%1$s üst üste %2$d kaybetti</string>
+    <string name="feed_tilt_sub">Biri bir baksın, iyi mi? 🫠</string>
+    <string name="feed_session">%1$s bir oturumda %2$d–%3$d yaptı</string>
+    <string name="feed_session_hot">Durdurulamaz</string>
+    <string name="feed_session_cold">Emek gerçek 😵</string>
+    <string name="feed_lead">%1$s haftalık düelloda öne geçti</string>
+    <string name="feed_wins_week">Bu hafta %1$d Dereceli galibiyet</string>
+    <string name="feed_duel">%1$s haftalık düelloyu kazandı</string>
+    <string name="feed_duel_sub">Pazartesiden pazara %1$d Dereceli galibiyet</string>
+    <string name="feed_mvp">Dünün MVP’si: %1$s</string>
+    <string name="feed_awards">Ekip ödülleri</string>
+    <string name="feed_awards_sub">%1$s haftası</string>
+    <string name="feed_award_brawler">En iyi %1$s</string>
+    <string name="feed_award_wr">%1$s · %3$d maçta %%%2$d galibiyet</string>
+    <string name="feed_award_mode">%1$s modunda en iyi</string>
+    <string name="feed_award_grind">En çok maç 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d maç. Biraz dışarı çıksan?</string>
+    <string name="feed_award_one">Tek karakter 🎯</string>
+    <string name="feed_award_one_v">%1$s · maçların %%%3$d’inde %2$s</string>
+    <string name="feed_award_owl">Gece kuşu 🦉</string>
+    <string name="feed_award_owl_v">%1$s · gece yarısından sonra %2$d maç</string>
+    <string name="feed_award_star">Yıldız oyuncu ⭐</string>
+    <string name="feed_award_star_v">%1$s · %2$d kez yıldız oyuncu</string>
+    <string name="feed_react_title">%1$s %2$s ile tepki verdi</string>
+    <string name="feed_react_many">Gönderilerine %1$d tepki</string>
+    <string name="feed_reacted">Tepki verenler: %1$s</string>
+    <string name="feed_reacted_more">Tepki verenler: %1$s ve %2$d kişi daha</string>
 </resources>

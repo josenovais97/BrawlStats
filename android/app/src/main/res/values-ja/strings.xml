@@ -355,4 +355,43 @@
     <string name="roast_close">閉じる</string>
     <string name="roast_failed">今はイジれません。少し待ってからもう一度お試しください。</string>
     <string name="roast_share_text">あなたのアカウントもイジってもらおう：brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">チームフィード</string>
+    <string name="feed_title">チームフィード</string>
+    <string name="feed_intro">あなたとフレンドの実際のガチバトルから作られます。リアクションで応援したり、イジったりしよう。</string>
+    <string name="feed_empty">まだ何もありません。あなたとフレンドがガチバトルをプレイすると、ランクアップ、連勝、今週の対決、日曜のチームアワードがここに表示されます。</string>
+    <string name="feed_see_all">フィードをすべて見る</string>
+    <string name="feed_new">新着 %1$d件</string>
+    <string name="feed_pass">%1$sがチームランキングで%2$sを追い抜いた</string>
+    <string name="feed_pass_sub">いまエロ %1$s 差でリード 👀</string>
+    <string name="feed_streak">%1$sが%2$d連勝中</string>
+    <string name="feed_streak_sub">誰か止めて！</string>
+    <string name="feed_tilt">%1$sが%2$d連敗</string>
+    <string name="feed_tilt_sub">誰か様子を見てあげて 🫠</string>
+    <string name="feed_session">%1$sが1セッションで%2$d勝%3$d敗</string>
+    <string name="feed_session_hot">止まらない</string>
+    <string name="feed_session_cold">道のりは険しい 😵</string>
+    <string name="feed_lead">%1$sが今週の対決でトップに</string>
+    <string name="feed_wins_week">今週のガチバトル勝利数 %1$d</string>
+    <string name="feed_duel">%1$sが今週の対決で優勝</string>
+    <string name="feed_duel_sub">月曜から日曜のガチバトル勝利数 %1$d</string>
+    <string name="feed_mvp">昨日のMVP：%1$s</string>
+    <string name="feed_awards">チームアワード</string>
+    <string name="feed_awards_sub">%1$sの週</string>
+    <string name="feed_award_brawler">%1$sの達人</string>
+    <string name="feed_award_wr">%1$s · %3$d戦で勝率%2$d%%</string>
+    <string name="feed_award_mode">%1$sの達人</string>
+    <string name="feed_award_grind">最多プレイ 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d戦。たまには外へ？</string>
+    <string name="feed_award_one">一筋プレイヤー 🎯</string>
+    <string name="feed_award_one_v">%1$s · %3$d%%の試合で%2$s</string>
+    <string name="feed_award_owl">夜ふかし 🦉</string>
+    <string name="feed_award_owl_v">%1$s · 深夜0時以降に%2$d戦</string>
+    <string name="feed_award_star">スタープレイヤー ⭐</string>
+    <string name="feed_award_star_v">%1$s · スタープレイヤー%2$d回</string>
+    <string name="feed_react_title">%1$sが%2$sでリアクション</string>
+    <string name="feed_react_many">あなたの投稿に%1$d件のリアクション</string>
+    <string name="feed_reacted">リアクション：%1$s</string>
+    <string name="feed_reacted_more">リアクション：%1$sほか%2$d人</string>
 </resources>

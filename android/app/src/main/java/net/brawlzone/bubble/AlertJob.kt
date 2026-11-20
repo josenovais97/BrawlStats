@@ -26,6 +26,7 @@ class AlertJob : JobService() {
                     val post = Alerts.enabled(applicationContext)
                     Online.check(applicationContext, post)
                     SessionRecap.quick(applicationContext, post)
+                    Feed.pollAbout(applicationContext, post)
                 } else {
                     run(applicationContext)
                 }
@@ -122,6 +123,9 @@ class AlertJob : JobService() {
             Online.check(context, post)
             // 1.42: the first week's tips for a new install.
             Welcome.check(context, post)
+            // 1.42: the squad feed's new posts, and friends' reactions on posts about the player.
+            Feed.observe(context, season)
+            Feed.pollAbout(context, post)
             if (me != null) Versus.fetch(context)
             Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)

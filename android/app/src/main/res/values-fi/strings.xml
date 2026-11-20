@@ -355,4 +355,43 @@
     <string name="roast_close">Sulje</string>
     <string name="roast_failed">Ei roastia juuri nyt. Yritä hetken päästä.</string>
     <string name="roast_share_text">Roastauta oma tilisi: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">PORUKAN SYÖTE</string>
+    <string name="feed_title">Porukan syöte</string>
+    <string name="feed_intro">Tehty sinun ja kaveriesi oikeista rankatuista peleistä. Reagoi kannustaaksesi tai piikitelläksesi.</string>
+    <string name="feed_empty">Täällä ei ole vielä mitään. Tasonousut, putket, viikon kaksintaistelu ja sunnuntain porukan palkinnot näkyvät täällä, kun sinä ja kaverisi pelaatte rankattua.</string>
+    <string name="feed_see_all">Näytä koko syöte</string>
+    <string name="feed_new">%1$d uutta</string>
+    <string name="feed_pass">%1$s ohitti pelaajan %2$s porukan tikkailla</string>
+    <string name="feed_pass_sub">Nyt %1$s eloa edellä 👀</string>
+    <string name="feed_streak">%1$s: %2$d voiton putki</string>
+    <string name="feed_streak_sub">Pysäyttääkö kukaan tätä?</string>
+    <string name="feed_tilt">%1$s hävisi %2$d peräkkäin</string>
+    <string name="feed_tilt_sub">Joku käy katsomassa, onko kaikki ok 🫠</string>
+    <string name="feed_session">%1$s: %2$d–%3$d yhdessä sessiossa</string>
+    <string name="feed_session_hot">Pysäyttämätön</string>
+    <string name="feed_session_cold">Grindaus on totta 😵</string>
+    <string name="feed_lead">%1$s johtaa viikon kaksintaistelua</string>
+    <string name="feed_wins_week">%1$d rankattua voittoa tällä viikolla</string>
+    <string name="feed_duel">%1$s voitti viikon kaksintaistelun</string>
+    <string name="feed_duel_sub">%1$d rankattua voittoa, maanantaista sunnuntaihin</string>
+    <string name="feed_mvp">Eilisen MVP: %1$s</string>
+    <string name="feed_awards">Porukan palkinnot</string>
+    <string name="feed_awards_sub">Viikko %1$s</string>
+    <string name="feed_award_brawler">Paras %1$s</string>
+    <string name="feed_award_wr">%1$s · %2$d %% voittoja %3$d pelissä</string>
+    <string name="feed_award_mode">Paras: %1$s</string>
+    <string name="feed_award_grind">Eniten pelejä 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d peliä. Ulos haukkaamaan happea?</string>
+    <string name="feed_award_one">Yhden hahmon pelaaja 🎯</string>
+    <string name="feed_award_one_v">%1$s · %2$s %3$d %%:ssa peleistä</string>
+    <string name="feed_award_owl">Yökyöpeli 🦉</string>
+    <string name="feed_award_owl_v">%1$s · %2$d peliä puolenyön jälkeen</string>
+    <string name="feed_award_star">Tähtipelaaja ⭐</string>
+    <string name="feed_award_star_v">%1$s · tähtipelaaja %2$d kertaa</string>
+    <string name="feed_react_title">%1$s reagoi %2$s</string>
+    <string name="feed_react_many">%1$d reaktiota julkaisuihisi</string>
+    <string name="feed_reacted">Reagoivat: %1$s</string>
+    <string name="feed_reacted_more">Reagoivat: %1$s ja %2$d muuta</string>
 </resources>

@@ -355,4 +355,43 @@
     <string name="roast_close">닫기</string>
     <string name="roast_failed">지금은 디스할 수 없어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="roast_share_text">내 계정도 디스 받아 보기: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">팀 피드</string>
+    <string name="feed_title">팀 피드</string>
+    <string name="feed_intro">나와 친구들의 실제 경쟁전 경기로 만들어져요. 리액션으로 응원하거나 놀려 보세요.</string>
+    <string name="feed_empty">아직 아무것도 없어요. 나와 친구들이 경쟁전을 하면 랭크 업, 연승, 주간 대결, 일요일 팀 어워드가 여기에 나타나요.</string>
+    <string name="feed_see_all">피드 전체 보기</string>
+    <string name="feed_new">새 글 %1$d개</string>
+    <string name="feed_pass">%1$s, 팀 랭킹에서 %2$s 추월</string>
+    <string name="feed_pass_sub">이제 엘로 %1$s 앞서요 👀</string>
+    <string name="feed_streak">%1$s %2$d연승 중</string>
+    <string name="feed_streak_sub">누가 좀 막아 봐요!</string>
+    <string name="feed_tilt">%1$s %2$d연패</string>
+    <string name="feed_tilt_sub">누가 괜찮은지 좀 봐 줘요 🫠</string>
+    <string name="feed_session">%1$s, 한 세션에 %2$d승 %3$d패</string>
+    <string name="feed_session_hot">멈출 수 없다</string>
+    <string name="feed_session_cold">험난한 여정 😵</string>
+    <string name="feed_lead">%1$s, 주간 대결 선두</string>
+    <string name="feed_wins_week">이번 주 경쟁전 %1$d승</string>
+    <string name="feed_duel">%1$s, 주간 대결 우승</string>
+    <string name="feed_duel_sub">월~일 경쟁전 %1$d승</string>
+    <string name="feed_mvp">어제의 MVP: %1$s</string>
+    <string name="feed_awards">팀 어워드</string>
+    <string name="feed_awards_sub">%1$s 주간</string>
+    <string name="feed_award_brawler">%1$s 최강</string>
+    <string name="feed_award_wr">%1$s · %3$d판 승률 %2$d%%</string>
+    <string name="feed_award_mode">%1$s 최강</string>
+    <string name="feed_award_grind">최다 경기 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d판. 바람 좀 쐬고 와요</string>
+    <string name="feed_award_one">원챔 장인 🎯</string>
+    <string name="feed_award_one_v">%1$s · %3$d%% 경기에서 %2$s</string>
+    <string name="feed_award_owl">올빼미 🦉</string>
+    <string name="feed_award_owl_v">%1$s · 자정 이후 %2$d판</string>
+    <string name="feed_award_star">스타 플레이어 ⭐</string>
+    <string name="feed_award_star_v">%1$s · 스타 플레이어 %2$d회</string>
+    <string name="feed_react_title">%1$s 님이 %2$s 리액션</string>
+    <string name="feed_react_many">내 게시물에 리액션 %1$d개</string>
+    <string name="feed_reacted">리액션: %1$s</string>
+    <string name="feed_reacted_more">리액션: %1$s 외 %2$d명</string>
 </resources>

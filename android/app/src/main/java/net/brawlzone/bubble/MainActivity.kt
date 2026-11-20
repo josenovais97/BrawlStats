@@ -124,6 +124,10 @@ class MainActivity : AppCompatActivity() {
         wireVersus()
         // 1.42: a welcome-week tip that lands here (the Friends card, or adding a widget).
         Welcome.handle(this, intent)
+        // 1.42: the squad feed, and a reaction notification opening it.
+        findViewById<View>(R.id.feed_all).setOnClickListener { startActivity(Intent(this, FeedActivity::class.java)) }
+        findViewById<View>(R.id.feed_caption).setOnClickListener { startActivity(Intent(this, FeedActivity::class.java)) }
+        if (intent?.action == Feed.ACTION_OPEN) startActivity(Intent(this, FeedActivity::class.java))
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -256,6 +260,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (Welcome.handle(this, intent)) return
+        if (intent.action == Feed.ACTION_OPEN) {
+            startActivity(Intent(this, FeedActivity::class.java))
+            return
+        }
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
@@ -368,6 +376,15 @@ class MainActivity : AppCompatActivity() {
         paintSeason()
         paintVersus()
         paintFriends()
+        paintFeed()
+        // 1.42: friends' reactions on the newest posts.
+        if (Feed.posts(this).isNotEmpty()) {
+            val app = applicationContext
+            Thread {
+                Feed.syncReactions(app)
+                runOnUiThread { if (!isFinishing && !isDestroyed) paintFeed() }
+            }.start()
+        }
         // 1.42: who is playing now, if the last look is more than a few minutes old.
         if (Friends.tags(this).isNotEmpty() && Online.isStale(this)) {
             val app = applicationContext
@@ -385,6 +402,7 @@ class MainActivity : AppCompatActivity() {
                 paintSeason()
                 paintVersus()
                 paintFriends()
+                paintFeed()
             }
         }.start()
     }
@@ -735,6 +753,29 @@ class MainActivity : AppCompatActivity() {
             else -> ""
         }
         gameType(card)
+    }
+
+    /** The squad feed's newest three posts (1.42); the rest are a tap away. */
+    private fun paintFeed() {
+        val caption = findViewById<TextView>(R.id.feed_caption)
+        val box = findViewById<LinearLayout>(R.id.feed_box)
+        if (Account.tag(this).isEmpty()) {
+            caption.visibility = View.GONE
+            box.visibility = View.GONE
+            return
+        }
+        caption.visibility = View.VISIBLE
+        box.visibility = View.VISIBLE
+        val fresh = Feed.unseen(this)
+        caption.text = getString(R.string.feed_caption) +
+            if (fresh > 0) "  \u00B7  " + getString(R.string.feed_new, fresh).uppercase() else ""
+        caption.setTextColor(getColor(if (fresh > 0) R.color.brand else R.color.muted))
+        val rows = findViewById<LinearLayout>(R.id.feed_rows)
+        rows.removeAllViews()
+        val posts = Feed.posts(this)
+        for (post in posts.take(3)) rows.addView(FeedView.inflate(this, rows, post))
+        findViewById<View>(R.id.feed_empty).visibility = if (posts.isEmpty()) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.feed_all).visibility = if (posts.size > 3) View.VISIBLE else View.GONE
     }
 
     private fun paintFriends() {

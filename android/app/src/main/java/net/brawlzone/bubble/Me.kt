@@ -10,7 +10,8 @@ import org.json.JSONObject
  */
 object Me {
 
-    data class Game(val time: String, val win: Boolean, val star: Boolean, val brawler: String?)
+    /** `mode` is the game's mode key (1.42, for the squad feed); null from an older site answer. */
+    data class Game(val time: String, val win: Boolean, val star: Boolean, val brawler: String?, val mode: String? = null)
 
     data class Data(
         val tag: String,
@@ -29,6 +30,8 @@ object Me {
         val losses: Int,
         val stars: Int,
         val list: List<Game>,
+        /** 1.42: each mode key's name in the app's language. */
+        val modes: Map<String, String> = emptyMap(),
     )
 
     private const val KEY = "me"
@@ -64,6 +67,7 @@ object Me {
                     win = g.optBoolean("win"),
                     star = g.optBoolean("star"),
                     brawler = g.optString("brawler").takeIf { it.isNotEmpty() && it != "null" },
+                    mode = g.optString("mode").takeIf { it.isNotEmpty() && it != "null" },
                 )
             }
         }.orEmpty()
@@ -86,6 +90,7 @@ object Me {
             losses = recent?.optInt("losses") ?: 0,
             stars = recent?.optInt("stars") ?: 0,
             list = list,
+            modes = j.optJSONObject("modes")?.let { o -> o.keys().asSequence().associateWith { o.optString(it) } }.orEmpty(),
         )
     }
 }

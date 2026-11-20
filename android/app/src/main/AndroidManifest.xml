@@ -104,6 +104,11 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- The squad feed (1.42): posts about the player and their friends, with reactions. -->
+        <activity
+            android:name=".FeedActivity"
+            android:exported="false" />
+
         <!--
           The hourly check for free rewards and Ranked season dates (1.40),
           which also refreshes the home-screen widget. Only the system's job

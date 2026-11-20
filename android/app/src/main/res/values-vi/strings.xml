@@ -355,4 +355,43 @@
     <string name="roast_close">Đóng</string>
     <string name="roast_failed">Chưa roast được lúc này. Thử lại sau một phút nhé.</string>
     <string name="roast_share_text">Roast cả tài khoản của bạn: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">BẢNG TIN ĐỘI</string>
+    <string name="feed_title">Bảng tin đội</string>
+    <string name="feed_intro">Tạo từ các trận Xếp hạng thật của bạn và bạn bè. Thả cảm xúc để cổ vũ hoặc trêu họ.</string>
+    <string name="feed_empty">Chưa có gì. Lên hạng, chuỗi thắng, cuộc đấu tuần và giải thưởng đội ngày Chủ nhật sẽ xuất hiện ở đây khi bạn và bạn bè chơi Xếp hạng.</string>
+    <string name="feed_see_all">Xem toàn bộ bảng tin</string>
+    <string name="feed_new">%1$d mới</string>
+    <string name="feed_pass">%1$s vượt %2$s trên bảng xếp hạng đội</string>
+    <string name="feed_pass_sub">Giờ đã hơn %1$s elo 👀</string>
+    <string name="feed_streak">%1$s đang có chuỗi %2$d trận thắng</string>
+    <string name="feed_streak_sub">Ai cản nổi không?</string>
+    <string name="feed_tilt">%1$s thua %2$d trận liên tiếp</string>
+    <string name="feed_tilt_sub">Ai đó hỏi thăm giúp với 🫠</string>
+    <string name="feed_session">%1$s đánh %2$d–%3$d trong một phiên</string>
+    <string name="feed_session_hot">Không thể cản</string>
+    <string name="feed_session_cold">Cày cuốc thật sự 😵</string>
+    <string name="feed_lead">%1$s dẫn đầu cuộc đấu tuần</string>
+    <string name="feed_wins_week">%1$d trận thắng Xếp hạng tuần này</string>
+    <string name="feed_duel">%1$s thắng cuộc đấu tuần</string>
+    <string name="feed_duel_sub">%1$d trận thắng Xếp hạng, thứ Hai đến Chủ nhật</string>
+    <string name="feed_mvp">MVP hôm qua: %1$s</string>
+    <string name="feed_awards">Giải thưởng đội</string>
+    <string name="feed_awards_sub">Tuần %1$s</string>
+    <string name="feed_award_brawler">Top %1$s</string>
+    <string name="feed_award_wr">%1$s · thắng %2$d%% trong %3$d trận</string>
+    <string name="feed_award_mode">Top ở %1$s</string>
+    <string name="feed_award_grind">Chơi nhiều nhất 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d trận. Ra ngoài hít thở chút?</string>
+    <string name="feed_award_one">Chuyên một tướng 🎯</string>
+    <string name="feed_award_one_v">%1$s · %2$s trong %3$d%% số trận</string>
+    <string name="feed_award_owl">Cú đêm 🦉</string>
+    <string name="feed_award_owl_v">%1$s · %2$d trận sau nửa đêm</string>
+    <string name="feed_award_star">Ngôi sao trận đấu ⭐</string>
+    <string name="feed_award_star_v">%1$s · ngôi sao trận đấu %2$d lần</string>
+    <string name="feed_react_title">%1$s đã thả %2$s</string>
+    <string name="feed_react_many">%1$d cảm xúc trên bài của bạn</string>
+    <string name="feed_reacted">Đã thả cảm xúc: %1$s</string>
+    <string name="feed_reacted_more">Đã thả cảm xúc: %1$s và %2$d người khác</string>
 </resources>

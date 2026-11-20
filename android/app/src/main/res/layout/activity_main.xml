@@ -746,6 +746,63 @@
         </LinearLayout>
 
         <!--
+          The squad feed (1.42): the newest posts about the player and their
+          friends, with reactions; the whole feed is FeedActivity.
+        -->
+        <TextView
+            android:id="@+id/feed_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:letterSpacing="0.12"
+            android:text="@string/feed_caption"
+            android:textColor="@color/muted"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/feed_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/feed_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/feed_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_surface"
+                android:lineSpacingMultiplier="1.25"
+                android:padding="18dp"
+                android:text="@string/feed_empty"
+                android:textColor="@color/muted"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/feed_all"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_outline"
+                android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="15dp"
+                android:text="@string/feed_see_all"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!--
           Friends and rivals (1.40): up to five tags, a ladder by elo with each
           one's week, and a notification when one of them ranks up. Rows are
           added in code; long-press one to remove it.

@@ -355,4 +355,43 @@
     <string name="roast_close">ปิด</string>
     <string name="roast_failed">ตอนนี้ยังแซวไม่ได้ ลองใหม่ในอีกสักครู่</string>
     <string name="roast_share_text">ให้บัญชีของคุณโดนแซวบ้าง: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">ฟีดของทีม</string>
+    <string name="feed_title">ฟีดของทีม</string>
+    <string name="feed_intro">สร้างจากแมตช์จัดอันดับจริงของคุณและเพื่อน กดรีแอคเพื่อเชียร์หรือแซวกัน</string>
+    <string name="feed_empty">ยังไม่มีอะไร การเลื่อนแรงก์ สตรีค ดวลประจำสัปดาห์ และรางวัลทีมวันอาทิตย์จะแสดงที่นี่เมื่อคุณและเพื่อนเล่นจัดอันดับ</string>
+    <string name="feed_see_all">ดูฟีดทั้งหมด</string>
+    <string name="feed_new">ใหม่ %1$d</string>
+    <string name="feed_pass">%1$s แซง %2$s ในอันดับของทีม</string>
+    <string name="feed_pass_sub">ตอนนี้นำอยู่ %1$s elo 👀</string>
+    <string name="feed_streak">%1$s ชนะติดกัน %2$d ตา</string>
+    <string name="feed_streak_sub">มีใครหยุดได้ไหม?</string>
+    <string name="feed_tilt">%1$s แพ้ติดกัน %2$d ตา</string>
+    <string name="feed_tilt_sub">ใครก็ได้ไปดูหน่อยว่าโอเคไหม 🫠</string>
+    <string name="feed_session">%1$s ทำได้ %2$d–%3$d ในเซสชันเดียว</string>
+    <string name="feed_session_hot">หยุดไม่อยู่</string>
+    <string name="feed_session_cold">สายแกรนด์ของจริง 😵</string>
+    <string name="feed_lead">%1$s ขึ้นนำในดวลประจำสัปดาห์</string>
+    <string name="feed_wins_week">ชนะจัดอันดับ %1$d ตาในสัปดาห์นี้</string>
+    <string name="feed_duel">%1$s ชนะดวลประจำสัปดาห์</string>
+    <string name="feed_duel_sub">ชนะจัดอันดับ %1$d ตา วันจันทร์ถึงอาทิตย์</string>
+    <string name="feed_mvp">MVP เมื่อวาน: %1$s</string>
+    <string name="feed_awards">รางวัลทีม</string>
+    <string name="feed_awards_sub">สัปดาห์ของ %1$s</string>
+    <string name="feed_award_brawler">สุดยอด %1$s</string>
+    <string name="feed_award_wr">%1$s · ชนะ %2$d%% จาก %3$d ตา</string>
+    <string name="feed_award_mode">สุดยอดใน %1$s</string>
+    <string name="feed_award_grind">เล่นเยอะที่สุด 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d ตา ออกไปสูดอากาศบ้างไหม?</string>
+    <string name="feed_award_one">สายเล่นตัวเดียว 🎯</string>
+    <string name="feed_award_one_v">%1$s · ใช้ %2$s %3$d%% ของตาที่เล่น</string>
+    <string name="feed_award_owl">นกฮูกกลางคืน 🦉</string>
+    <string name="feed_award_owl_v">%1$s · %2$d ตาหลังเที่ยงคืน</string>
+    <string name="feed_award_star">ผู้เล่นดาวเด่น ⭐</string>
+    <string name="feed_award_star_v">%1$s · ผู้เล่นดาวเด่น %2$d ครั้ง</string>
+    <string name="feed_react_title">%1$s รีแอค %2$s</string>
+    <string name="feed_react_many">%1$d รีแอคในโพสต์ของคุณ</string>
+    <string name="feed_reacted">รีแอคโดย: %1$s</string>
+    <string name="feed_reacted_more">รีแอคโดย: %1$s และอีก %2$d คน</string>
 </resources>

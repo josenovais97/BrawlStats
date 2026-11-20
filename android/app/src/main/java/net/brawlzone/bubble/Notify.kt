@@ -89,6 +89,10 @@ object Notify {
     fun postFriend(context: Context, id: Int, title: String, text: String) =
         post(context, CH_FRIENDS, id, title, text, null)
 
+    /** A friend reacted to a post about the player (1.42, Feed); tapping opens the feed. */
+    fun postReaction(context: Context, title: String, text: String) =
+        post(context, CH_FRIENDS, 7360, title, text, Feed.ACTION_OPEN)
+
     /** The welcome week's tip of the day (1.42, Welcome); the tap does what the tip says. */
     fun postWelcome(context: Context, id: Int, title: String, text: String, action: String?) =
         post(context, CH_WELCOME, id, title, text, action)
@@ -338,6 +342,9 @@ object Notify {
         Progress.test(context)
         Goal.test(context)
         Friends.test(context)
+        // 1.42: a few feed posts about the player, and what a friend's reaction looks like.
+        Feed.sample(context)
+        postReaction(context, AppLang.wrap(context).getString(R.string.feed_react_title, "Alex", "\uD83D\uDD25"), Feed.posts(context).firstOrNull()?.let { Feed.text(context, it).first } ?: "")
         postWrapped(context, number)
     }
 

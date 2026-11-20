@@ -355,4 +355,43 @@
     <string name="roast_close">Cerrar</string>
     <string name="roast_failed">Ahora no hay humillación. Prueba en un minuto.</string>
     <string name="roast_share_text">Que humillen tu cuenta también: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">FEED DEL GRUPO</string>
+    <string name="feed_title">Feed del grupo</string>
+    <string name="feed_intro">Hecho con las partidas reales de Competitivo tuyas y de tus amigos. Reacciona para animarlos o para burlarte.</string>
+    <string name="feed_empty">Aún no hay nada. Subidas de rango, rachas, el duelo semanal y los premios del domingo aparecen aquí cuando tú y tus amigos jugáis Competitivo.</string>
+    <string name="feed_see_all">Ver todo el feed</string>
+    <string name="feed_new">%1$d nuevos</string>
+    <string name="feed_pass">%1$s superó a %2$s en la clasificación del grupo</string>
+    <string name="feed_pass_sub">%1$s de elo por delante 👀</string>
+    <string name="feed_streak">%1$s lleva %2$d victorias seguidas</string>
+    <string name="feed_streak_sub">¿Alguien puede pararlo?</string>
+    <string name="feed_tilt">%1$s perdió %2$d seguidas</string>
+    <string name="feed_tilt_sub">Que alguien vaya a ver cómo está 🫠</string>
+    <string name="feed_session">%1$s hizo %2$d–%3$d en una sesión</string>
+    <string name="feed_session_hot">Imparable</string>
+    <string name="feed_session_cold">La lucha es real 😵</string>
+    <string name="feed_lead">%1$s va primero en el duelo semanal</string>
+    <string name="feed_wins_week">%1$d victorias en Competitivo esta semana</string>
+    <string name="feed_duel">%1$s ganó el duelo semanal</string>
+    <string name="feed_duel_sub">%1$d victorias en Competitivo, de lunes a domingo</string>
+    <string name="feed_mvp">MVP de ayer: %1$s</string>
+    <string name="feed_awards">Premios del grupo</string>
+    <string name="feed_awards_sub">Semana del %1$s</string>
+    <string name="feed_award_brawler">Top %1$s</string>
+    <string name="feed_award_wr">%1$s · %2$d%% de victorias en %3$d partidas</string>
+    <string name="feed_award_mode">Top en %1$s</string>
+    <string name="feed_award_grind">Más partidas 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d partidas. ¿Salimos a tomar el aire?</string>
+    <string name="feed_award_one">Monomain 🎯</string>
+    <string name="feed_award_one_v">%1$s · %2$s en el %3$d%% de las partidas</string>
+    <string name="feed_award_owl">Búho nocturno 🦉</string>
+    <string name="feed_award_owl_v">%1$s · %2$d partidas después de medianoche</string>
+    <string name="feed_award_star">Jugador estelar ⭐</string>
+    <string name="feed_award_star_v">%1$s · jugador estelar %2$d veces</string>
+    <string name="feed_react_title">%1$s reaccionó %2$s</string>
+    <string name="feed_react_many">%1$d reacciones en tus publicaciones</string>
+    <string name="feed_reacted">Reaccionaron: %1$s</string>
+    <string name="feed_reacted_more">Reaccionaron: %1$s y %2$d más</string>
 </resources>

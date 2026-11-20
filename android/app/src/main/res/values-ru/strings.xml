@@ -355,4 +355,43 @@
     <string name="roast_close">Закрыть</string>
     <string name="roast_failed">Сейчас прожарки нет. Попробуй через минуту.</string>
     <string name="roast_share_text">Прожарь и свой аккаунт: brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">ЛЕНТА ОТРЯДА</string>
+    <string name="feed_title">Лента отряда</string>
+    <string name="feed_intro">Из настоящих ранговых боёв — твоих и твоих друзей. Ставь реакции, чтобы поддержать или подколоть.</string>
+    <string name="feed_empty">Пока пусто. Повышения ранга, серии, дуэль недели и воскресные награды отряда появятся здесь, когда ты и друзья сыграете в ранговых боях.</string>
+    <string name="feed_see_all">Вся лента</string>
+    <string name="feed_new">Новых: %1$d</string>
+    <string name="feed_pass">%1$s теперь выше, чем %2$s, в рейтинге отряда</string>
+    <string name="feed_pass_sub">Отрыв уже %1$s эло 👀</string>
+    <string name="feed_streak">У %1$s серия из %2$d побед</string>
+    <string name="feed_streak_sub">Кто-нибудь это остановит?</string>
+    <string name="feed_tilt">%1$s: %2$d поражений подряд</string>
+    <string name="feed_tilt_sub">Проверьте, как там дела 🫠</string>
+    <string name="feed_session">%1$s: %2$d–%3$d за одну сессию</string>
+    <string name="feed_session_hot">Не остановить</string>
+    <string name="feed_session_cold">Гринд — это жёстко 😵</string>
+    <string name="feed_lead">%1$s — лидер дуэли недели</string>
+    <string name="feed_wins_week">Ранговых побед за неделю: %1$d</string>
+    <string name="feed_duel">%1$s — победитель дуэли недели</string>
+    <string name="feed_duel_sub">Ранговых побед с понедельника по воскресенье: %1$d</string>
+    <string name="feed_mvp">MVP вчерашнего дня: %1$s</string>
+    <string name="feed_awards">Награды отряда</string>
+    <string name="feed_awards_sub">Неделя с %1$s</string>
+    <string name="feed_award_brawler">Топ %1$s</string>
+    <string name="feed_award_wr">%1$s · %2$d%% побед за %3$d боёв</string>
+    <string name="feed_award_mode">Топ: %1$s</string>
+    <string name="feed_award_grind">Больше всех боёв 🌱</string>
+    <string name="feed_award_games">%1$s · боёв: %2$d. Может, прогуляться?</string>
+    <string name="feed_award_one">Ван-трик 🎯</string>
+    <string name="feed_award_one_v">%1$s · %2$s в %3$d%% боёв</string>
+    <string name="feed_award_owl">Ночная сова 🦉</string>
+    <string name="feed_award_owl_v">%1$s · боёв после полуночи: %2$d</string>
+    <string name="feed_award_star">Звёздный игрок ⭐</string>
+    <string name="feed_award_star_v">%1$s · звёздный игрок %2$d раз</string>
+    <string name="feed_react_title">%1$s: реакция %2$s</string>
+    <string name="feed_react_many">Реакций на твои посты: %1$d</string>
+    <string name="feed_reacted">Реакции: %1$s</string>
+    <string name="feed_reacted_more">Реакции: %1$s и ещё %2$d</string>
 </resources>

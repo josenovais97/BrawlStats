@@ -355,4 +355,43 @@
     <string name="roast_close">关闭</string>
     <string name="roast_failed">暂时无法吐槽，请稍后再试。</string>
     <string name="roast_share_text">也来吐槽你的账号：brawlzone.net/bubble</string>
+
+    <!-- 1.42: the squad feed (Feed, FeedView, FeedActivity) -->
+    <string name="feed_caption">小队动态</string>
+    <string name="feed_title">小队动态</string>
+    <string name="feed_intro">根据你和好友的真实排位赛对局生成。点个表情为他们加油，或者调侃一下。</string>
+    <string name="feed_empty">这里还没有内容。你和好友打排位赛后，升段、连胜、每周对决和周日的小队奖项都会出现在这里。</string>
+    <string name="feed_see_all">查看全部动态</string>
+    <string name="feed_new">%1$d 条新动态</string>
+    <string name="feed_pass">%1$s 在小队排行榜上超过了 %2$s</string>
+    <string name="feed_pass_sub">现在领先 %1$s 分 👀</string>
+    <string name="feed_streak">%1$s %2$d 连胜中</string>
+    <string name="feed_streak_sub">谁来阻止一下？</string>
+    <string name="feed_tilt">%1$s 连输 %2$d 场</string>
+    <string name="feed_tilt_sub">谁去看看他还好吗 🫠</string>
+    <string name="feed_session">%1$s 一次打出 %2$d胜%3$d负</string>
+    <string name="feed_session_hot">势不可挡</string>
+    <string name="feed_session_cold">好难啊 😵</string>
+    <string name="feed_lead">%1$s 在每周对决中领先</string>
+    <string name="feed_wins_week">本周排位赛 %1$d 胜</string>
+    <string name="feed_duel">%1$s 赢得了每周对决</string>
+    <string name="feed_duel_sub">周一到周日排位赛 %1$d 胜</string>
+    <string name="feed_mvp">昨日 MVP：%1$s</string>
+    <string name="feed_awards">小队奖项</string>
+    <string name="feed_awards_sub">%1$s 这一周</string>
+    <string name="feed_award_brawler">最强%1$s</string>
+    <string name="feed_award_wr">%1$s · %3$d 场胜率 %2$d%%</string>
+    <string name="feed_award_mode">%1$s 最强</string>
+    <string name="feed_award_grind">场次最多 🌱</string>
+    <string name="feed_award_games">%1$s · %2$d 场。出去透透气？</string>
+    <string name="feed_award_one">绝活哥 🎯</string>
+    <string name="feed_award_one_v">%1$s · %3$d%% 的对局用 %2$s</string>
+    <string name="feed_award_owl">夜猫子 🦉</string>
+    <string name="feed_award_owl_v">%1$s · 午夜后打了 %2$d 场</string>
+    <string name="feed_award_star">全场最佳 ⭐</string>
+    <string name="feed_award_star_v">%1$s · %2$d 次全场最佳</string>
+    <string name="feed_react_title">%1$s 回应了 %2$s</string>
+    <string name="feed_react_many">你的动态收到 %1$d 个回应</string>
+    <string name="feed_reacted">回应：%1$s</string>
+    <string name="feed_reacted_more">回应：%1$s 等 %2$d 人</string>
 </resources>

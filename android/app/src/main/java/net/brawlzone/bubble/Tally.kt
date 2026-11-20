@@ -20,7 +20,8 @@ import java.time.format.DateTimeFormatter
  */
 object Tally {
 
-    data class Battle(val at: Long, val win: Boolean, val brawler: String?)
+    /** 1.42 adds the mode key and the star player flag, for the squad feed (older rows have neither). */
+    data class Battle(val at: Long, val win: Boolean, val brawler: String?, val mode: String? = null, val star: Boolean = false)
 
     private const val PREFS = "brawlzone-tally"
     private const val DAY_MS = 24L * 60 * 60 * 1000
@@ -37,7 +38,13 @@ object Tally {
         val a = runCatching { JSONArray(raw) }.getOrNull() ?: return emptyList()
         return (0 until a.length()).mapNotNull { i ->
             val row = a.optJSONArray(i) ?: return@mapNotNull null
-            Battle(row.optLong(0), row.optInt(1) == 1, row.optString(2).takeIf { it.isNotEmpty() })
+            Battle(
+                row.optLong(0),
+                row.optInt(1) == 1,
+                row.optString(2).takeIf { it.isNotEmpty() },
+                row.optString(3).takeIf { it.isNotEmpty() },
+                row.optInt(4) == 1,
+            )
         }
     }
 
@@ -50,13 +57,15 @@ object Tally {
         val seen = known.mapTo(HashSet()) { it.at }
         val cutoff = System.currentTimeMillis() - KEEP_MS
         val fresh = games
-            .mapNotNull { g -> time(g.time)?.let { Battle(it, g.win, g.brawler) } }
+            .mapNotNull { g -> time(g.time)?.let { Battle(it, g.win, g.brawler, g.mode, g.star) } }
             .filter { it.at >= cutoff && it.at !in seen }
             .distinctBy { it.at }
             .sortedBy { it.at }
         val all = (known + fresh).filter { it.at >= cutoff }.sortedBy { it.at }
         val out = JSONArray()
-        for (b in all) out.put(JSONArray().put(b.at).put(if (b.win) 1 else 0).put(b.brawler ?: ""))
+        for (b in all) {
+            out.put(JSONArray().put(b.at).put(if (b.win) 1 else 0).put(b.brawler ?: "").put(b.mode ?: "").put(if (b.star) 1 else 0))
+        }
         prefs(context).edit().putString("b_$tag", out.toString()).apply()
         return fresh
     }
