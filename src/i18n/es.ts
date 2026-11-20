@@ -5284,4 +5284,16 @@ export const ES: Record<string, string> = {
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Si compartes una invitación de amigo, brawlzone.net guarda tu tag de jugador con el código de la invitación, y el tag de cada jugador que la abra en la app, para que os añadáis mutuamente como amigos. No se guarda nada más de ninguno de los dos.",
   "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Si reaccionas a una publicación en el feed del grupo de la app, brawlzone.net guarda tu ID de jugador, tu nombre en el juego, el emoji y en qué publicación fue durante 30 días, para que tus amigos lo vean. Las publicaciones se crean en tu móvil a partir de datos públicos del juego.",
+  "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.":
+    "Feed del grupo: subidas de rango, rachas y premios semanales tuyos y de tus amigos. Reacciona con emoji.",
+  "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.":
+    "Avisos de recompensas gratis: una notificación en cuanto aparece una recompensa gratis nueva, y widgets en la pantalla de inicio con recompensas, el meta y tu rango.",
+  "Ask Bubble: ask about any brawler, map or mode, by text or voice.":
+    "Pregunta a Bubble: cualquier brawler, mapa o modo, por texto o voz.",
+  "Invite friends, race them in the weekly duel and see who's playing now.":
+    "Invita a tus amigos, compite en el duelo semanal y mira quién está jugando ahora.",
+  "Your season graph, personal records and this season vs last.":
+    "Gráfica de la temporada, récords personales y esta temporada contra la anterior.",
+  "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
+    "Humilla tu cuenta y compártelo. Temas para la burbuja y cualquier brawler como su cara.",
 };

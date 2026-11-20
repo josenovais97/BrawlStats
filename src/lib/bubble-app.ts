@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.30',
+  version: '1.42',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 52,
+  versionCode: 55,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.30.apk',
+  path: '/downloads/brawlzone-bubble-1.42.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,11 +62,11 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2989186,
-  sha256: '7eb010d03b2c78bbdc68c1839f7c69a685a3f46adc4e9fc383b6dc98727334c3',
+  size: 3795031,
+  sha256: '2fc1499991a0ef55453e5ab1bdd68c82321c54759988b102fb61f87570127f4c',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-10-12',
+  released: '2026-11-20',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -95,6 +95,19 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.42',
+    versionCode: 55,
+    date: '2026-11-20',
+    changes: [
+      "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.",
+      "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.",
+      "Ask Bubble: ask about any brawler, map or mode, by text or voice.",
+      "Invite friends, race them in the weekly duel and see who's playing now.",
+      "Your season graph, personal records and this season vs last.",
+      "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.",
+    ],
+  },
   {
     version: '1.30',
     versionCode: 52,

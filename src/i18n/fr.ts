@@ -5285,4 +5285,16 @@ export const FR: Record<string, string> = {
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Si tu partages une invitation d'ami, brawlzone.net garde ton tag de joueur avec le code d'invitation, et le tag de chaque joueur qui l'ouvre dans l'appli, pour que vous soyez ajoutés aux amis l'un de l'autre. Rien d'autre n'est conservé sur l'un ou l'autre.",
   "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Si tu réagis à une publication dans le fil de l'équipe de l'appli, brawlzone.net garde ton tag de joueur, ton pseudo, l'emoji et la publication concernée pendant 30 jours, pour que tes amis le voient. Les publications elles-mêmes sont créées sur ton téléphone à partir des données publiques du jeu.",
+  "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.":
+    "Fil de l'équipe : montées de rang, séries et récompenses de la semaine pour toi et tes amis. Réagis avec des emoji.",
+  "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.":
+    "Alertes récompenses gratuites : une notification dès qu'une nouvelle récompense gratuite apparaît, et des widgets d'écran d'accueil pour les récompenses, la méta et ton rang.",
+  "Ask Bubble: ask about any brawler, map or mode, by text or voice.":
+    "Demande à Bubble : n'importe quel brawler, carte ou mode, à l'écrit ou à la voix.",
+  "Invite friends, race them in the weekly duel and see who's playing now.":
+    "Invite tes amis, affrontez-vous dans le duel de la semaine et vois qui joue en ce moment.",
+  "Your season graph, personal records and this season vs last.":
+    "Ta courbe de saison, tes records et cette saison contre la précédente.",
+  "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
+    "Fais clasher ton compte et partage-le. Des thèmes pour la bulle, et n'importe quel brawler comme visage.",
 };

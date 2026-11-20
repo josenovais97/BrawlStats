@@ -5284,4 +5284,16 @@ export const TR: Record<string, string> = {
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Bir arkadaş daveti paylaşırsan brawlzone.net oyuncu etiketini davet koduyla birlikte, daveti uygulamada açan her oyuncunun etiketini de saklar; böylece birbirinizin arkadaş listesine eklenirsiniz. İki oyuncu hakkında başka hiçbir şey saklanmaz.",
   "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Uygulamadaki ekip akışında bir gönderiye tepki verirsen brawlzone.net oyuncu etiketini, oyun içi adını, emojiyi ve hangi gönderiye verildiğini 30 gün saklar, böylece arkadaşların görebilir. Gönderilerin kendisi telefonunda, oyunun herkese açık verilerinden oluşturulur.",
+  "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.":
+    "Ekip akışı: senin ve arkadaşlarının rütbe atlamaları, serileri ve haftalık ödülleri. Emoji ile tepki ver.",
+  "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.":
+    "Ücretsiz ödül bildirimleri: yeni bir ücretsiz ödül çıktığı anda bildirim, ayrıca ödüller, meta ve rütben için ana ekran widget'ları.",
+  "Ask Bubble: ask about any brawler, map or mode, by text or voice.":
+    "Bubble'a sor: herhangi bir savaşçı, harita ya da mod hakkında, yazarak veya sesle.",
+  "Invite friends, race them in the weekly duel and see who's playing now.":
+    "Arkadaşlarını davet et, haftalık düelloda yarışın ve kimin şu an oynadığını gör.",
+  "Your season graph, personal records and this season vs last.":
+    "Sezon grafiğin, kişisel rekorların ve bu sezon ile geçen sezon.",
+  "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
+    "Hesabını kızart ve paylaş. Baloncuk temaları ve baloncuğun yüzü olarak istediğin savaşçı.",
 };

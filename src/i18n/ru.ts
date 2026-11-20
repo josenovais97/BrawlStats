@@ -5285,4 +5285,16 @@ export const RU: Record<string, string> = {
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Если ты делишься приглашением в друзья, brawlzone.net хранит твой тег игрока вместе с кодом приглашения и тег каждого игрока, открывшего его в приложении, чтобы вы добавились друг к другу в друзья. Больше ничего ни о ком из вас не хранится.",
   "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Если ты реагируешь на пост в ленте отряда в приложении, brawlzone.net хранит твой тег игрока, игровое имя, эмодзи и пост 30 дней, чтобы это видели твои друзья. Сами посты создаются на твоём телефоне из открытых данных игры.",
+  "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.":
+    "Лента отряда: повышения ранга, серии и награды недели — твои и друзей. Ставь реакции.",
+  "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.":
+    "Бесплатные награды: уведомление, как только появляется новая бесплатная награда, и виджеты на главном экране с наградами, метой и твоим рангом.",
+  "Ask Bubble: ask about any brawler, map or mode, by text or voice.":
+    "Спроси Bubble: о любом бойце, карте или режиме, текстом или голосом.",
+  "Invite friends, race them in the weekly duel and see who's playing now.":
+    "Приглашай друзей, соревнуйтесь в дуэли недели и смотри, кто сейчас играет.",
+  "Your season graph, personal records and this season vs last.":
+    "График сезона, личные рекорды и этот сезон против прошлого.",
+  "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
+    "Прожарь свой аккаунт и поделись. Темы для пузыря и любой боец в качестве его лица.",
 };

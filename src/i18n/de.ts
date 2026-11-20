@@ -5285,4 +5285,16 @@ export const DE: Record<string, string> = {
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Wenn du eine Freundeseinladung teilst, speichert brawlzone.net deinen Spieler-Tag mit dem Einladungscode und den Tag jedes Spielers, der sie in der App öffnet, damit ihr euch gegenseitig als Freunde hinzufügt. Sonst wird über keinen der beiden etwas gespeichert.",
   "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Wenn du in der App auf einen Beitrag im Squad-Feed reagierst, speichert brawlzone.net deinen Spieler-Tag, deinen Spielnamen, das Emoji und den Beitrag 30 Tage lang, damit deine Freunde es sehen. Die Beiträge selbst entstehen auf deinem Handy aus öffentlichen Spieldaten.",
+  "Squad feed: rank-ups, streaks and weekly awards for you and your friends. React with emoji.":
+    "Squad-Feed: Rangaufstiege, Serien und Wochen-Awards von dir und deinen Freunden. Reagiere mit Emoji.",
+  "Free reward alerts: a notification the moment a new free reward appears, and home-screen widgets for rewards, the meta and your rank.":
+    "Gratis-Belohnungen: eine Benachrichtigung, sobald eine neue Gratis-Belohnung auftaucht, und Widgets für den Startbildschirm mit Belohnungen, Meta und deinem Rang.",
+  "Ask Bubble: ask about any brawler, map or mode, by text or voice.":
+    "Frag Bubble: zu jedem Brawler, jeder Map und jedem Modus, per Text oder Stimme.",
+  "Invite friends, race them in the weekly duel and see who's playing now.":
+    "Lade Freunde ein, tretet im Wochenduell an und sieh, wer gerade spielt.",
+  "Your season graph, personal records and this season vs last.":
+    "Deine Saisonkurve, persönliche Rekorde und diese Saison gegen die letzte.",
+  "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
+    "Lass deinen Account roasten und teile es. Bubble-Designs und jeder Brawler als Gesicht deiner Bubble.",
 };
