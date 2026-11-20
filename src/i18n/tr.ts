@@ -5283,4 +5283,5 @@ export const TR: Record<string, string> = {
     "Geçen sezonu geçmek için {rank} seviyesine ulaş",
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Bir arkadaş daveti paylaşırsan brawlzone.net oyuncu etiketini davet koduyla birlikte, daveti uygulamada açan her oyuncunun etiketini de saklar; böylece birbirinizin arkadaş listesine eklenirsiniz. İki oyuncu hakkında başka hiçbir şey saklanmaz.",
+  "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Uygulamadaki ekip akışında bir gönderiye tepki verirsen brawlzone.net oyuncu etiketini, oyun içi adını, emojiyi ve hangi gönderiye verildiğini 30 gün saklar, böylece arkadaşların görebilir. Gönderilerin kendisi telefonunda, oyunun herkese açık verilerinden oluşturulur.",
 };

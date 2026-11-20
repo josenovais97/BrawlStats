@@ -834,3 +834,23 @@ model BubbleInviteAccept {
   @@id([code, invitee])
   @@map("bubble_invite_accepts")
 }
+
+/// Reactions in the Bubble app's squad feed (1.42): one of six fixed emoji
+/// per player per post. Posts are made on the phones; their ids name the
+/// players they are about (`subject` is the first), see lib/bubble-feed-id.
+/// The name is the reacting player's in-game name from the official API.
+/// Kept 30 days.
+model BubbleReaction {
+  post      String
+  tag       String
+  subject   String
+  name      String
+  emoji     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([post, tag])
+  @@index([subject, createdAt])
+  @@index([tag, createdAt])
+  @@index([createdAt])
+  @@map("bubble_reactions")
+}

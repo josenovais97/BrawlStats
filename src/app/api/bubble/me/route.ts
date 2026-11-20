@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-import { playerIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel, playerIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { appNames, localRank } from '@/lib/bubble-app-l10n';
 import { RANK_ELO_FLOORS, rankProgress, winsToNext } from '@/lib/ranked-elo';
@@ -8,6 +8,7 @@ import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
 import { getRankedEloRates } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
+import type { BAGameMode } from '@/types/brawlapi';
 import { lastBubble, rememberBubble } from '@/lib/bubble-last';
 import { toApiError } from '@/lib/errors';
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   if (!tag) return Response.json({ error: 'no tag' }, { status: 400 });
 
   let failure: unknown = null;
-  const [player, log, rates, name] = await Promise.all([
+  const [player, log, rates, name, modeMeta] = await Promise.all([
     getPlayer(tag).catch((err) => {
       failure = err;
       return null;
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest) {
       .catch(() => []),
     getRankedEloRates().catch(() => ({})),
     appNames(params.get('lang')),
+    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
   ]);
   if (!player) {
     // During an outage, the last good answer (see lib/bubble-last), so the
@@ -67,8 +69,14 @@ export async function GET(request: NextRequest) {
         win: e.battle.result === 'victory',
         star: e.battle.starPlayer?.tag?.toUpperCase() === me,
         brawler: mine?.brawler?.name ? name(mine.brawler.name) : null,
+        // 1.42: the mode, for the squad feed's "best in Heist" award.
+        mode: e.event?.mode ?? e.battle.mode ?? null,
       };
     });
+  // Each mode's name in the app's language, once rather than per game.
+  const modes = Object.fromEntries(
+    [...new Set(games.map((g) => g.mode).filter((m): m is string => !!m))].map((m) => [m, name(modeLabel(modeMeta, m))]),
+  );
 
   const icon = absolute(playerIconUrl(player.icon?.id));
 
@@ -91,6 +99,7 @@ export async function GET(request: NextRequest) {
         stars: games.filter((g) => g.star).length,
       },
       games,
+      modes,
   };
   rememberBubble('me', tag, body).catch(() => {
     /* A lost copy only matters during the next outage. */

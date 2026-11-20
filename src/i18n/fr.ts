@@ -5284,4 +5284,5 @@ export const FR: Record<string, string> = {
     "Atteins {rank} pour battre la saison dernière",
   "If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.":
     "Si tu partages une invitation d'ami, brawlzone.net garde ton tag de joueur avec le code d'invitation, et le tag de chaque joueur qui l'ouvre dans l'appli, pour que vous soyez ajoutés aux amis l'un de l'autre. Rien d'autre n'est conservé sur l'un ou l'autre.",
+  "If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.": "Si tu réagis à une publication dans le fil de l'équipe de l'appli, brawlzone.net garde ton tag de joueur, ton pseudo, l'emoji et la publication concernée pendant 30 jours, pour que tes amis le voient. Les publications elles-mêmes sont créées sur ton téléphone à partir des données publiques du jeu.",
 };
