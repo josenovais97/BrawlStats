@@ -588,4 +588,6 @@ export const CLIENT_FR: Record<string, string> = {
     "Tu en as récupéré {done} sur {n}. Touche Récupérer pour les autres.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "{n} récompenses gratuites en ce moment. Touche Récupérer sur chacune, elles seront cochées ici.",
+  "Or get the BrawlZone Bubble app: an alert for every new reward, and a widget with the latest one.":
+    "Ou installe l’appli BrawlZone Bubble : une alerte à chaque nouvelle récompense et un widget avec la dernière.",
 };

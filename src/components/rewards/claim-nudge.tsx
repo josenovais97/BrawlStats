@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { NotifyButton } from '@/components/rewards/notify-button';
 import { useT } from '@/components/i18n/use-t';
+import { GooglePlayBadge } from '@/components/store-badges';
+import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
 import { WHATSAPP_URL } from '@/lib/site';
 
 /**
@@ -22,7 +24,13 @@ import { WHATSAPP_URL } from '@/lib/site';
  * offered a way to hear about the next one. They get the home-screen steps
  * (push works from there) and the WhatsApp and Discord buttons; a browser
  * with notifications blocked gets the buttons.
+ *
+ * 2026-11-20: Android phones also get the Play badge. The app has sent
+ * reward alerts and a rewards widget since 1.40, and /rewards (the site's
+ * second page) never mentioned it. The referrer puts these installs under
+ * their own campaign in Play Console's acquisition report.
  */
+const PLAY_URL = `${PLAY_TEST.listingUrl}&referrer=${encodeURIComponent('utm_source=brawlzone.net&utm_medium=claim_nudge')}`;
 const SNOOZE_KEY = 'bz-notify-nudge';
 const WEEK = 7 * 86_400_000;
 
@@ -40,15 +48,17 @@ export function ClaimNudge({ vapidKey, discordUrl }: { vapidKey: string; discord
   const t = useT();
   const [open, setOpen] = useState<Mode | null>(null);
   const [iphone, setIphone] = useState(false);
+  const [android, setAndroid] = useState(false);
   const eligible = useRef<Mode | null>(null);
 
   useEffect(() => {
     if (snoozed()) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the device is only knowable in the browser
+    setAndroid(PLAY_LIVE && /Android/i.test(navigator.userAgent));
     const push = !!vapidKey && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
     if (!push || Notification.permission === 'denied') {
       eligible.current = 'follow';
       // iPadOS reports itself as a Mac, so a touch screen gives it away.
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- the device is only knowable in the browser
       setIphone(/iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
     } else {
       navigator.serviceWorker
@@ -146,6 +156,23 @@ export function ClaimNudge({ vapidKey, discordUrl }: { vapidKey: string; discord
             </div>
           </>
         )}
+        {android ? (
+          <div className="space-y-3 border-t border-border pt-4">
+            <p className="text-sm leading-relaxed text-muted">
+              {t('Or get the BrawlZone Bubble app: an alert for every new reward, and a widget with the latest one.')}
+            </p>
+            <a
+              href={PLAY_URL}
+              rel="noopener"
+              data-umami-event="play_store"
+              data-umami-event-from="claim-nudge"
+              aria-label={t('Get it on Google Play')}
+              className="inline-block transition-transform hover:-translate-y-0.5"
+            >
+              <GooglePlayBadge className="h-12 w-auto" t={t} />
+            </a>
+          </div>
+        ) : null}
         <button type="button" onClick={dismiss} data-umami-event="notify_nudge_dismiss" className="text-sm text-muted underline">
           {t('Not now')}
         </button>

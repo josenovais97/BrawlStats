@@ -7,6 +7,9 @@
  * gets the message in the language it subscribed from, opening /rewards in
  * that language. Subscriptions the push service calls gone (404/410) are
  * deleted. Prints "push: sent N, gone N, failed N".
+ *
+ * 2026-11-20: the link carries ?from=push, so Umami can count the taps
+ * (url_query); before that a tap looked like any direct visit.
  */
 import { isIntlLocale, type Locale } from '@/lib/i18n';
 import { getPrisma } from '@/lib/prisma';
@@ -36,7 +39,7 @@ async function main(): Promise<void> {
     await Promise.all(
       subs.slice(i, i + 10).map(async (s) => {
         const text = isIntlLocale(s.lang) ? TEXT[s.lang] : TEXT.en;
-        const result = await sendPush(s, { title: text.title, body: text.body(listed), url: text.path, tag: 'brawlzone-reward' });
+        const result = await sendPush(s, { title: text.title, body: text.body(listed), url: `${text.path}?from=push`, tag: 'brawlzone-reward' });
         tally[result] += 1;
         if (result === 'gone') await prisma.pushSubscription.delete({ where: { id: s.id } }).catch(() => {});
         if (result === 'sent') await prisma.pushSubscription.update({ where: { id: s.id }, data: { lastSentAt: new Date() } }).catch(() => {});

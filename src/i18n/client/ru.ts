@@ -588,4 +588,6 @@ export const CLIENT_RU: Record<string, string> = {
     "Получено {done} из {n}. Нажми «Забрать» на остальных.",
   "{n} free rewards live. Tap Claim on each one and they get ticked off here.":
     "Бесплатных наград сейчас: {n}. Нажми «Забрать» на каждой, и они отметятся здесь.",
+  "Or get the BrawlZone Bubble app: an alert for every new reward, and a widget with the latest one.":
+    "Или установи приложение BrawlZone Bubble: уведомление о каждой новой награде и виджет с последней.",
 };
