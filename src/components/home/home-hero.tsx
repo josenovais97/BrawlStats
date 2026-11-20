@@ -86,7 +86,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                   the gold last line and the label above were template habits. */}
               <h1 className="display-hero text-game-stroke text-[2.375rem] leading-[1.02] sm:text-[3rem] lg:text-[3.75rem]">{t('Brawl Stars|hero-1')}{' '}{t('stats that show|hero-2')}{' '}{t('where you stand|hero-3')}</h1>
 
-              <p className="mt-3.5 max-w-md leading-relaxed text-muted">{t('Search any player or club. See skill score, roster gaps, progression and live meta context in seconds.')}</p>
+              <p className="mt-3.5 max-w-md leading-relaxed text-muted">{t('BrawlZone is a free Brawl Stars stats site built on real battles we collect ourselves. Search any player or club, or check tier lists and Ranked picks for every mode.')}</p>
 
               <Console />
             </div>

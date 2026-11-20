@@ -5296,4 +5296,20 @@ export const ES: Record<string, string> = {
     "Gráfica de la temporada, récords personales y esta temporada contra la anterior.",
   "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
     "Humilla tu cuenta y compártelo. Temas para la burbuja y cualquier brawler como su cara.",
+  "The website shows ads served by Google AdSense, which pay for the server. Third-party vendors, including Google, use cookies to serve ads based on a visitor's earlier visits to this website or other websites. Google's advertising cookies let it and its partners show ads based on visits to this site and other sites on the internet. Visitors in the EEA, the UK and Switzerland are asked first, through Google's consent message, and can refuse.":
+    "El sitio web muestra anuncios de Google AdSense, que pagan el servidor. Proveedores externos, incluido Google, usan cookies para mostrar anuncios basados en las visitas anteriores de cada visitante a este u otros sitios web. Las cookies publicitarias de Google les permiten a Google y a sus socios mostrar anuncios basados en visitas a este sitio y a otros sitios de internet. A los visitantes del EEE, el Reino Unido y Suiza se les pregunta primero, con el aviso de consentimiento de Google, y pueden rechazarlo.",
+  ", and some other ad companies' cookies at":
+    ", y las cookies de algunas otras empresas de publicidad en",
+  "app is free and provided as-is. It draws an overlay showing this site's data over other apps, with your permission, and reads nothing from the game. What it sends to this site is listed in the":
+    "es gratis y se ofrece tal cual. Muestra una capa con los datos de este sitio sobre otras apps, con tu permiso, y no lee nada del juego. Lo que envía a este sitio se detalla en la",
+  "Ads on the site are chosen and served by Google, not by us. Links to other sites, including Supercell's reward links, lead to pages we do not control.":
+    "Los anuncios del sitio los elige y los sirve Google, no nosotros. Los enlaces a otros sitios, incluidos los enlaces de recompensas de Supercell, llevan a páginas que no controlamos.",
+  "These terms may change as the site does. The date below shows when they last changed.":
+    "Estos términos pueden cambiar a medida que cambia el sitio. La fecha de abajo indica cuándo cambiaron por última vez.",
+  "BrawlZone is made and run by Novais Labs, a one-person studio in Portugal. These terms are governed by Portuguese law, without taking away any rights the law of your own country gives you.":
+    "BrawlZone lo hace y lo mantiene Novais Labs, un estudio de una sola persona en Portugal. Estos términos se rigen por la ley portuguesa, sin quitarte ningún derecho que te dé la ley de tu propio país.",
+  "Last updated: {date}":
+    "Última actualización: {date}",
+  "BrawlZone is a free Brawl Stars stats site built on real battles we collect ourselves. Search any player or club, or check tier lists and Ranked picks for every mode.":
+    "BrawlZone es un sitio gratis de estadísticas de Brawl Stars hecho con partidas reales que recogemos nosotros mismos. Busca cualquier jugador o club, o mira tier lists y las mejores elecciones de Competitivo para cada modo.",
 };

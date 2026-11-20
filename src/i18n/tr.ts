@@ -5296,4 +5296,20 @@ export const TR: Record<string, string> = {
     "Sezon grafiğin, kişisel rekorların ve bu sezon ile geçen sezon.",
   "Roast your account and share it. Bubble themes, and any brawler as your bubble's face.":
     "Hesabını kızart ve paylaş. Baloncuk temaları ve baloncuğun yüzü olarak istediğin savaşçı.",
+  "The website shows ads served by Google AdSense, which pay for the server. Third-party vendors, including Google, use cookies to serve ads based on a visitor's earlier visits to this website or other websites. Google's advertising cookies let it and its partners show ads based on visits to this site and other sites on the internet. Visitors in the EEA, the UK and Switzerland are asked first, through Google's consent message, and can refuse.":
+    "Web sitesi, sunucunun masrafını karşılayan Google AdSense reklamları gösterir. Google dahil üçüncü taraf sağlayıcılar, ziyaretçinin bu siteye veya başka sitelere önceki ziyaretlerine dayalı reklamlar göstermek için çerez kullanır. Google'ın reklam çerezleri, Google'ın ve ortaklarının bu siteye ve internetteki başka sitelere yapılan ziyaretlere göre reklam göstermesini sağlar. AEA, Birleşik Krallık ve İsviçre'deki ziyaretçilere önce Google'ın onay mesajıyla sorulur ve reddedebilirler.",
+  ", and some other ad companies' cookies at":
+    "; bazı diğer reklam şirketlerinin çerezlerini ise şuradan:",
+  "app is free and provided as-is. It draws an overlay showing this site's data over other apps, with your permission, and reads nothing from the game. What it sends to this site is listed in the":
+    "uygulaması ücretsizdir ve olduğu gibi sunulur. İzninle diğer uygulamaların üzerine bu sitenin verilerini gösteren bir katman çizer; oyundan hiçbir şey okumaz. Bu siteye ne gönderdiği şurada listelenir:",
+  "Ads on the site are chosen and served by Google, not by us. Links to other sites, including Supercell's reward links, lead to pages we do not control.":
+    "Sitedeki reklamları biz değil, Google seçer ve gösterir. Supercell'in ödül linkleri dahil başka sitelere giden linkler, kontrol etmediğimiz sayfalara açılır.",
+  "These terms may change as the site does. The date below shows when they last changed.":
+    "Bu şartlar site değiştikçe değişebilir. Aşağıdaki tarih, en son ne zaman değiştiklerini gösterir.",
+  "BrawlZone is made and run by Novais Labs, a one-person studio in Portugal. These terms are governed by Portuguese law, without taking away any rights the law of your own country gives you.":
+    "BrawlZone, Portekiz'de tek kişilik bir stüdyo olan Novais Labs tarafından yapılır ve işletilir. Bu şartlar Portekiz hukukuna tabidir; kendi ülkenin hukukunun sana verdiği hakları ortadan kaldırmaz.",
+  "Last updated: {date}":
+    "Son güncelleme: {date}",
+  "BrawlZone is a free Brawl Stars stats site built on real battles we collect ourselves. Search any player or club, or check tier lists and Ranked picks for every mode.":
+    "BrawlZone, kendi topladığımız gerçek maçlardan oluşturulan ücretsiz bir Brawl Stars istatistik sitesidir. Herhangi bir oyuncuyu veya kulübü ara ya da her mod için tier listelerine ve en iyi Aşamalı seçimlerine bak.",
 };

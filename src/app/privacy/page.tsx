@@ -37,6 +37,9 @@ const NOTHING = [
   'No email address, name, phone number or payment details — none are ever asked for.',
 ];
 
+/** Bump when the policy text changes; shown at the bottom of the page. */
+const UPDATED = '2026-11-20T00:00:00Z';
+
 export default function PrivacyPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
@@ -133,14 +136,20 @@ export default function PrivacyPage() {
           <div className="flex gap-4">
             <Megaphone className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>{t('The website shows ads served by Google AdSense, which pay for the server. Google and its partners may use cookies and similar technology to show and measure ads, including ads based on earlier visits to this and other sites. Visitors in the EEA, the UK and Switzerland are asked first, through Google\'s consent message, and can refuse.')}</p>
+              <p>{t('The website shows ads served by Google AdSense, which pay for the server. Third-party vendors, including Google, use cookies to serve ads based on a visitor\'s earlier visits to this website or other websites. Google\'s advertising cookies let it and its partners show ads based on visits to this site and other sites on the internet. Visitors in the EEA, the UK and Switzerland are asked first, through Google\'s consent message, and can refuse.')}</p>
               <p>{t('You can turn off personalised ads in')}{' '}
                 <a
                   href="https://adssettings.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('Google\'s ad settings')}</a>{t('. How Google uses this data is explained in')}{' '}
+                >{t('Google\'s ad settings')}</a>{t(', and some other ad companies\' cookies at')}{' '}
+                <a
+                  href="https://optout.aboutads.info"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >aboutads.info</a>{t('. How Google uses this data is explained in')}{' '}
                 <a
                   href="https://policies.google.com/technologies/partner-sites"
                   target="_blank"
@@ -303,6 +312,7 @@ export default function PrivacyPage() {
           >
             {CONTACT_EMAIL}
           </a>{t('. If this page ever stops matching what the site actually does, that is a bug — say so and it will be fixed.')}</p>
+        <p className="mt-2 text-xs text-muted">{t('Last updated: {date}', { date: new Intl.DateTimeFormat(requestLocale(), { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(UPDATED)) })}</p>
       </section>
     </div>
   );

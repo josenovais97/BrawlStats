@@ -42,6 +42,9 @@ const NOT_ALLOWED = [
   'Redistributing the Android app repackaged, modified, or signed with a different key.',
 ];
 
+/** Bump when the terms change; shown at the bottom of the page. */
+const UPDATED = '2026-11-20T00:00:00Z';
+
 export default function TermsPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
@@ -132,8 +135,8 @@ export default function TermsPage() {
         />
         <div className="card space-y-3 p-6 text-sm leading-relaxed text-muted">
           <p>{t('The')}{' '}
-            <Link href={lp('/bubble')} className="font-medium text-brand hover:underline">{t('BrawlZone Bubble')}</Link>{' '}{t('app is free and provided as-is. It draws an overlay showing this site\'s data over other apps, with your permission, and reads nothing from your device or from the game. What it collects is covered by the')}{' '}
-            <Link href={lp('/privacy')} className="font-medium text-brand hover:underline">{t('privacy policy')}</Link>{t(', and the answer is nothing.')}</p>
+            <Link href={lp('/bubble')} className="font-medium text-brand hover:underline">{t('BrawlZone Bubble')}</Link>{' '}{t('app is free and provided as-is. It draws an overlay showing this site\'s data over other apps, with your permission, and reads nothing from the game. What it sends to this site is listed in the')}{' '}
+            <Link href={lp('/privacy')} className="font-medium text-brand hover:underline">{t('privacy policy')}</Link>.</p>
           <p>{t('It is not a modification of Brawl Stars, does not interact with the game, and does not automate play. Using it should not put an account at risk, but the site cannot make promises on Supercell\'s behalf about what their rules permit.')}</p>
         </div>
       </section>
@@ -143,7 +146,10 @@ export default function TermsPage() {
         <div className="card p-6">
           <div className="flex gap-4">
             <AlertTriangle className="size-5 shrink-0 text-brand" />
-            <p className="text-sm leading-relaxed text-muted">{t('The site and the app are provided “as is”, without warranty of any kind. They may be unavailable, incomplete, or wrong at any time. To the extent the law allows,')}{' '}{SITE_NAME}{' '}{t('accepts no liability for any loss arising from using them — including decisions made in a game on the strength of a number printed here.')}</p>
+            <div className="space-y-3 text-sm leading-relaxed text-muted">
+              <p>{t('The site and the app are provided “as is”, without warranty of any kind. They may be unavailable, incomplete, or wrong at any time. To the extent the law allows,')}{' '}{SITE_NAME}{' '}{t('accepts no liability for any loss arising from using them — including decisions made in a game on the strength of a number printed here.')}</p>
+              <p>{t('Ads on the site are chosen and served by Google, not by us. Links to other sites, including Supercell\'s reward links, lead to pages we do not control.')}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -154,11 +160,7 @@ export default function TermsPage() {
           <div className="flex gap-4">
             <Gavel className="size-5 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>{t('These terms may change as the site does. Material changes are noted in the')}{' '}
-                <Link
-                  href={lp('/release-notes')}
-                  className="font-medium text-brand hover:underline"
-                >{t('release notes')}</Link>{t(', which are dated.')}</p>
+              <p>{t('These terms may change as the site does. The date below shows when they last changed.')}</p>
               <p>{t('Questions, corrections, or a takedown request:')}{' '}
                 <a
                   href={lp(`mailto:${CONTACT_EMAIL}`)}
@@ -168,6 +170,8 @@ export default function TermsPage() {
                 </a>
                 .
               </p>
+              <p>{t('BrawlZone is made and run by Novais Labs, a one-person studio in Portugal. These terms are governed by Portuguese law, without taking away any rights the law of your own country gives you.')}</p>
+              <p className="text-xs">{t('Last updated: {date}', { date: new Intl.DateTimeFormat(requestLocale(), { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(UPDATED)) })}</p>
             </div>
           </div>
         </div>

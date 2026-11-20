@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 /**
  * The site's star-and-chart mark, kept in sync with `src/app/icon.svg`.
  *
@@ -5,6 +7,9 @@
  * size without a network request and can inherit sizing from Tailwind classes.
  */
 export function BrandMark({ className = 'size-8' }: { className?: string }) {
+  // The mark is drawn twice on every page (header and footer); a fixed
+  // gradient id would repeat, which is invalid HTML (flagged 2026-11-20).
+  const gradient = `brandmark-star-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   return (
     <svg
       viewBox="0 0 64 64"
@@ -14,7 +19,7 @@ export function BrandMark({ className = 'size-8' }: { className?: string }) {
       fill="none"
     >
       <defs>
-        <linearGradient id="brandmark-star" x1="0.15" y1="0" x2="0.6" y2="1">
+        <linearGradient id={gradient} x1="0.15" y1="0" x2="0.6" y2="1">
           <stop offset="0" stopColor="#FFDC6B" />
           <stop offset="0.5" stopColor="#FBC02D" />
           <stop offset="1" stopColor="#EF9F1C" />
@@ -23,7 +28,7 @@ export function BrandMark({ className = 'size-8' }: { className?: string }) {
 
       <path
         d="M 25.50,3.00 L 33.25,12.08 L 44.99,14.25 L 41.00,25.50 L 44.99,36.75 L 33.25,38.92 L 25.50,48.00 L 17.75,38.92 L 6.01,36.75 L 10.00,25.50 L 6.01,14.25 L 17.75,12.08 Z"
-        fill="url(#brandmark-star)"
+        fill={`url(#${gradient})`}
         stroke="#14365F"
         strokeWidth="3"
         strokeLinejoin="round"
