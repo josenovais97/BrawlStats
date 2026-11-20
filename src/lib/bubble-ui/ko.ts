@@ -218,6 +218,9 @@ const ko: UiStrings = {
   "ask.noTag": "앱에 플레이어 태그를 추가하면 내 브롤러 기준으로 답해요.",
   "ask.tier": "{t} 티어",
   "ask.voice": "음성으로 물어보기",
+  "ask.ex.upgrade": "다음엔 뭘 강화할까?",
+  "ask.upgrade": "먼저 강화하기",
+  "ask.upgradeFail": "강화 계획을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
   "chooser.ask": "무엇이든 물어보세요: 카운터, 최고의 픽, 밴, 빌드",
 };
 

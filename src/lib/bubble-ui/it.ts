@@ -218,6 +218,9 @@ const it: UiStrings = {
   "ask.noTag": "Aggiungi il tuo tag giocatore nell'app per ricevere risposte sui tuoi brawler.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Chiedi a voce",
+  "ask.ex.upgrade": "Cosa potenzio adesso?",
+  "ask.upgrade": "Da potenziare prima",
+  "ask.upgradeFail": "Non riesco a caricare il tuo piano di potenziamento. Riprova tra un minuto.",
   "chooser.ask": "Chiedi qualsiasi cosa: counter, scelte migliori, ban, build",
 };
 

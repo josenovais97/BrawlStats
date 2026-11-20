@@ -218,6 +218,9 @@ const fr: UiStrings = {
   "ask.noTag": "Ajoute ton tag de joueur dans l'appli pour des réponses sur tes brawlers.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Demander à voix haute",
+  "ask.ex.upgrade": "Qu'est-ce que j'améliore ensuite ?",
+  "ask.upgrade": "À améliorer d'abord",
+  "ask.upgradeFail": "Impossible de charger ton plan d'amélioration. Réessaie dans une minute.",
   "chooser.ask": "Pose ta question : counters, meilleurs choix, bans, builds",
 };
 

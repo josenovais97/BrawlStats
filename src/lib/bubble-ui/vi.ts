@@ -218,6 +218,9 @@ const vi: UiStrings = {
   "ask.noTag": "Thêm thẻ người chơi trong ứng dụng để nhận câu trả lời về brawler của bạn.",
   "ask.tier": "Hạng {t}",
   "ask.voice": "Hỏi bằng giọng nói",
+  "ask.ex.upgrade": "Tiếp theo nên nâng cấp gì?",
+  "ask.upgrade": "Nâng cấp trước",
+  "ask.upgradeFail": "Chưa tải được kế hoạch nâng cấp. Thử lại sau một phút nhé.",
   "chooser.ask": "Hỏi gì cũng được: khắc chế, lựa chọn, cấm, build",
 };
 

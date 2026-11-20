@@ -10,7 +10,7 @@
  * already loaded (roster, Ranked maps, modes, each with its localized name).
  */
 
-export type AskIntent = 'counters' | 'strong' | 'mates' | 'build' | 'maps' | 'picks' | 'bans' | 'trio' | 'good' | 'versus';
+export type AskIntent = 'upgrade' | 'counters' | 'strong' | 'mates' | 'build' | 'maps' | 'picks' | 'bans' | 'trio' | 'good' | 'versus';
 
 export interface AskParsed {
   brawlers: number[];
@@ -126,6 +126,12 @@ const MODE_WORDS: Record<string, string[]> = {
  * two: which is better; a map: its picks; a mode: its best).
  */
 const INTENTS: [AskIntent, string[]][] = [
+  // What to spend coins on: the app's upgrade plan, for the player's own account.
+  ['upgrade', ['upgrade', 'upgrades', 'upgrading', 'level up', 'power up', 'power points', 'coins', 'spend', 'upar', 'evoluir', 'melhorar', 'moedas', 'mejorar',
+    'subir de nivel', 'monedas', 'ameliorer', 'upgrader', 'monter de niveau', 'upgraden', 'aufwerten', 'leveln', 'munzen', 'potenziare', 'livellare', 'monete',
+    'прокачать', 'прокачивать', 'прокачка', 'улучшить', 'монеты', 'yukselt', 'yukseltmek', 'seviye atlat', 'ulepszyc', 'ulepszac', 'monety', 'munten',
+    'naik level', 'naik taraf', 'tingkatkan', 'koin', 'nang cap', 'paivita', 'paivitan', 'paivittaa', 'kolikot', 'ترقية', 'تطوير', 'طور', 'اطور', 'שדרוג', 'לשדרג', 'アップグレード', 'レベル上げ', '強化', 'コイン',
+    '업그레이드', '강화', '코인', '升级', '升級', '强化', '金币', '金幣', 'อัพเกรด', 'อัปเกรด']],
   ['build', ['build', 'gadget', 'star power', 'starpower', 'gear', 'gears', 'sp', 'acessorio', 'acessorios', 'poder de estrela', 'engrenagem',
     'accesorio', 'poder estelar', 'engranaje', 'gadgets', 'pouvoir stellaire', 'equipement', 'sternenkraft', 'ausrustung', 'abilita stellare',
     'accessorio', 'гаджет', 'звездная сила', 'снаряжение', 'yildiz gucu', 'alet', 'ビルド', 'ガジェット', 'スターパワー', '빌드', '가젯', '스타파워', '配装', '出装', '妙具', '星徽之力']],

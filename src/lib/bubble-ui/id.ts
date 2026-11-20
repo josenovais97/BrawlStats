@@ -218,6 +218,9 @@ const id: UiStrings = {
   "ask.noTag": "Tambahkan tag pemainmu di aplikasi untuk jawaban tentang brawler milikmu.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Tanya dengan suara",
+  "ask.ex.upgrade": "Apa yang harus kuupgrade berikutnya?",
+  "ask.upgrade": "Upgrade dulu",
+  "ask.upgradeFail": "Rencana upgrade belum bisa dimuat. Coba lagi sebentar lagi.",
   "chooser.ask": "Tanya apa saja: counter, pilihan terbaik, ban, build",
 };
 

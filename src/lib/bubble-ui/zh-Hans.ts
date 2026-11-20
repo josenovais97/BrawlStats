@@ -218,6 +218,9 @@ const zhHans: UiStrings = {
   "ask.noTag": "在应用里添加玩家标签，即可按你的英雄回答。",
   "ask.tier": "{t}级",
   "ask.voice": "语音提问",
+  "ask.ex.upgrade": "接下来该升级谁？",
+  "ask.upgrade": "优先升级",
+  "ask.upgradeFail": "暂时无法加载你的升级计划，请稍后再试。",
   "chooser.ask": "随便问：克制、最佳选择、禁用、配装",
 };
 

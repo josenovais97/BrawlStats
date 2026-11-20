@@ -218,6 +218,9 @@ const ms: UiStrings = {
   "ask.noTag": "Tambah tag pemain anda dalam aplikasi untuk jawapan tentang brawler anda.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Tanya dengan suara",
+  "ask.ex.upgrade": "Apa patut saya naik taraf seterusnya?",
+  "ask.upgrade": "Naik taraf dulu",
+  "ask.upgradeFail": "Pelan naik taraf tidak dapat dimuatkan sekarang. Cuba lagi sebentar lagi.",
   "chooser.ask": "Tanya apa sahaja: counter, pilihan terbaik, ban, build",
 };
 

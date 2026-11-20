@@ -218,6 +218,9 @@ const fi: UiStrings = {
   "ask.noTag": "Lisää pelaajatunnuksesi sovelluksessa saadaksesi vastauksia omista brawlereistasi.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Kysy äänellä",
+  "ask.ex.upgrade": "Mitä päivitän seuraavaksi?",
+  "ask.upgrade": "Päivitä ensin",
+  "ask.upgradeFail": "Päivityssuunnitelmaa ei saatu ladattua. Yritä hetken päästä uudelleen.",
   "chooser.ask": "Kysy mitä vain: counterit, parhaat valinnat, bannit, buildit",
 };
 

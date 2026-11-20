@@ -218,6 +218,9 @@ const pl: UiStrings = {
   "ask.noTag": "Dodaj tag gracza w aplikacji, aby dostawać odpowiedzi o swoich zadymiarzach.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Zapytaj głosem",
+  "ask.ex.upgrade": "Co ulepszyć teraz?",
+  "ask.upgrade": "Ulepsz najpierw",
+  "ask.upgradeFail": "Nie udało się wczytać planu ulepszeń. Spróbuj za minutę.",
   "chooser.ask": "Pytaj o wszystko: kontry, najlepsze wybory, bany, buildy",
 };
 

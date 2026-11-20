@@ -218,6 +218,9 @@ const zhHant: UiStrings = {
   "ask.noTag": "在應用程式裡加入玩家標籤，即可按你的英雄回答。",
   "ask.tier": "{t}級",
   "ask.voice": "語音提問",
+  "ask.ex.upgrade": "接下來該升級誰？",
+  "ask.upgrade": "優先升級",
+  "ask.upgradeFail": "暫時無法載入你的升級計畫，請稍後再試。",
   "chooser.ask": "隨便問：克制、最佳選擇、禁用、配裝",
 };
 

@@ -218,6 +218,9 @@ const tr: UiStrings = {
   "ask.noTag": "Kendi savaşçıların hakkında cevaplar için uygulamaya oyuncu etiketini ekle.",
   "ask.tier": "{t} seviyesi",
   "ask.voice": "Sesle sor",
+  "ask.ex.upgrade": "Sırada neyi yükselteyim?",
+  "ask.upgrade": "Önce bunları yükselt",
+  "ask.upgradeFail": "Yükseltme planın şu an yüklenemedi. Bir dakika sonra tekrar dene.",
   "chooser.ask": "Her şeyi sor: kontralar, en iyi seçimler, banlar, yapılar",
 };
 

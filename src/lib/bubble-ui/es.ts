@@ -223,6 +223,9 @@ const es: UiStrings = {
   "ask.noTag": "Añade tu ID de jugador en la app para recibir respuestas sobre tus brawlers.",
   "ask.tier": "Tier {t}",
   "ask.voice": "Preguntar por voz",
+  "ask.ex.upgrade": "¿Qué mejoro ahora?",
+  "ask.upgrade": "Mejora esto primero",
+  "ask.upgradeFail": "No pude cargar tu plan de mejoras. Prueba en un minuto.",
   "chooser.ask": "Pregunta lo que sea: counters, mejores elecciones, bloqueos, builds",
 };
 

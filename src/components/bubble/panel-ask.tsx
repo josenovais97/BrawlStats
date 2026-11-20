@@ -34,12 +34,30 @@ type Answer =
   | { kind: 'versus'; a: number; b: number; map: string | null }
   | { kind: 'map'; map: string; intent: AskIntent | null; mine: boolean }
   | { kind: 'mode'; mode: string; intent: AskIntent | null }
+  | { kind: 'upgrade'; brawler: number | null }
   | { kind: 'unknown' };
 type Turn = { id: number; q: string; answer: Answer };
 type Chip = { text: string; parsed: AskParsed };
 
+type Plan = { headline: string; note: string; steps: { brawlerId: number; name: string; icon: string; detail: string; gain: string }[] };
+
 const details = new Map<string, Promise<TierBrawlerDetail | null>>();
 const counterCache = new Map<string, Promise<Counter[]>>();
+const plans = new Map<string, Promise<Plan | null>>();
+
+/** The app's upgrade plan (/api/bubble/plan, the same optimiser as the profile), once per tag and language. */
+function getPlan(tag: string, lang: string) {
+  const key = `${tag}|${lang}`;
+  if (!plans.has(key)) {
+    plans.set(
+      key,
+      fetch(`/api/bubble/plan?${new URLSearchParams({ tag, lang })}`)
+        .then((r) => (r.ok ? (r.json() as Promise<Plan>) : null))
+        .catch(() => null),
+    );
+  }
+  return plans.get(key)!;
+}
 
 function getDetail(id: number, modes: string[], lang: string) {
   const key = `${id}|${lang}`;
@@ -135,6 +153,7 @@ export function PanelAsk({
   const rank = panelBracket(account.rankName);
 
   const answerFor = (p: AskParsed): Answer => {
+    if (p.intent === 'upgrade') return { kind: 'upgrade', brawler: p.brawlers[0] ?? null };
     if (p.brawlers.length >= 2) return { kind: 'versus', a: p.brawlers[0], b: p.brawlers[1], map: p.map };
     if (p.brawlers.length === 1) return { kind: 'brawler', id: p.brawlers[0], map: p.map, intent: p.intent };
     if (p.map) return { kind: 'map', map: p.map, intent: p.intent, mine: p.mine };
@@ -190,13 +209,14 @@ export function PanelAsk({
     const out: Chip[] = [];
     if (context.map) out.push({ text: t('ask.ex.picks', { map: name(context.map) }), parsed: P({ map: context.map, intent: 'picks' }) });
     if (a) out.push({ text: t('ask.ex.counters', { name: local(a.brawlerId) }), parsed: P({ brawlers: [a.brawlerId], intent: 'counters' }) });
+    if (account.tag) out.push({ text: t('ask.ex.upgrade'), parsed: P({ intent: 'upgrade' }) });
     if (context.map) out.push({ text: t('ask.ex.bans', { map: name(context.map) }), parsed: P({ map: context.map, intent: 'bans' }) });
     if (account.owned && context.map) out.push({ text: t('ask.ex.mine', { map: name(context.map) }), parsed: P({ map: context.map, intent: 'picks', mine: true }) });
     if (b && c) out.push({ text: t('ask.ex.versus', { a: local(b.brawlerId), b: local(c.brawlerId) }), parsed: P({ brawlers: [b.brawlerId, c.brawlerId], intent: 'versus' }) });
     if (b) out.push({ text: t('ask.ex.build', { name: local(b.brawlerId) }), parsed: P({ brawlers: [b.brawlerId], intent: 'build' }) });
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context, account.owned, t, name]);
+  }, [context, account.owned, account.tag, t, name]);
 
   const chipRow = (chips: Chip[]) => (
     <div className="flex flex-wrap gap-1.5">
@@ -341,6 +361,7 @@ function AnswerView({ answer, ctx }: { answer: Answer; ctx: Ctx }) {
   if (answer.kind === 'versus') return <VersusAnswer a={answer.a} b={answer.b} map={answer.map} ctx={ctx} />;
   if (answer.kind === 'map') return <MapAnswer map={answer.map} intent={answer.intent} mine={answer.mine} ctx={ctx} />;
   if (answer.kind === 'mode') return <ModeAnswer mode={answer.mode} intent={answer.intent} ctx={ctx} />;
+  if (answer.kind === 'upgrade') return <UpgradeAnswer brawler={answer.brawler} ctx={ctx} />;
   return (
     <Card>
       <p className="text-[12px] leading-snug">{ctx.t('ask.unknown')}</p>
@@ -625,6 +646,48 @@ function ModeAnswer({ mode, intent, ctx }: { mode: string; intent: AskIntent | n
       {ctx.chipRow(
         m.maps.slice(0, 4).map((mp) => ({ text: ctx.t('ask.ex.picks', { map: ctx.name(mp.mapName) }), parsed: ctx.P({ map: mp.mapName, intent: 'picks' }) })),
       )}
+    </Card>
+  );
+}
+
+/** "What should I upgrade?": where the coins go next, from the player's own roster. */
+function UpgradeAnswer({ brawler, ctx }: { brawler: number | null; ctx: Ctx }) {
+  const tag = ctx.account.tag;
+  const plan = useAsync(() => (tag ? getPlan(tag, ctx.lang) : Promise.resolve(null)), [tag, ctx.lang]);
+  if (!tag) return <Card><p className="text-[12px] leading-snug">{ctx.t('ask.noTag')}</p></Card>;
+  if (plan === undefined) return <Thinking t={ctx.t} />;
+  if (plan === null) return <Card><p className="text-[12px] leading-snug">{ctx.t('ask.upgradeFail')}</p></Card>;
+  const first = plan.steps[0]?.brawlerId;
+  const follow: Chip[] = first
+    ? [
+        { text: ctx.t('ask.ex.build', { name: ctx.local(first) }), parsed: ctx.P({ brawlers: [first], intent: 'build' }) },
+        { text: ctx.t('ask.ex.maps', { name: ctx.local(first) }), parsed: ctx.P({ brawlers: [first], intent: 'maps' }) },
+      ]
+    : [];
+  return (
+    <Card>
+      <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{ctx.t('ask.upgrade')}</p>
+      <p className="text-[13px] font-bold leading-snug">{plan.headline}</p>
+      {plan.note ? <p className="text-[11px] leading-snug text-muted">{plan.note}</p> : null}
+      {plan.steps.length ? (
+        <ol className="space-y-1">
+          {plan.steps.map((step, i) => {
+            const lit = step.brawlerId === brawler;
+            return (
+              <li key={step.brawlerId} className={`flex items-center gap-2 rounded-lg px-1.5 py-1 ${lit ? 'bg-brand/15 ring-2 ring-brand' : 'bg-surface-2/60'}`}>
+                <span className="display w-4 shrink-0 text-center text-[13px] text-brand">{i + 1}</span>
+                <Face src={ctx.byId.get(step.brawlerId)?.imageUrl ?? step.icon} size={30} ring={i === 0 || lit ? 'border-brand' : undefined} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[12px] font-bold leading-tight">{ctx.local(step.brawlerId) || step.name}</span>
+                  <span className="block text-[10px] tabular-nums text-muted">{step.detail}</span>
+                  {step.gain ? <span className="block text-[10px] leading-snug text-brand">{step.gain}</span> : null}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
+      {ctx.chipRow(follow)}
     </Card>
   );
 }

@@ -218,6 +218,9 @@ const ja: UiStrings = {
   "ask.noTag": "アプリでプレイヤータグを登録すると、自分のキャラで答えます。",
   "ask.tier": "{t}ティア",
   "ask.voice": "音声で聞く",
+  "ask.ex.upgrade": "次に強化するのは？",
+  "ask.upgrade": "次に強化",
+  "ask.upgradeFail": "強化プランを読み込めませんでした。少し待ってからもう一度お試しください。",
   "chooser.ask": "何でも聞いて：カウンター、おすすめ、バン、ビルド",
 };
 

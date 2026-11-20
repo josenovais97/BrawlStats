@@ -237,6 +237,9 @@ export const UI_EN = {
   "ask.noTag": "Add your player tag in the app to get answers for your own brawlers.",
   "ask.tier": "{t} tier",
   "ask.voice": "Ask by voice",
+  "ask.ex.upgrade": "What should I upgrade next?",
+  "ask.upgrade": "Upgrade next",
+  "ask.upgradeFail": "Couldn't get your upgrade plan right now. Try again in a minute.",
   "chooser.ask": "Ask anything: counters, best picks, bans, builds",
 } as const;
 

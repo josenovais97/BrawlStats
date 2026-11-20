@@ -94,3 +94,13 @@ test('the player asking about themselves', () => {
   assert.equal(parseAsk('what should i pick on out in the open', index).mine, true);
   assert.equal(parseAsk('best picks on out in the open', index).mine, false);
 });
+
+test('what to upgrade, in a few languages', () => {
+  assert.equal(parseAsk('what should I upgrade next?', index).intent, 'upgrade');
+  assert.equal(parseAsk('o que devo upar agora', index).intent, 'upgrade');
+  assert.equal(parseAsk('¿Qué brawler mejorar con mis monedas?', index).intent, 'upgrade');
+  assert.equal(parseAsk('кого прокачать', index).intent, 'upgrade');
+  assert.equal(parseAsk('次に強化するのは', index).intent, 'upgrade');
+  // A build question stays a build question.
+  assert.equal(parseAsk('best gadget for bea', index).intent, 'build');
+});

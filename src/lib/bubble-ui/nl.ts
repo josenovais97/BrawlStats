@@ -218,6 +218,9 @@ const nl: UiStrings = {
   "ask.noTag": "Voeg je spelerstag toe in de app voor antwoorden over je eigen brawlers.",
   "ask.tier": "{t}-tier",
   "ask.voice": "Vraag met je stem",
+  "ask.ex.upgrade": "Wat moet ik nu upgraden?",
+  "ask.upgrade": "Eerst upgraden",
+  "ask.upgradeFail": "Je upgradeplan laadt nu niet. Probeer het zo opnieuw.",
   "chooser.ask": "Vraag alles: counters, beste picks, bans, builds",
 };
 
