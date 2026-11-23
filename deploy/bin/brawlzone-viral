@@ -31,7 +31,8 @@
 #
 #   Mon drops  Tue stop  Wed ranks  Thu whatsnew  Fri broken (giveaway to Nov 30)  Sat modes  Sun everyrank
 #   The third Thursday, when a Ranked season starts (lib/ranked-seasons), is seasonclimb instead of whatsnew.
-#   (drops: "I opened 1,000 X", a different drop or box each week, from 2026-11-09)
+#   (drops: "I opened 1,000 X", a different drop or box each time, from 2026-11-09; at most
+#   once a fortnight from 2026-11-23, else classrank)
 #
 # Fridays until the giveaway closes (2026-11-30) are its reminder instead.
 #
@@ -89,7 +90,12 @@ if [ -z "$kind" ]; then
 fi
 if [ "$kind" = extra ]; then
   case "$(date -u +%u)" in
-    1) kind=drops ;;
+    # Drops at most once a fortnight (2026-11-23): the fourth simulation in
+    # three weeks did 503 views against ~1,100 before. Otherwise a class.
+    1) kind=drops
+       for i in $(seq 1 13); do
+         grep -qs '"kind": "drops"' "$PUBLIC/$(date -u -d "-$i day" +%Y-%m-%d)"*/meta.json && kind=classrank
+       done ;;
     2) kind=stop ;;
     3) kind=ranks ;;
     4) if [ "$(date -u +%-d)" -ge 15 ] && [ "$(date -u +%-d)" -le 21 ]; then kind=seasonclimb; else kind=whatsnew; fi ;;
@@ -460,9 +466,11 @@ draw () { # kind
   return "$rc"
 }
 
-recent () { # kind: drawn in the last three days, whichever folder it went to
+recent () { # kind: drawn in the last 13 days, whichever folder it went to
+  # (three days until 2026-11-23, when drops became fortnightly: as a
+  # fallback it would otherwise come back every week anyway)
   local i
-  for i in 1 2 3; do
+  for i in $(seq 1 13); do
     grep -qs "\"kind\": \"$1\"" "$PUBLIC/$(date -u -d "-$i day" +%Y-%m-%d)"*/meta.json && return 0
   done
   return 1

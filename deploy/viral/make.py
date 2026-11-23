@@ -1203,7 +1203,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
             'description': 'A new Ranked season starts today. '
                            + ('It is the first under the Ranked Refresh: Power 11 at every rank, and the reset only '
                               'drops you 2 ranks. ' if refresh else '')
-                           + f"The 10 best brawlers to climb with, from this week's Ranked games. Top 3: {top3}. "
+                           + f"The 10 best brawlers to climb with, from this week's Ranked games across all ranks. Top 3: {top3}. "
                              f'Who are you climbing with? Comment below 👇\n\n'
                              f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -1220,7 +1220,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                                      tr='YENİ Ranked sezonu: şu ana kadar ne kazanıyor 🔥 #Shorts',
                                      pl='NOWY sezon Ranked: co naprawdę wygrywa do tej pory 🔥 #Shorts')},
             'description': f"The new Ranked season started on {SS.get('startedOn')}. The 10 brawlers winning most since the reset, "
-                           f"from {SS.get('games', 0):,} Ranked games. Top 3: {top3}. "
+                           f"from {SS.get('games', 0):,} Ranked games across all ranks. Top 3: {top3}. "
                            + (f"Biggest climber against last season: {nice(big[1]['n'])} (#{big[2]} → #{big[3]}). " if big else '')
                            + f'Who are you climbing with? Comment below 👇\n\n'
                              f'Tier list for the last 24 hours: https://brawlzone.net/tier-list/ranked/24h{FOOTER}\n{COUNT_HASHTAGS}',
@@ -1234,7 +1234,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                                      de='Alle Brawler vom SCHLECHTESTEN zum BESTEN 😳 #Shorts',
                                      tr='Tüm brawlerlar EN KÖTÜDEN EN İYİYE 😳 #Shorts',
                                      pl='Wszyscy brawlerzy od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts')},
-            'description': f"All {NB} brawlers ranked by this week's Ranked games (Season {data.get('season')}). "
+            'description': f"All {NB} brawlers ranked by this week's Ranked games across all ranks (Season {data.get('season')}). "
                            f'Top 3: {top3}. Where is your main? Comment below 👇 New ranking every week.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -1248,7 +1248,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                            ('de', 'Alle {} vom SCHLECHTESTEN zum BESTEN 😳 #Shorts'),
                            ('tr', 'Tüm {} EN KÖTÜDEN EN İYİYE 😳 #Shorts'),
                            ('pl', '{} od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts'))} if WORD in GROUP_L10N else {})},
-            'description': f"All {NB} {en_pl} ranked by this week's Ranked games (Season {data.get('season')}). "
+            'description': f"All {NB} {en_pl} ranked by this week's Ranked games across all ranks (Season {data.get('season')}). "
                            f'Top 3: {top3}. Which one do you main? Comment below 👇 Another class next time.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -2457,6 +2457,8 @@ PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyra
 # answer, giveaway, drops, newbrawler, roastmains, wrapped.
 HOOKS = [{'lead': 'GET YOUR ACCOUNT ROASTED', 'url': 'brawlzone.net/roast'},
          {'lead': 'SEE WHAT YOUR ACCOUNT IS WORTH', 'url': 'brawlzone.net/account-value'}]
+# The lists built from every rank's Ranked games, labelled so (2026-11-23).
+ALL_RANK_KINDS = ('everyrank', 'classrank', 'seasonclimb', 'newseason', 'modes', 'stop', 'broken')
 HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb', 'newseason',
               'modes', 'ranks', 'stop', 'broken', 'whatsnew')
 
@@ -2670,6 +2672,15 @@ def export_plan(out):
             if os.path.exists(p):
                 leagues.append(save(Image.open(p).convert('RGBA'), f'c/league-{n}.png'))
         plan.update(season=W_SEASON, ends=W_ENDS, days=W_DAYS, card='c/card.jpg', leagues=leagues)
+    if KIND in ALL_RANK_KINDS:
+        # Every frame says which ranks the list is from (RankTag): these all
+        # read the whole Ranked sample, Bronze to Pro.
+        badges = []
+        for n in RR_LEAGUES:
+            src = f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png"
+            if os.path.exists(src):
+                badges.append(save(Image.open(src).convert('RGBA'), f'c/league-{n}.png'))
+        plan['rank'] = {'label': 'ALL RANKS', 'badges': badges}
     if KIND in HOOK_KINDS:
         import datetime
         try:

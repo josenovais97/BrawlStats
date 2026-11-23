@@ -2,7 +2,7 @@
 // beat grid, a punch-in at each cut, and the swipe across the big cuts.
 import React from 'react';
 import {AbsoluteFill, Sequence, random, useCurrentFrame} from 'remotion';
-import {Swipe} from './fx';
+import {RankTag, Swipe} from './fx';
 import {Plan, Segment} from './theme';
 
 export type SceneProps = {seg: Segment; plan: Plan; frame: number; beat: number; t: number; spb: number};
@@ -29,6 +29,7 @@ export const Stage: React.FC<{plan: Plan; scenes: Record<string, React.FC<SceneP
           </Sequence>
         );
       })}
+      {plan.rank && <RankTag rank={plan.rank} />}
       <Swipe p={swipe} />
     </AbsoluteFill>
   );

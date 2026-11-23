@@ -37,7 +37,7 @@ const Intro: React.FC<SceneProps> = ({plan, frame, t, spb}) => {
             <Arrow x={W / 2} y={1050} size={120} color="#fff" />
             <Chip text="BEST" color="#3cd26e" size={78} x={W / 2 + 260 + 260 * (1 - outBack((frame - spb * 3) / 10))} y={1050} />
           </>)}
-      {frame > spb * 4 && <Title text={fresh ? `FROM ${Math.max(1, Math.round((plan.games || 0) / 1000))}K GAMES SINCE THE RESET` : climb ? "FROM THIS WEEK'S RANKED GAMES" : `THIS WEEK IN RANKED · SEASON ${plan.season}`} size={52} gold frame={frame} at={spb * 4} stagger={0.4} y={1220} />}
+      {frame > spb * 4 && <Title text={fresh ? `FROM ${Math.max(1, Math.round((plan.games || 0) / 1000))}K GAMES SINCE THE RESET` : climb ? "FROM THIS WEEK'S RANKED GAMES" : `${plan.rank ? plan.rank.label + ' · ' : ''}THIS WEEK IN RANKED · SEASON ${plan.season}`} size={52} gold frame={frame} at={spb * 4} stagger={0.4} y={1220} />}
       {frame > spb * 4.5 && <div style={{position: 'absolute', left: W / 2, top: 1390, transform: `translate(-50%,-50%) scale(${1 + 0.06 * Math.sin(t * 10)})`}}>
         <Label text="wait for #1..." size={90} /></div>}
     </AbsoluteFill>

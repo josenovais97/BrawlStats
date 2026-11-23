@@ -349,6 +349,24 @@ export const SearchBar: React.FC<{text?: string; frame: number; at?: number; x?:
 };
 
 /** The address at the top of every frame, as a small search box. */
+/**
+ * Which ranks a list is built from, pinned to the top of every frame
+ * (2026-11-23, owner: "when doing tierlists always put the rank it is based
+ * on"): the league badges it covers, then the words.
+ */
+export const RankTag: React.FC<{rank: {label: string; badges?: string[]}; y?: number; scale?: number}> = ({rank, y = 92, scale = 1}) => (
+  <div style={{position: 'absolute', left: W / 2, top: y, transform: `translate(-50%, -50%) scale(${scale})`, display: 'flex', alignItems: 'center', gap: 14,
+    padding: '8px 26px 8px 14px', borderRadius: 999, whiteSpace: 'nowrap', background: `linear-gradient(180deg, #2c3478 0%, ${INK} 100%)`,
+    boxShadow: `0 0 0 5px #ffb21e, 0 9px 0 5px ${DEEP}`}}>
+    <div style={{display: 'flex', alignItems: 'center'}}>
+      {(rank.badges || []).map((b, i) => (
+        <Img key={i} src={staticFile(b)} style={{width: 58, height: 58, objectFit: 'contain', marginLeft: i ? -16 : 0, filter: 'drop-shadow(0 3px 0 rgba(0,0,0,0.55))'}} />
+      ))}
+    </div>
+    <Label text={rank.label} size={42} color="#ffe45a" stroke={0} />
+  </div>
+);
+
 export const BrandBug: React.FC<{y?: number}> = ({y = 200}) => (
   <div style={{position: 'absolute', left: W / 2, top: y, transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: 14,
     padding: '10px 14px 10px 12px', borderRadius: 999, background: 'linear-gradient(180deg,#ffffff,#e9edff)',
