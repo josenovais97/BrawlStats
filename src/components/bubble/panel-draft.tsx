@@ -69,8 +69,6 @@ type Slot = 'bans' | 'allies' | 'enemies';
 /** What a Ranked draft actually allows, so the strips cannot overfill. */
 const LIMITS: Record<Slot, number> = { bans: 6, allies: 2, enemies: 3 };
 
-/** Long enough to read, short enough that three fit on one line. */
-const LABELS: Record<Slot, UiKey> = { bans: 'draft.ban', allies: 'draft.you', enemies: 'draft.vs' };
 
 /** For the picker's placeholder, where there is room for the real words. */
 const LONG: Record<Slot, UiKey> = {
@@ -133,6 +131,9 @@ export function PanelDraft({
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
   const [safe, setSafe] = useState<SafePick[]>([]);
   const [loading, setLoading] = useState(false);
+  // 1.43: the pick being tried (tap a suggestion), and the draft's live chance.
+  const [mine, setMine] = useState<number | null>(null);
+  const [chance, setChance] = useState<number | null>(null);
 
   const { t, name, lang } = usePanelI18n();
   const modeName = useModeLabel();
@@ -184,6 +185,7 @@ export function PanelDraft({
         bans?: number[];
         allies?: number[];
         enemies?: number[];
+        mine?: number | null;
       };
       if (!saved.map || Date.now() - (saved.at ?? 0) > DRAFT_TTL_MS) {
         fallBack();
@@ -207,6 +209,7 @@ export function PanelDraft({
           allies: saved.allies ?? [],
           enemies: saved.enemies ?? [],
         });
+        setMine(typeof saved.mine === 'number' ? saved.mine : null);
         return;
       }
     } catch {
@@ -221,12 +224,40 @@ export function PanelDraft({
     try {
       window.localStorage.setItem(
         STORED_DRAFT,
-        JSON.stringify({ map: map.mapName, at: Date.now(), ...picked }),
+        JSON.stringify({ map: map.mapName, at: Date.now(), ...picked, mine }),
       );
     } catch {
       // ignored
     }
-  }, [map, picked]);
+  }, [map, picked, mine]);
+
+  /*
+   * The draft's chance (1.43), from the same reading as the post-game review:
+   * teammates plus the pick being tried, against the enemies entered so far.
+   * Debounced like the suggestions; cached by URL at the edge.
+   */
+  useEffect(() => {
+    const team = [...picked.allies, ...(mine !== null ? [mine] : [])];
+    if (!map || team.length === 0 || picked.enemies.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setChance(null);
+      return;
+    }
+    const params = new URLSearchParams({ map: map.mapName, mine: team.join(','), theirs: picked.enemies.join(',') });
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch(`/api/bubble/chance?${params}`, { signal: controller.signal })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+        .then((data: { chance: number | null }) => setChance(typeof data.chance === 'number' ? data.chance : null))
+        .catch((err) => {
+          if ((err as Error).name !== 'AbortError') setChance(null);
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [map, picked, mine]);
 
   /*
    * Scoring, debounced.
@@ -284,6 +315,7 @@ export function PanelDraft({
     setPicks(null);
     setSafe([]);
     setPicked({ bans: [], allies: [], enemies: [] });
+    setMine(null);
   };
 
   /* One tap back to an empty board, because the next match is a new draft. */
@@ -292,9 +324,12 @@ export function PanelDraft({
     setPicking(null);
     setPicks(null);
     setSafe([]);
+    setMine(null);
   };
 
   const add = (slot: Slot, id: number) => {
+    // A brawler entered anywhere on the board can no longer be your pick.
+    if (mine === id) setMine(null);
     setPicked((prev) => {
       // One brawler, one place. A pick cannot also be a ban, and the game
       // would not offer it twice.
@@ -359,6 +394,52 @@ export function PanelDraft({
     // `taken` is derived from `picked`; listing it would re-filter every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, localRoster, picked, lang]);
+
+  /* One portrait on the board. Enemies open their counters; the rest remove on tap. */
+  const slotPortrait = (slot: Slot, id: number, size: number) => {
+    const b = byId.get(id);
+    return (
+      <button
+        key={`${slot}${id}`}
+        type="button"
+        onClick={() => {
+          if (slot === 'enemies') setInspect(inspect === id ? null : id);
+          else remove(slot, id);
+        }}
+        aria-pressed={slot === 'enemies' ? inspect === id : undefined}
+        title={
+          slot === 'enemies'
+            ? t('draft.beats', { name: b?.localName ?? String(id) })
+            : t('draft.remove', { name: b?.localName ?? String(id) })
+        }
+        className={`shrink-0 ${slot === 'enemies' && inspect === id ? 'rounded ring-2 ring-brand' : ''}`}
+      >
+        <Image
+          src={b?.imageUrl ?? ''}
+          alt={b?.localName ?? ''}
+          width={size}
+          height={size}
+          style={{ width: size, height: size }}
+          className={`rounded bg-surface-2 ${slot === 'bans' ? 'opacity-40 grayscale' : slot === 'enemies' ? 'border-2 border-defeat/70' : 'border-2 border-black/60'}`}
+          unoptimized
+        />
+      </button>
+    );
+  };
+  const addButton = (slot: Slot, size: number) => (
+    <button
+      type="button"
+      onClick={() => setPicking(picking === slot ? null : slot)}
+      aria-pressed={picking === slot}
+      aria-label={t(LONG[slot])}
+      style={{ width: size, height: size }}
+      className={`grid shrink-0 place-items-center rounded border text-xs font-bold leading-none ${
+        picking === slot ? 'border-brand bg-brand/15 text-brand' : 'border-dashed border-border-strong text-muted'
+      }`}
+    >
+      +
+    </button>
+  );
 
   return (
     <div className="space-y-2">
@@ -484,84 +565,67 @@ export function PanelDraft({
             is — the state of the draft — and the suggestions start above the
             fold instead of below it.
           */}
-          <div className="bz-panel flex flex-wrap items-center gap-x-2.5 gap-y-1 px-2 py-1.5">
-            {(['bans', 'allies', 'enemies'] as Slot[]).map((slot) => (
-              <div key={slot} className="flex items-center gap-1">
-                <span className="text-[9px] font-bold uppercase tracking-wide text-muted">
-                  {t(LABELS[slot])}
-                  {/* The count only appears once something is in the slot: a
-                      board showing 0/6 before anyone has done anything reads
-                      as a form to fill in rather than a draft to follow. */}
-                  {picked[slot].length > 0 ? (
-                    <span className="ms-0.5 tabular-nums text-muted/70">
-                      {picked[slot].length}/{LIMITS[slot]}
-                    </span>
-                  ) : null}
-                </span>
-
-                {picked[slot].map((id) => {
-                  const b = byId.get(id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      // An enemy opens its counters (Remove is inside the
-                      // card); bans and team-mates still remove on tap.
-                      onClick={() => {
-                        if (slot === 'enemies') setInspect(inspect === id ? null : id);
-                        else remove(slot, id);
-                      }}
-                      aria-pressed={slot === 'enemies' ? inspect === id : undefined}
-                      title={
-                        slot === 'enemies'
-                          ? t('draft.beats', { name: b?.localName ?? String(id) })
-                          : t('draft.remove', { name: b?.localName ?? String(id) })
-                      }
-                      className={slot === 'enemies' && inspect === id ? 'rounded ring-2 ring-brand' : undefined}
-                    >
-                      <Image
-                        src={b?.imageUrl ?? ''}
-                        alt={b?.localName ?? ''}
-                        width={24}
-                        height={24}
-                        className={`size-6 rounded bg-surface-2 ${
-                          slot === 'bans' ? 'opacity-40 grayscale' : ''
-                        }`}
-                        unoptimized
-                      />
-                    </button>
-                  );
-                })}
-
-                {picked[slot].length < LIMITS[slot] ? (
+          {/*
+            The board (1.43): bans on top, then the two teams facing each other
+            with the draft's chance between them. The gold slot is your own
+            pick: tap a suggestion below to try it and the chance follows.
+          */}
+          <div className="bz-panel space-y-1.5 px-2 py-1.5">
+            <div className="flex items-center gap-1">
+              <span className="w-8 shrink-0 text-[9px] font-bold uppercase tracking-wide text-muted">
+                {t('draft.ban')}
+                {picked.bans.length > 0 ? <span className="block tabular-nums text-muted/70">{picked.bans.length}/{LIMITS.bans}</span> : null}
+              </span>
+              {picked.bans.map((id) => slotPortrait('bans', id, 22))}
+              {picked.bans.length < LIMITS.bans ? addButton('bans', 22) : null}
+              {picked.bans.length + picked.allies.length + picked.enemies.length > 0 || mine !== null ? (
+                <button
+                  type="button"
+                  onClick={clear}
+                  className="ms-auto shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
+                >
+                  {t('draft.clear')}
+                </button>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="flex shrink-0 items-center gap-1">
+                <span className="w-8 shrink-0 text-[9px] font-bold uppercase tracking-wide text-muted">{t('draft.you')}</span>
+                {picked.allies.map((id) => slotPortrait('allies', id, 30))}
+                {picked.allies.length < LIMITS.allies ? addButton('allies', 30) : null}
+                {mine !== null ? (
                   <button
                     type="button"
-                    onClick={() => setPicking(picking === slot ? null : slot)}
-                    aria-pressed={picking === slot}
-                    aria-label={t(LONG[slot])}
-                    className={`grid size-6 place-items-center rounded border text-xs font-bold leading-none ${
-                      picking === slot
-                        ? 'border-brand bg-brand/15 text-brand'
-                        : 'border-dashed border-border-strong text-muted'
-                    }`}
+                    onClick={() => setMine(null)}
+                    title={t('draft.remove', { name: byId.get(mine)?.localName ?? String(mine) })}
+                    className="relative shrink-0"
                   >
-                    +
+                    <Image
+                      src={byId.get(mine)?.imageUrl ?? ''}
+                      alt={byId.get(mine)?.localName ?? ''}
+                      width={30}
+                      height={30}
+                      className="size-[30px] rounded border-2 border-brand bg-surface-2"
+                      unoptimized
+                    />
+                    <span className="absolute -end-1 -top-1 grid size-3.5 place-items-center rounded-full bg-brand text-[8px] font-black text-brand-ink">★</span>
                   </button>
-                ) : null}
+                ) : (
+                  <span
+                    title={t('draft.tryHint')}
+                    className="grid size-[30px] shrink-0 place-items-center rounded border-2 border-dashed border-brand/70 text-xs font-black text-brand"
+                  >
+                    ?
+                  </span>
+                )}
               </div>
-            ))}
-
-            {/* Only once there is something to clear. A reset button on an
-                empty board is a control that does nothing. */}
-            {picked.bans.length + picked.allies.length + picked.enemies.length > 0 ? (
-              <button
-                type="button"
-                onClick={clear}
-                className="ms-auto shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
-              >
-                {t('draft.clear')}
-              </button>
-            ) : null}
+              <ChanceMeter chance={chance} />
+              <div className="flex shrink-0 items-center gap-1">
+                {picked.enemies.map((id) => slotPortrait('enemies', id, 30))}
+                {picked.enemies.length < LIMITS.enemies ? addButton('enemies', 30) : null}
+                <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-muted">{t('draft.vs')}</span>
+              </div>
+            </div>
           </div>
 
           {picking ? (
@@ -593,7 +657,7 @@ export function PanelDraft({
           {/* Before the enemy has picked: what is hard to punish here. */}
           {picked.enemies.length === 0 && safe.length > 0 ? <SafePicks safe={safe} byId={byId} /> : null}
 
-          <Suggestions picks={picks} loading={loading} byId={byId} />
+          <Suggestions picks={picks} loading={loading} byId={byId} mine={mine} onTry={(id) => setMine(mine === id ? null : id)} />
         </>
       )}
     </div>
@@ -800,10 +864,15 @@ function Suggestions({
   picks,
   loading,
   byId,
+  mine,
+  onTry,
 }: {
   picks: Suggestion[] | null;
   loading: boolean;
   byId: Map<number, LocalBrawler>;
+  /** The pick being tried in the gold slot (1.43). */
+  mine: number | null;
+  onTry: (id: number) => void;
 }) {
   const { t } = usePanelI18n();
   if (picks === null) {
@@ -819,11 +888,19 @@ function Suggestions({
   }
 
   return (
+    <>
+    <p className="px-1 text-[10px] text-muted">{t('draft.tryHint')}</p>
     <ol className={`bz-panel divide-y divide-border overflow-hidden ${loading ? 'opacity-60' : ''}`}>
       {picks.map((pick, index) => {
         const b = byId.get(pick.brawlerId);
         return (
-          <li key={pick.brawlerId} className="flex items-center gap-2 px-2 py-1.5">
+          <li key={pick.brawlerId}>
+            <button
+              type="button"
+              onClick={() => onTry(pick.brawlerId)}
+              aria-pressed={mine === pick.brawlerId}
+              className={`flex w-full items-center gap-2 px-2 py-1 text-start ${mine === pick.brawlerId ? 'bg-brand/15 shadow-[inset_3px_0_0_var(--brand)]' : ''}`}
+            >
             <span
               aria-hidden
               className={`grid size-5 shrink-0 place-items-center rounded-full text-[10px] font-black tabular-nums ${
@@ -886,10 +963,12 @@ function Suggestions({
             <span className="shrink-0 text-[11px] font-black tabular-nums text-victory">
               {(pick.total * 100).toFixed(1)}%
             </span>
+            </button>
           </li>
         );
       })}
     </ol>
+    </>
   );
 }
 
@@ -1002,5 +1081,27 @@ function EnemyCounters({
         </a>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The draft's chance to win (1.43), between the two teams on the board.
+ * Before both sides have a pick it says what it needs instead of a number.
+ */
+function ChanceMeter({ chance }: { chance: number | null }) {
+  const { t } = usePanelI18n();
+  if (chance === null) {
+    return <span className="min-w-0 flex-1 truncate text-center text-[9px] leading-tight text-muted">{t('draft.chanceEmpty')}</span>;
+  }
+  const pct = Math.round(chance * 100);
+  const tone = chance > 0.55 ? 'text-victory' : chance < 0.45 ? 'text-defeat' : 'text-foreground';
+  return (
+    <span className="flex min-w-0 flex-1 flex-col items-center gap-0.5" aria-label={t('draft.chance', { n: pct })}>
+      <span className={`display text-[17px] leading-none tabular-nums ${tone}`}>{pct}%</span>
+      <span className="flex h-1.5 w-full overflow-hidden rounded-full bg-defeat/55">
+        <span className="bz-bar-fill block h-full rounded-full bg-brand transition-[width] duration-300" style={{ width: `${pct}%` }} />
+      </span>
+      <span className="truncate text-[8px] font-bold uppercase leading-none text-muted">{t('draft.chanceLabel')}</span>
+    </span>
   );
 }

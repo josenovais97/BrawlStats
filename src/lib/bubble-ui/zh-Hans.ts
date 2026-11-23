@@ -222,6 +222,14 @@ const zhHans: UiStrings = {
   "ask.upgrade": "优先升级",
   "ask.upgradeFail": "暂时无法加载你的升级计划，请稍后再试。",
   "chooser.ask": "随便问：克制、最佳选择、禁用、配装",
+  "account.noTagShort": "在应用中添加标签，即可标出你的英雄。",
+  "more.title": "更多",
+  "draft.tryHint": "点一个推荐试试",
+  "draft.chanceEmpty": "加入选择即可看到胜率",
+  "draft.chance": "胜率 {n}%",
+  "draft.chanceLabel": "胜率",
+  "review.nextTime": "下次在{map}",
+  "review.yourPickHere": "{name}在这里：地图 {n}%，{count} 个中排第 {rank}",
 };
 
 export default zhHans;

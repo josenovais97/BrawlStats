@@ -222,6 +222,14 @@ const ja: UiStrings = {
   "ask.upgrade": "次に強化",
   "ask.upgradeFail": "強化プランを読み込めませんでした。少し待ってからもう一度お試しください。",
   "chooser.ask": "何でも聞いて：カウンター、おすすめ、バン、ビルド",
+  "account.noTagShort": "アプリでタグを追加すると所持キャラクターが表示されます。",
+  "more.title": "その他",
+  "draft.tryHint": "タップして試せます",
+  "draft.chanceEmpty": "ピックを入れると勝率が出ます",
+  "draft.chance": "勝率{n}%",
+  "draft.chanceLabel": "勝率",
+  "review.nextTime": "次に{map}なら",
+  "review.yourPickHere": "ここでの{name}: マップ{n}%、{count}体中{rank}位",
 };
 
 export default ja;

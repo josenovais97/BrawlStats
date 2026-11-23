@@ -222,6 +222,14 @@ const de: UiStrings = {
   "ask.upgrade": "Als Nächstes verbessern",
   "ask.upgradeFail": "Dein Upgrade-Plan lädt gerade nicht. Versuch es gleich nochmal.",
   "chooser.ask": "Frag alles: Konter, beste Picks, Bans, Builds",
+  "account.noTagShort": "Füg deine Spieler-ID in der App hinzu, um deine Brawler zu markieren.",
+  "more.title": "Mehr",
+  "draft.tryHint": "Tippe auf einen Pick, um ihn zu testen",
+  "draft.chanceEmpty": "Füg Picks hinzu für deine Chance",
+  "draft.chance": "{n} % Siegchance",
+  "draft.chanceLabel": "Siegchance",
+  "review.nextTime": "Nächstes Mal auf {map}",
+  "review.yourPickHere": "{name} hier: Map {n} %, Platz {rank} von {count}",
 };
 
 export default de;

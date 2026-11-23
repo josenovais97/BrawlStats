@@ -117,11 +117,6 @@ export function PanelComps({
 
   return (
     <>
-      <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
-        {t('comps.heading')}{' '}
-        <span className="text-[11px] text-muted">· {t('common.lastDays', { n: 14 })}</span>
-      </p>
-
       <ModeMapChips
         modes={pickable}
         mode={current}
@@ -271,6 +266,9 @@ export function PanelComps({
         <p className="px-2 pt-2 text-center text-[10px] text-muted">{t('comps.tapBuild')}</p>
       ) : null}
       {open ? <BuildCard ref={cardRef} entry={open} build={build} modes={modes} onClose={close} /> : null}
+      <p className="px-1 pt-2 text-[10px] text-muted">
+        {t('comps.heading')} · {t('common.lastDays', { n: 14 })}
+      </p>
     </>
   );
 }

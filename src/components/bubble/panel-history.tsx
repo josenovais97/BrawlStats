@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
+import type { PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { haptic } from '@/lib/haptics';
 import { panelTrack } from '@/lib/panel-telemetry';
@@ -46,11 +47,15 @@ export function PanelHistory({
   modeArt,
   onClose,
   onCounters,
+  modes,
+  onDraft,
 }: {
   roster: DraftBrawler[];
   modeArt: Record<string, { label: string; icon: string | null }>;
   onClose: () => void;
   onCounters: (brawlerId: number) => void;
+  modes?: PanelMode[];
+  onDraft?: (mode: string, mapName: string) => void;
 }) {
   const { t, name, lang } = usePanelI18n();
   const { tag } = useBubbleAccount();
@@ -96,7 +101,7 @@ export function PanelHistory({
   };
 
   if (open) {
-    return <PanelReview review={open} roster={roster} modeArt={modeArt} onClose={() => setOpen(null)} onCounters={onCounters} />;
+    return <PanelReview key={open.battleTime} review={open} roster={roster} modeArt={modeArt} modes={modes} onDraft={onDraft} onClose={() => setOpen(null)} onCounters={onCounters} />;
   }
 
   const face = (s: Side, size: number, ring: boolean) => {

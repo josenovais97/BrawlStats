@@ -20,7 +20,7 @@ export const UI_EN = {
   'account.noTag': 'Add your player tag in the BrawlZone app and this panel marks the brawlers you own.',
 
   'tab.meta': 'Meta',
-  'tab.comps': 'Team comp',
+  'tab.comps': 'Trios',
   'tab.draft': 'Draft',
   'chooser.title': 'What do you need?',
   'chooser.sub': 'Pick one. The panel remembers it next time.',
@@ -241,6 +241,14 @@ export const UI_EN = {
   "ask.upgrade": "Upgrade next",
   "ask.upgradeFail": "Couldn't get your upgrade plan right now. Try again in a minute.",
   "chooser.ask": "Ask anything: counters, best picks, bans, builds",
+  "account.noTagShort": "Add your tag in the app to mark your brawlers.",
+  "more.title": "More",
+  "draft.tryHint": "Tap a pick to try it",
+  "draft.chanceEmpty": "Add picks to see your odds",
+  "draft.chance": "{n}% to win",
+  "draft.chanceLabel": "to win",
+  "review.nextTime": "Next time on {map}",
+  "review.yourPickHere": "{name} here: map {n}%, #{rank} of {count}",
 } as const;
 
 export type UiKey = keyof typeof UI_EN;

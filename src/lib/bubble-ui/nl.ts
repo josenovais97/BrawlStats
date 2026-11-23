@@ -222,6 +222,14 @@ const nl: UiStrings = {
   "ask.upgrade": "Eerst upgraden",
   "ask.upgradeFail": "Je upgradeplan laadt nu niet. Probeer het zo opnieuw.",
   "chooser.ask": "Vraag alles: counters, beste picks, bans, builds",
+  "account.noTagShort": "Voeg je tag toe in de app om je knokkers te markeren.",
+  "more.title": "Meer",
+  "draft.tryHint": "Tik op een pick om hem te proberen",
+  "draft.chanceEmpty": "Voeg picks toe voor je kansen",
+  "draft.chance": "{n}% winkans",
+  "draft.chanceLabel": "winkans",
+  "review.nextTime": "Volgende keer op {map}",
+  "review.yourPickHere": "{name} hier: kaart {n}%, #{rank} van {count}",
 };
 
 export default nl;

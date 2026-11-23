@@ -222,6 +222,14 @@ const ko: UiStrings = {
   "ask.upgrade": "먼저 강화하기",
   "ask.upgradeFail": "강화 계획을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
   "chooser.ask": "무엇이든 물어보세요: 카운터, 최고의 픽, 밴, 빌드",
+  "account.noTagShort": "앱에 태그를 추가하면 보유 브롤러를 표시해요.",
+  "more.title": "더보기",
+  "draft.tryHint": "픽을 눌러 시험해 보세요",
+  "draft.chanceEmpty": "픽을 넣으면 승률이 보여요",
+  "draft.chance": "승률 {n}%",
+  "draft.chanceLabel": "승률",
+  "review.nextTime": "다음에 {map}에서는",
+  "review.yourPickHere": "여기서 {name}: 맵 {n}%, {count}명 중 {rank}위",
 };
 
 export default ko;

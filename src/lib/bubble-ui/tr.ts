@@ -222,6 +222,14 @@ const tr: UiStrings = {
   "ask.upgrade": "Önce bunları yükselt",
   "ask.upgradeFail": "Yükseltme planın şu an yüklenemedi. Bir dakika sonra tekrar dene.",
   "chooser.ask": "Her şeyi sor: kontralar, en iyi seçimler, banlar, yapılar",
+  "account.noTagShort": "Savaşçılarını işaretlemek için etiketini uygulamaya ekle.",
+  "more.title": "Daha fazla",
+  "draft.tryHint": "Denemek için bir seçime dokun",
+  "draft.chanceEmpty": "Şansını görmek için seçim ekle",
+  "draft.chance": "Kazanma şansı %{n}",
+  "draft.chanceLabel": "kazanma şansı",
+  "review.nextTime": "Bir dahaki sefere {map} haritasında",
+  "review.yourPickHere": "{name} burada: harita %{n}, {count} içinde {rank}.",
 };
 
 export default tr;

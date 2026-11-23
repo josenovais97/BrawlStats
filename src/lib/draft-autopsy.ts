@@ -217,6 +217,35 @@ function sideEdge(ids: number[], form: Map<number, MapForm>): DraftSide {
 }
 
 /**
+ * The draft's chance for line-ups still being picked (Bubble 1.43): the same
+ * reading as a finished game's, for the panel's draft board. Either side may
+ * be partial; null until both have at least one brawler with a number.
+ */
+export function draftChance({
+  myIds,
+  theirIds,
+  mapForm,
+  overall,
+  counters,
+  countered,
+}: {
+  myIds: number[];
+  theirIds: number[];
+  mapForm: Map<number, MapForm>;
+  overall: Map<number, number>;
+  /** Every brawler against their line-up (getCounterScores(theirIds)). */
+  counters: Map<number, CounterScore>;
+  /** Every brawler against our line-up (getCounterScores(myIds)). */
+  countered: Map<number, CounterScore>;
+}): { chance: number; mapped: number } | null {
+  if (myIds.length === 0 || theirIds.length === 0) return null;
+  const mine = sideRate(myIds, mapForm, overall, counters);
+  const theirs = sideRate(theirIds, mapForm, overall, countered);
+  if (!mine || !theirs) return null;
+  return { chance: winProbability(mine.rate, theirs.rate), mapped: mine.mapped + theirs.mapped };
+}
+
+/**
  * Reads one battle against the map, the matchups and the roster.
  *
  * Returns null for anything it cannot speak to: a mode without teams, a battle

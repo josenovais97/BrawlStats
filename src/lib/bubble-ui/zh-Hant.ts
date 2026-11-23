@@ -222,6 +222,14 @@ const zhHant: UiStrings = {
   "ask.upgrade": "優先升級",
   "ask.upgradeFail": "暫時無法載入你的升級計畫，請稍後再試。",
   "chooser.ask": "隨便問：克制、最佳選擇、禁用、配裝",
+  "account.noTagShort": "在應用程式中加入標籤，即可標出你的英雄。",
+  "more.title": "更多",
+  "draft.tryHint": "點一個推薦試試",
+  "draft.chanceEmpty": "加入選擇即可看到勝率",
+  "draft.chance": "勝率 {n}%",
+  "draft.chanceLabel": "勝率",
+  "review.nextTime": "下次在{map}",
+  "review.yourPickHere": "{name}在這裡：地圖 {n}%，{count} 個中排第 {rank}",
 };
 
 export default zhHant;

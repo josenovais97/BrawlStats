@@ -81,25 +81,23 @@ export function ModeMapChips({
   rank?: { summary: ReactNode; row: (close: () => void) => ReactNode };
 }) {
   const [changing, setChanging] = useState(false);
-  // Picking a mode hides the others behind a Change (owner, 2026-11-06): a
-  // chosen mode plus all six alternatives was two rows restating one choice.
-  const [pickingMode, setPickingMode] = useState(false);
   const { t, name, lang } = usePanelI18n();
   const modeName = useModeLabel();
   // Alphabetical in the reader's language, so the chips read in order. The
   // server sorts by the English name, which is no order at all in Japanese.
   const maps = [...mode.maps].sort((a, b) => name(a.mapName).localeCompare(name(b.mapName), lang));
 
-  if (map !== null && !changing) {
+  /*
+   * Always one line until Change is tapped (1.43). It used to collapse only
+   * once a map was chosen, so Meta on "all modes" spent three rows of chips
+   * (rank, then modes wrapping onto a second line) above the first brawler.
+   */
+  if (!changing) {
     return (
       <button
         type="button"
-        onClick={() => {
-          // Change reopens the modes too, not just this mode's maps (owner).
-          setChanging(true);
-          setPickingMode(true);
-        }}
-        className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-start text-[11px]"
+        onClick={() => setChanging(true)}
+        className="bz-panel mx-1 mb-2 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-start text-[11px]"
       >
         {rank ? <span className="flex shrink-0 items-center gap-1 text-muted">{rank.summary}<span>·</span></span> : null}
         {mode.icon ? (
@@ -112,8 +110,12 @@ export function ModeMapChips({
             unoptimized
           />
         ) : null}
-        <span className="display truncate text-[13px] text-[#a3eaff]">{name(map)}</span>
-        <span className="shrink-0 text-muted">· {modeName(mode)}</span>
+        <span className="display truncate text-[13px] text-[#a3eaff]">{map !== null ? name(map) : modeName(mode)}</span>
+        {map !== null ? (
+          <span className="shrink-0 text-muted">· {modeName(mode)}</span>
+        ) : mode.key !== null && mode.maps.length > 0 ? (
+          <span className="shrink-0 text-muted">· {allMapsLabel ?? t('chips.allMaps')}</span>
+        ) : null}
         <span className="bz-chip ms-auto shrink-0 px-2 py-0.5">
           {t('chips.change')}
         </span>
@@ -121,36 +123,9 @@ export function ModeMapChips({
     );
   }
 
-  const modeChosen = mode.key !== null && !pickingMode;
-
   return (
     <>
-      {modeChosen ? (
-        <div className="flex items-center gap-1.5 px-1 pb-2 text-[11px]">
-          {rank ? (
-            <button type="button" onClick={() => setPickingMode(true)} className="bz-chip inline-flex items-center gap-1 px-2 py-1 leading-tight">
-              {rank.summary}
-            </button>
-          ) : null}
-          {/* The chosen mode is itself a way back to the other modes. */}
-          <button type="button" onClick={() => setPickingMode(true)} className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
-            {mode.icon ? (
-              <Image src={mode.icon} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
-            ) : null}
-            {modeName(mode)}
-          </button>
-          <button type="button" onClick={() => setPickingMode(true)} className="bz-chip ms-auto shrink-0 px-2 py-0.5">
-            {t('chips.change')}
-          </button>
-        </div>
-      ) : (
-      <>
-      {rank
-        ? rank.row(() => {
-            setChanging(false);
-            setPickingMode(false);
-          })
-        : null}
+      {rank ? rank.row(() => setChanging(false)) : null}
       <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
         {modes.map((m) => {
           const on = m.key === mode.key;
@@ -160,7 +135,8 @@ export function ModeMapChips({
               type="button"
               onClick={() => {
                 onMode(m.key);
-                setPickingMode(false);
+                // A mode with maps stays open for the map; "all" is a final answer.
+                if (m.key === null || m.maps.length === 0) setChanging(false);
               }}
               aria-pressed={on}
               className={`inline-flex items-center gap-1 px-2 py-1 leading-tight ${
@@ -182,8 +158,6 @@ export function ModeMapChips({
           );
         })}
       </div>
-      </>
-      )}
 
       {mode.key !== null && mode.maps.length > 0 ? (
         <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">

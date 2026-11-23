@@ -222,6 +222,14 @@ const th: UiStrings = {
   "ask.upgrade": "อัปเกรดก่อน",
   "ask.upgradeFail": "โหลดแผนอัปเกรดไม่ได้ตอนนี้ ลองใหม่อีกครั้งในอีกสักครู่",
   "chooser.ask": "ถามได้ทุกอย่าง: เคาน์เตอร์ ตัวเลือก แบน บิลด์",
+  "account.noTagShort": "เพิ่มแท็กในแอปเพื่อทำเครื่องหมายบรอว์เลอร์ของคุณ",
+  "more.title": "เพิ่มเติม",
+  "draft.tryHint": "แตะตัวเลือกเพื่อลองดู",
+  "draft.chanceEmpty": "เพิ่มตัวเลือกเพื่อดูโอกาสชนะ",
+  "draft.chance": "โอกาสชนะ {n}%",
+  "draft.chanceLabel": "โอกาสชนะ",
+  "review.nextTime": "ครั้งหน้าที่ {map}",
+  "review.yourPickHere": "{name} ที่นี่: แผนที่ {n}% อันดับ {rank} จาก {count}",
 };
 
 export default th;

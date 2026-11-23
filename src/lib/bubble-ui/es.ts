@@ -227,6 +227,14 @@ const es: UiStrings = {
   "ask.upgrade": "Mejora esto primero",
   "ask.upgradeFail": "No pude cargar tu plan de mejoras. Prueba en un minuto.",
   "chooser.ask": "Pregunta lo que sea: counters, mejores elecciones, bloqueos, builds",
+  "account.noTagShort": "Añade tu ID en la app para marcar tus brawlers.",
+  "more.title": "Más",
+  "draft.tryHint": "Toca un pick para probarlo",
+  "draft.chanceEmpty": "Añade picks para ver tus opciones",
+  "draft.chance": "{n} % de victoria",
+  "draft.chanceLabel": "de victoria",
+  "review.nextTime": "La próxima vez en {map}",
+  "review.yourPickHere": "{name} aquí: mapa {n} %, n.º {rank} de {count}",
 };
 
 export default es;

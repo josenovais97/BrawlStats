@@ -222,6 +222,14 @@ const pl: UiStrings = {
   "ask.upgrade": "Ulepsz najpierw",
   "ask.upgradeFail": "Nie udało się wczytać planu ulepszeń. Spróbuj za minutę.",
   "chooser.ask": "Pytaj o wszystko: kontry, najlepsze wybory, bany, buildy",
+  "account.noTagShort": "Dodaj swój tag w aplikacji, żeby oznaczyć swoich zadymiarzy.",
+  "more.title": "Więcej",
+  "draft.tryHint": "Dotknij picku, żeby go sprawdzić",
+  "draft.chanceEmpty": "Dodaj picki, żeby zobaczyć szanse",
+  "draft.chance": "{n}% na wygraną",
+  "draft.chanceLabel": "na wygraną",
+  "review.nextTime": "Następnym razem na {map}",
+  "review.yourPickHere": "{name} tutaj: mapa {n}%, #{rank} z {count}",
 };
 
 export default pl;

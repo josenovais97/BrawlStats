@@ -303,15 +303,6 @@ export function PanelTiers({
 
   return (
     <>
-      {/* Belongs to this view, not to the panel: the draft board is not a
-          seven-day average of anything, and the heading said so anyway. */}
-      <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
-        {t('meta.heading')}{' '}
-        <span className="text-[11px] text-muted">
-          · {t('common.lastDays', { n: bracketList?.days ?? windowDays })}
-        </span>
-      </p>
-
       {bracketThin && activeBracket && !currentMap ? (
         <p className="mx-1 mb-2 text-[10px] leading-snug text-muted">
           {t('bracket.thin', { rank: bracketLabel(activeBracket) })}
@@ -424,6 +415,12 @@ export function PanelTiers({
           })}
         </ul>
       )}
+
+      {/* What the list is, under it (1.43): the heading used to sit above the
+          picker and cost a row before the first brawler. */}
+      <p className="px-1 pt-2 text-[10px] text-muted">
+        {t('meta.heading')} · {t('common.lastDays', { n: bracketList?.days ?? windowDays })}
+      </p>
 
       {open ? (
         <BuildCard

@@ -222,6 +222,14 @@ const ru: UiStrings = {
   "ask.upgrade": "Прокачай сначала",
   "ask.upgradeFail": "Не получилось загрузить план прокачки. Попробуй через минуту.",
   "chooser.ask": "Спрашивай что угодно: контры, лучшие выборы, баны, сборки",
+  "account.noTagShort": "Добавь тег в приложении, чтобы отметить своих бойцов.",
+  "more.title": "Ещё",
+  "draft.tryHint": "Нажми на пик, чтобы примерить",
+  "draft.chanceEmpty": "Добавь пики, чтобы увидеть шансы",
+  "draft.chance": "{n}% на победу",
+  "draft.chanceLabel": "на победу",
+  "review.nextTime": "В следующий раз на карте {map}",
+  "review.yourPickHere": "{name} здесь: карта {n}%, {rank}-е место из {count}",
 };
 
 export default ru;

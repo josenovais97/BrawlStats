@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
-import { useModeLabel } from '@/components/bubble/panel-chips';
+import { remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
 import { PanelCounters } from '@/components/bubble/panel-counters';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
@@ -15,7 +15,7 @@ import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/compon
 import { PanelClub } from '@/components/bubble/panel-club';
 import { PanelHistory } from '@/components/bubble/panel-history';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
-import { Check, ChevronDown, Sparkles, X } from 'lucide-react';
+import { BarChart3, Check, ChevronDown, History, LayoutGrid, MoreVertical, Search, Shield, Sparkles, Trophy, Users, X } from 'lucide-react';
 import { PanelAsk } from '@/components/bubble/panel-ask';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
@@ -150,6 +150,26 @@ export function PanelShell({
       delete w.__bzShowReview;
     };
   }, []);
+  /*
+   * "Draft on this map" from a review (1.43): an empty board on that map,
+   * then the Draft tab. The draft restores what storage says, so the board is
+   * written there first.
+   */
+  const draftOn = (mode: string, mapName: string) => {
+    remember(STORED_MODE, mode);
+    remember(STORED_MAP, mapName);
+    try {
+      window.localStorage.setItem(
+        'brawlzone.bubble.draft',
+        JSON.stringify({ map: mapName, at: Date.now(), bans: [], allies: [], enemies: [], mine: null }),
+      );
+    } catch {
+      // ignored
+    }
+    setReview(null);
+    setHistoryOpen(false);
+    choose('draft');
+  };
   const reviewCounters = (brawlerId: number) => {
     const w = window as unknown as { __bzPendingCounter?: number; __bzOpenCounter?: (id: number) => void };
     w.__bzPendingCounter = brawlerId;
@@ -163,6 +183,8 @@ export function PanelShell({
   const { record, form } = useSinceTagRecord(account.tag);
   // The player card opens a small drawer: rank progress and form by mode.
   const [cardOpen, setCardOpen] = useState(false);
+  // The ⋯ menu (1.43): season line, History and the language.
+  const [moreOpen, setMoreOpen] = useState(false);
   const progress = rankProgress(account.elo);
   const winsNeeded = winsToNext(progress, eloRates);
   const lastGame = useLastRankedGame(account.tag, cardOpen);
@@ -188,7 +210,16 @@ export function PanelShell({
   if (review) {
     return (
       <div data-panel-overlay>
-        <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+        <PanelReview
+          key={review.battleTime}
+          review={review}
+          roster={roster}
+          modeArt={modeArt}
+          modes={modes}
+          onClose={() => setReview(null)}
+          onCounters={reviewCounters}
+          onDraft={draftOn}
+        />
       </div>
     );
   }
@@ -212,6 +243,8 @@ export function PanelShell({
     return (
       <div data-panel-overlay>
         <PanelHistory
+          modes={modes}
+          onDraft={draftOn}
           roster={roster}
           modeArt={modeArt}
           onClose={() => setHistoryOpen(false)}
@@ -224,87 +257,163 @@ export function PanelShell({
     );
   }
 
+  /*
+   * The Ranked season in one line: when it ends, its trial brawlers, and the
+   * record since the tag. Lives in the player drawer and the ⋯ menu since
+   * 1.43, where it no longer costs a row above every answer.
+   */
+  const seasonLine = season ? (
+    <div className="flex items-center gap-1.5 overflow-hidden text-[10px] text-muted">
+      <span className="truncate font-semibold">
+        {season.endsOn ? t('season.ends', { n: season.number, date: shortDate(season.endsOn) }) : `S${season.number}`}
+      </span>
+      {season.trial.length > 0 ? (
+        <>
+          <span className="shrink-0">· {t('season.trial')}</span>
+          {season.trial.slice(0, 4).map((b) => (
+            <Image key={b.name} src={b.imageUrl} alt={b.name} title={b.name} width={16} height={16} className="size-4 shrink-0 rounded-sm bg-surface-2" unoptimized />
+          ))}
+        </>
+      ) : null}
+      {record && record.wins + record.losses > 0 ? (
+        <span className="ms-auto flex shrink-0 items-center gap-0.5" title={t('record.title', { w: record.wins, l: record.losses })}>
+          <Check className="size-3 text-victory" aria-hidden />
+          <span className="font-bold tabular-nums text-victory">{record.wins}</span>
+          <X className="size-3 text-defeat" aria-hidden />
+          <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
+          <span>&nbsp;{t('record.since', { date: shortDate(record.since) })}</span>
+        </span>
+      ) : null}
+    </div>
+  ) : null;
+
+  const openAsk = (from: string) => {
+    setAskOpen(true);
+    panelTrack('panel_ask_open', { from });
+  };
+
   return (
     <>
       {/*
-        Whose panel this is.
+        Whose panel this is, in one row (1.43).
 
-        With a tag set, the player's own icon and name, and the filter in
-        force -- the panel marks and hides brawlers on their behalf, and a
-        face at the top is how they know it is their roster being read and
-        not someone else's. Without one, a single quiet line saying what a tag
-        would add, pointing at the app where it is entered. Never a blocker:
-        the panel works the same either way.
+        With a tag: the player's icon and name (tap for the drawer), the filter
+        in force, then Ask and the ⋯ menu. Without one, a single short line
+        pointing at the app. The language, the season line and History moved
+        into ⋯ so the answer starts higher in a window ~340dp tall.
       */}
-      <div>
-      {account.tag ? (
-        <div className="bz-panel mx-1 mb-2.5 flex items-center gap-2 px-2 py-1.5">
-          {account.iconUrl ? (
-            <Image
-              src={account.iconUrl}
-              alt=""
-              width={28}
-              height={28}
-              className="size-8 shrink-0 rounded-lg border-2 border-brand bg-surface-2"
-              unoptimized
-            />
-          ) : (
-            <span className="size-8 shrink-0 rounded-lg border-2 border-brand bg-surface-2" />
-          )}
+      <div className="relative">
+      <div className="mx-1 mb-1.5 flex items-center gap-1.5">
+        {account.tag ? (
+          <>
+            {account.iconUrl ? (
+              <Image
+                src={account.iconUrl}
+                alt=""
+                width={28}
+                height={28}
+                className="size-7 shrink-0 rounded-lg border-2 border-brand bg-surface-2"
+                unoptimized
+              />
+            ) : (
+              <span className="size-7 shrink-0 rounded-lg border-2 border-brand bg-surface-2" />
+            )}
+            <button
+              type="button"
+              onClick={() => setCardOpen((v) => !v)}
+              aria-expanded={cardOpen}
+              className="min-w-0 flex-1 text-start leading-tight"
+            >
+              <span className="flex items-center gap-1">
+                <span className="display truncate text-[13px]">{account.name ?? `#${account.tag}`}</span>
+                <ChevronDown className={`size-3.5 shrink-0 text-muted transition-transform ${cardOpen ? 'rotate-180' : ''}`} aria-hidden />
+              </span>
+              {form && form.games > 0 ? (
+                <span className="flex items-center gap-1 truncate text-[10px] text-muted">
+                  <span className="shrink-0">{t('record.last', { n: form.games })}</span>
+                  <Check className="size-3 shrink-0 text-victory" aria-hidden />
+                  <span className="font-bold tabular-nums text-victory">{form.wins}</span>
+                  <X className="size-3 shrink-0 text-defeat" aria-hidden />
+                  <span className="font-bold tabular-nums text-defeat">{form.losses}</span>
+                  <span className="shrink-0 font-bold tabular-nums text-foreground">· {Math.round((form.wins / form.games) * 100)}%</span>
+                  {form.stars > 0 ? (
+                    <span className="shrink-0 font-bold tabular-nums text-brand" title={t('record.starTitle', { n: form.stars, g: form.games })}>
+                      · ★{form.stars}
+                    </span>
+                  ) : null}
+                  {form.streak >= 2 ? (
+                    <span className="shrink-0 font-bold tabular-nums text-[#ff9b3d]" title={t('record.streakTitle', { n: form.streak })}>
+                      · 🔥{form.streak}
+                    </span>
+                  ) : null}
+                </span>
+              ) : (
+                <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
+              )}
+            </button>
+            <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
+              {filterLabel}
+              {account.hide ? ` · ${t('filter.hiding')}` : ''}
+            </span>
+          </>
+        ) : (
+          <p className="min-w-0 flex-1 truncate text-[11px] text-muted">{t('account.noTagShort')}</p>
+        )}
+        {/* Ask Bubble, as the panel's search (1.43): violet, so it never reads as a tab. */}
+        <button
+          type="button"
+          onClick={() => openAsk('tabs')}
+          aria-label={t('ask.title')}
+          title={t('ask.title')}
+          className="grid size-8 shrink-0 place-items-center rounded-[10px] border-2 border-[#050a1f] bg-gradient-to-b from-[#c9a8ff] to-[#7a4cff] text-white shadow-[inset_0_2px_0_rgb(255_255_255/0.45),0_2px_0_#050a1f]"
+        >
+          <Search className="size-4" strokeWidth={3} aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={() => setMoreOpen((v) => !v)}
+          aria-expanded={moreOpen}
+          aria-label={t('more.title')}
+          title={t('more.title')}
+          className="bz-chip grid h-8 w-7 shrink-0 place-items-center p-0"
+        >
+          <MoreVertical className="size-4" aria-hidden />
+        </button>
+      </div>
+
+      {moreOpen ? (
+        <>
           <button
             type="button"
-            onClick={() => setCardOpen((v) => !v)}
-            aria-expanded={cardOpen}
-            className="min-w-0 flex-1 text-start leading-tight"
-          >
-            <span className="flex items-center gap-1">
-              <span className="display truncate text-sm">{account.name ?? `#${account.tag}`}</span>
-              {progress || (form && form.byMode.length > 0) ? (
-                <ChevronDown className={`size-3.5 shrink-0 text-muted transition-transform ${cardOpen ? 'rotate-180' : ''}`} aria-hidden />
-              ) : null}
-            </span>
-            {/* Recent form from the battle log (2026-11-06), in place of the
-                tag once it has loaded: results, win rate, star player, streak. */}
-            {form && form.games > 0 ? (
-              <span className="flex items-center gap-1 truncate text-[10px] text-muted">
-                <span className="shrink-0">{t('record.last', { n: form.games })}</span>
-                <Check className="size-3 shrink-0 text-victory" aria-hidden />
-                <span className="font-bold tabular-nums text-victory">{form.wins}</span>
-                <X className="size-3 shrink-0 text-defeat" aria-hidden />
-                <span className="font-bold tabular-nums text-defeat">{form.losses}</span>
-                <span className="shrink-0 font-bold tabular-nums text-foreground">· {Math.round((form.wins / form.games) * 100)}%</span>
-                {form.stars > 0 ? (
-                  <span className="shrink-0 font-bold tabular-nums text-brand" title={t('record.starTitle', { n: form.stars, g: form.games })}>
-                    · ★{form.stars}
-                  </span>
-                ) : null}
-                {form.streak >= 2 ? (
-                  <span className="shrink-0 font-bold tabular-nums text-[#ff9b3d]" title={t('record.streakTitle', { n: form.streak })}>
-                    · 🔥{form.streak}
-                  </span>
-                ) : null}
-              </span>
-            ) : (
-              <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
-            )}
-          </button>
-          <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
-            {filterLabel}
-            {account.hide ? ` · ${t('filter.hiding')}` : ''}
-          </span>
-          <LanguagePicker />
-        </div>
-      ) : (
-        <div className="mx-1 mb-2 flex items-start gap-2">
-          <p className="flex-1 rounded-md border border-dashed border-border px-2 py-1.5 text-[11px] leading-snug text-muted">
-            {t('account.noTag')}
-          </p>
-          <LanguagePicker />
-        </div>
-      )}
+            aria-label={t('review.close')}
+            onClick={() => setMoreOpen(false)}
+            className="fixed inset-0 z-40 cursor-default bg-[#050a1f]/40"
+          />
+          <div className="bz-panel absolute end-1 top-10 z-50 w-[min(18rem,calc(100%-0.5rem))] space-y-2 p-2">
+            {seasonLine}
+            {account.tag ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMoreOpen(false);
+                  setHistoryOpen(true);
+                }}
+                className="bz-chip flex w-full items-center gap-2 px-3 py-2 text-start text-[13px]"
+              >
+                <History className="size-4 shrink-0" aria-hidden />
+                {t('history.open')}
+              </button>
+            ) : null}
+            <LanguagePicker variant="row" />
+          </div>
+        </>
+      ) : null}
+
       {account.tag && cardOpen ? (
-        <div className="bz-panel mx-1 -mt-1 mb-2.5 space-y-1.5 px-2 py-1.5 text-[10px]">
+        <div className="bz-panel mx-1 mb-2 space-y-1.5 px-2 py-1.5 text-[10px]">
+          {seasonLine}
           {progress ? (
+
             <div className="flex items-center gap-2">
               <span className="shrink-0 font-bold">{progress.rank}</span>
               <span className="shrink-0 tabular-nums text-muted">{t('record.elo', { n: progress.elo.toLocaleString(lang) })}</span>
@@ -392,87 +501,32 @@ export function PanelShell({
       ) : null}
       </div>
 
-      {/*
-        Two tabs, sized like the chips below them rather than like a phone's
-        tab bar. A full-width segmented control would cost a row of a window
-        that is only ~375dp tall in the orientation the game is played in.
-      */}
-      {/* The Ranked season in one line: when it ends, and its trial brawlers. */}
-      {season ? (
-        <div className="mx-1 mb-2 flex items-center gap-1.5 overflow-hidden text-[10px] text-muted">
-          <span className="truncate font-semibold">
-            {season.endsOn ? t('season.ends', { n: season.number, date: shortDate(season.endsOn) }) : `S${season.number}`}
-          </span>
-          {season.trial.length > 0 ? (
-            <>
-              <span className="shrink-0">· {t('season.trial')}</span>
-              {season.trial.slice(0, 4).map((b) => (
-                <Image key={b.name} src={b.imageUrl} alt={b.name} title={b.name} width={16} height={16} className="size-4 shrink-0 rounded-sm bg-surface-2" unoptimized />
-              ))}
-            </>
-          ) : null}
-          {record && record.wins + record.losses > 0 ? (
-            <span
-              className="ms-auto flex shrink-0 items-center gap-0.5"
-              title={t('record.title', { w: record.wins, l: record.losses })}
-            >
-              <Check className="size-3 text-victory" aria-hidden />
-              <span className="font-bold tabular-nums text-victory">{record.wins}</span>
-              <X className="size-3 text-defeat" aria-hidden />
-              <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
-              <span>&nbsp;{t('record.since', { date: shortDate(record.since) })}</span>
-            </span>
-          ) : null}
-          {account.tag ? (
-            <button
-              type="button"
-              onClick={() => setHistoryOpen(true)}
-              className={`${record && record.wins + record.losses > 0 ? 'ms-1.5' : 'ms-auto'} bz-chip shrink-0 px-2 py-0.5 text-[10px] leading-tight`}
-            >
-              {t('history.open')}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-
-      <div role="tablist" aria-label="Panel view" className="mb-2.5 flex gap-1.5 px-1">
+      {/* Five tabs with icons (1.43): the icon reads faster than the word, and
+          short words stop "Team comp" being cut to "Teamco…". */}
+      <div role="tablist" aria-label="Panel view" className="mb-2 flex gap-1 px-1">
         {(
           [
-            ['meta', t('tab.meta')],
-            ['comps', t('tab.comps')],
-            ['draft', t('tab.draft')],
-            ['counters', t('tab.counters')],
-            ['trophies', t('tab.trophies')],
+            ['meta', t('tab.meta'), BarChart3],
+            ['comps', t('tab.comps'), Users],
+            ['draft', t('tab.draft'), LayoutGrid],
+            ['counters', t('tab.counters'), Shield],
+            ['trophies', t('tab.trophies'), Trophy],
           ] as const
-        ).map(([key, label]) => (
+        ).map(([key, label, Icon]) => (
           <button
             key={key}
             type="button"
             role="tab"
             aria-selected={tab === key}
             onClick={() => choose(key)}
-            className={`min-w-0 flex-1 truncate px-1.5 py-1.5 text-[12px] leading-tight ${
-              tab === key
-                ? 'bz-chip-on'
-                : 'bz-chip'
+            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-1 py-1.5 text-[12px] leading-tight ${
+              tab === key ? 'bz-chip-on' : 'bz-chip'
             }`}
           >
-            {label}
+            <Icon className="size-3.5 shrink-0" strokeWidth={2.6} aria-hidden />
+            <span className="truncate">{label}</span>
           </button>
         ))}
-        {/* Ask Bubble: violet, so it never reads as a selected tab. */}
-        <button
-          type="button"
-          onClick={() => {
-            setAskOpen(true);
-            panelTrack('panel_ask_open', { from: 'tabs' });
-          }}
-          aria-label={t('ask.title')}
-          title={t('ask.title')}
-          className="grid w-9 shrink-0 place-items-center rounded-[10px] border-2 border-[#050a1f] bg-gradient-to-b from-[#c9a8ff] to-[#7a4cff] text-white shadow-[inset_0_2px_0_rgb(255_255_255/0.45),0_3px_0_#050a1f]"
-        >
-          <Sparkles className="size-4" aria-hidden />
-        </button>
       </div>
 
       {tab === null ? (
@@ -505,10 +559,7 @@ export function PanelShell({
           </ul>
           <button
             type="button"
-            onClick={() => {
-              setAskOpen(true);
-              panelTrack('panel_ask_open', { from: 'chooser' });
-            }}
+            onClick={() => openAsk('chooser')}
             className="mt-2 flex w-full items-center gap-2 rounded-[10px] border-2 border-[#050a1f] bg-gradient-to-b from-[#9f7bff] to-[#5b34d6] px-3 py-2 text-start text-white"
           >
             <Sparkles className="size-4 shrink-0" aria-hidden />

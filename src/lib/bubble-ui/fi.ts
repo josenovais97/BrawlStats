@@ -222,6 +222,14 @@ const fi: UiStrings = {
   "ask.upgrade": "Päivitä ensin",
   "ask.upgradeFail": "Päivityssuunnitelmaa ei saatu ladattua. Yritä hetken päästä uudelleen.",
   "chooser.ask": "Kysy mitä vain: counterit, parhaat valinnat, bannit, buildit",
+  "account.noTagShort": "Lisää tunnuksesi sovellukseen, niin omat rämäpääsi merkitään.",
+  "more.title": "Lisää",
+  "draft.tryHint": "Napauta valintaa kokeillaksesi sitä",
+  "draft.chanceEmpty": "Lisää valintoja nähdäksesi mahdollisuutesi",
+  "draft.chance": "{n} % voittoon",
+  "draft.chanceLabel": "voittoon",
+  "review.nextTime": "Ensi kerralla kartalla {map}",
+  "review.yourPickHere": "{name} täällä: kartta {n} %, sija {rank}/{count}",
 };
 
 export default fi;

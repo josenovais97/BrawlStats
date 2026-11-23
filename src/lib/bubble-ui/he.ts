@@ -222,6 +222,14 @@ const he: UiStrings = {
   "ask.upgrade": "לשדרג קודם",
   "ask.upgradeFail": "לא הצלחנו לטעון את תוכנית השדרוג. נסה שוב בעוד דקה.",
   "chooser.ask": "שאל כל דבר: קאונטרים, בחירות, חסימות, בילדים",
+  "account.noTagShort": "הוסיפו את התג שלכם באפליקציה כדי לסמן את הבראולרים שלכם.",
+  "more.title": "עוד",
+  "draft.tryHint": "הקישו על בחירה כדי לנסות אותה",
+  "draft.chanceEmpty": "הוסיפו בחירות כדי לראות את הסיכויים",
+  "draft.chance": "{n}% לניצחון",
+  "draft.chanceLabel": "לניצחון",
+  "review.nextTime": "בפעם הבאה ב-{map}",
+  "review.yourPickHere": "{name} כאן: מפה {n}%, מקום {rank} מתוך {count}",
 };
 
 export default he;

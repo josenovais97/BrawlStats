@@ -222,6 +222,14 @@ const ms: UiStrings = {
   "ask.upgrade": "Naik taraf dulu",
   "ask.upgradeFail": "Pelan naik taraf tidak dapat dimuatkan sekarang. Cuba lagi sebentar lagi.",
   "chooser.ask": "Tanya apa sahaja: counter, pilihan terbaik, ban, build",
+  "account.noTagShort": "Tambah tag anda dalam aplikasi untuk menandakan brawler anda.",
+  "more.title": "Lagi",
+  "draft.tryHint": "Ketik pilihan untuk mencubanya",
+  "draft.chanceEmpty": "Tambah pilihan untuk lihat peluang anda",
+  "draft.chance": "{n}% peluang menang",
+  "draft.chanceLabel": "peluang menang",
+  "review.nextTime": "Lain kali di {map}",
+  "review.yourPickHere": "{name} di sini: peta {n}%, #{rank} daripada {count}",
 };
 
 export default ms;

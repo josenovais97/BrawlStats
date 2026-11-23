@@ -18,6 +18,8 @@ const es419: UiStrings = {
   'bracket.all': 'Todos los rangos',
   'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',
   'bracket.mapsAllRanks': 'Las elecciones por mapa cuentan todos los rangos: un solo rango tiene muy pocos combates por mapa.',
+  "account.noTagShort": "Agrega tu ID en la app para marcar tus brawlers.",
+  "draft.chanceEmpty": "Agrega picks para ver tus chances",
 };
 
 export default es419;

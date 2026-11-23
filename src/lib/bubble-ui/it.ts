@@ -222,6 +222,14 @@ const it: UiStrings = {
   "ask.upgrade": "Da potenziare prima",
   "ask.upgradeFail": "Non riesco a caricare il tuo piano di potenziamento. Riprova tra un minuto.",
   "chooser.ask": "Chiedi qualsiasi cosa: counter, scelte migliori, ban, build",
+  "account.noTagShort": "Aggiungi il tuo ID nell’app per segnare i tuoi brawler.",
+  "more.title": "Altro",
+  "draft.tryHint": "Tocca un pick per provarlo",
+  "draft.chanceEmpty": "Aggiungi pick per vedere le tue probabilità",
+  "draft.chance": "{n}% di vittoria",
+  "draft.chanceLabel": "di vittoria",
+  "review.nextTime": "La prossima volta su {map}",
+  "review.yourPickHere": "{name} qui: mappa {n}%, {rank}° su {count}",
 };
 
 export default it;

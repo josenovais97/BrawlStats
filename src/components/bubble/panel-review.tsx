@@ -1,12 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { ArrowLeftRight, Flame, Star, X } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Flame, Star, X } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
+import type { PanelMode } from '@/components/bubble/panel-tiers';
+import { canField } from '@/lib/bubble-account';
 import { sitePrefix } from '@/components/bubble/panel-counters';
 
 /**
@@ -40,6 +42,13 @@ export interface PostGameReview {
   goal?: { wins: number; target: number; streak: number } | null;
 }
 
+/** "20261109T151120.000Z" as a Date, or null. */
+function battleDate(battleTime: string): Date | null {
+  const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/.exec(battleTime);
+  if (!m) return null;
+  return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]));
+}
+
 /** "20261109T151120.000Z" as the reader's own clock time. */
 function clock(battleTime: string, lang: string): string {
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/.exec(battleTime);
@@ -49,11 +58,13 @@ function clock(battleTime: string, lang: string): string {
 }
 
 export function PanelReview({
-  review,
+  review: initial,
   roster,
   modeArt,
   onClose,
   onCounters,
+  modes = [],
+  onDraft,
 }: {
   review: PostGameReview;
   roster: DraftBrawler[];
@@ -61,9 +72,57 @@ export function PanelReview({
   onClose: () => void;
   /** Opens the Counters tab on this brawler. */
   onCounters: (brawlerId: number) => void;
+  /** The panel's Ranked lists, for "next time on this map" (1.43). */
+  modes?: PanelMode[];
+  /** Opens the Draft tab on this map (1.43). */
+  onDraft?: (mode: string, mapName: string) => void;
 }) {
   const { t, tx, lang, name } = usePanelI18n();
-  const { tag } = useBubbleAccount();
+  const account = useBubbleAccount();
+  const { tag } = account;
+
+  /*
+   * Today's games (1.43): a strip of results above the card, and a swipe
+   * through them. The game the bubble pulsed for opens first; any other is
+   * read on demand from the match history's own route.
+   */
+  const [review, setReview] = useState<PostGameReview>(initial);
+  const [today, setToday] = useState<{ battleTime: string; result: 'victory' | 'defeat' }[]>([]);
+  const [loadingGame, setLoadingGame] = useState<string | null>(null);
+  useEffect(() => {
+    if (!tag) return;
+    const controller = new AbortController();
+    fetch(`/api/bubble/history?tag=${encodeURIComponent(tag)}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: { games?: { battleTime: string; result: 'victory' | 'defeat' }[] }) => {
+        const day = (bt: string) => battleDate(bt)?.toDateString() ?? '';
+        const anchor = day(initial.battleTime) || new Date().toDateString();
+        setToday((data.games ?? []).filter((g) => day(g.battleTime) === anchor).reverse());
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [tag, initial.battleTime]);
+  const openGame = (battleTime: string) => {
+    if (!tag || battleTime === review.battleTime || loadingGame) return;
+    if (battleTime === initial.battleTime) {
+      setReview(initial);
+      return;
+    }
+    setLoadingGame(battleTime);
+    fetch(`/api/bubble/review?tag=${encodeURIComponent(tag)}&lang=${encodeURIComponent(lang)}&game=${encodeURIComponent(battleTime)}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: { game?: PostGameReview | null }) => {
+        if (data.game && Array.isArray(data.game.mine)) setReview(data.game);
+      })
+      .catch(() => undefined)
+      .finally(() => setLoadingGame(null));
+  };
+  const at = today.findIndex((g) => g.battleTime === review.battleTime);
+  const step = (dir: -1 | 1) => {
+    const next = today[at + dir];
+    if (at >= 0 && next) openGame(next.battleTime);
+  };
+  const touch = useRef<number | null>(null);
   const won = review.result === 'victory';
   const byId = new Map(roster.map((b) => [b.brawlerId, b]));
   const brawlerName = (id: number) => {
@@ -134,8 +193,73 @@ export function PanelReview({
   );
   const eyebrow = (text: string) => <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{text}</p>;
 
+  /* Next time on this map (1.43): its best Ranked picks you can field. */
+  const mapLists = modes.flatMap((m) => m.maps);
+  const thisMap = review.mapName ? mapLists.find((m) => m.mapName === review.mapName) ?? null : null;
+  const fieldable = (id: number) => account.owned === null || canField(account.owned, id, account.filter);
+  const nextPicks = thisMap ? thisMap.picks.filter((p) => fieldable(p.brawlerId)).slice(0, 3) : [];
+  const yourId = review.mine.find((p) => p.you)?.id ?? null;
+  const yourRank = thisMap && yourId !== null ? thisMap.picks.findIndex((p) => p.brawlerId === yourId) : -1;
+
   return (
-    <div className="mx-1 space-y-2 pb-1">
+    <div
+      className="mx-1 space-y-2 pb-1"
+      onTouchStart={(e) => {
+        touch.current = e.touches[0]?.clientX ?? null;
+      }}
+      onTouchEnd={(e) => {
+        const from = touch.current;
+        touch.current = null;
+        const to = e.changedTouches[0]?.clientX;
+        if (from === null || to === undefined) return;
+        // Right to left = the newer game, like turning a page.
+        if (from - to > 60) step(1);
+        else if (to - from > 60) step(-1);
+      }}
+    >
+      {today.length > 1 ? (
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted">{t('review.today')}</span>
+          <button
+            type="button"
+            onClick={() => step(-1)}
+            disabled={at <= 0}
+            aria-label="‹"
+            className="grid size-6 shrink-0 place-items-center rounded text-muted disabled:opacity-30"
+          >
+            <ChevronLeft className="size-4" aria-hidden />
+          </button>
+          <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
+            {today.map((g) => {
+              const on = g.battleTime === review.battleTime;
+              return (
+                <button
+                  key={g.battleTime}
+                  type="button"
+                  onClick={() => openGame(g.battleTime)}
+                  aria-pressed={on}
+                  title={clock(g.battleTime, lang)}
+                  className={`grid size-6 shrink-0 place-items-center rounded-md border-2 text-[11px] font-black ${
+                    g.result === 'victory' ? 'bg-victory/25 text-victory' : 'bg-defeat/25 text-defeat'
+                  } ${on ? 'border-brand' : 'border-transparent'} ${loadingGame === g.battleTime ? 'animate-pulse' : ''}`}
+                >
+                  {g.result === 'victory' ? '✓' : '✗'}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={() => step(1)}
+            disabled={at < 0 || at >= today.length - 1}
+            aria-label="›"
+            className="grid size-6 shrink-0 place-items-center rounded text-muted disabled:opacity-30"
+          >
+            <ChevronRight className="size-4" aria-hidden />
+          </button>
+        </div>
+      ) : null}
+
       {/* The result, like the game's own end screen. */}
       <div
         className="bz-review-in relative overflow-hidden rounded-[14px] border-2 border-[#050a1f] px-3 py-2.5 shadow-[0_3px_0_#050a1f]"
@@ -276,6 +400,45 @@ export function PanelReview({
                   <p className="mt-0.5 font-bold text-victory">{t('review.gain', { n: review.better.gain.toFixed(1) })}</p>
                 </div>
               </div>
+            </>,
+          )
+        : null}
+
+      {/* Next time on this map (1.43): what to take here, and a way to draft it. */}
+      {thisMap && (nextPicks.length > 0 || yourRank >= 0)
+        ? card(
+            250,
+            <>
+              {eyebrow(t('review.nextTime', { map: name(thisMap.mapName) }))}
+              {nextPicks.length > 0 ? (
+                <div className="mt-1.5 flex items-center gap-2">
+                  {nextPicks.map((p) => (
+                    <span key={p.brawlerId} className="flex min-w-0 flex-col items-center gap-0.5">
+                      {portrait(p.brawlerId, { ring: 'victory', size: 34 })}
+                      <span className="text-[9px] font-bold tabular-nums text-victory">{t('draft.map', { n: (p.score * 100).toFixed(0) })}</span>
+                    </span>
+                  ))}
+                  {onDraft ? (
+                    <button
+                      type="button"
+                      onClick={() => onDraft(thisMap.mode, thisMap.mapName)}
+                      className="bz-chip ms-auto shrink-0 px-2 py-1.5 text-[11px]"
+                    >
+                      {t('tab.draft')} →
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              {yourRank >= 0 && yourId !== null ? (
+                <p className="mt-1.5 text-[11px] text-muted">
+                  {t('review.yourPickHere', {
+                    name: brawlerName(yourId),
+                    n: (thisMap.picks[yourRank].score * 100).toFixed(0),
+                    rank: yourRank + 1,
+                    count: thisMap.picks.length,
+                  })}
+                </p>
+              ) : null}
             </>,
           )
         : null}

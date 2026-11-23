@@ -222,6 +222,14 @@ const ar: UiStrings = {
   "ask.upgrade": "طوّر أولاً",
   "ask.upgradeFail": "تعذّر تحميل خطة التطوير الآن. حاول بعد دقيقة.",
   "chooser.ask": "اسأل أي شيء: المضادات، أفضل الاختيارات، الحظر، التجهيزات",
+  "account.noTagShort": "أضف وسمك في التطبيق لتمييز أبطالك.",
+  "more.title": "المزيد",
+  "draft.tryHint": "اضغط على اختيار لتجربته",
+  "draft.chanceEmpty": "أضف اختيارات لترى فرصك",
+  "draft.chance": "فرصة الفوز {n}%",
+  "draft.chanceLabel": "للفوز",
+  "review.nextTime": "في المرة القادمة على {map}",
+  "review.yourPickHere": "{name} هنا: الخريطة {n}%، المركز {rank} من {count}",
 };
 
 export default ar;

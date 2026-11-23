@@ -222,6 +222,14 @@ const vi: UiStrings = {
   "ask.upgrade": "Nâng cấp trước",
   "ask.upgradeFail": "Chưa tải được kế hoạch nâng cấp. Thử lại sau một phút nhé.",
   "chooser.ask": "Hỏi gì cũng được: khắc chế, lựa chọn, cấm, build",
+  "account.noTagShort": "Thêm thẻ trong ứng dụng để đánh dấu chiến binh của bạn.",
+  "more.title": "Thêm",
+  "draft.tryHint": "Chạm vào lựa chọn để thử",
+  "draft.chanceEmpty": "Thêm lựa chọn để xem tỉ lệ thắng",
+  "draft.chance": "{n}% thắng",
+  "draft.chanceLabel": "thắng",
+  "review.nextTime": "Lần sau ở {map}",
+  "review.yourPickHere": "{name} ở đây: bản đồ {n}%, hạng {rank}/{count}",
 };
 
 export default vi;

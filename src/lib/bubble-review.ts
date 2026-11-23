@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
-import { draftAutopsy, type DraftAutopsy } from '@/lib/draft-autopsy';
+import { draftAutopsy, draftChance, type DraftAutopsy } from '@/lib/draft-autopsy';
 import {
   getBrawlerPairings,
   getCounterScores,
@@ -114,4 +114,40 @@ export async function reviewGame(
   });
 
   return { myIds, theirIds, mine, theirs, review };
+}
+
+/**
+ * The draft board's live chance (Bubble 1.43): the same inputs as a review,
+ * for line-ups still being picked on `mapName`.
+ */
+export async function draftChanceFor(
+  mapName: string,
+  myIds: number[],
+  theirIds: number[],
+): Promise<{ chance: number; mapped: number } | null> {
+  if (myIds.length === 0 || theirIds.length === 0) return null;
+  const [rankedMaps, form, counters, countered, meta] = await Promise.all([
+    getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, { mapName }).catch(() => []),
+    getLadderMapForm().catch(() => new Map<string, MapForm[]>()),
+    getCounterScores(theirIds).catch(() => new Map<number, CounterScore>()),
+    getCounterScores(myIds).catch(() => new Map<number, CounterScore>()),
+    getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
+  ]);
+  const rankedMap = rankedMaps.find((m) => m.mapName === mapName);
+  const mapRows: MapForm[] =
+    rankedMap && rankedMap.picks.length >= 6
+      ? rankedMap.picks.map((p) => ({ brawlerId: p.brawlerId, battles: p.decidedSampleSize, winRate: p.winRate, adjusted: p.score }))
+      : (form.get(mapName) ?? []);
+  return draftChance({
+    myIds,
+    theirIds,
+    mapForm: new Map<number, MapForm>(mapRows.map((row) => [row.brawlerId, row])),
+    overall: new Map(
+      [...meta.values()]
+        .filter((e) => e.normalizedWinRate !== null)
+        .map((e) => [e.brawlerId, e.normalizedWinRate!] as const),
+    ),
+    counters,
+    countered,
+  });
 }

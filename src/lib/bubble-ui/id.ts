@@ -222,6 +222,14 @@ const id: UiStrings = {
   "ask.upgrade": "Upgrade dulu",
   "ask.upgradeFail": "Rencana upgrade belum bisa dimuat. Coba lagi sebentar lagi.",
   "chooser.ask": "Tanya apa saja: counter, pilihan terbaik, ban, build",
+  "account.noTagShort": "Tambahkan tag-mu di aplikasi untuk menandai jagoanmu.",
+  "more.title": "Lainnya",
+  "draft.tryHint": "Ketuk pilihan untuk mencobanya",
+  "draft.chanceEmpty": "Tambah pilihan untuk lihat peluangmu",
+  "draft.chance": "{n}% peluang menang",
+  "draft.chanceLabel": "peluang menang",
+  "review.nextTime": "Lain kali di {map}",
+  "review.yourPickHere": "{name} di sini: peta {n}%, #{rank} dari {count}",
 };
 
 export default id;
