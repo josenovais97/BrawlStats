@@ -6,6 +6,10 @@ import { MapArt } from '@/components/maps/map-art';
 import { MapCatalogue } from '@/components/maps/map-catalogue';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { PageNotes } from '@/components/ui/page-notes';
+import { formatPercent, titleCaseLabel } from '@/lib/format';
+import { getRankedMapPicks } from '@/lib/stats';
+import type { RankedMapPicks } from '@/types/stats';
 import { getEventRotation } from '@/lib/bs-api';
 import { MapsIcon } from '@/components/game-icons';
 import { getActiveMaps, groupByMode, type GameMap } from '@/lib/game-maps';
@@ -15,7 +19,7 @@ import { slugify } from '@/lib/slugs';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
-import { mapNamer } from '@/lib/i18n-game';
+import { gameWords, mapNamer } from '@/lib/i18n-game';
 
 /* Generated rather than static, for the month — see the brawler index. */
 export function generateMetadata(): Metadata {
@@ -63,9 +67,11 @@ export default async function MapsIndexPage() {
    *   distinguishes a map in today's rotation from one that has not appeared
    *   in months.
    */
-  const [rotation, season] = await Promise.all([
+  const [rotation, season, mapPicks, words] = await Promise.all([
     getEventRotation(ROTATION_REVALIDATE).catch(() => []),
     getSeasonState().catch(() => null),
+    getRankedMapPicks(3).catch(() => [] as RankedMapPicks[]),
+    gameWords(requestLocale()),
   ]);
 
   const byRoute = new Map(maps.map((entry) => [`${entry.modeSlug}/${entry.mapSlug}`, entry]));
@@ -90,6 +96,34 @@ export default async function MapsIndexPage() {
   }
 
   const groups = groupByMode(maps);
+
+  /*
+   * The maps in words (2026-11-23, AdSense "low value content"): what is
+   * live, the busiest Ranked map and its best pick, the strongest top pick
+   * anywhere in the pool, and how a map page decides. Sentences whose numbers
+   * are missing are left out.
+   */
+  const withPicks = mapPicks.filter((m) => m.picks.length > 0);
+  const busiest = [...withPicks].sort((a, b) => b.sampleSize - a.sampleSize)[0];
+  const strongest = withPicks
+    .filter((m) => m.confidence === 'high')
+    .sort((a, b) => b.picks[0].score - a.picks[0].score)[0];
+  const notes = [
+    live.length > 0 && rankedPool.length > 0
+      ? t('{live} maps are in the event rotation right now, and {pool} make up the Ranked pool.', { live: live.length, pool: rankedPool.length })
+      : '',
+    busiest && strongest
+      ? t('The Ranked map with the most games in our sample is {map} in {mode}, where {pick} is the strongest pick. The best record of any top pick belongs to {best} on {bestMap}, with an adjusted win rate of {rate}.', {
+          map: nm(busiest.mapName),
+          mode: words.mode(busiest.mode),
+          pick: titleCaseLabel(busiest.picks[0].brawlerName),
+          best: titleCaseLabel(strongest.picks[0].brawlerName),
+          bestMap: nm(strongest.mapName),
+          rate: formatPercent(strongest.picks[0].score),
+        })
+      : '',
+    t("Each map page ranks brawlers from battles played on that map only. When a map has too few battles to say anything, it shows its mode's best picks instead and says so, and every map is labelled by how much evidence is behind it."),
+  ];
 
   return (
     <div className="space-y-10">
@@ -116,7 +150,7 @@ export default async function MapsIndexPage() {
       {rankedPool.length > 0 ? (
         <MapStrip
           id="ranked-pool"
-          title={t('Ranked pool{v}', { v: season?.current ? ` · season ${season.current.number}` : '' })}
+          title={t('Ranked pool{v}', { v: season?.mapPoolSeason ? ` · ${t('Season {n}', { n: season.mapPoolSeason })}` : '' })}
           subtitle={t('The competitive map pool for the current Ranked season. Fixed until the season turns over.')}
           maps={rankedPool}
         />
@@ -150,6 +184,8 @@ export default async function MapsIndexPage() {
           />
         </div>
       )}
+
+      <PageNotes title={t('About these maps')} paragraphs={notes} />
     </div>
   );
 }
@@ -172,7 +208,7 @@ async function MapStrip({
   return (
     <section aria-labelledby={id}>
       <div id={id}>
-        <SectionHeading title={t(title)} subtitle={t(subtitle)} aside={`${maps.length} maps`} />
+        <SectionHeading title={t(title)} subtitle={t(subtitle)} aside={t('{length} maps', { length: maps.length })} />
       </div>
       {/* Scrolls rather than wraps: these are short, ordered lists and a grid
           of eight would push the catalogue below the fold on a phone. */}

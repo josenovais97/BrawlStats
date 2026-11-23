@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { BrawlerBrowser } from '@/components/brawlers/brawler-browser';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading } from '@/components/ui/section-heading';
+import { PageNotes } from '@/components/ui/page-notes';
+import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
@@ -74,6 +76,40 @@ export default async function BrawlersPage() {
     catalog.all.map((b) => b.name),
   ).catch(() => [] as UpcomingBrawler[]);
 
+  /*
+   * The week in words, under the grid (2026-11-23, AdSense "low value
+   * content"): who leads, who is picked most, who moved, and how the tiers
+   * are made. Each sentence is dropped when its numbers are missing.
+   */
+  const rated = [...meta.values()].filter((b) => b.tier && b.normalizedWinRate !== null && b.metaScore !== null);
+  const leader = [...rated].sort((a, b) => (b.metaScore as number) - (a.metaScore as number))[0];
+  const picked = [...rated].sort((a, b) => (b.usageRate ?? 0) - (a.usageRate ?? 0))[0];
+  const climbs = movers.filter((m) => m.metaScoreDelta > 0 && m.tierNow !== m.tierBefore).sort((a, b) => b.metaScoreDelta - a.metaScoreDelta);
+  const drops = movers.filter((m) => m.metaScoreDelta < 0 && m.tierNow !== m.tierBefore).sort((a, b) => a.metaScoreDelta - b.metaScoreDelta);
+  const notes = [
+    leader && picked
+      ? t('{top} leads Ranked this week with an adjusted win rate of {rate} over {games} decided games, and {picked} is picked most, in {share} of all picks.', {
+          top: titleCaseLabel(leader.brawlerName),
+          rate: formatPercent(leader.normalizedWinRate),
+          games: formatNumber(leader.decidedSampleSize),
+          picked: titleCaseLabel(picked.brawlerName),
+          share: formatPercent(picked.usageRate),
+        })
+      : '',
+    climbs[0] && drops[0]
+      ? t('Since last week {up} has climbed the furthest, from {from} to {to} tier, while {down} dropped from {dfrom} to {dto}.', {
+          up: titleCaseLabel(climbs[0].brawlerName),
+          from: climbs[0].tierBefore,
+          to: climbs[0].tierNow,
+          down: titleCaseLabel(drops[0].brawlerName),
+          dfrom: drops[0].tierBefore,
+          dto: drops[0].tierNow,
+        })
+      : '',
+    t('Every tier comes from real Ranked matches we sample ourselves every few hours, all six brawlers of each battle, not from votes or opinion. Win rates are adjusted against the average of the same sample, so a tier reflects the brawler rather than who was playing it, and a brawler needs enough decided games before it gets a tier at all.'),
+    t('Open any brawler for its best maps and modes, its counters, the teammates it wins with and the gears its players buy.'),
+  ];
+
   return (
     <div className="space-y-6">
       {/* The count is the playable roster, not the row count: the artwork
@@ -83,7 +119,7 @@ export default async function BrawlersPage() {
       <PageHeading
         title={t('Brawlers')}
         subtitle={t('All {length} current brawlers with their Ranked tier, sortable by how strong they are right now{v}', { length: catalog.current.length, v: catalog.legacy.length > 0
-            ? `. Plus ${catalog.legacy.length} no longer playable.`
+            ? `. ${t('Plus {n} no longer playable.', { n: catalog.legacy.length })}`
             : '.' })}
       />
 
@@ -132,6 +168,8 @@ export default async function BrawlersPage() {
           })),
         ]}
       />
+
+      <PageNotes title={t('About these rankings')} paragraphs={notes} />
     </div>
   );
 }

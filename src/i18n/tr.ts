@@ -5316,4 +5316,40 @@ export const TR: Record<string, string> = {
     "Brawl Stars Aşamalı {n}. Sezon: haritalar ve en iyi savaşçılar ({v})",
   "Season {n}":
     "{n}. Sezon",
+  "Plus {n} no longer playable.":
+    "Artı artık oynanamayan {n} savaşçı.",
+  "{top} leads Ranked this week with an adjusted win rate of {rate} over {games} decided games, and {picked} is picked most, in {share} of all picks.":
+    "{top} bu hafta {games} sonuçlanan maçta {rate} düzeltilmiş kazanma oranıyla Aşamalı'nın zirvesinde, en çok seçilen ise tüm seçimlerin {share} kadarıyla {picked}.",
+  "Since last week {up} has climbed the furthest, from {from} to {to} tier, while {down} dropped from {dfrom} to {dto}.":
+    "Geçen haftadan bu yana en çok yükselen {up} oldu (tier {from} → {to}), en çok düşen ise {down} (tier {dfrom} → {dto}).",
+  "Every tier comes from real Ranked matches we sample ourselves every few hours, all six brawlers of each battle, not from votes or opinion. Win rates are adjusted against the average of the same sample, so a tier reflects the brawler rather than who was playing it, and a brawler needs enough decided games before it gets a tier at all.":
+    "Her tier, oy ya da görüşten değil, birkaç saatte bir kendimiz topladığımız gerçek Aşamalı maçlarından gelir; her maçtaki altı savaşçının hepsi sayılır. Kazanma oranı aynı örneklemin ortalamasına göre düzeltilir, böylece tier onu kimin oynadığını değil savaşçının kendisini yansıtır ve bir savaşçı tier almadan önce yeterince sonuçlanan maça ihtiyaç duyar.",
+  "Open any brawler for its best maps and modes, its counters, the teammates it wins with and the gears its players buy.":
+    "Herhangi bir savaşçıyı açarak en iyi haritalarını ve modlarını, karşı seçimlerini, birlikte daha çok kazandığı takım arkadaşlarını ve oyuncularının aldığı eşyaları görebilirsin.",
+  "About these rankings":
+    "Bu sıralamalar hakkında",
+  "{live} maps are in the event rotation right now, and {pool} make up the Ranked pool.":
+    "Şu anda etkinlik rotasyonunda {live} harita var ve {pool} harita Aşamalı harita havuzunu oluşturuyor.",
+  "The Ranked map with the most games in our sample is {map} in {mode}, where {pick} is the strongest pick. The best record of any top pick belongs to {best} on {bestMap}, with an adjusted win rate of {rate}.":
+    "Örneklemimizde en çok maç oynanan Aşamalı haritası {mode} modunda {map}; orada en güçlü seçim {pick}. Tüm en iyi seçimler arasında en iyi kayıt: {bestMap} haritasında {best}, {rate} düzeltilmiş kazanma oranıyla.",
+  "Each map page ranks brawlers from battles played on that map only. When a map has too few battles to say anything, it shows its mode's best picks instead and says so, and every map is labelled by how much evidence is behind it.":
+    "Her harita sayfası savaşçıları yalnızca o haritada oynanan maçlara göre sıralar. Bir haritada bir şey söylemek için çok az maç varsa, bunun yerine modun en iyi seçimlerini gösterir ve bunu belirtir; her harita arkasında ne kadar veri olduğuna göre etiketlenir.",
+  "About these maps":
+    "Bu haritalar hakkında",
+  "The official boards are the game's own top 100 players and clubs by trophies, worldwide or in one country, read from the Brawl Stars API every fifteen minutes.":
+    "Resmi sıralamalar, oyunun kendi kupa sıralamasına göre ilk 100 oyuncu ve kulüptür; dünya genelinde ya da tek bir ülkede, Brawl Stars API'sinden on beş dakikada bir okunur.",
+  "The Ranked board is ours: the game API has no Ranked leaderboard, so it ranks the players we follow by their Ranked elo, updated every few hours. The cosmetics board shows what those players wear, from our own daily samples.":
+    "Aşamalı sıralaması bizim: oyun API'sinde Aşamalı sıralaması yok, bu yüzden takip ettiğimiz oyuncuları Aşamalı elolarına göre sıralar ve birkaç saatte bir güncellenir. Kozmetik sıralaması, kendi günlük örneklerimizden, bu oyuncuların ne giydiğini gösterir.",
+  "Open any player for their profile, brawlers, Ranked history and recent battles, or any club for its members.":
+    "Herhangi bir oyuncuyu açarak profilini, savaşçılarını, Aşamalı geçmişini ve son maçlarını, herhangi bir kulübü açarak da üyelerini görebilirsin.",
+  "About the leaderboard":
+    "Sıralama hakkında",
+  "How comparing works":
+    "Karşılaştırma nasıl çalışır",
+  "Compare two players to see their trophies, Ranked rank, skill score, account completion and head-to-head record side by side. Compare two brawlers to see their win rates, pick rates and how they do against each other in Ranked.":
+    "İki oyuncuyu karşılaştırarak kupalarını, Aşamalı rankını, beceri puanını, hesap tamamlanma oranını ve birbirlerine karşı kayıtlarını yan yana gör. İki savaşçıyı karşılaştırarak kazanma oranlarını, seçilme oranlarını ve Aşamalı'da birbirlerine karşı nasıl olduklarını gör.",
+  "Players are read live from the official Brawl Stars API when you open a comparison. Brawler numbers come from the same sampled Ranked battles as the tier list, updated every few hours.":
+    "Bir karşılaştırma açtığında oyuncular resmi Brawl Stars API'sinden canlı okunur. Savaşçı sayıları, tier listesiyle aynı örneklenmiş Aşamalı maçlarından gelir ve birkaç saatte bir güncellenir.",
+  "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
+    "Bu savaşçı için henüz eşya verisi yok. Takip ettiğimiz yeterli sayıda oyuncu ona eşya aldığında burada görünecek.",
 };

@@ -11,6 +11,7 @@ import {
 import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { PageNotes } from '@/components/ui/page-notes';
 import { LeaderboardIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
 import { getClubRankings, getPlayerRankings } from '@/lib/bs-api';
@@ -93,6 +94,16 @@ export async function LeaderboardView({
           <TrophyGains />
         </Suspense>
       ) : null}
+
+      {/* Where each board comes from, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes
+        title={t('About the leaderboard')}
+        paragraphs={[
+          t("The official boards are the game's own top 100 players and clubs by trophies, worldwide or in one country, read from the Brawl Stars API every fifteen minutes."),
+          t('The Ranked board is ours: the game API has no Ranked leaderboard, so it ranks the players we follow by their Ranked elo, updated every few hours. The cosmetics board shows what those players wear, from our own daily samples.'),
+          t('Open any player for their profile, brawlers, Ranked history and recent battles, or any club for its members.'),
+        ]}
+      />
     </div>
   );
 }

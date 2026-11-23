@@ -5317,4 +5317,40 @@ export const FR: Record<string, string> = {
     "Brawl Stars Classé saison {n} : cartes et meilleurs brawlers ({v})",
   "Season {n}":
     "Saison {n}",
+  "Plus {n} no longer playable.":
+    "Plus {n} qui ne sont plus jouables.",
+  "{top} leads Ranked this week with an adjusted win rate of {rate} over {games} decided games, and {picked} is picked most, in {share} of all picks.":
+    "{top} domine le Classé cette semaine avec un taux de victoire ajusté de {rate} sur {games} parties décidées, et {picked} est le plus choisi, avec {share} de tous les choix.",
+  "Since last week {up} has climbed the furthest, from {from} to {to} tier, while {down} dropped from {dfrom} to {dto}.":
+    "Depuis la semaine dernière, {up} est celui qui a le plus progressé, du tier {from} au {to}, tandis que {down} est passé de {dfrom} à {dto}.",
+  "Every tier comes from real Ranked matches we sample ourselves every few hours, all six brawlers of each battle, not from votes or opinion. Win rates are adjusted against the average of the same sample, so a tier reflects the brawler rather than who was playing it, and a brawler needs enough decided games before it gets a tier at all.":
+    "Chaque tier vient de vraies parties de Classé que nous collectons nous-mêmes toutes les quelques heures, avec les six brawlers de chaque combat, pas de votes ni d'avis. Le taux de victoire est ajusté par rapport à la moyenne du même échantillon, si bien qu'un tier reflète le brawler et non celui qui le jouait, et un brawler a besoin d'assez de parties décidées avant d'obtenir un tier.",
+  "Open any brawler for its best maps and modes, its counters, the teammates it wins with and the gears its players buy.":
+    "Ouvre n'importe quel brawler pour voir ses meilleures cartes et ses meilleurs modes, ses counters, les alliés avec qui il gagne davantage et les équipements que ses joueurs achètent.",
+  "About these rankings":
+    "À propos de ces classements",
+  "{live} maps are in the event rotation right now, and {pool} make up the Ranked pool.":
+    "{live} cartes sont dans la rotation des événements en ce moment, et {pool} forment le pool de cartes du Classé.",
+  "The Ranked map with the most games in our sample is {map} in {mode}, where {pick} is the strongest pick. The best record of any top pick belongs to {best} on {bestMap}, with an adjusted win rate of {rate}.":
+    "La carte de Classé avec le plus de parties dans notre échantillon est {map} en {mode}, où {pick} est le meilleur choix. Le meilleur bilan parmi tous les meilleurs choix revient à {best} sur {bestMap}, avec un taux de victoire ajusté de {rate}.",
+  "Each map page ranks brawlers from battles played on that map only. When a map has too few battles to say anything, it shows its mode's best picks instead and says so, and every map is labelled by how much evidence is behind it.":
+    "Chaque page de carte classe les brawlers uniquement d'après les combats joués sur cette carte. Quand une carte a trop peu de combats pour en dire quelque chose, elle montre plutôt les meilleurs choix de son mode et le précise, et chaque carte indique combien de données se trouvent derrière.",
+  "About these maps":
+    "À propos de ces cartes",
+  "The official boards are the game's own top 100 players and clubs by trophies, worldwide or in one country, read from the Brawl Stars API every fifteen minutes.":
+    "Les classements officiels sont le top 100 du jeu lui-même, joueurs et clubs par trophées, dans le monde ou dans un pays, lu depuis l'API de Brawl Stars toutes les quinze minutes.",
+  "The Ranked board is ours: the game API has no Ranked leaderboard, so it ranks the players we follow by their Ranked elo, updated every few hours. The cosmetics board shows what those players wear, from our own daily samples.":
+    "Le classement du Classé est le nôtre : l'API du jeu n'en a pas, il classe donc les joueurs que nous suivons selon leur elo en Classé, mis à jour toutes les quelques heures. Le classement des cosmétiques montre ce que portent ces joueurs, d'après nos propres échantillons quotidiens.",
+  "Open any player for their profile, brawlers, Ranked history and recent battles, or any club for its members.":
+    "Ouvre n'importe quel joueur pour voir son profil, ses brawlers, son historique en Classé et ses derniers combats, ou n'importe quel club pour voir ses membres.",
+  "About the leaderboard":
+    "À propos du classement",
+  "How comparing works":
+    "Comment fonctionne la comparaison",
+  "Compare two players to see their trophies, Ranked rank, skill score, account completion and head-to-head record side by side. Compare two brawlers to see their win rates, pick rates and how they do against each other in Ranked.":
+    "Compare deux joueurs pour voir côte à côte leurs trophées, leur rang en Classé, leur score de skill, la progression de leur compte et leur bilan en face-à-face. Compare deux brawlers pour voir leurs taux de victoire, leurs taux de sélection et comment ils s'en sortent l'un contre l'autre en Classé.",
+  "Players are read live from the official Brawl Stars API when you open a comparison. Brawler numbers come from the same sampled Ranked battles as the tier list, updated every few hours.":
+    "Les joueurs sont lus en direct depuis l'API officielle de Brawl Stars quand tu ouvres une comparaison. Les chiffres des brawlers viennent des mêmes combats de Classé échantillonnés que la tier list, mis à jour toutes les quelques heures.",
+  "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
+    "Pas encore de données d'équipement pour ce brawler. Elles apparaîtront ici dès qu'assez de joueurs que nous suivons lui auront acheté des équipements.",
 };

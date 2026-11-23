@@ -46,7 +46,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       /* An empty state that ends the visit is a wasted one, so it says what is
          missing and offers a page that does have an answer. */
       <div className="card p-6">
-        <p className="text-sm leading-relaxed text-muted">{t('No data yet. This fills in within a few days.')}</p>
+        <p className="text-sm leading-relaxed text-muted">{t('No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.')}</p>
         <Link
           href={lp('/tier-list/trophy')}
           className="mt-4 inline-flex rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"

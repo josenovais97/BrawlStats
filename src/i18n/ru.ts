@@ -5317,4 +5317,40 @@ export const RU: Record<string, string> = {
     "Ранговые бои Brawl Stars, сезон {n}: карты и лучшие бойцы ({v})",
   "Season {n}":
     "Сезон {n}",
+  "Plus {n} no longer playable.":
+    "И ещё {n} {n|one:боец|few:бойца|many:бойцов|other:бойца}, которые больше недоступны.",
+  "{top} leads Ranked this week with an adjusted win rate of {rate} over {games} decided games, and {picked} is picked most, in {share} of all picks.":
+    "{top} лидирует в ранговых боях на этой неделе: скорректированный процент побед {rate}, решённых боёв: {games}. Чаще всех выбирают {picked} — {share} всех выборов.",
+  "Since last week {up} has climbed the furthest, from {from} to {to} tier, while {down} dropped from {dfrom} to {dto}.":
+    "С прошлой недели выше всех поднялся {up}, с тира {from} до {to}, а {down} опустился с {dfrom} до {dto}.",
+  "Every tier comes from real Ranked matches we sample ourselves every few hours, all six brawlers of each battle, not from votes or opinion. Win rates are adjusted against the average of the same sample, so a tier reflects the brawler rather than who was playing it, and a brawler needs enough decided games before it gets a tier at all.":
+    "Каждый тир — из настоящих ранговых боёв, которые мы сами собираем каждые несколько часов, со всеми шестью бойцами каждого боя, а не из голосований или мнений. Процент побед скорректирован относительно среднего по той же выборке, поэтому тир отражает бойца, а не того, кто им играл, и бойцу нужно достаточно решённых боёв, чтобы вообще получить тир.",
+  "Open any brawler for its best maps and modes, its counters, the teammates it wins with and the gears its players buy.":
+    "Откройте любого бойца, чтобы увидеть его лучшие карты и режимы, контрпики, союзников, с которыми он чаще побеждает, и снаряжение, которое покупают его игроки.",
+  "About these rankings":
+    "Об этих рейтингах",
+  "{live} maps are in the event rotation right now, and {pool} make up the Ranked pool.":
+    "Карт в ротации событий сейчас: {live}. Карт в пуле ранговых боёв: {pool}.",
+  "The Ranked map with the most games in our sample is {map} in {mode}, where {pick} is the strongest pick. The best record of any top pick belongs to {best} on {bestMap}, with an adjusted win rate of {rate}.":
+    "Ранговая карта с наибольшим числом боёв в нашей выборке — {map} ({mode}), лучший выбор на ней — {pick}. Лучший результат среди всех лучших выборов у {best} на карте {bestMap}: скорректированный процент побед {rate}.",
+  "Each map page ranks brawlers from battles played on that map only. When a map has too few battles to say anything, it shows its mode's best picks instead and says so, and every map is labelled by how much evidence is behind it.":
+    "Каждая страница карты ранжирует бойцов только по боям на этой карте. Если боёв слишком мало, чтобы что-то сказать, она показывает лучших бойцов режима и прямо об этом пишет, а у каждой карты есть пометка о том, сколько данных за ней стоит.",
+  "About these maps":
+    "Об этих картах",
+  "The official boards are the game's own top 100 players and clubs by trophies, worldwide or in one country, read from the Brawl Stars API every fifteen minutes.":
+    "Официальные рейтинги — это собственный топ-100 игры по трофеям среди игроков и клубов, по всему миру или в одной стране, загружаемый из API Brawl Stars каждые пятнадцать минут.",
+  "The Ranked board is ours: the game API has no Ranked leaderboard, so it ranks the players we follow by their Ranked elo, updated every few hours. The cosmetics board shows what those players wear, from our own daily samples.":
+    "Рейтинг ранговых боёв — наш собственный: в API игры его нет, поэтому он ранжирует игроков, за которыми мы следим, по их рейтингу эло в ранговых боях и обновляется каждые несколько часов. Рейтинг косметики показывает, что носят эти игроки, по нашим собственным ежедневным выборкам.",
+  "Open any player for their profile, brawlers, Ranked history and recent battles, or any club for its members.":
+    "Откройте любого игрока, чтобы увидеть его профиль, бойцов, историю ранговых боёв и последние бои, или любой клуб, чтобы увидеть его участников.",
+  "About the leaderboard":
+    "О рейтинге",
+  "How comparing works":
+    "Как работает сравнение",
+  "Compare two players to see their trophies, Ranked rank, skill score, account completion and head-to-head record side by side. Compare two brawlers to see their win rates, pick rates and how they do against each other in Ranked.":
+    "Сравните двух игроков, чтобы увидеть рядом их трофеи, ранг в ранговых боях, оценку навыка, прогресс аккаунта и личные встречи. Сравните двух бойцов, чтобы увидеть их процент побед, частоту выбора и то, как они играют друг против друга в ранговых боях.",
+  "Players are read live from the official Brawl Stars API when you open a comparison. Brawler numbers come from the same sampled Ranked battles as the tier list, updated every few hours.":
+    "Данные игроков загружаются напрямую из официального API Brawl Stars, когда вы открываете сравнение. Цифры по бойцам берутся из тех же собранных ранговых боёв, что и тир-лист, и обновляются каждые несколько часов.",
+  "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
+    "Для этого бойца пока нет данных о снаряжении. Они появятся здесь, когда достаточно игроков, за которыми мы следим, купят ему снаряжение.",
 };
