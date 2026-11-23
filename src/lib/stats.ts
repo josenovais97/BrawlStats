@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { isListedMode } from '@/lib/battle-mode';
+import { mergeBracketRows } from '@/lib/bracket-merge';
 import { solveEloRate, type EloRate } from '@/lib/ranked-elo';
 import { dayBefore, dayRange, type RankedGame } from '@/lib/ranked-season';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
@@ -1835,6 +1836,29 @@ export async function getScoredRoster(
     getSkillEdge(format).catch(() => new Map<number, SkillEdge>()),
   ]);
   return scoreBrawlers(rows, format, edges);
+}
+
+/**
+ * One roster over several Ranked brackets (2026-11-23: the videos read Mythic
+ * and up, not every rank): each bracket's rows from the same cached reads the
+ * bracket pages use, merged (lib/bracket-merge), then scored like any other.
+ * With `days`, an explicit range instead of a trailing window, for the
+ * day-by-day race; those read the sampled picks rather than whole lineups.
+ */
+export async function getScoredRosterForBrackets(
+  windowDays: number,
+  brackets: number[],
+  days?: { gte: Date; lt?: Date },
+): Promise<ScoredBrawler[]> {
+  const [sets, edges] = await Promise.all([
+    Promise.all(
+      brackets.map((b) =>
+        days ? computeBrawlerStatsIn(days, windowDays, undefined, 'ranked', b) : getBrawlerStatsForWindow(windowDays, undefined, 'ranked', b),
+      ),
+    ),
+    getSkillEdge('ranked').catch(() => new Map<number, SkillEdge>()),
+  ]);
+  return scoreBrawlers(mergeBracketRows(sets), 'ranked', edges);
 }
 
 /**

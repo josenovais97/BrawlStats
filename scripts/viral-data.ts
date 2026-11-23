@@ -16,7 +16,14 @@ import { MAINS } from '@/lib/roast-jokes';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
 import { getStarrDrops } from '@/lib/starr-drops';
-import { getBracketRoster, getRankedMapPicks, getRankedRecentMaps, getRankedTrends, getScoredRoster } from '@/lib/stats';
+import {
+  getBracketRoster,
+  getRankedMapPicks,
+  getRankedRecentMaps,
+  getRankedTrends,
+  getScoredRoster,
+  getScoredRosterForBrackets,
+} from '@/lib/stats';
 
 const BRACKETS = [
   ['low', 1],
@@ -117,6 +124,45 @@ async function main() {
       .map(([id, series]) => [id, series.map(([d, wr]) => [d, Math.round(wr * 10_000) / 10_000])]),
   );
 
+  // Mythic and up (2026-11-23, owner: "avoid doing posts with all ranks, it
+  // ends up not being real. most people are mythic +"): the videos' roster.
+  // make.py reads these in place of `all`, `recent`, `seasonStart` and
+  // `trends` when they are there.
+  const MYTHIC_PLUS = [2, 3, 4];
+  const [mpWeek, mpRecent] = await Promise.all([
+    getScoredRosterForBrackets(7, MYTHIC_PLUS),
+    getScoredRosterForBrackets(3, MYTHIC_PLUS),
+  ]);
+  const mythicPlusStart =
+    seasonStart && daysIn >= 0
+      ? await getScoredRosterForBrackets(daysIn + 1, MYTHIC_PLUS)
+          .then((roster) => roster.filter((b) => b.tier))
+          .then((roster) => ({
+            ...seasonStart,
+            games: Math.round(roster.reduce((n, b) => n + b.decidedSampleSize, 0) / 6),
+            all: roster.map(row),
+          }))
+          .catch(() => null)
+      : null;
+  // The race's daily points: each day's adjusted win rate over the three days
+  // ending on it (one day of one bracket is too thin), for brawlers with a
+  // Mythic+ tier this week.
+  const mpTiered = new Set(mpWeek.filter((b) => b.tier).map((b) => b.brawlerId));
+  const mythicPlusTrends: Record<number, [string, number][]> = {};
+  const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+  for (let i = 13; i >= 0; i--) {
+    const end = today - i * 86_400_000;
+    const day = new Date(end).toISOString().slice(0, 10);
+    const roster = await getScoredRosterForBrackets(3, MYTHIC_PLUS, {
+      gte: new Date(end - 2 * 86_400_000),
+      lt: new Date(end + 86_400_000),
+    }).catch(() => []);
+    for (const b of roster) {
+      if (!mpTiered.has(b.brawlerId) || b.normalizedWinRate === null) continue;
+      (mythicPlusTrends[b.brawlerId] ??= []).push([day, Math.round(b.normalizedWinRate * 10_000) / 10_000]);
+    }
+  }
+
   // The drop tables for the "1,000 Chaos Drops" Short (2026-10-29), from the
   // same wiki read as /starr-drops. A failed read leaves them out and make.py
   // draws something else.
@@ -176,6 +222,10 @@ async function main() {
       pool,
       brackets,
       trends,
+      mythicPlus: mpWeek.filter((b) => b.tier).map(row),
+      mythicPlusRecent: mpRecent.filter((b) => b.tier).map(row),
+      mythicPlusStart,
+      mythicPlusTrends,
       drops,
       // Roast My Account's per-brawler lines, English, for the "what your
       // main says about you" Short (2026-11-17). Keyed by the API's name.

@@ -66,6 +66,19 @@ try:
 except (OSError, ValueError):
     state = {}
 rnd = random.Random(f"{data.get('date', '')}/{KIND}")
+# Mythic and up (2026-11-23, owner: "avoid doing posts with all ranks, it ends
+# up not being real. most people are mythic +"): with the Mythic+ roster in
+# the snapshot (viral-data.ts), every format reads it in place of every rank's.
+MYTHIC_PLUS = bool(data.get('mythicPlus'))
+if MYTHIC_PLUS:
+    data['all'] = data['mythicPlus']
+    data['recent'] = data.get('mythicPlusRecent') or data.get('recent', [])
+    if data.get('mythicPlusStart'): data['seasonStart'] = data['mythicPlusStart']
+    if data.get('mythicPlusTrends'): data['trends'] = data['mythicPlusTrends']
+    if prev and prev.get('mythicPlus'):
+        prev['all'] = prev['mythicPlus']
+        prev['recent'] = prev.get('mythicPlusRecent') or prev.get('recent', [])
+RANKS = 'in Mythic and above' if MYTHIC_PLUS else 'across all ranks'
 by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
@@ -1203,7 +1216,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
             'description': 'A new Ranked season starts today. '
                            + ('It is the first under the Ranked Refresh: Power 11 at every rank, and the reset only '
                               'drops you 2 ranks. ' if refresh else '')
-                           + f"The 10 best brawlers to climb with, from this week's Ranked games across all ranks. Top 3: {top3}. "
+                           + f"The 10 best brawlers to climb with, from this week's Ranked games {RANKS}. Top 3: {top3}. "
                              f'Who are you climbing with? Comment below 👇\n\n'
                              f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -1220,7 +1233,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                                      tr='YENİ Ranked sezonu: şu ana kadar ne kazanıyor 🔥 #Shorts',
                                      pl='NOWY sezon Ranked: co naprawdę wygrywa do tej pory 🔥 #Shorts')},
             'description': f"The new Ranked season started on {SS.get('startedOn')}. The 10 brawlers winning most since the reset, "
-                           f"from {SS.get('games', 0):,} Ranked games across all ranks. Top 3: {top3}. "
+                           f"from {SS.get('games', 0):,} Ranked games {RANKS}. Top 3: {top3}. "
                            + (f"Biggest climber against last season: {nice(big[1]['n'])} (#{big[2]} → #{big[3]}). " if big else '')
                            + f'Who are you climbing with? Comment below 👇\n\n'
                              f'Tier list for the last 24 hours: https://brawlzone.net/tier-list/ranked/24h{FOOTER}\n{COUNT_HASHTAGS}',
@@ -1234,7 +1247,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                                      de='Alle Brawler vom SCHLECHTESTEN zum BESTEN 😳 #Shorts',
                                      tr='Tüm brawlerlar EN KÖTÜDEN EN İYİYE 😳 #Shorts',
                                      pl='Wszyscy brawlerzy od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts')},
-            'description': f"All {NB} brawlers ranked by this week's Ranked games across all ranks (Season {data.get('season')}). "
+            'description': f"All {NB} brawlers ranked by this week's Ranked games {RANKS} (Season {data.get('season')}). "
                            f'Top 3: {top3}. Where is your main? Comment below 👇 New ranking every week.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -1248,7 +1261,7 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb', 'newseason'):
                            ('de', 'Alle {} vom SCHLECHTESTEN zum BESTEN 😳 #Shorts'),
                            ('tr', 'Tüm {} EN KÖTÜDEN EN İYİYE 😳 #Shorts'),
                            ('pl', '{} od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts'))} if WORD in GROUP_L10N else {})},
-            'description': f"All {NB} {en_pl} ranked by this week's Ranked games across all ranks (Season {data.get('season')}). "
+            'description': f"All {NB} {en_pl} ranked by this week's Ranked games {RANKS} (Season {data.get('season')}). "
                            f'Top 3: {top3}. Which one do you main? Comment below 👇 Another class next time.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
         }
@@ -2451,8 +2464,7 @@ BRACKET_SHOW = [
     ('pro', 'MASTERS', 'MASTERS+', ['masters', 'pro']),
     ('legendary', 'LEGENDARY', 'LEGENDARY', ['legendary']),
     ('mythic', 'MYTHIC', 'MYTHIC', ['mythic']),
-    ('low', 'DIAMOND', 'DIAMOND & BELOW', ['bronze', 'silver', 'gold', 'diamond']),
-]
+]  # (no Diamond-and-below episode: most viewers are Mythic+, owner 2026-11-23)
 NEW_RANK = None  # the rank tag of a list that is not from every rank
 CLASS_COL = {'Tank': (255, 140, 40), 'Damage Dealer': (255, 60, 100), 'Assassin': (150, 105, 255), 'Marksman': (60, 170, 255),
              'Controller': (70, 215, 120), 'Support': (255, 205, 40), 'Artillery': (255, 106, 213)}
@@ -2535,7 +2547,7 @@ if KIND == 'higherlower':
                                  tr='YÜKSEK mi DÜŞÜK mü: Brawl Stars kazanma oranı 🤔 #Shorts',
                                  pl='WYŻEJ czy NIŻEJ: win rate w Brawl Stars 🤔 #Shorts')},
         'description': "Higher or lower: does the next brawler win more or less in Ranked? Six rounds, harder each time, "
-                       f"from this week's Ranked games across all ranks. Comment your score 👇\n\n"
+                       f"from this week's Ranked games {RANKS}. Comment your score 👇\n\n"
                        f'Every win rate: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #higherorlower #quiz',
     }
 
@@ -2568,7 +2580,7 @@ if KIND == 'hiddenop':
                                  tr="Şu an Aşamalı'nın en HAFİFE ALINAN brawlerı 🤫 #Shorts",
                                  pl='Najbardziej NIEDOCENIANY brawler w Rankedzie 🤫 #Shorts')},
         'description': f"{_n} wins {wr1(HERO)} of its Ranked games (#{HO_WR[HERO['id']]} of {HO_TOTAL}) but is only "
-                       f"#{HO_USE[HERO['id']]} of {HO_TOTAL} in picks, across all ranks this week. Also hiding: "
+                       f"#{HO_USE[HERO['id']]} of {HO_TOTAL} in picks, {RANKS} this week. Also hiding: "
                        f"{', '.join(nice(b['n']) + ' ' + wr1(b) for b in HO_MORE)}. Who's your hidden pick? 👇\n\n"
                        f'The hidden meta: https://brawlzone.net/hidden-meta{FOOTER}\n{TAGS} #underrated',
     }
@@ -2608,8 +2620,8 @@ if KIND == 'wrrace':
                                  de='Wer hat Ranked die letzten 2 Wochen dominiert? 🏁 #Shorts',
                                  tr="Son 2 haftada Aşamalı'ya kim hükmetti? 🏁 #Shorts",
                                  pl='Kto rządził w Rankedzie przez ostatnie 2 tygodnie? 🏁 #Shorts')},
-        'description': f"The 10 best win rates in Ranked, day by day for two weeks, across all ranks. {_n} is #1 "
-                       f"{'for ' + str(RC_STREAK) + ' days straight' if RC_STREAK > 1 else 'today'}. Who catches up next? 👇\n\n"
+        'description': f"The 10 best win rates in Ranked, day by day for two weeks, {RANKS}. {_n} is #1 "
+                       f"{'for ' + str(RC_STREAK) + ' days straight' if RC_STREAK >= 4 else 'right now'}. Who catches up next? 👇\n\n"
                        f'Live tier list: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #barchartrace',
     }
 
@@ -2641,7 +2653,7 @@ if KIND == 'pickrow':
                                  de='Wähle EINEN aus jeder Reihe 👇 wir bewerten dein Team #Shorts',
                                  tr='Her sıradan BİR tane seç 👇 takımını puanlayalım #Shorts',
                                  pl='Wybierz JEDNEGO z każdego rzędu 👇 ocenimy twoją drużynę #Shorts')},
-        'description': "Pick one brawler from each row, then see how each one really does in Ranked this week, across all ranks. "
+        'description': f"Pick one brawler from each row, then see how each one really does in Ranked this week, {RANKS}. "
                        f"The best team: {', '.join(nice(b['n']) + ' ' + wr1(b) for b in _best)}. Comment your team 👇\n\n"
                        f'Every brawler, every rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #pickone',
     }
@@ -2794,6 +2806,9 @@ def export_plan(out):
         plan['modes'] = {mk: {'name': MODE_NAME[mk], 'color': hexc(MODE_COL[mk]), 'icon': mode_icon(mk, A)} for mk in MODE_COL}
     if KIND == 'ranks':
         plan.update(low=hexc(LOWC), leg=hexc(LEGC))
+    if KIND == 'higherlower':
+        plan['leagues'] = [save(Image.open(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png").convert('RGBA'), f'c/league-{n}.png')
+                           for n in RR_LEAGUES if os.path.exists(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png")]
     if KIND == 'ranktier':
         plan.update(word=RT_WORD, tag=RT_TAG, games=RT_GAMES, season=data.get('season'), total=len(RT_ROSTER),
                     rows=[{'tier': t, 'items': [bz(b) for b in bs]} for t, bs in RT_ROWS],
@@ -2906,7 +2921,8 @@ def export_plan(out):
         plan.update(season=W_SEASON, ends=W_ENDS, days=W_DAYS, card='c/card.jpg', leagues=leagues)
     # Every frame says which ranks the list is from (RankTag): most read the
     # whole Ranked sample, Bronze to Pro; the rank tier list one bracket.
-    spec = ('ALL RANKS', RR_LEAGUES) if KIND in ALL_RANK_KINDS else NEW_RANK
+    spec = ((('MYTHIC+', ['mythic', 'legendary', 'masters', 'pro']) if MYTHIC_PLUS else ('ALL RANKS', RR_LEAGUES))
+            if KIND in ALL_RANK_KINDS else NEW_RANK)
     if spec:
         badges = []
         for n in spec[1]:

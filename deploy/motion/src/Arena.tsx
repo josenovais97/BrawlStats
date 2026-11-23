@@ -13,8 +13,9 @@ const GREEN = '#3ce07a', RED = '#ff4a62', GOLD = '#ffc53d';
 const pc = (x: number) => `${(x * 100).toFixed(1)}%`;
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const smooth = (k: number) => k * k * (3 - 2 * k);
-/** A league badge by name ("masters"), from the plan's rank tag. */
-const badge = (plan: Plan, name: string): string | undefined => (plan.rank?.badges || []).find((b: string) => b.includes(`league-${name}`));
+/** A league badge by name ("masters"), from the plan's league list or its rank tag. */
+const badge = (plan: Plan, name: string): string | undefined =>
+  [...(plan.leagues || []), ...(plan.rank?.badges || [])].find((b: string) => b.includes(`league-${name}`));
 
 /** A rounded dark panel. */
 const Panel: React.FC<{x: number; y: number; w: number; h: number; color?: string; glow?: number; children?: React.ReactNode}> = ({x, y, w, h, color = '#1b2150', glow = 0, children}) => (
@@ -526,8 +527,9 @@ const RFinal: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
     <AbsoluteFill>
       <Backdrop color={GOLD} t={t} rays={1} cy={920} />
       <BrandBug />
-      <Title text={plan.streak > 1 ? `#1 FOR ${plan.streak} DAYS` : '#1 RIGHT NOW'} size={120} gold frame={frame} y={380} glow="#8a4a00" />
-      {plan.streak > 1 && frame > spb && <Title text="STRAIGHT" size={90} frame={frame} at={spb} y={510} />}
+      {/* A streak is the story only when it is long; else the new #1 is. */}
+      <Title text={plan.streak >= 4 ? `#1 FOR ${plan.streak} DAYS` : '#1 RIGHT NOW'} size={120} gold frame={frame} y={380} glow="#8a4a00" />
+      {plan.streak >= 4 && frame > spb && <Title text="STRAIGHT" size={90} frame={frame} at={spb} y={510} />}
       <Halo x={W / 2} y={960} r={520} color="#fff3b0" a={0.9} />
       <div style={{position: 'absolute', left: W / 2, top: 980, transform: `translate(-50%,-50%) translateY(${(1 - outBack(u, 1.4)) * 260}px) scale(${0.6 + 0.4 * outBack(u, 1.5)})`}}>
         <Art src={b.art} size={800} style={{filter: 'drop-shadow(0 22px 0 rgba(0,0,0,0.3))'}} />
