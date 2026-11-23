@@ -516,4 +516,13 @@
     <string name="ring_aurora">Kutup Işığı</string>
     <string name="ring_storm">Fırtına</string>
     <string name="ring_candy">Şeker</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Oturum bitti: %1$d–%2$d</string>
+    <string name="recap_title_elo">Oturum bitti: %1$d–%2$d · %3$s elo</string>
+    <string name="recap_record">Galibiyet %1$d, mağlubiyet %2$d (%%%3$d galibiyet)</string>
+    <string name="recap_stars">Yıldız Oyuncu: %1$d×</string>
+    <string name="recap_mvp">MVP: %1$s, galibiyet: %2$d</string>
+    <string name="recap_streak">En iyi seri: üst üste %1$d galibiyet</string>
+    <string name="recap_time">Oynanan: %1$d dk</string>
 </resources>

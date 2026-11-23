@@ -516,4 +516,13 @@
     <string name="ring_aurora">オーロラ</string>
     <string name="ring_storm">ストーム</string>
     <string name="ring_candy">キャンディ</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">セッション終了: %1$d–%2$d</string>
+    <string name="recap_title_elo">セッション終了: %1$d–%2$d · %3$sエロ</string>
+    <string name="recap_record">%1$d勝 %2$d敗（勝率%3$d%%）</string>
+    <string name="recap_stars">スタープレイヤー: %1$d回</string>
+    <string name="recap_mvp">MVP: %1$s、%2$d勝</string>
+    <string name="recap_streak">最高連勝: %1$d連勝</string>
+    <string name="recap_time">プレイ時間: %1$d分</string>
 </resources>

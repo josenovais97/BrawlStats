@@ -516,4 +516,13 @@
     <string name="ring_aurora">오로라</string>
     <string name="ring_storm">폭풍</string>
     <string name="ring_candy">캔디</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">세션 종료: %1$d–%2$d</string>
+    <string name="recap_title_elo">세션 종료: %1$d–%2$d · %3$s 엘로</string>
+    <string name="recap_record">%1$d승 %2$d패 (승률 %3$d%%)</string>
+    <string name="recap_stars">스타 플레이어: %1$d회</string>
+    <string name="recap_mvp">MVP: %1$s, %2$d승</string>
+    <string name="recap_streak">최고 연승: %1$d연승</string>
+    <string name="recap_time">플레이 시간: %1$d분</string>
 </resources>

@@ -516,4 +516,13 @@
     <string name="ring_aurora">شفق</string>
     <string name="ring_storm">عاصفة</string>
     <string name="ring_candy">حلوى</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">انتهت الجلسة: %1$d–%2$d</string>
+    <string name="recap_title_elo">انتهت الجلسة: %1$d–%2$d · %3$s إيلو</string>
+    <string name="recap_record">فوز %1$d، خسارة %2$d (فوز %3$d%%)</string>
+    <string name="recap_stars">اللاعب النجم: %1$d×</string>
+    <string name="recap_mvp">الأفضل: %1$s، فوز %2$d</string>
+    <string name="recap_streak">أفضل سلسلة: %1$d انتصارات متتالية</string>
+    <string name="recap_time">مدة اللعب: %1$d دقيقة</string>
 </resources>

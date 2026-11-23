@@ -31,7 +31,8 @@ object Welcome {
 
     private enum class Step(val key: String, val title: Int, val text: Int, val action: String?) {
         TAG("tag", R.string.welcome_tag_title, R.string.welcome_tag_text, null),
-        BUBBLE("bubble", R.string.welcome_bubble_title, R.string.welcome_bubble_text, Shortcuts.ACTION_PLAY),
+        // 1.44: Home, where the Play button is (it used to open the game straight away).
+        BUBBLE("bubble", R.string.welcome_bubble_title, R.string.welcome_bubble_text, Tabs.ACTION_OPEN_HOME),
         FRIEND("friend", R.string.welcome_friend_title, R.string.welcome_friend_text, ACTION_FRIENDS),
         WIDGET("widget", R.string.welcome_widget_title, R.string.welcome_widget_text, ACTION_WIDGET),
         ASK("ask", R.string.welcome_ask_title, R.string.welcome_ask_text, Shortcuts.ACTION_ASK),

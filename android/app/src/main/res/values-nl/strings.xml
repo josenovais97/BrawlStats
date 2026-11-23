@@ -516,4 +516,13 @@
     <string name="ring_aurora">Noorderlicht</string>
     <string name="ring_storm">Storm</string>
     <string name="ring_candy">Snoep</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Sessie klaar: %1$d–%2$d</string>
+    <string name="recap_title_elo">Sessie klaar: %1$d–%2$d · %3$s elo</string>
+    <string name="recap_record">Gewonnen %1$d, verloren %2$d (%3$d%% winst)</string>
+    <string name="recap_stars">Sterspeler: %1$d×</string>
+    <string name="recap_mvp">MVP: %1$s, gewonnen: %2$d</string>
+    <string name="recap_streak">Beste reeks: %1$d keer op rij gewonnen</string>
+    <string name="recap_time">Gespeeld: %1$d min</string>
 </resources>

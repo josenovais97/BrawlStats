@@ -139,6 +139,8 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action == Feed.ACTION_OPEN) startActivity(Intent(this, FeedActivity::class.java))
         // 1.43: a Bubble Pass notification opens the pass.
         if (intent?.action == Pass.ACTION_OPEN) startActivity(Intent(this, PassActivity::class.java))
+        // 1.44: a notification about the season, the squad or today opens that tab.
+        Tabs.forAction(intent?.action)?.let { selectTab(it, track = false) }
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -290,6 +292,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PassActivity::class.java))
             return
         }
+        Tabs.forAction(intent.action)?.let {
+            selectTab(it, track = false)
+            refreshStanding(force = true)
+            return
+        }
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
@@ -349,6 +356,8 @@ class MainActivity : AppCompatActivity() {
                 Thread { Notify.test(applicationContext) }.start()
                 // 1.43: a Bubble Pass ring unlock, revealed when the pass opens.
                 Thread { Pass.test(applicationContext) }.start()
+                // 1.44: the session recap, from the newest games on the phone.
+                Thread { SessionRecap.test(applicationContext) }.start()
                 // With the bubble up: the newest Ranked game as a post-game review (pulse, badge, panel).
                 if (BubbleService.running) {
                     runCatching { startService(Intent(this, BubbleService::class.java).setAction(BubbleService.ACTION_TEST_REVIEW)) }

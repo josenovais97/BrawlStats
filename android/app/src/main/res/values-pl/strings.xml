@@ -516,4 +516,13 @@
     <string name="ring_aurora">Zorza</string>
     <string name="ring_storm">Burza</string>
     <string name="ring_candy">Cukierek</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Sesja zakończona: %1$d–%2$d</string>
+    <string name="recap_title_elo">Sesja zakończona: %1$d–%2$d · elo %3$s</string>
+    <string name="recap_record">Wygrane: %1$d, przegrane: %2$d (%3$d%% wygranych)</string>
+    <string name="recap_stars">Gwiazda meczu: %1$d×</string>
+    <string name="recap_mvp">MVP: %1$s, wygrane: %2$d</string>
+    <string name="recap_streak">Najlepsza seria: %1$d wygranych z rzędu</string>
+    <string name="recap_time">Grano: %1$d min</string>
 </resources>

@@ -516,4 +516,13 @@
     <string name="ring_aurora">Aurora</string>
     <string name="ring_storm">Badai</string>
     <string name="ring_candy">Permen</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Sesi selesai: %1$d–%2$d</string>
+    <string name="recap_title_elo">Sesi selesai: %1$d–%2$d · %3$s elo</string>
+    <string name="recap_record">Menang %1$d, kalah %2$d (menang %3$d%%)</string>
+    <string name="recap_stars">MVP pertandingan: %1$d×</string>
+    <string name="recap_mvp">Andalan: %1$s, menang %2$d</string>
+    <string name="recap_streak">Beruntun terbaik: %1$d kemenangan</string>
+    <string name="recap_time">Dimainkan: %1$d mnt</string>
 </resources>

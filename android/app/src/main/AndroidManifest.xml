@@ -104,6 +104,11 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- The session recap's alarm (1.44): a look 46 minutes after the newest game. -->
+        <receiver
+            android:name=".RecapReceiver"
+            android:exported="false" />
+
         <!-- Bubble Pass (1.43): weekly quests and the rings they unlock. -->
         <activity
             android:name=".PassActivity"

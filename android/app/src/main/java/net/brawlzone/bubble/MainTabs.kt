@@ -47,6 +47,24 @@ internal object Tabs {
     val NAMES = arrayOf("home", "season", "squad", "settings")
 
     const val PREFS = "brawlzone-home"
+
+    /*
+     * Where a notification lands (1.44). Until 1.43 the rank-up, goal, record,
+     * season, recap and friend-playing notifications all used the Play
+     * shortcut, so a tap started the bubble and opened Brawl Stars instead of
+     * the thing the notification was about.
+     */
+    const val ACTION_OPEN_HOME = "net.brawlzone.bubble.OPEN_HOME"
+    const val ACTION_OPEN_SEASON = "net.brawlzone.bubble.OPEN_SEASON"
+    const val ACTION_OPEN_SQUAD = "net.brawlzone.bubble.OPEN_SQUAD"
+
+    /** The tab an OPEN_* action asks for, or null for any other intent. */
+    fun forAction(action: String?): Int? = when (action) {
+        ACTION_OPEN_HOME -> HOME
+        ACTION_OPEN_SEASON -> SEASON
+        ACTION_OPEN_SQUAD -> SQUAD
+        else -> null
+    }
     const val KEY_PIN_DONE = "pin_done"
 }
 

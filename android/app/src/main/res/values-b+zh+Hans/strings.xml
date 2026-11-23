@@ -516,4 +516,13 @@
     <string name="ring_aurora">极光</string>
     <string name="ring_storm">风暴</string>
     <string name="ring_candy">糖果</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">本轮结束：%1$d–%2$d</string>
+    <string name="recap_title_elo">本轮结束：%1$d–%2$d · %3$s 分</string>
+    <string name="recap_record">胜 %1$d 场，负 %2$d 场（胜率 %3$d%%）</string>
+    <string name="recap_stars">全场最佳：%1$d 次</string>
+    <string name="recap_mvp">MVP：%1$s，赢 %2$d 场</string>
+    <string name="recap_streak">最长连胜：%1$d 连胜</string>
+    <string name="recap_time">游戏时长：%1$d 分钟</string>
 </resources>

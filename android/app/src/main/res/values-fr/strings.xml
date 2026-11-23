@@ -516,4 +516,13 @@
     <string name="ring_aurora">Aurore</string>
     <string name="ring_storm">Tempête</string>
     <string name="ring_candy">Bonbon</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Session terminée : %1$d–%2$d</string>
+    <string name="recap_title_elo">Session terminée : %1$d–%2$d · %3$s elo</string>
+    <string name="recap_record">Victoires %1$d, défaites %2$d (%3$d %% de victoires)</string>
+    <string name="recap_stars">Joueur star : %1$d×</string>
+    <string name="recap_mvp">MVP : %1$s, victoires : %2$d</string>
+    <string name="recap_streak">Meilleure série : %1$d victoires d’affilée</string>
+    <string name="recap_time">Joué : %1$d min</string>
 </resources>

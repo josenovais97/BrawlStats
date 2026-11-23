@@ -91,6 +91,8 @@ class AlertJob : JobService() {
             val body = runCatching { Http.text(Alerts.url(context)) }.getOrNull()
             val data = body?.let { runCatching { Alerts.parse(it) }.getOrNull() }
             if (body != null && data != null) Alerts.remember(context, body)
+            // 1.44: the reading from before this check, for where a new session began.
+            val before = Me.last(context)
             val me = Me.fetch(context) ?: Me.last(context)
             val post = Alerts.enabled(context)
             if (data != null) {
@@ -108,6 +110,9 @@ class AlertJob : JobService() {
                 // 1.40: the player's own games, then the goal, the season and the friends.
                 val firstLook = !Tally.known(context, me.tag)
                 val fresh = Tally.merge(context, me.tag, me.list)
+                // 1.44: the elo before a new session, and the recap alarm for when it ends.
+                val prior = before?.takeIf { it.tag == me.tag }
+                SessionRecap.noteGames(context, me.tag, fresh, prior?.elo, prior?.rank)
                 Goal.record(context, me.tag, fresh, firstLook, post)
                 Season.update(context, me, alerts, fresh, post)
                 EloLog.record(context, me.tag, season, me.elo)

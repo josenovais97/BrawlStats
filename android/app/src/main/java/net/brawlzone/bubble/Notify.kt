@@ -105,11 +105,11 @@ object Notify {
 
     /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
     fun postProgress(context: Context, id: Int, title: String, text: String) =
-        post(context, CH_PROGRESS, id, title, text, Shortcuts.ACTION_PLAY)
+        post(context, CH_PROGRESS, id, title, text, Tabs.ACTION_OPEN_SEASON)
 
     /** The daily goal and streak (1.40, Goal). Tapping opens Brawl Stars with the bubble. */
     fun postGoal(context: Context, id: Int, title: String, text: String) =
-        post(context, CH_GOAL, id, title, text, Shortcuts.ACTION_PLAY)
+        post(context, CH_GOAL, id, title, text, Tabs.ACTION_OPEN_HOME)
 
     /** Bubble Pass (1.43): a ring unlocked, or a new week. Tapping opens the pass. */
     fun postPass(context: Context, id: Int, title: String, text: String) =
@@ -117,7 +117,7 @@ object Notify {
 
     /** A friend's rank-up (1.40, Friends). Tapping opens the app, where the ladder is. */
     fun postFriend(context: Context, id: Int, title: String, text: String) =
-        post(context, CH_FRIENDS, id, title, text, null)
+        post(context, CH_FRIENDS, id, title, text, Tabs.ACTION_OPEN_SQUAD)
 
     /** A friend reacted to a post about the player (1.42, Feed); tapping opens the feed. */
     fun postReaction(context: Context, title: String, text: String) =
@@ -129,7 +129,11 @@ object Notify {
 
     /** A friend started a Ranked session (1.42, Online): tapping starts the bubble and the game. */
     fun postOnline(context: Context, id: Int, title: String, text: String) =
-        post(context, CH_ONLINE, id, title, text, Shortcuts.ACTION_PLAY)
+        post(context, CH_ONLINE, id, title, text, Tabs.ACTION_OPEN_SQUAD)
+
+    /** The end-of-session recap (1.44, SessionRecap): tapping opens Home, with today's games and the last one. */
+    fun postRecap(context: Context, title: String, text: String) =
+        post(context, CH_PROGRESS, 7600, title, text, Tabs.ACTION_OPEN_HOME)
 
     /** A finished season's Wrapped (1.40, Season). Tapping makes the card and opens the share sheet. */
     /**
@@ -332,7 +336,7 @@ object Notify {
             context,
             7001,
             Intent(context, MainActivity::class.java)
-                .setAction(Shortcuts.ACTION_PLAY)
+                .setAction(Tabs.ACTION_OPEN_SEASON)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )

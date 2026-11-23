@@ -148,7 +148,14 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * which had no measured demand, while it is not public; give it a real
    * budget at launch by lowering something else, not the ceiling.
    */
-  '/roast/': { perSecond: 0.5, burst: 5 },
+  '/roast/': { perSecond: 0.25, burst: 3 },
+
+  /*
+   * The same roast story image for the Bubble app (2026-11-23), outside
+   * /roast/ because Cloudflare challenges that prefix and an app cannot pass a
+   * challenge. Half of `/roast/`'s 0.5/s and of its burst, so neither total moves.
+   */
+  '/api/bubble/roast/': { perSecond: 0.25, burst: 2 },
 
   /*
    * The Bubble app's share cards (2026-11-09): a player fetch, a battle log or
@@ -246,6 +253,7 @@ export const LIMITED_PREFIXES = [
   '/account-value/',
   '/tier-list/maker/image/',
   '/roast/',
+  '/api/bubble/roast/',
   '/api/bubble/card/',
 ] as const;
 

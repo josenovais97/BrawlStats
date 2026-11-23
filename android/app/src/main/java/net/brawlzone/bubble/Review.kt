@@ -86,6 +86,9 @@ object Review {
         if (games.isNotEmpty()) {
             val firstLook = !Tally.known(context, tag)
             val fresh = Tally.merge(context, tag, games)
+            // 1.44: the elo from the poll before these games, for the session recap, and its alarm.
+            val last = Me.last(context)?.takeIf { it.tag == tag }
+            SessionRecap.noteGames(context, tag, fresh, if (sameTag && elo > 0) elo else last?.elo, last?.rank)
             val post = Alerts.enabled(context)
             Goal.record(context, tag, fresh, firstLook, post)
             Me.last(context)?.let { me -> Season.update(context, me, Alerts.last(context), fresh, post) }

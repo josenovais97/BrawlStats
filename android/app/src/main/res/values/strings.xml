@@ -523,4 +523,13 @@
     <string name="ring_aurora">Aurora</string>
     <string name="ring_storm">Storm</string>
     <string name="ring_candy">Candy</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Session over: %1$d–%2$d</string>
+    <string name="recap_title_elo">Session over: %1$d–%2$d · %3$s elo</string>
+    <string name="recap_record">Won %1$d, lost %2$d (%3$d%% wins)</string>
+    <string name="recap_stars">Star Player: %1$d×</string>
+    <string name="recap_mvp">MVP: %1$s, %2$d wins</string>
+    <string name="recap_streak">Best run: %1$d wins in a row</string>
+    <string name="recap_time">Played: %1$d min</string>
 </resources>

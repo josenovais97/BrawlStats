@@ -29,7 +29,8 @@ object Roast {
 
     private fun url(activity: Activity, tag: String): String {
         val lang = AppLang.current(activity).lowercase().substringBefore('-').let { if (it in LANGS) it else "en" }
-        return "${Http.SITE}/roast/${Uri.encode(tag.removePrefix("#").uppercase())}/story/$lang"
+        // 1.44: the API copy of /roast/<tag>/story/<lang>; Cloudflare challenges /roast/ and the app cannot pass it.
+        return "${Http.SITE}/api/bubble/roast/${Uri.encode(tag.removePrefix("#").uppercase())}/$lang"
     }
 
     fun show(activity: Activity, tag: String) {

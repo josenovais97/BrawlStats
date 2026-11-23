@@ -516,4 +516,13 @@
     <string name="ring_aurora">Сияние</string>
     <string name="ring_storm">Шторм</string>
     <string name="ring_candy">Конфета</string>
+
+    <!-- 1.44: the session recap's lines (SessionRecap) -->
+    <string name="recap_title">Сессия окончена: %1$d–%2$d</string>
+    <string name="recap_title_elo">Сессия окончена: %1$d–%2$d · эло %3$s</string>
+    <string name="recap_record">Побед: %1$d, поражений: %2$d (%3$d%% побед)</string>
+    <string name="recap_stars">Звёздный игрок: %1$d×</string>
+    <string name="recap_mvp">MVP: %1$s, побед: %2$d</string>
+    <string name="recap_streak">Лучшая серия: %1$d побед подряд</string>
+    <string name="recap_time">Сыграно: %1$d мин</string>
 </resources>
