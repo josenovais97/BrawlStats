@@ -5402,4 +5402,8 @@ export const TR: Record<string, string> = {
     "Değer nasıl hesaplanır",
   "The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.":
     "Değer, her savaşçını mevcut güç seviyesine getirmenin altın ve güç puanı maliyetini, sahip olduğun her yıldız gücü, aksesuar, eşya ve hiper şarjla birlikte oyunun kendi fiyatlarıyla toplar. Sıralama bu toplamı takip ettiğimiz aktif oyuncularla karşılaştırır.",
+  "To suggest friends, the app asks brawlzone.net which players were on your team more than once in your recent games. That reads the same public battle log and nothing is stored.":
+    "Arkadaş önermek için uygulama, son maçlarında takımında birden fazla kez yer alan oyuncuları brawlzone.net'e sorar. Bu, aynı herkese açık savaş kaydını okur ve hiçbir şey saklanmaz.",
+  "The app sends anonymous usage events to the site's own analytics (Umami): which screens and features are used, such as finishing setup or starting the bubble, with a random install number made on your phone. Never your player tag, your name or your friends. Reinstalling the app makes a new number.":
+    "Uygulama, sitenin kendi analitiğine (Umami) anonim kullanım olayları gönderir: kurulumu bitirmek veya baloncuğu başlatmak gibi hangi ekranların ve özelliklerin kullanıldığını, telefonunda oluşturulan rastgele bir kurulum numarasıyla. Asla oyuncu etiketini, adını veya arkadaşlarını göndermez. Uygulamayı yeniden yüklemek yeni bir numara oluşturur.",
 };

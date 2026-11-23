@@ -253,6 +253,9 @@ export default function PrivacyPage() {
               <p>{t("If you share a friend invite, brawlzone.net keeps your player tag with the invite code, and the tag of each player who opens it in the app, so both of you are added to each other's friends. Nothing else about either player is stored.")}</p>
               {/* 1.42 squad feed: reactions are the only feed data the server keeps. */}
               <p>{t("If you react to a post in the app's squad feed, brawlzone.net keeps your player tag, your in-game name, the emoji and which post it was on for 30 days, so your friends can see it. The posts themselves are made on your phone from public game data.")}</p>
+              {/* 1.43: friend suggestions from the battle log, and anonymous app usage events. */}
+              <p>{t("To suggest friends, the app asks brawlzone.net which players were on your team more than once in your recent games. That reads the same public battle log and nothing is stored.")}</p>
+              <p>{t("The app sends anonymous usage events to the site's own analytics (Umami): which screens and features are used, such as finishing setup or starting the bubble, with a random install number made on your phone. Never your player tag, your name or your friends. Reinstalling the app makes a new number.")}</p>
               <p>{t('Its panel is a web view of')}{' '}
                 <Link
                   href={lp('/bubble/panel')}

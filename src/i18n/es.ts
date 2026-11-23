@@ -5402,4 +5402,8 @@ export const ES: Record<string, string> = {
     "Cómo se calcula el valor",
   "The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.":
     "El valor suma las monedas y los puntos de fuerza que cuesta subir cada uno de tus brawlers a su nivel actual, más cada habilidad estelar, gadget, refuerzo e hipercarga que tienes, a los precios del propio juego. La clasificación compara ese total con los jugadores activos que seguimos.",
+  "To suggest friends, the app asks brawlzone.net which players were on your team more than once in your recent games. That reads the same public battle log and nothing is stored.":
+    "Para sugerir amigos, la app le pregunta a brawlzone.net qué jugadores estuvieron en tu equipo más de una vez en tus partidas recientes. Eso lee el mismo registro de batallas público y no se guarda nada.",
+  "The app sends anonymous usage events to the site's own analytics (Umami): which screens and features are used, such as finishing setup or starting the bubble, with a random install number made on your phone. Never your player tag, your name or your friends. Reinstalling the app makes a new number.":
+    "La app envía eventos de uso anónimos a la analítica propia del sitio (Umami): qué pantallas y funciones se usan, como terminar la configuración o abrir la burbuja, con un número de instalación aleatorio creado en tu teléfono. Nunca tu ID de jugador, tu nombre ni tus amigos. Reinstalar la app crea un número nuevo.",
 };
