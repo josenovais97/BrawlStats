@@ -20,4 +20,16 @@
     <string name="friends_add_button">Agregar</string>
     <string name="friends_full">Puedes agregar hasta 5 amigos.</string>
     <string name="widget_friends_none">Agrega amigos en la app para ver aquí tu clasificación.</string>
+
+    <!-- 1.43: tabs, Play, Today, Last game, insights, teammates, notification settings, widgets -->
+    <string name="pin_title">Agrega Jugar a tu pantalla de inicio</string>
+    <string name="pin_add">Agregar</string>
+    <string name="season_empty">Agrega tu ID de jugador para ver tu rango, tu meta diaria y tu temporada.</string>
+    <string name="squad_no_tag">Primero agrega tu ID de jugador y después a tus amigos.</string>
+    <string name="squad_body">Agrega a la gente con la que juegas Competitivo. Tendrás una clasificación, un duelo semanal y un feed con los grandes momentos de cada uno.</string>
+    <string name="mates_add">Agregar</string>
+    <string name="widgets_add">Agregar</string>
+    <string name="widgets_added">Agregado</string>
+    <string name="widgets_hint">Mantén presionada la pantalla de inicio y elige Widgets para agregar uno.</string>
+    <string name="notif_limit_body">Máximo 3 con sonido al día. El resto llega en silencio.</string>
 </resources>

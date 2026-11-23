@@ -30,6 +30,8 @@ object Review {
     private const val KEY_DAY = "session_day"
     private const val KEY_DAY_ELO = "session_day_elo"
     private const val FRESH_MS = 15 * 60 * 1000L
+    /** 1.43: the newest reviewed game, for the Home tab's "Last game" card. */
+    private const val KEY_LAST_GAME = "last_game"
 
     data class Found(val json: JSONObject, val win: Boolean)
 
@@ -161,6 +163,14 @@ object Review {
                     .put("streak", Goal.streak(context, tag)),
             )
         }
+        prefs(context).edit().putString(KEY_LAST_GAME, game.toString()).apply()
         return Found(game, game.optString("result") == "victory")
+    }
+
+    /** The newest game the bubble reviewed for this tag (1.43), or null. */
+    fun lastGame(context: Context): JSONObject? {
+        val p = prefs(context)
+        if (p.getString(KEY_TAG, null) != Account.tag(context)) return null
+        return p.getString(KEY_LAST_GAME, null)?.let { runCatching { JSONObject(it) }.getOrNull() }
     }
 }

@@ -14,9 +14,10 @@ import java.time.format.DateTimeFormatter
  * history feeds the daily goal and streak (Goal), each friend's week
  * (Friends) and the season tally (Season).
  *
- * Eight days are kept, enough for "today" and "this week". A game older than
- * that is never treated as new, so a player who stops for a fortnight does
- * not have the same 25 games counted again on every check.
+ * Thirty days are kept since 1.43 (eight before), enough for "today", "this
+ * week" and the Season tab's insights. A game older than that is never
+ * treated as new, so a player who stops for a while does not have the same
+ * 25 games counted again on every check.
  */
 object Tally {
 
@@ -25,7 +26,7 @@ object Tally {
 
     private const val PREFS = "brawlzone-tally"
     private const val DAY_MS = 24L * 60 * 60 * 1000
-    private const val KEEP_MS = 8 * DAY_MS
+    private const val KEEP_MS = 30 * DAY_MS
     private val BATTLE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSS'Z'")
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

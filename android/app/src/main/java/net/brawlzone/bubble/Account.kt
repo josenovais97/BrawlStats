@@ -66,6 +66,8 @@ object Account {
     fun hide(context: Context): Boolean = prefs(context).getBoolean(KEY_HIDE, false)
 
     fun save(context: Context, tag: String, filter: String, hide: Boolean) {
+        // 1.43: whether a tag was ever set on this install (never the tag itself).
+        if (normalise(tag).isNotEmpty()) Stats.once(context, "app_tag_set")
         prefs(context).edit()
             .putString(KEY_TAG, normalise(tag))
             .putString(KEY_FILTER, filter)

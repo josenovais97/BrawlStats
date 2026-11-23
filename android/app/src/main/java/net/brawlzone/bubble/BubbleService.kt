@@ -242,6 +242,7 @@ class BubbleService : Service() {
         running = true
         BubbleTileService.refresh(this)
         Welcome.bubbleUsed(this)
+        Stats.event(this, "app_bubble_start")
 
         /*
          * Start loading the panel now, so the first tap opens a list rather
@@ -492,6 +493,15 @@ class BubbleService : Service() {
                 pendingHeard = intent?.getStringExtra(EXTRA_TEXT).orEmpty()
                 openPanelOn("ask")
                 if (panelLoaded) applyPendingHeard()
+            }
+            // 1.43: the Home tab's "Full review": a stored review, shown in the panel now.
+            ACTION_SHOW_REVIEW -> if (bubble != null) {
+                intent?.getStringExtra(EXTRA_TEXT)?.takeIf { it.startsWith("{") }?.let { json ->
+                    reviewPending = json
+                    reviewWin = runCatching { org.json.JSONObject(json).optString("result") == "victory" }.getOrDefault(false)
+                    if (panel == null) showPanel()
+                    if (panelLoaded) applyPendingReview()
+                }
             }
             ACTION_TEST_REVIEW -> if (bubble != null && BuildConfig.BUILD_TYPE == "qa") {
                 val app = applicationContext
@@ -2254,6 +2264,7 @@ class BubbleService : Service() {
 
         /** The test build's button: replay the newest Ranked game as a post-game review. */
         const val ACTION_TEST_REVIEW = "net.brawlzone.bubble.TEST_REVIEW"
+        const val ACTION_SHOW_REVIEW = "net.brawlzone.bubble.SHOW_REVIEW"
         const val ACTION_ASK_HEARD = "net.brawlzone.bubble.ASK_HEARD"
         const val EXTRA_TEXT = "text"
         const val EXTRA_TAB = "tab"

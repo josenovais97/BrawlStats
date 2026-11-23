@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         const val NOTIFICATIONS = 4210
+        private const val KEY_TAB = "tab"
     }
 
 
@@ -93,8 +94,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
         setContentView(R.layout.activity_main)
-        gameType(findViewById(R.id.scroll))
+        gameType(findViewById(R.id.root))
         fitSystemBars()
+        // 1.43: four tabs over a bottom bar.
+        for ((index, id) in Tabs.NAV.withIndex()) findViewById<View>(id).setOnClickListener { selectTab(index) }
+        selectTab(savedInstanceState?.getInt(KEY_TAB, Tabs.HOME) ?: Tabs.HOME, track = false)
+        Stats.once(this, "app_first_open")
 
         statusText = findViewById(R.id.status_text)
         statusDot = findViewById(R.id.status_dot)
@@ -106,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
         askForNotifications()
 
-        findViewById<TextView>(R.id.version_chip).text = "v${BuildConfig.VERSION_NAME}"
+        findViewById<TextView>(R.id.version_chip).text = "BrawlZone Bubble v${BuildConfig.VERSION_NAME}"
         findViewById<TextView>(R.id.footer_link).setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://brawlzone.net/bubble")))
         }
@@ -118,6 +123,10 @@ class MainActivity : AppCompatActivity() {
         wireLook()
         wireLanguage()
         wireAlerts()
+        wireNotifications()
+        findViewById<View>(R.id.lang_row).setOnClickListener { showLanguagePicker() }
+        findViewById<View>(R.id.season_empty_cta).setOnClickListener { findViewById<View>(R.id.setup_cta).performClick() }
+        findViewById<View>(R.id.squad_no_tag_cta).setOnClickListener { findViewById<View>(R.id.setup_cta).performClick() }
         wireFollow()
         wireSeason()
         wireFriends()
@@ -139,6 +148,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
             stopService(Intent(this, BubbleService::class.java))
+            findViewById<View>(R.id.stop).postDelayed({ if (!isDestroyed) paintStatus() }, 300)
         }
         offerTile()
     }
@@ -157,17 +167,24 @@ class MainActivity : AppCompatActivity() {
      * into view above it.
      */
     private fun fitSystemBars() {
-        val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        scroll.clipToPadding = false
+        // 1.43: four scrolling pages over a bottom bar. The pages take the top
+        // and sides; the bar takes the gesture area; with the keyboard up the
+        // bar steps aside and the open page scrolls the field into view.
+        val pages = Tabs.PAGES.map { findViewById<android.widget.ScrollView>(it) }
+        val nav = findViewById<View>(R.id.bottom_nav)
+        for (page in pages) page.clipToPadding = false
         val gap = (16 * resources.displayMetrics.density).toInt()
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(scroll) { view, insets ->
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { _, insets ->
             val bars = insets.getInsets(Type.systemBars() or Type.displayCutout())
             val ime = insets.getInsets(Type.ime()).bottom
-            view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime))
+            nav.visibility = if (ime > 0) View.GONE else View.VISIBLE
+            nav.setPadding(bars.left, 0, bars.right, bars.bottom)
+            for (page in pages) page.setPadding(bars.left, bars.top, bars.right, if (ime > 0) ime else 0)
             if (ime > 0) {
-                view.findFocus()?.let { focused ->
-                    view.post {
+                val scroll = pages.firstOrNull { it.visibility == View.VISIBLE }
+                scroll?.findFocus()?.let { focused ->
+                    scroll.post {
                         val box = android.graphics.Rect()
                         focused.getDrawingRect(box)
                         scroll.offsetDescendantRectToMyCoords(focused, box)
@@ -234,6 +251,9 @@ class MainActivity : AppCompatActivity() {
      * permission prompt appearing over a game is the thing this app has spent
      * several releases learning not to do.
      */
+    /** For MainTabs (1.43): the notification permission, asked from the Settings tab. */
+    internal fun requestNotifications() = askForNotifications()
+
     private fun askForNotifications() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
         val granted = checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
@@ -314,10 +334,6 @@ class MainActivity : AppCompatActivity() {
     private fun wireAlerts() {
         val toggle = findViewById<Switch>(R.id.alerts_switch)
         toggle.isChecked = Alerts.enabled(this)
-        toggle.setOnCheckedChangeListener { _, on ->
-            Alerts.setEnabled(this, on)
-            if (on) askForNotifications()
-        }
         // The test build only: show every notification now, to check how they look.
         val test = findViewById<TextView>(R.id.alerts_test)
         if (BuildConfig.BUILD_TYPE == "qa") {
@@ -351,17 +367,72 @@ class MainActivity : AppCompatActivity() {
         Store.maybeAskForReview(this)
         refreshStanding()
         askInvite()
+        val granted = paintStatus()
+        restricted.visibility = if (!granted && asked) View.VISIBLE else View.GONE
+        paintWidgets()
+        Stats.opened(this, Account.tag(this).isNotEmpty())
+    }
+
+    /**
+     * The pill in Home's corner (1.43): the bubble on, off, or waiting for
+     * the overlay permission. Returns whether the permission is granted.
+     */
+    private fun paintStatus(): Boolean {
         val granted =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
-
-        statusText.text =
-            getString(if (granted) R.string.status_ready else R.string.status_needed)
-        statusText.setTextColor(
-            if (granted) getColor(R.color.victory) else getColor(R.color.muted),
+        val on = granted && BubbleService.running
+        statusText.text = getString(
+            when {
+                !granted -> R.string.status_perm
+                on -> R.string.status_on
+                else -> R.string.status_off
+            },
         )
-        tintDot(if (granted) getColor(R.color.victory) else getColor(R.color.muted))
+        val color = if (on) getColor(R.color.victory) else getColor(R.color.muted)
+        statusText.setTextColor(color)
+        tintDot(color)
+        return granted
+    }
 
-        restricted.visibility = if (!granted && asked) View.VISIBLE else View.GONE
+    // ---------------------------------------------------------- 1.43: tabs
+
+    private var tab = Tabs.HOME
+
+    /** Shows a tab; counted (anonymously) when a person taps it. */
+    internal fun selectTab(index: Int, track: Boolean = true) {
+        val next = index.coerceIn(0, Tabs.PAGES.size - 1)
+        if (track && next != tab) Stats.event(this, "app_tab", mapOf("tab" to Tabs.NAMES[next]))
+        tab = next
+        paintTabs(next)
+        if (next == Tabs.SQUAD) paintSquad()
+    }
+
+    /** The tab holding a view, shown and scrolled to it (Welcome's tips, the tag field). */
+    internal fun reveal(id: Int) {
+        val target = findViewById<View>(id) ?: return
+        var page: View? = target
+        while (page != null && page.id !in Tabs.PAGES) page = page.parent as? View
+        val index = Tabs.PAGES.indexOf(page?.id ?: return)
+        if (index < 0) return
+        selectTab(index, track = false)
+        val scroll = page as android.widget.ScrollView
+        scroll.post {
+            val box = android.graphics.Rect()
+            target.getDrawingRect(box)
+            scroll.offsetDescendantRectToMyCoords(target, box)
+            scroll.smoothScrollTo(0, (box.top - (24 * resources.displayMetrics.density).toInt()).coerceAtLeast(0))
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_TAB, tab)
+    }
+
+    /** After a friend is added or removed (1.43: the Squad tab's teammates too). */
+    internal fun refreshAfterFriends() {
+        paintFriends()
+        paintFeed()
     }
 
     // ---------------------------------------------------------- 1.40: season, goal, friends
@@ -377,6 +448,8 @@ class MainActivity : AppCompatActivity() {
         paintVersus()
         paintFriends()
         paintFeed()
+        paintHome()
+        paintSeasonPage()
         // 1.42: friends' reactions on the newest posts.
         if (Feed.posts(this).isNotEmpty()) {
             val app = applicationContext
@@ -403,6 +476,8 @@ class MainActivity : AppCompatActivity() {
                 paintVersus()
                 paintFriends()
                 paintFeed()
+                paintHome()
+                paintSeasonPage()
             }
         }.start()
     }
@@ -759,7 +834,8 @@ class MainActivity : AppCompatActivity() {
     private fun paintFeed() {
         val caption = findViewById<TextView>(R.id.feed_caption)
         val box = findViewById<LinearLayout>(R.id.feed_box)
-        if (Account.tag(this).isEmpty()) {
+        // 1.43: the feed lives on the Squad tab and shows once a friend is in.
+        if (Account.tag(this).isEmpty() || Friends.tags(this).isEmpty()) {
             caption.visibility = View.GONE
             box.visibility = View.GONE
             return
@@ -779,6 +855,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun paintFriends() {
+        paintSquad()
         val caption = findViewById<View>(R.id.friends_caption)
         val card = findViewById<View>(R.id.friends_card)
         if (Account.tag(this).isEmpty()) {
@@ -793,6 +870,9 @@ class MainActivity : AppCompatActivity() {
         val ladder = Friends.ladder(this)
         val hasFriends = ladder.any { !it.you }
         findViewById<View>(R.id.friends_body).visibility = if (hasFriends) View.GONE else View.VISIBLE
+        // 1.43: no caption over the empty state, which has its own title.
+        caption.visibility = if (hasFriends) View.VISIBLE else View.GONE
+        if (!hasFriends) findViewById<TextView>(R.id.friends_body).setText(R.string.squad_body)
         findViewById<View>(R.id.friends_remove_hint).visibility = if (hasFriends) View.VISIBLE else View.GONE
         findViewById<View>(R.id.friends_add).visibility =
             if (Friends.tags(this).size >= Friends.MAX) View.GONE
@@ -894,8 +974,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
         startForegroundService(Intent(this, BubbleService::class.java))
-
-        moveTaskToBack(true)
+        // 1.43: the button is "Play Brawl Stars": the bubble, then the game.
+        Stats.event(this, "app_play", mapOf("from" to "home"))
+        Shortcuts.openGame(this)
     }
 
     /**
@@ -954,7 +1035,7 @@ class MainActivity : AppCompatActivity() {
         val savedScroll = findViewById<View>(R.id.saved_scroll)
         val savedRow = findViewById<LinearLayout>(R.id.saved_row)
         val setupPrompt = findViewById<LinearLayout>(R.id.setup_prompt)
-        val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
+        val scroll = findViewById<android.widget.ScrollView>(R.id.scroll_settings)
 
         /*
          * Find by name (1.40): typing a name instead of a tag lists matching
@@ -1268,6 +1349,7 @@ class MainActivity : AppCompatActivity() {
          * of step with what was typed.
          */
         findViewById<TextView>(R.id.setup_cta).setOnClickListener {
+            selectTab(Tabs.SETTINGS, track = false)
             setEditing(true)
             tag.requestFocus()
             scroll.post {
@@ -1615,7 +1697,7 @@ class MainActivity : AppCompatActivity() {
      * down: the way game UI sets type on bright surfaces. Text fields are left
      * alone; a tag is typed, not read as a title.
      */
-    private fun gameType(root: View) {
+    internal fun gameType(root: View) {
         /*
          * Lilita One has Latin letters only. A Russian or Thai title set in it
          * would come out in whatever the system substitutes glyph by glyph,

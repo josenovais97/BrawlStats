@@ -49,6 +49,9 @@ object Welcome {
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+    /** Whether the bubble has ever come up on this install (1.43: Home's first-run cards). */
+    fun wasBubbleUsed(context: Context): Boolean = prefs(context).getBoolean(KEY_BUBBLE, false)
+
     /** The bubble came up at least once (BubbleService.onCreate). */
     fun bubbleUsed(context: Context) {
         val p = prefs(context)
@@ -100,6 +103,11 @@ object Welcome {
     }
 
     private fun scrollTo(activity: Activity, id: Int) {
+        // 1.43: the app screen has tabs; it shows the one holding the view.
+        if (activity is MainActivity) {
+            activity.reveal(id)
+            return
+        }
         val scroll = activity.findViewById<ScrollView>(R.id.scroll) ?: return
         val target = activity.findViewById<View>(id) ?: return
         scroll.post {

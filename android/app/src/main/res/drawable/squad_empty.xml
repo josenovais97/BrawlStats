@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 1.43: the empty Squad tab's picture. You, and two dashed places for friends. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp" android:height="52dp" android:viewportWidth="120" android:viewportHeight="52">
+    <path android:fillColor="#3550B8" android:strokeColor="#050A1F" android:strokeWidth="3"
+        android:pathData="M26,26m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+    <path android:fillColor="#FFC53D"
+        android:pathData="M26,17A6,6 0,1 1,26 29A6,6 0,1 1,26 17ZM15,39C16.5,33.5 20.5,31 26,31C31.5,31 35.5,33.5 37,39Z" />
+    <path android:fillColor="#1A2759" android:strokeColor="#4A62B8" android:strokeWidth="3"
+        android:pathData="M60,26m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+    <path android:strokeColor="#A9B6E0" android:strokeWidth="3.4" android:strokeLineCap="round"
+        android:pathData="M60,18V34M52,26H68" />
+    <path android:fillColor="#1A2759" android:strokeColor="#4A62B8" android:strokeWidth="3"
+        android:pathData="M94,26m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+    <path android:strokeColor="#A9B6E0" android:strokeWidth="3.4" android:strokeLineCap="round"
+        android:pathData="M94,18V34M86,26H102" />
+</vector>

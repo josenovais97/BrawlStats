@@ -34,6 +34,8 @@ object Notify {
     private const val CH_PATCH = "brawlzone-patch"
     private const val CH_ONLINE = "brawlzone-online"
     private const val CH_WELCOME = "brawlzone-welcome"
+    /** 1.43: where quiet hours and the daily limit send a notification, silent but still shown. */
+    private const val CH_QUIET = "brawlzone-quiet"
     private const val KEY_PATCH_SEEN = "seen_patch"
     private const val KEY_PATCH_TAG = "seen_patch_tag"
     private const val KEY_PRESTIGE_SEEN = "seen_prestige"
@@ -75,6 +77,30 @@ object Notify {
         m.createNotificationChannel(
             NotificationChannel(CH_WELCOME, local.getString(R.string.channel_welcome), NotificationManager.IMPORTANCE_DEFAULT),
         )
+        m.createNotificationChannel(
+            NotificationChannel(CH_QUIET, local.getString(R.string.channel_quiet), NotificationManager.IMPORTANCE_LOW),
+        )
+    }
+
+    /** The Settings switch a channel answers to (1.43). */
+    private fun kindOf(channel: String): NotifyPrefs.Kind = when (channel) {
+        CH_REWARDS -> NotifyPrefs.Kind.REWARDS
+        CH_SEASON -> NotifyPrefs.Kind.SEASON
+        CH_PATCH -> NotifyPrefs.Kind.PATCH
+        CH_FRIENDS, CH_ONLINE -> NotifyPrefs.Kind.FRIENDS
+        else -> NotifyPrefs.Kind.PROGRESS
+    }
+
+    /**
+     * Every notification goes out here (1.43): skipped when its kind is
+     * switched off, moved to the silent channel inside quiet hours or past
+     * the daily limit, otherwise posted as it is.
+     */
+    private fun deliver(context: Context, channel: String, id: Int, builder: Notification.Builder) {
+        if (!NotifyPrefs.on(context, kindOf(channel))) return
+        if (!NotifyPrefs.takeLoud(context)) builder.setChannelId(CH_QUIET)
+        runCatching { manager(context)?.notify(id, builder.build()) }
+        Stats.event(context, "app_notify", mapOf("kind" to kindOf(channel).name.lowercase()))
     }
 
     /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
@@ -172,8 +198,7 @@ object Notify {
             .setStyle(Notification.BigTextStyle().bigText(text))
             .setContentIntent(open)
             .setAutoCancel(true)
-            .build()
-        runCatching { manager(context)?.notify(id, notification) }
+        deliver(context, channel, id, notification)
     }
 
     /** New rewards since the last check, at most three at once. Runs off the main thread. */
@@ -237,7 +262,7 @@ object Notify {
             .setStyle(Notification.BigTextStyle().bigText(lines.joinToString("\n")))
             .setContentIntent(open)
             .setAutoCancel(true)
-        runCatching { manager(context)?.notify(KEY_PATCH_SEEN.hashCode(), builder.build()) }
+        deliver(context, CH_PATCH, KEY_PATCH_SEEN.hashCode(), builder)
     }
 
     private fun postReward(context: Context, reward: Alerts.Reward) {
@@ -261,7 +286,7 @@ object Notify {
                 builder.setLargeIcon(bitmap)
                 builder.setStyle(Notification.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null as Bitmap?))
             }
-            runCatching { manager(context)?.notify(reward.id.hashCode(), builder.build()) }
+            deliver(context, CH_REWARDS, reward.id.hashCode(), builder)
         }
     }
 
@@ -322,8 +347,7 @@ object Notify {
             .setStyle(Notification.BigTextStyle().bigText(text))
             .setContentIntent(play)
             .setAutoCancel(true)
-            .build()
-        runCatching { manager(context)?.notify(if (start) 7001 else 7002, notification) }
+        deliver(context, CH_SEASON, if (start) 7001 else 7002, notification)
     }
 
     /**

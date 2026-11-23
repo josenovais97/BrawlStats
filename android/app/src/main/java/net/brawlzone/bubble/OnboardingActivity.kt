@@ -44,6 +44,8 @@ class OnboardingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_onboarding)
         GameType.apply(this, findViewById(R.id.onb_root))
         fitSystemBars()
+        // 1.43: the setup funnel, anonymously (Stats): seen, each step, done or skipped.
+        Stats.once(this, "app_onb_view")
 
         tagField = findViewById(R.id.onb_tag)
         tagStatus = findViewById(R.id.onb_tag_status)
@@ -92,6 +94,7 @@ class OnboardingActivity : AppCompatActivity() {
         })
 
         findViewById<Button>(R.id.onb_allow).setOnClickListener {
+            Stats.once(this, "app_onb_allow_tap")
             // Overlay toggles are disabled while anything draws over the screen.
             stopService(Intent(this, BubbleService::class.java))
             runCatching {
@@ -100,6 +103,7 @@ class OnboardingActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.onb_save_tag).setOnClickListener { saveTag(tagField.text.toString()) }
         findViewById<Button>(R.id.onb_skip_tag).setOnClickListener {
+            Stats.once(this, "app_onb_tag_skip")
             tagSkipped = true
             paint()
         }
@@ -117,11 +121,13 @@ class OnboardingActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             Onboarding.markDone(this)
+            Stats.once(this, "app_onb_done", mapOf("tag" to Account.tag(this).isNotEmpty()))
             Shortcuts.startBubble(this, null)
             Shortcuts.openGame(this)
             finish()
         }
         findViewById<TextView>(R.id.onb_skip_all).setOnClickListener {
+            Stats.once(this, "app_onb_skip_all")
             Onboarding.markDone(this)
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -131,6 +137,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (overlayGranted()) Stats.once(this, "app_onb_overlay")
         paint()
     }
 
