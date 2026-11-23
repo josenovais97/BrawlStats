@@ -5406,4 +5406,14 @@ export const PT: Record<string, string> = {
     "Para sugerir amigos, o app pergunta ao brawlzone.net quais jogadores estiveram no seu time mais de uma vez nas suas partidas recentes. Isso lê o mesmo histórico de batalhas público e nada é guardado.",
   "The app sends anonymous usage events to the site's own analytics (Umami): which screens and features are used, such as finishing setup or starting the bubble, with a random install number made on your phone. Never your player tag, your name or your friends. Reinstalling the app makes a new number.":
     "O app envia eventos de uso anônimos para a análise própria do site (Umami): quais telas e recursos são usados, como concluir a configuração ou abrir a bolha, com um número de instalação aleatório criado no seu celular. Nunca sua tag de jogador, seu nome ou seus amigos. Reinstalar o app cria um número novo.",
+  "Bubble Pass: free weekly quests that unlock rings for your bubble, and a legendary ring every week.":
+    "Bubble Pass: missões semanais grátis que liberam anéis para a sua bolinha, e um anel lendário toda semana.",
+  "A new look with Home, Season, Squad and Settings tabs, and a Play button that starts the bubble and opens the game.":
+    "Visual novo com abas Início, Temporada, Galera e Ajustes, e um botão Jogar que liga a bolinha e abre o jogo.",
+  "Today's games, your last game and what wins for you by hour, brawler and mode.":
+    "Partidas de hoje, sua última partida e o que te faz ganhar por horário, brawler e modo.",
+  "The draft board shows your chance to win as you pick.":
+    "O draft mostra sua chance de vitória enquanto você escolhe.",
+  "Choose which notifications you get, with quiet hours.":
+    "Escolha quais notificações receber, com horário silencioso.",
 };

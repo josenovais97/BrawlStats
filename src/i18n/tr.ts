@@ -5406,4 +5406,14 @@ export const TR: Record<string, string> = {
     "Arkadaş önermek için uygulama, son maçlarında takımında birden fazla kez yer alan oyuncuları brawlzone.net'e sorar. Bu, aynı herkese açık savaş kaydını okur ve hiçbir şey saklanmaz.",
   "The app sends anonymous usage events to the site's own analytics (Umami): which screens and features are used, such as finishing setup or starting the bubble, with a random install number made on your phone. Never your player tag, your name or your friends. Reinstalling the app makes a new number.":
     "Uygulama, sitenin kendi analitiğine (Umami) anonim kullanım olayları gönderir: kurulumu bitirmek veya baloncuğu başlatmak gibi hangi ekranların ve özelliklerin kullanıldığını, telefonunda oluşturulan rastgele bir kurulum numarasıyla. Asla oyuncu etiketini, adını veya arkadaşlarını göndermez. Uygulamayı yeniden yüklemek yeni bir numara oluşturur.",
+  "Bubble Pass: free weekly quests that unlock rings for your bubble, and a legendary ring every week.":
+    "Bubble Pass: baloncuğun için halka açan ücretsiz haftalık görevler ve her hafta efsanevi bir halka.",
+  "A new look with Home, Season, Squad and Settings tabs, and a Play button that starts the bubble and opens the game.":
+    "Ana sayfa, Sezon, Ekip ve Ayarlar sekmeleriyle yeni görünüm ve baloncuğu başlatıp oyunu açan bir Oyna butonu.",
+  "Today's games, your last game and what wins for you by hour, brawler and mode.":
+    "Bugünkü maçlar, son maçın ve saate, savaşçıya, moda göre sana ne kazandırıyor.",
+  "The draft board shows your chance to win as you pick.":
+    "Draft tahtası seçim yaparken kazanma şansını gösterir.",
+  "Choose which notifications you get, with quiet hours.":
+    "Hangi bildirimleri alacağını seç, sessiz saatlerle.",
 };

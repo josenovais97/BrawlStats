@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.42',
+  version: '1.43',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 55,
+  versionCode: 56,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.42.apk',
+  path: '/downloads/brawlzone-bubble-1.43.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,11 +62,11 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3795031,
-  sha256: '2fc1499991a0ef55453e5ab1bdd68c82321c54759988b102fb61f87570127f4c',
+  size: 4020587,
+  sha256: 'a2e5332b551b565eca6443fd54df367351c82badcf362102e1bb227feb3ba857',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-11-20',
+  released: '2026-11-23',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -95,6 +95,18 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.43',
+    versionCode: 56,
+    date: '2026-11-23',
+    changes: [
+      "Bubble Pass: free weekly quests that unlock rings for your bubble, and a legendary ring every week.",
+      "A new look with Home, Season, Squad and Settings tabs, and a Play button that starts the bubble and opens the game.",
+      "Today's games, your last game and what wins for you by hour, brawler and mode.",
+      "The draft board shows your chance to win as you pick.",
+      "Choose which notifications you get, with quiet hours.",
+    ],
+  },
   {
     version: '1.42',
     versionCode: 55,
