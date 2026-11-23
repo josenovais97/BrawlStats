@@ -105,20 +105,25 @@ function toGame(
   const rankIndex = progress ? RANK_ELO_FLOORS.findIndex(([n]) => n === progress.rank.toUpperCase()) : -1;
   const starTag = normalizeTag(entry.battle.starPlayer?.tag ?? null);
 
-  const advantage = review?.advantage ?? null;
   const won = entry.battle.result === 'victory';
+  /*
+   * Read from the same chance the card's bar shows (2026-11-23). It used the
+   * map-only edge before, which could say "your draft was stronger" under a
+   * bar reading 47%. 45-55% is even, as in the panel drawer's last game line.
+   */
+  const chance = review?.winChance ?? null;
   const verdict =
-    review?.winChance == null || advantage === null
+    chance === null
       ? 'unknown'
       : won
-        ? advantage >= 4
+        ? chance >= 0.55
           ? 'draftWon'
-          : advantage <= -4
+          : chance <= 0.45
             ? 'upset'
             : 'even'
-        : advantage <= -4
+        : chance <= 0.45
           ? 'draftLost'
-          : advantage >= 4
+          : chance >= 0.55
             ? 'playLost'
             : 'even';
 

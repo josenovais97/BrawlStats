@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
     if (!teams || teams.length < 2) continue;
     const mine = teams.find((team) => team.some((p) => normalizeTag(p.tag) === tag));
     if (!mine) continue;
-    const won = entry.battle.result === 'victory';
+    // Duo Showdown has a placement instead of a result: top two counts as a win.
+    const rank = (entry.battle as { rank?: number }).rank;
+    const won = entry.battle.result === 'victory' || (typeof rank === 'number' && rank <= 2);
     for (const p of mine) {
       const other = normalizeTag(p.tag);
       if (!other || other === tag || skip.has(other) || isOptedOut(other)) continue;

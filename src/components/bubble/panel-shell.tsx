@@ -519,7 +519,7 @@ export function PanelShell({
             role="tab"
             aria-selected={tab === key}
             onClick={() => choose(key)}
-            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-1 py-1.5 text-[12px] leading-tight ${
+            className={`inline-flex min-w-0 flex-auto items-center justify-center gap-1 px-1.5 py-1.5 text-[12px] leading-tight ${
               tab === key ? 'bz-chip-on' : 'bz-chip'
             }`}
           >
