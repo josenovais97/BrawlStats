@@ -68,6 +68,7 @@ import {
   getBrawlerSplits,
   getLastAggregationRun,
   getBrawlerStat,
+  getLatestBrawlerStats,
   getBrawlerTrend,
   getBrawlerSkins,
   getIndexablePairs,
@@ -352,6 +353,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: t('Best {name} build in Brawl Stars ({v}): gadget and star power', { name: name, v: currentMonth() }),
     description,
     alternates: { canonical: `/brawlers/${resolved.slug}` },
+    /*
+     * No sampled battles yet (a brawler just released): the page is mostly
+     * "Not enough battles yet", the empty kind an AdSense reviewer counts
+     * against a site (2026-11-23, Rey and Ruby), so it stays out of the index
+     * until data arrives. Only when the stats read itself works, so a failed
+     * read never hides every brawler; the sitemap applies the same rule.
+     */
+    ...(!stat && (await getLatestBrawlerStats().catch(() => [])).length > 0 ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: t('{name} build and stats, {v}', { name: name, v: currentMonth() }),
       description,

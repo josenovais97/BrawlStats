@@ -14,6 +14,7 @@ import {
   DEFAULT_TIER_WINDOW,
   TIER_WINDOWS,
   getFilterableModes,
+  getScoredRoster,
   isTierWindow,
   type TierFormat,
   type TierWindowKey,
@@ -275,6 +276,26 @@ const INTL: Record<
   },
 };
 
+/**
+ * Whether a mode's tier list rates anyone in its default window.
+ *
+ * The sitemap listed every mode with 150 battles in 30 days, but the page
+ * shows 7: on 2026-11-23 the Siege and Last Stand trophy lists were listed
+ * and indexable while reading "No aggregated data yet", the empty pages an
+ * AdSense reviewer counts against a site. A mode page with nothing rated is
+ * noindex and out of the sitemap until it has data. Only when the overall
+ * roster read works: a failed read must never hide every mode.
+ */
+export async function modeHasTiers(format: TierFormat, mode: string): Promise<boolean> {
+  const days = TIER_WINDOWS[DEFAULT_TIER_WINDOW].days;
+  const [all, mine] = await Promise.all([
+    getScoredRoster(days, undefined, format).catch(() => []),
+    getScoredRoster(days, mode, format).catch(() => []),
+  ]);
+  if (!all.some((b) => b.tier)) return true;
+  return mine.some((b) => b.tier);
+}
+
 export async function tierListMetadata(
   format: TierFormat,
   { windowKey, modeSlug }: TierRoute,
@@ -310,7 +331,7 @@ export async function tierListMetadata(
       title: `${title}${suffix}`,
       description,
       alternates: alternatesFor(tierListHref(format, windowKey, resolved), locale),
-      robots,
+      robots: resolved && isDefaultWindow && !(await modeHasTiers(format, resolved)) ? { index: false, follow: true } : robots,
     };
   }
 
@@ -343,7 +364,7 @@ export async function tierListMetadata(
       format === 'ranked' ? 'competitive Ranked' : 'trophy-ladder'
     } battles and refreshed every few hours. See the top picks before your next ${label} game.`,
     alternates: alternatesFor(tierListHref(format, windowKey, resolved), locale),
-    robots,
+    robots: isDefaultWindow && !(await modeHasTiers(format, resolved)) ? { index: false, follow: true } : robots,
   };
 }
 

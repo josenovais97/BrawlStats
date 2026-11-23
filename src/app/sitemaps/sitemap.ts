@@ -3,7 +3,7 @@ import { MIN_INDEXABLE_COMPS } from '@/lib/comps-indexing';
 import { INTL_LOCALES, isTranslatedPath, languageAlternates } from '@/lib/i18n';
 import { INTL_INDEXED } from '@/lib/intl-indexing';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
-import { bracketTierListHref } from '@/lib/tier-list-route';
+import { bracketTierListHref, modeHasTiers } from '@/lib/tier-list-route';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
@@ -16,6 +16,7 @@ import {
   getBestPicksByMode,
   getFilterableModes,
   getCorePairs,
+  getLatestBrawlerStats,
   getNewestDayByMap,
   getTeamComps,
 } from '@/lib/stats';
@@ -128,7 +129,12 @@ async function core(add: Add, dataDay: Date | null) {
    * and a sitemap full of redirects wastes the crawl it is meant to direct.
    */
   const catalog = await getBrawlerCatalog().catch(() => null);
+  // A brawler with no sampled battles yet (just released) is noindex until it
+  // has some (brawlers/[slug] generateMetadata), so it is left out here too.
+  // An empty read means the read failed, and then nobody is left out.
+  const withStats = new Set((await getLatestBrawlerStats().catch(() => [])).map((s) => s.brawlerId));
   for (const brawler of catalog?.current ?? []) {
+    if (withStats.size > 0 && !withStats.has(brawler.id)) continue;
     add(`/brawlers/${slugify(brawler.name)}`, 'daily', 0.8);
     // Counters pages are out of the index since 2026-11-12 (countersMetadata):
     // most were "unknown to Google" and they repeat the brawler page's
@@ -140,6 +146,8 @@ async function core(add: Add, dataDay: Date | null) {
   for (const format of ['ranked', 'trophy'] as const) {
     const modes = await getFilterableModes(30, 150, format).catch(() => []);
     for (const mode of modes) {
+      // ...and that rate someone in the page's own window (modeHasTiers).
+      if (!(await modeHasTiers(format, mode.mode))) continue;
       add(`/tier-list/${format}/${slugify(mode.mode)}`, 'daily', 0.75);
     }
   }
