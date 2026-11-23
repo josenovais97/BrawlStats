@@ -5313,4 +5313,8 @@ export const DE: Record<string, string> = {
     "Zuletzt aktualisiert: {date}",
   "BrawlZone is a free Brawl Stars stats site built on real battles we collect ourselves. Search any player or club, or check tier lists and Ranked picks for every mode.":
     "BrawlZone ist eine kostenlose Statistik-Seite für Brawl Stars, gebaut aus echten Matches, die wir selbst sammeln. Such jeden Spieler oder Club oder sieh dir Tier-Listen und die besten Ranked-Picks für jeden Modus an.",
+  "Brawl Stars Ranked Season {n}: maps and best brawlers ({v})":
+    "Brawl Stars Ranked Saison {n}: Maps und beste Brawler ({v})",
+  "Season {n}":
+    "Saison {n}",
 };

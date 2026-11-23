@@ -71,6 +71,7 @@ import type { BABrawler } from '@/types/brawlapi';
 import type { ModeBestPicks, Tier, TierListEntry } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { YoutubeCard } from '@/components/youtube-card';
+import { getLiveSeasonNumber } from '@/lib/ranked-seasons';
 
 /** How many meta movers to show on each side. */
 const MOVER_LIMIT = 8;
@@ -267,6 +268,9 @@ export async function TierListView({
   // A mode page is about that mode, so it says so in the heading rather than
   // carrying the generic title with a filter chip lit up below it.
   const heading = t.heading(format, modeName, rankName);
+  // "Ranked tier list · Season 51": the number people search at each reset.
+  const season = format === 'ranked' ? await getLiveSeasonNumber() : null;
+  const title = season ? `${heading} · ${t.season(season)}` : heading;
 
   /*
    * Answers to what people actually type, in the words they type them.
@@ -358,7 +362,7 @@ export async function TierListView({
           </p>
           <LanguageLinks locale={locale} path={currentPath(format, windowKey, mode, bracket)} />
         </div>
-        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{heading}</h1>
+        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{title}</h1>
 
         {/*
           The answer, in one sentence, before anything else.

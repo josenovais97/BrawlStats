@@ -387,6 +387,24 @@ export async function getSeasonState(now: Date = new Date()): Promise<SeasonStat
   };
 }
 
+/**
+ * The number of the Ranked season being played today.
+ *
+ * The wiki can take days to list a new season (Season 51 was still missing on
+ * 2026-11-23, four days in), so once the newest listed season has ended the
+ * one running is the next number: the rule SeasonBanner and viral-data use.
+ */
+export function liveSeasonNumber(state: Pick<SeasonState, 'current' | 'latest'> | null): number | null {
+  if (!state) return null;
+  if (state.current) return state.current.number;
+  return state.latest ? state.latest.number + 1 : null;
+}
+
+/** `liveSeasonNumber` from the cached wiki read, or null when that fails. */
+export async function getLiveSeasonNumber(): Promise<number | null> {
+  return liveSeasonNumber(await getSeasonState().catch(() => null));
+}
+
 /* ------------------------------ season windows ------------------------------ */
 
 export interface SeasonWindow {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { parseMapPool, parseSeasons } from '@/lib/ranked-seasons';
+import { liveSeasonNumber, parseMapPool, parseSeasons, type ResolvedSeason } from '@/lib/ranked-seasons';
 
 /* The wiki's Ranked page as of 2026-10-15, trimmed: the one-line-per-row
  * layout, a footnote on a date, a mode cell wrapped onto its own line, and a
@@ -78,4 +78,12 @@ test('the map pool parses despite the "==Maps===" heading', () => {
   const { season, pool } = parseMapPool(NEW_LAYOUT);
   assert.equal(season, 50);
   assert.deepEqual(pool.find((p) => p.mode === 'Gem Grab')?.maps, ['Double Swoosh', 'Gem Fort']);
+});
+
+test('the live season is the current one, or the next number while the wiki lags', () => {
+  const season = (number: number) => ({ number }) as ResolvedSeason;
+  assert.equal(liveSeasonNumber({ current: season(50), latest: season(50) }), 50);
+  assert.equal(liveSeasonNumber({ current: null, latest: season(50) }), 51);
+  assert.equal(liveSeasonNumber({ current: null, latest: null }), null);
+  assert.equal(liveSeasonNumber(null), null);
 });

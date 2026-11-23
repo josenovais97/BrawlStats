@@ -16,7 +16,7 @@ import { brawlerIconUrl, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatDate, formatNumber, formatPercent, humanizeMode, relativeTime, titleCaseLabel } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { rotationKey, rotationMaps } from '@/lib/ranked-rotation';
-import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
+import { getLiveSeasonNumber, getSeasonState, liveSeasonNumber, type SeasonState } from '@/lib/ranked-seasons';
 import { SeasonBanner } from '@/components/season-banner';
 import { getRankedMapLastSeen, getRankedRecentMaps } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
@@ -38,12 +38,19 @@ import { requestLocale } from '@/lib/request-locale';
 import { mapNamer } from '@/lib/i18n-game';
 import { YoutubeCard } from '@/components/youtube-card';
 
-/* A function, so the month is the month the page was last regenerated. */
-export function generateMetadata(): Metadata {
+/*
+ * A function, so the month is the month the page was last regenerated. With
+ * the season number (2026-11-23): "ranked season 51" is how people search
+ * after each reset.
+ */
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT(requestLocale());
+  const season = await getLiveSeasonNumber();
   return {
     alternates: { canonical: '/ranked' },
-    title: t('Brawl Stars Ranked maps and best brawlers ({v})', { v: currentMonth() }),
+    title: season
+      ? t('Brawl Stars Ranked Season {n}: maps and best brawlers ({v})', { n: season, v: currentMonth() })
+      : t('Brawl Stars Ranked maps and best brawlers ({v})', { v: currentMonth() }),
     description: t('The best brawlers for every map in the current Ranked rotation, {v}. From sampled competitive battles, updated every few hours.', { v: currentMonth() }),
   };
 }
@@ -136,6 +143,7 @@ export default async function RankedPage() {
    */
   const recent = await getRankedRecentMaps().catch(() => []);
   const rotation = rotationMaps({ recent, pool: season.mapPool });
+  const seasonNumber = liveSeasonNumber(season);
   const modeOrder = [
     ...new Set([...season.mapPool.map((e) => slugify(e.mode)), ...recent.map((r) => slugify(r.mode))]),
   ].filter((modeSlug) => rotation.has(rotationKey(modeSlug)));
@@ -265,7 +273,7 @@ export default async function RankedPage() {
         <div>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <RankedIcon className="size-4" />{t('Competitive only')}</p>
-        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{t('Ranked maps')}</h1>
+        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{t('Ranked maps')}{seasonNumber ? ` · ${t('Season {n}', { n: seasonNumber })}` : ''}</h1>
 
         {/*
           The answer first, as a sentence. Measured in Umami on 2026-09-21 this

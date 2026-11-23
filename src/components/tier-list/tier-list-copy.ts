@@ -29,6 +29,8 @@ interface FormatCopy {
 export interface TierCopy {
   format: Record<TierFormat, FormatCopy>;
   heading: (format: TierFormat, mode?: string, rank?: string) => string;
+  /** "Season 51", appended to the Ranked heading while a season is known. */
+  season: (n: number) => string;
   scopeLabel: (window: string, mode?: string) => string;
   faq: {
     bestQ: (format: TierFormat, mode?: string) => string;
@@ -103,6 +105,7 @@ const en: TierCopy = {
       where: 'trophy ladder',
     },
   },
+  season: (n) => `Season ${n}`,
   heading: (format, mode, rank) => {
     const h = en.format[format].heading;
     const base = mode ? `${mode} ${h.toLowerCase()}` : h;
@@ -199,6 +202,7 @@ const es: TierCopy = {
       where: 'trofeos',
     },
   },
+  season: (n) => `Temporada ${n}`,
   heading: (format, mode, rank) => {
     const base = mode
       ? `Tier list de ${mode} en ${format === 'ranked' ? 'Competitivo' : 'trofeos'}`
@@ -297,6 +301,7 @@ const pt: TierCopy = {
       where: 'troféus',
     },
   },
+  season: (n) => `Temporada ${n}`,
   heading: (format, mode, rank) => {
     const base = mode
       ? `Tier list de ${mode} ${format === 'ranked' ? 'no Ranqueado' : 'nos troféus'}`
@@ -395,6 +400,7 @@ const tr: TierCopy = {
       where: 'kupa maçları',
     },
   },
+  season: (n) => `${n}. Sezon`,
   heading: (format, mode, rank) => {
     const h = tr.format[format].heading;
     const base = mode ? `${mode} ${h}` : h;
@@ -492,6 +498,7 @@ const de: TierCopy = {
       where: 'Trophäenpfad',
     },
   },
+  season: (n) => `Saison ${n}`,
   heading: (format, mode, rank) => {
     const h = de.format[format].heading;
     const base = mode ? `${mode} ${h}` : h;
@@ -588,6 +595,7 @@ const ru: TierCopy = {
       where: 'пути к славе',
     },
   },
+  season: (n) => `Сезон ${n}`,
   heading: (format, mode, rank) => {
     const h = ru.format[format].heading;
     const base = mode ? `${h}: ${mode}` : h;
@@ -684,6 +692,7 @@ const fr: TierCopy = {
       where: 'Voie des trophées',
     },
   },
+  season: (n) => `Saison ${n}`,
   heading: (format, mode, rank) => {
     const h = fr.format[format].heading;
     const base = mode ? `${h} ${mode}` : h;

@@ -6,6 +6,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { languageAlternates, localePath, monthYear, rankLabel, type Locale } from '@/lib/i18n';
 import { gameWords } from '@/lib/i18n-game';
 import { bracketBySlug, type RankBracket } from '@/lib/rank-brackets';
+import { getLiveSeasonNumber } from '@/lib/ranked-seasons';
 import { currentMonth } from '@/lib/site';
 import { humanizeMode } from '@/lib/format';
 import { findBySlug, slugify } from '@/lib/slugs';
@@ -142,6 +143,8 @@ const INTL: Record<
     rank: (rank: string, month: string) => [string, string];
     rankMode: (mode: string, rank: string, month: string) => [string, string];
     last24: string;
+    /** "Season 51", put before the month in Ranked titles. */
+    season: (n: number) => string;
   }
 > = {
   es: {
@@ -163,6 +166,7 @@ const INTL: Record<
       `Los brawlers que más ganan en ${mode} en ${rank}, con partidas reales de Competitivo de ese rango, actualizados cada pocas horas.`,
     ],
     last24: ', últimas 24 horas',
+    season: (n) => `Temporada ${n}`,
   },
   pt: {
     where: { ranked: 'Ranqueado', trophy: 'troféus' },
@@ -183,6 +187,7 @@ const INTL: Record<
       `Os brawlers que mais ganham em ${mode} no ${rank}, com partidas ranqueadas reais desse rank, atualizados a cada poucas horas.`,
     ],
     last24: ', últimas 24 horas',
+    season: (n) => `Temporada ${n}`,
   },
   tr: {
     where: { ranked: 'Aşamalı', trophy: 'kupa' },
@@ -203,6 +208,7 @@ const INTL: Record<
       `${rank} rütbesinde ${mode} modunda en çok kazanan savaşçılar; o rütbenin gerçek Aşamalı maçlarıyla, birkaç saatte bir güncellenir.`,
     ],
     last24: ', son 24 saat',
+    season: (n) => `${n}. Sezon`,
   },
   de: {
     where: { ranked: 'Ranked', trophy: 'Trophäen' },
@@ -223,6 +229,7 @@ const INTL: Record<
       `Die Brawler, die in ${mode} auf ${rank} am meisten gewinnen, aus echten Ranked-Matches dieses Rangs, alle paar Stunden aktualisiert.`,
     ],
     last24: ', letzte 24 Stunden',
+    season: (n) => `Saison ${n}`,
   },
   ru: {
     where: { ranked: 'Ranked', trophy: 'Trophies' },
@@ -243,6 +250,7 @@ const INTL: Record<
       `Бойцы, которые чаще всех побеждают в режиме «${mode}» на ранге ${rank}, по настоящим ранговым боям этого ранга, обновляется каждые несколько часов.`,
     ],
     last24: ', последние 24 часа',
+    season: (n) => `Сезон ${n}`,
   },
   fr: {
     where: { ranked: 'Ranked', trophy: 'Trophies' },
@@ -263,6 +271,7 @@ const INTL: Record<
       `Les brawlers qui gagnent le plus en ${mode} en ${rank}, d'après de vrais combats Classé à ce rang, mis à jour toutes les quelques heures.`,
     ],
     last24: ', dernières 24 heures',
+    season: (n) => `Saison ${n}`,
   },
 };
 
@@ -276,18 +285,27 @@ export async function tierListMetadata(
   const windowSuffix = isDefaultWindow ? '' : `, last ${TIER_WINDOWS[windowKey].sublabel}`;
   const robots = isDefaultWindow ? undefined : { index: false, follow: true };
 
+  /*
+   * Ranked titles name the season (2026-11-23): "ranked season 51 tier list"
+   * is how people search after each reset. Titles only; the descriptions keep
+   * the plain month.
+   */
+  const season = format === 'ranked' ? await getLiveSeasonNumber() : null;
+
   if (locale !== 'en') {
     const t = INTL[locale];
     const month = monthYear(locale);
+    const titleMonth = season ? `${t.season(season)}, ${month}` : month;
     const suffix = isDefaultWindow ? '' : t.last24;
     let resolved: string | undefined;
     if (modeSlug) {
       const modes = await getFilterableModes(30, 150, format).catch(() => []);
       resolved = findBySlug(modes, modeSlug, (m) => m.mode)?.mode ?? modeSlug;
     }
-    const [title, description] = resolved
-      ? t.mode((await gameWords(locale)).mode(resolved), t.where[format], month)
-      : t.index(t.where[format], month);
+    const modeWord = resolved ? (await gameWords(locale)).mode(resolved) : undefined;
+    const copyFor = (m: string) => (modeWord ? t.mode(modeWord, t.where[format], m) : t.index(t.where[format], m));
+    const [title] = copyFor(titleMonth);
+    const [, description] = copyFor(month);
     return {
       title: `${title}${suffix}`,
       description,
@@ -298,7 +316,7 @@ export async function tierListMetadata(
 
   if (!modeSlug) {
     return {
-      title: `Brawl Stars ${copy.noun} (${currentMonth()})${windowSuffix}`,
+      title: `Brawl Stars ${copy.noun}${season ? `: Season ${season}` : ''} (${currentMonth()})${windowSuffix}`,
       description: copy.description.replace('MONTH', currentMonth()),
       alternates: alternatesFor(tierListHref(format, windowKey), locale),
       robots,
@@ -318,7 +336,7 @@ export async function tierListMetadata(
      * grab brawlers") sat mid-sentence, and it ended on a qualifier nobody
      * searches for. Now: the answer's name, the month, then what kind of list.
      */
-    title: `Best ${label} brawlers in Brawl Stars (${currentMonth()}): ${
+    title: `Best ${label} brawlers in Brawl Stars (${season ? `Season ${season}, ` : ''}${currentMonth()}): ${
       format === 'ranked' ? 'Ranked' : 'ladder'
     } tier list${windowSuffix}`,
     description: `The brawlers winning most in ${label} right now, ranked from real ${
