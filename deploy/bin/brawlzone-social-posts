@@ -36,20 +36,35 @@ def get(url, headers=None):
         return json.load(r)
 
 
-def kind(text):
-    """Which format a post is, from its own title or caption."""
+def kind(head, rest=''):
+    """Which format a post is: from its title (or a caption's first line), and
+    only when that says nothing, from the rest. Until 2026-11-23 the title and
+    description were read together, and since every description mentions the
+    giveaway, every YouTube video counted as "giveaway"."""
+    k = classify(head)
+    return k if k != 'other' or not rest else classify(rest)
+def classify(text):
     t = (text or '').lower()
     rules = [
-        ('giveaway', r'giveaway'),
+        ('giveaway', r'giveaway|win a €10'),
         ('rewards', r'free brawl stars reward|mega box|voucher|free reward'),
         # The daily viral series (brawlzone-viral), one line per format, so the
         # weakest can give its weekday to the strongest.
         # The 2026-11-23 formats.
         ('viral: higher or lower', r'higher or lower'),
-        ('viral: rank tier list', r'tier list: what wins at your rank'),
-        ('viral: underrated', r'most underrated brawler'),
-        ('viral: win-rate race', r'who ruled ranked'),
-        ('viral: pick one per row', r'pick one from each row'),
+        ('viral: rank tier list', r'tier list: what wins at your rank|ranked games only'),
+        ('viral: underrated', r'most underrated brawler|also hiding'),
+        ('viral: win-rate race', r'who ruled ranked|day by day for two weeks'),
+        ('viral: pick one per row', r'pick one (brawler )?from each row'),
+        # Older formats as their captions word them (Instagram, TikTok).
+        ('viral: new season', r'new ranked season|ranked season starts|season started'),
+        ('viral: wrapped', r'wrapped'),
+        ('viral: roast mains', r'roasted|what your main says'),
+        ('viral: drops', r'real drop rates|what 1,000'),
+        ('viral: class rank', r'every (tank|sniper|assassin|support|controller|thrower|damage dealer|legendary|mythic|epic|super rare|rare)\w* ranked'
+                              r'|all \d+ (tanks|snipers|assassins|supports|controllers|throwers|damage dealers|legendar|mythic|epic)'),
+        ('viral: balance', r'balance update|who really got stronger|a week after the update'),
+        ('daily teaser', r"today's zoom puzzle|guess today's brawler"),
         ('viral: shadow quiz', r'guess the brawler by its shadow'),
         ('viral: zoom quiz', r'guess the brawler from this zoom'),
         ('viral: skin quiz', r'guess the brawler by its skin'),
@@ -57,17 +72,18 @@ def kind(text):
         ('viral: quiz', r'guess the brawler'),
         ('viral: broken', r'who got broken'),
         ('viral: ranks', r'what masters pick|what legends pick|what you pick'),
-        ('viral: modes', r'for every mode'),
-        ('viral: one-off', r'every brawler ranked|stop picking|inside these boxes'),
+        ('viral: modes', r'for every (ranked )?mode'),
+        ('ranked refresh', r'ranked just changed'),
+        ('viral: one-off', r'every brawler ranked|all \d+ brawlers ranked|stop picking|inside these boxes|everyone picks them'),
         ('viral: whats new', r'new brawlers & buffies|buffies'),
         ('new brawler', r'first stats|is \w+ (broken|good|bad)\?'),
         ('account rating', r"account worth|rating a top"),
-        ('weekly report', r'week \d|weekly|season \d+ week'),
+        ('weekly report', r'week \d|weekly|season \d+ week|ranked meta this week'),
         ('counter', r'how to (beat|counter)|struggling against|counters?\b'),
         ('map picks', r'best brawlers for|who to pick on'),
         ('build', r'\bbuild\b'),
         ('team', r'best team|team comp|\brun \w+ \+'),
-        ('bubble app', r'bubble'),
+        ('bubble app', r'bubble|coaches you|draft helper'),
     ]
     for name, rx in rules:
         if re.search(rx, t):
@@ -87,7 +103,7 @@ try:
             {'part': 'snippet,statistics', 'id': ids, 'key': key}))['items']:
         s = v['statistics']
         posts.append({'net': 'youtube', 'id': v['id'], 'at': v['snippet']['publishedAt'][:19],
-                      'title': v['snippet']['title'], 'kind': kind(v['snippet']['title'] + ' ' + v['snippet'].get('description', '')[:300]),
+                      'title': v['snippet']['title'], 'kind': kind(v['snippet']['title'], v['snippet'].get('description', '')[:300]),
                       'views': int(s.get('viewCount', 0)), 'likes': int(s.get('likeCount', 0)), 'comments': int(s.get('commentCount', 0)),
                       'url': f"https://youtube.com/shorts/{v['id']}"})
 except Exception as e:  # noqa: BLE001 -- one network down still leaves a report
@@ -100,7 +116,7 @@ try:
     for m in media:
         cap = m.get('caption') or ''
         posts.append({'net': 'instagram', 'id': m['id'], 'at': m['timestamp'][:19], 'title': cap.split('\n')[0][:100],
-                      'kind': kind(cap), 'views': None, 'likes': m.get('like_count', 0), 'comments': m.get('comments_count', 0),
+                      'kind': kind(cap.split('\n')[0], cap), 'views': None, 'likes': m.get('like_count', 0), 'comments': m.get('comments_count', 0),
                       'url': m.get('permalink')})
 except Exception as e:  # noqa: BLE001
     errors.append(f'Instagram: {e}')
@@ -109,7 +125,7 @@ try:
     for v in json.load(open(f'{HOME}/.brawlzone-tiktok-videos.json'))['videos']:
         text = v.get('title') or v.get('video_description') or ''
         posts.append({'net': 'tiktok', 'id': v['id'], 'at': datetime.datetime.fromtimestamp(int(v.get('create_time', 0)), datetime.timezone.utc).replace(tzinfo=None).isoformat(),
-                      'title': text.split('\n')[0][:100], 'kind': kind(text), 'views': v.get('view_count', 0),
+                      'title': text.split('\n')[0][:100], 'kind': kind(text.split('\n')[0], text), 'views': v.get('view_count', 0),
                       'likes': v.get('like_count', 0), 'comments': v.get('comment_count', 0), 'url': None})
 except Exception as e:  # noqa: BLE001
     errors.append(f'TikTok: {e}')
