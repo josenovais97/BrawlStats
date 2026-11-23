@@ -18,6 +18,7 @@ import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { mapNamer, modeNamer } from '@/lib/i18n-game';
+import { PageNotes } from '@/components/ui/page-notes';
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -223,6 +224,9 @@ export default async function ModeMapsPage({ params }: PageProps) {
           ))}
         </ul>
       </section>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How these picks are scored')} paragraphs={[t("Picks here are scored against {label}'s own average rather than the whole game's, because modes do not share a baseline and matching the mode average is no achievement. Small samples are shrunk toward that average, so a few lucky games cannot put a brawler on top.", { label: resolved.label })]} />
     </div>
   );
 }

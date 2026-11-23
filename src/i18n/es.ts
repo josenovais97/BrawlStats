@@ -5352,4 +5352,54 @@ export const ES: Record<string, string> = {
     "Los jugadores se leen en directo de la API oficial de Brawl Stars cuando abres una comparación. Los números de los brawlers salen de las mismas batallas de Competitivo de la muestra que la tier list, actualizados cada pocas horas.",
   "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
     "Aún no hay datos de refuerzos de este brawler. Aparecerán aquí cuando suficientes jugadores de los que seguimos le hayan comprado refuerzos.",
+  "About these comps":
+    "Sobre estos equipos",
+  "{count} trios clear both floors in {mode} right now. The best, {a}, {b} and {c}, wins {rate} of {battles} battles across {players} different players, {edge} points above the mode's average.":
+    "{count} tríos superan los dos mínimos en {mode} ahora mismo. El mejor, {a}, {b} y {c}, gana el {rate} de {battles} batallas entre {players} jugadores distintos, {edge} puntos por encima de la media del modo.",
+  "Why the floors: three friends who queue together bring the same comp every game, so a strong squad can write its own win rate into whatever it plays. A comp counts only once 15 different players have used it in at least 40 battles, so the list measures the brawlers rather than one group of friends.":
+    "Por qué hay mínimos: tres amigos que juegan juntos llevan el mismo equipo en cada partida, así que un grupo fuerte puede imponer su propia tasa de victorias a lo que juegue. Un equipo solo cuenta cuando 15 jugadores distintos lo han usado en al menos 40 batallas, así que la lista mide a los brawlers y no a un grupo de amigos.",
+  "Use the best comp as a starting point, not a rule: the draft helper picks around the brawlers already on the board, and every brawler page lists the allies it wins with.":
+    "Toma el mejor equipo como punto de partida, no como regla: el asistente de draft elige en torno a los brawlers que ya están en la partida, y cada página de brawler muestra los aliados con los que gana más.",
+  "The strongest trio anywhere right now is {a}, {b} and {c} in {mode}, {edge} points above that mode's average over {battles} battles.":
+    "El trío más fuerte ahora mismo es {a}, {b} y {c} en {mode}, {edge} puntos por encima de la media de ese modo en {battles} batallas.",
+  "How these picks are scored":
+    "Cómo se puntúan estas elecciones",
+  "Picks here are scored against {label}'s own average rather than the whole game's, because modes do not share a baseline and matching the mode average is no achievement. Small samples are shrunk toward that average, so a few lucky games cannot put a brawler on top.":
+    "Aquí las elecciones se puntúan frente a la media propia de {label} y no la de todo el juego, porque los modos no comparten una referencia y quedarse en la media del modo no tiene mérito. Las muestras pequeñas se acercan a esa media, así que unas pocas partidas con suerte no ponen a un brawler arriba.",
+  "How this comparison works":
+    "Cómo funciona esta comparación",
+  "Both brawlers are measured on the same sampled battles, and each win rate is adjusted against the sample's average, so the comparison is about the brawlers rather than who plays them. The head-to-head counts only battles where the two were on opposite teams, so it can disagree with their overall win rates: one can be stronger in general and still lose the matchup.":
+    "Los dos brawlers se miden con las mismas batallas de la muestra, y cada tasa de victorias se ajusta frente a la media de la muestra, así que la comparación trata de los brawlers y no de quién los juega. El cara a cara solo cuenta batallas en las que estaban en equipos contrarios, así que puede no coincidir con sus tasas generales: uno puede ser más fuerte en general y aun así perder el enfrentamiento.",
+  "How this is measured":
+    "Cómo se mide",
+  "Everything here is measured from what the players we sample have equipped, not listed from the shop's catalogue, so a skin or icon nobody uses does not show up, however new it is.":
+    "Todo lo de aquí se mide con lo que llevan equipado los jugadores de nuestra muestra, no se copia del catálogo de la tienda, así que una skin o un icono que nadie usa no aparece, por nuevo que sea.",
+  "About this page":
+    "Sobre esta página",
+  "News collects the Brawl Stars team's own posts and the changes we spot in the game data ourselves, such as a new brawler, gadget or skin turning up, each with a link to where it came from.":
+    "Noticias reúne las publicaciones del propio equipo de Brawl Stars y los cambios que detectamos nosotros en los datos del juego, como un brawler, un gadget o una skin nuevos, cada uno con un enlace a su origen.",
+  "This page sums up the latest update in our own words and numbers: which brawlers it touched and, once enough games are in, how their win rates moved in our sampled Ranked battles. The full patch notes are Supercell's own, linked from this page.":
+    "Esta página resume la última actualización con nuestras palabras y nuestros números: qué brawlers tocó y, cuando hay suficientes partidas, cómo se movieron sus tasas de victorias en nuestras batallas de Competitivo. Las notas completas son de Supercell y están enlazadas desde aquí.",
+  "Each change is measured as the brawler's adjusted win rate in the {n} days after an update against the {n} days before, from the same sampled Ranked battles. A buff that did nothing shows up as nothing, and updates too small or too recent to measure are listed separately instead of being dressed up as a result.":
+    "Cada cambio se mide como la tasa de victorias ajustada del brawler en los {n} días después de una actualización frente a los {n} días anteriores, con las mismas batallas de Competitivo de la muestra. Una mejora que no hizo nada aparece como nada, y las actualizaciones demasiado pequeñas o recientes para medirse van aparte en lugar de presentarse como un resultado.",
+  "About community events":
+    "Sobre los eventos de comunidad",
+  "Community events are the game's own: every player works toward one shared milestone, and everyone gets the reward once it is reached. The write-ups here come from the Brawl Stars wiki.":
+    "Los eventos de comunidad son del propio juego: todos los jugadores avanzan hacia un mismo objetivo y todos reciben la recompensa cuando se alcanza. Las descripciones de aquí vienen de la wiki de Brawl Stars.",
+  "About the daily reports":
+    "Sobre los informes diarios",
+  "Each daily report is written automatically from that day's sampled battles: which brawlers rose or fell, the standout picks and anything unusual in the numbers. Old reports keep their own address because their data windows roll past and cannot be recomputed later.":
+    "Cada informe diario se escribe automáticamente con las batallas de la muestra de ese día: qué brawlers subieron o bajaron, las elecciones destacadas y cualquier cosa rara en los números. Los informes antiguos conservan su propia dirección porque sus ventanas de datos pasan y no se pueden volver a calcular.",
+  "How this page works":
+    "Cómo funciona esta página",
+  "This page compares the last seven days with the seven before, from sampled Ranked battles: the best pick in each mode, the brawlers that changed tier and how far they moved. A tier change needs the brawler's meta score to cross a tier boundary, so small wobbles do not show up as news.":
+    "Esta página compara los últimos siete días con los siete anteriores, con batallas de Competitivo de la muestra: la mejor elección de cada modo, los brawlers que cambiaron de tier y cuánto se movieron. Un cambio de tier exige que la puntuación meta del brawler cruce un límite de tier, así que las pequeñas oscilaciones no aparecen como noticia.",
+  "How the roast works":
+    "Cómo funciona el roast",
+  "Your roast is written from your own public profile, read live from the official Brawl Stars API when you enter your tag: your most played brawler, your Ranked rank and your last games. The lines follow what your numbers actually show, so two accounts rarely get the same roast.":
+    "Tu roast se escribe a partir de tu perfil público, leído en directo de la API oficial de Brawl Stars cuando escribes tu tag: tu brawler más jugado, tu rango de Competitivo y tus últimas partidas. Las frases siguen lo que muestran tus números, así que dos cuentas rara vez reciben el mismo roast.",
+  "How the value is worked out":
+    "Cómo se calcula el valor",
+  "The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.":
+    "El valor suma las monedas y los puntos de fuerza que cuesta subir cada uno de tus brawlers a su nivel actual, más cada habilidad estelar, gadget, refuerzo e hipercarga que tienes, a los precios del propio juego. La clasificación compara ese total con los jugadores activos que seguimos.",
 };

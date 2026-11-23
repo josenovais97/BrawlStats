@@ -10,7 +10,7 @@ import { PageHeading } from '@/components/ui/section-heading';
 
 import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import { MIN_INDEXABLE_COMPS } from '@/lib/comps-indexing';
 import { getTeamComps, type ModeComps } from '@/lib/stats';
@@ -18,6 +18,7 @@ import type { BABrawler } from '@/types/brawlapi';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -84,6 +85,10 @@ export default async function ModeCompsPage({ params }: PageProps) {
   const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
   const { comps } = resolved;
 
+  const best = comps.comps[0];
+  const edge = best ? Math.round((best.winRate - comps.baseline) * 1000) / 10 : 0;
+  const nameOf = (id: number) => titleCaseLabel(brawlerMeta.get(id)?.name ?? '');
+
   return (
     <div className="space-y-6">
       <JsonLd
@@ -131,6 +136,13 @@ export default async function ModeCompsPage({ params }: PageProps) {
       />
 
       <p className="text-xs leading-relaxed text-muted">{t('A comp is listed once 15 different players have used it in at least 40 battles, so one strong squad cannot carry it. Ranked and ladder battles both count.')}</p>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About these comps')} paragraphs={[
+        best && edge > 0 ? t("{count} trios clear both floors in {mode} right now. The best, {a}, {b} and {c}, wins {rate} of {battles} battles across {players} different players, {edge} points above the mode's average.", { count: comps.comps.length, mode: t(resolved.label), a: nameOf(best.brawlerIds[0]), b: nameOf(best.brawlerIds[1]), c: nameOf(best.brawlerIds[2]), rate: formatPercent(best.winRate), battles: formatNumber(best.battles), players: formatNumber(best.players), edge: formatNumber(edge) }) : '',
+        t("Why the floors: three friends who queue together bring the same comp every game, so a strong squad can write its own win rate into whatever it plays. A comp counts only once 15 different players have used it in at least 40 battles, so the list measures the brawlers rather than one group of friends."),
+        t("Use the best comp as a starting point, not a rule: the draft helper picks around the brawlers already on the board, and every brawler page lists the allies it wins with."),
+      ]} />
     </div>
   );
 }

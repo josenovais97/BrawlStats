@@ -33,6 +33,7 @@ import type { BrawlerStatRow, Tier } from '@/types/stats';
 import { andList, getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 interface PageProps {
   params: Promise<{ pair: string }>;
@@ -408,6 +409,9 @@ export default async function ComparePage({ params }: PageProps) {
           ))}
         </dl>
       </section>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How this comparison works')} paragraphs={[t("Both brawlers are measured on the same sampled battles, and each win rate is adjusted against the sample's average, so the comparison is about the brawlers rather than who plays them. The head-to-head counts only battles where the two were on opposite teams, so it can disagree with their overall win rates: one can be stronger in general and still lose the matchup.")]} />
     </div>
   );
 }

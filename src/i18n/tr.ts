@@ -5352,4 +5352,54 @@ export const TR: Record<string, string> = {
     "Bir karşılaştırma açtığında oyuncular resmi Brawl Stars API'sinden canlı okunur. Savaşçı sayıları, tier listesiyle aynı örneklenmiş Aşamalı maçlarından gelir ve birkaç saatte bir güncellenir.",
   "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
     "Bu savaşçı için henüz eşya verisi yok. Takip ettiğimiz yeterli sayıda oyuncu ona eşya aldığında burada görünecek.",
+  "About these comps":
+    "Bu takımlar hakkında",
+  "{count} trios clear both floors in {mode} right now. The best, {a}, {b} and {c}, wins {rate} of {battles} battles across {players} different players, {edge} points above the mode's average.":
+    "Şu anda {mode} modunda {count} üçlü iki eşiği de geçiyor. En iyisi {a}, {b} ve {c}: {players} farklı oyuncunun oynadığı {battles} maçın {rate} kadarını kazanıyor, modun ortalamasının {edge} puan üstünde.",
+  "Why the floors: three friends who queue together bring the same comp every game, so a strong squad can write its own win rate into whatever it plays. A comp counts only once 15 different players have used it in at least 40 battles, so the list measures the brawlers rather than one group of friends.":
+    "Neden eşik var: birlikte oynayan üç arkadaş her maça aynı takımla girer, böylece güçlü bir grup oynadığı her şeye kendi kazanma oranını yazabilir. Bir takım ancak 15 farklı oyuncu onu en az 40 maçta kullandıktan sonra sayılır; böylece liste bir arkadaş grubunu değil savaşçıları ölçer.",
+  "Use the best comp as a starting point, not a rule: the draft helper picks around the brawlers already on the board, and every brawler page lists the allies it wins with.":
+    "En iyi takımı kural değil, başlangıç noktası olarak kullan: draft yardımcısı sahadaki savaşçılara göre seçim yapar ve her savaşçı sayfası birlikte daha çok kazandığı takım arkadaşlarını gösterir.",
+  "The strongest trio anywhere right now is {a}, {b} and {c} in {mode}, {edge} points above that mode's average over {battles} battles.":
+    "Şu anda en güçlü üçlü {mode} modunda {a}, {b} ve {c}: {battles} maçta o modun ortalamasının {edge} puan üstünde.",
+  "How these picks are scored":
+    "Bu seçimler nasıl puanlanır",
+  "Picks here are scored against {label}'s own average rather than the whole game's, because modes do not share a baseline and matching the mode average is no achievement. Small samples are shrunk toward that average, so a few lucky games cannot put a brawler on top.":
+    "Buradaki seçimler oyunun geneline değil {label} modunun kendi ortalamasına göre puanlanır, çünkü modların ortak bir referansı yoktur ve modun ortalamasında kalmak başarı sayılmaz. Küçük örneklemler bu ortalamaya doğru çekilir, böylece birkaç şanslı maç bir savaşçıyı zirveye taşıyamaz.",
+  "How this comparison works":
+    "Bu karşılaştırma nasıl çalışır",
+  "Both brawlers are measured on the same sampled battles, and each win rate is adjusted against the sample's average, so the comparison is about the brawlers rather than who plays them. The head-to-head counts only battles where the two were on opposite teams, so it can disagree with their overall win rates: one can be stronger in general and still lose the matchup.":
+    "İki savaşçı da aynı örneklenmiş maçlarla ölçülür ve her kazanma oranı örneklemin ortalamasına göre düzeltilir; böylece karşılaştırma onları kimin oynadığıyla değil savaşçıların kendisiyle ilgilidir. Kafa kafaya kayıt yalnızca ikisinin karşı takımlarda olduğu maçları sayar, bu yüzden genel kazanma oranlarıyla çelişebilir: biri genelde daha güçlü olup yine de bu eşleşmeyi kaybedebilir.",
+  "How this is measured":
+    "Nasıl ölçülür",
+  "Everything here is measured from what the players we sample have equipped, not listed from the shop's catalogue, so a skin or icon nobody uses does not show up, however new it is.":
+    "Buradaki her şey, mağaza kataloğundan değil, örneklediğimiz oyuncuların kuşandıklarından ölçülür; bu yüzden kimsenin kullanmadığı bir kostüm ya da simge, ne kadar yeni olursa olsun görünmez.",
+  "About this page":
+    "Bu sayfa hakkında",
+  "News collects the Brawl Stars team's own posts and the changes we spot in the game data ourselves, such as a new brawler, gadget or skin turning up, each with a link to where it came from.":
+    "Haberler, Brawl Stars ekibinin kendi paylaşımlarını ve oyun verisinde kendimiz fark ettiğimiz değişiklikleri (yeni bir savaşçı, aksesuar ya da kostümün ortaya çıkması gibi) kaynağına bağlantıyla bir araya getirir.",
+  "This page sums up the latest update in our own words and numbers: which brawlers it touched and, once enough games are in, how their win rates moved in our sampled Ranked battles. The full patch notes are Supercell's own, linked from this page.":
+    "Bu sayfa son güncellemeyi kendi sözlerimiz ve sayılarımızla özetler: hangi savaşçılara dokunduğunu ve yeterince maç birikince örneklediğimiz Aşamalı maçlarında kazanma oranlarının nasıl değiştiğini. Tam yama notları Supercell'e aittir ve bu sayfadan bağlantısı verilir.",
+  "Each change is measured as the brawler's adjusted win rate in the {n} days after an update against the {n} days before, from the same sampled Ranked battles. A buff that did nothing shows up as nothing, and updates too small or too recent to measure are listed separately instead of being dressed up as a result.":
+    "Her değişiklik, savaşçının bir güncellemeden sonraki {n} gündeki düzeltilmiş kazanma oranının önceki {n} günle karşılaştırılmasıyla, aynı örneklenmiş Aşamalı maçlarından ölçülür. Hiçbir şey değiştirmeyen bir güçlendirme hiçbir şey olarak görünür; ölçülemeyecek kadar küçük ya da yeni güncellemeler sonuç gibi sunulmak yerine ayrı listelenir.",
+  "About community events":
+    "Topluluk etkinlikleri hakkında",
+  "Community events are the game's own: every player works toward one shared milestone, and everyone gets the reward once it is reached. The write-ups here come from the Brawl Stars wiki.":
+    "Topluluk etkinlikleri oyunun kendisine aittir: tüm oyuncular ortak bir hedefe doğru ilerler ve hedefe ulaşıldığında herkes ödülü alır. Buradaki açıklamalar Brawl Stars wiki'sinden gelir.",
+  "About the daily reports":
+    "Günlük raporlar hakkında",
+  "Each daily report is written automatically from that day's sampled battles: which brawlers rose or fell, the standout picks and anything unusual in the numbers. Old reports keep their own address because their data windows roll past and cannot be recomputed later.":
+    "Her günlük rapor o günün örneklenmiş maçlarından otomatik olarak yazılır: hangi savaşçıların yükselip düştüğü, öne çıkan seçimler ve sayılardaki olağandışı her şey. Eski raporlar kendi adreslerini korur, çünkü veri pencereleri geçer ve sonradan yeniden hesaplanamaz.",
+  "How this page works":
+    "Bu sayfa nasıl çalışır",
+  "This page compares the last seven days with the seven before, from sampled Ranked battles: the best pick in each mode, the brawlers that changed tier and how far they moved. A tier change needs the brawler's meta score to cross a tier boundary, so small wobbles do not show up as news.":
+    "Bu sayfa son yedi günü önceki yedi günle, örneklenmiş Aşamalı maçlarından karşılaştırır: her moddaki en iyi seçim, tier değiştiren savaşçılar ve ne kadar hareket ettikleri. Tier değişikliği için savaşçının meta puanının bir tier sınırını geçmesi gerekir; böylece küçük dalgalanmalar haber olmaz.",
+  "How the roast works":
+    "Roast nasıl çalışır",
+  "Your roast is written from your own public profile, read live from the official Brawl Stars API when you enter your tag: your most played brawler, your Ranked rank and your last games. The lines follow what your numbers actually show, so two accounts rarely get the same roast.":
+    "Roast'un, etiketini girdiğinde resmi Brawl Stars API'sinden canlı okunan herkese açık profilinden yazılır: en çok oynadığın savaşçı, Aşamalı rankın ve son maçların. Cümleler sayılarının gerçekten gösterdiğini takip eder, bu yüzden iki hesap nadiren aynı roast'u alır.",
+  "How the value is worked out":
+    "Değer nasıl hesaplanır",
+  "The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.":
+    "Değer, her savaşçını mevcut güç seviyesine getirmenin altın ve güç puanı maliyetini, sahip olduğun her yıldız gücü, aksesuar, eşya ve hiper şarjla birlikte oyunun kendi fiyatlarıyla toplar. Sıralama bu toplamı takip ettiğimiz aktif oyuncularla karşılaştırır.",
 };

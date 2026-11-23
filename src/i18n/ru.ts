@@ -5353,4 +5353,54 @@ export const RU: Record<string, string> = {
     "Данные игроков загружаются напрямую из официального API Brawl Stars, когда вы открываете сравнение. Цифры по бойцам берутся из тех же собранных ранговых боёв, что и тир-лист, и обновляются каждые несколько часов.",
   "No gear data for this brawler yet. It shows here once enough of the players we follow have bought gears for it.":
     "Для этого бойца пока нет данных о снаряжении. Они появятся здесь, когда достаточно игроков, за которыми мы следим, купят ему снаряжение.",
+  "About these comps":
+    "Об этих составах",
+  "{count} trios clear both floors in {mode} right now. The best, {a}, {b} and {c}, wins {rate} of {battles} battles across {players} different players, {edge} points above the mode's average.":
+    "Сейчас в режиме «{mode}» оба порога проходят составов: {count}. Лучший — {a}, {b} и {c}: {rate} побед в {battles} боях, разных игроков: {players}, на {edge} п. выше среднего по режиму.",
+  "Why the floors: three friends who queue together bring the same comp every game, so a strong squad can write its own win rate into whatever it plays. A comp counts only once 15 different players have used it in at least 40 battles, so the list measures the brawlers rather than one group of friends.":
+    "Зачем пороги: трое друзей, играющих вместе, берут один и тот же состав в каждом бою, и сильная команда может вписать свой процент побед во что угодно. Состав учитывается, только когда его использовали 15 разных игроков минимум в 40 боях, поэтому список измеряет бойцов, а не одну компанию друзей.",
+  "Use the best comp as a starting point, not a rule: the draft helper picks around the brawlers already on the board, and every brawler page lists the allies it wins with.":
+    "Считайте лучший состав отправной точкой, а не правилом: помощник по драфту подбирает пики под бойцов, которые уже выбраны, а на странице каждого бойца есть союзники, с которыми он чаще побеждает.",
+  "The strongest trio anywhere right now is {a}, {b} and {c} in {mode}, {edge} points above that mode's average over {battles} battles.":
+    "Самое сильное трио сейчас — {a}, {b} и {c} в режиме «{mode}»: на {edge} п. выше среднего по этому режиму в {battles} боях.",
+  "How these picks are scored":
+    "Как оцениваются эти пики",
+  "Picks here are scored against {label}'s own average rather than the whole game's, because modes do not share a baseline and matching the mode average is no achievement. Small samples are shrunk toward that average, so a few lucky games cannot put a brawler on top.":
+    "Пики здесь оцениваются относительно среднего по режиму «{label}», а не по всей игре, потому что у режимов нет общей точки отсчёта, а держаться на среднем уровне режима — не достижение. Маленькие выборки подтягиваются к этому среднему, так что несколько удачных боёв не выведут бойца наверх.",
+  "How this comparison works":
+    "Как работает это сравнение",
+  "Both brawlers are measured on the same sampled battles, and each win rate is adjusted against the sample's average, so the comparison is about the brawlers rather than who plays them. The head-to-head counts only battles where the two were on opposite teams, so it can disagree with their overall win rates: one can be stronger in general and still lose the matchup.":
+    "Оба бойца измеряются на одних и тех же собранных боях, а каждый процент побед скорректирован относительно среднего по выборке, поэтому сравнение — о бойцах, а не о тех, кто ими играет. Личные встречи учитывают только бои, где они были в разных командах, поэтому могут расходиться с общим процентом побед: один может быть сильнее в целом и всё равно проигрывать в этой паре.",
+  "How this is measured":
+    "Как это измеряется",
+  "Everything here is measured from what the players we sample have equipped, not listed from the shop's catalogue, so a skin or icon nobody uses does not show up, however new it is.":
+    "Всё здесь измерено по тому, что надето у игроков из нашей выборки, а не взято из каталога магазина, поэтому скин или значок, которым никто не пользуется, здесь не появится, каким бы новым он ни был.",
+  "About this page":
+    "Об этой странице",
+  "News collects the Brawl Stars team's own posts and the changes we spot in the game data ourselves, such as a new brawler, gadget or skin turning up, each with a link to where it came from.":
+    "В новостях собраны публикации самой команды Brawl Stars и изменения, которые мы сами замечаем в данных игры, например появление нового бойца, гаджета или скина, каждое со ссылкой на источник.",
+  "This page sums up the latest update in our own words and numbers: which brawlers it touched and, once enough games are in, how their win rates moved in our sampled Ranked battles. The full patch notes are Supercell's own, linked from this page.":
+    "Эта страница пересказывает последнее обновление нашими словами и цифрами: каких бойцов оно затронуло и, когда наберётся достаточно боёв, как изменился их процент побед в наших собранных ранговых боях. Полный список изменений — от Supercell, ссылка на него есть на этой странице.",
+  "Each change is measured as the brawler's adjusted win rate in the {n} days after an update against the {n} days before, from the same sampled Ranked battles. A buff that did nothing shows up as nothing, and updates too small or too recent to measure are listed separately instead of being dressed up as a result.":
+    "Каждое изменение измеряется как скорректированный процент побед бойца за {n} дн. после обновления против {n} дн. до него, по тем же собранным ранговым боям. Усиление, которое ничего не дало, так и показывается, а обновления, слишком мелкие или свежие для измерения, вынесены отдельно, а не выдаются за результат.",
+  "About community events":
+    "О событиях сообщества",
+  "Community events are the game's own: every player works toward one shared milestone, and everyone gets the reward once it is reached. The write-ups here come from the Brawl Stars wiki.":
+    "События сообщества — часть самой игры: все игроки вместе идут к одной цели, и все получают награду, когда она достигнута. Описания здесь взяты из вики Brawl Stars.",
+  "About the daily reports":
+    "О ежедневных отчётах",
+  "Each daily report is written automatically from that day's sampled battles: which brawlers rose or fell, the standout picks and anything unusual in the numbers. Old reports keep their own address because their data windows roll past and cannot be recomputed later.":
+    "Каждый ежедневный отчёт пишется автоматически по собранным боям этого дня: какие бойцы выросли или упали, заметные пики и всё необычное в цифрах. Старые отчёты сохраняют свой адрес, потому что их окна данных уходят в прошлое и пересчитать их потом нельзя.",
+  "How this page works":
+    "Как работает эта страница",
+  "This page compares the last seven days with the seven before, from sampled Ranked battles: the best pick in each mode, the brawlers that changed tier and how far they moved. A tier change needs the brawler's meta score to cross a tier boundary, so small wobbles do not show up as news.":
+    "Эта страница сравнивает последние семь дней с семью предыдущими по собранным ранговым боям: лучший пик в каждом режиме, бойцы, сменившие тир, и насколько они сдвинулись. Чтобы тир сменился, мета-оценка бойца должна перейти границу тира, поэтому мелкие колебания не становятся новостью.",
+  "How the roast works":
+    "Как работает роаст",
+  "Your roast is written from your own public profile, read live from the official Brawl Stars API when you enter your tag: your most played brawler, your Ranked rank and your last games. The lines follow what your numbers actually show, so two accounts rarely get the same roast.":
+    "Ваш роаст пишется по вашему публичному профилю, который загружается напрямую из официального API Brawl Stars, когда вы вводите тег: самый игранный боец, ранг в ранговых боях и последние бои. Фразы следуют тому, что на самом деле показывают ваши цифры, поэтому два аккаунта редко получают одинаковый роаст.",
+  "How the value is worked out":
+    "Как считается стоимость",
+  "The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.":
+    "Стоимость складывает монеты и очки силы, нужные, чтобы довести каждого вашего бойца до текущего уровня силы, плюс каждую звёздную силу, гаджет, снаряжение и гиперзаряд, которые у вас есть, по ценам самой игры. Рейтинг сравнивает эту сумму с активными игроками, за которыми мы следим.",
 };

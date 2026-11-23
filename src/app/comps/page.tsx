@@ -8,13 +8,14 @@ import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 
 import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import { getTeamComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /* Matches READ_CACHE_SECONDS: a longer declaration would be capped by the
    data cache inside it anyway. See trap 2 in AGENTS.md. */
@@ -40,6 +41,12 @@ export default async function CompsPage() {
   ]);
 
   const withComps = modes.filter((mode) => mode.comps.length > 0);
+
+  const top = withComps
+    .map((m) => ({ m, c: m.comps[0], edge: Math.round((m.comps[0].winRate - m.baseline) * 1000) / 10 }))
+    .filter((x) => x.edge > 0)
+    .sort((x, y) => y.edge - x.edge)[0];
+  const nameOf = (id: number) => titleCaseLabel(brawlerMeta.get(id)?.name ?? '');
 
   return (
     <div className="space-y-8">
@@ -98,6 +105,12 @@ export default async function CompsPage() {
           </section>
         );
       })}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About these comps')} paragraphs={[
+        top ? t("The strongest trio anywhere right now is {a}, {b} and {c} in {mode}, {edge} points above that mode's average over {battles} battles.", { a: nameOf(top.c.brawlerIds[0]), b: nameOf(top.c.brawlerIds[1]), c: nameOf(top.c.brawlerIds[2]), mode: t(modeLabel(modeMeta, top.m.mode)), edge: formatNumber(top.edge), battles: formatNumber(top.c.battles) }) : '',
+        t("Why the floors: three friends who queue together bring the same comp every game, so a strong squad can write its own win rate into whatever it plays. A comp counts only once 15 different players have used it in at least 40 battles, so the list measures the brawlers rather than one group of friends."),
+      ]} />
     </div>
   );
 }

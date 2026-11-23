@@ -25,6 +25,7 @@ import type { BABrawler } from '@/types/brawlapi';
 import { getT, type T } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /**
  * Whether the balance changes in an update actually did anything.
@@ -141,6 +142,9 @@ export default async function PatchesPage() {
           </ul>
         </section>
       ) : null}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How this is measured')} paragraphs={[t("Each change is measured as the brawler's adjusted win rate in the {n} days after an update against the {n} days before, from the same sampled Ranked battles. A buff that did nothing shows up as nothing, and updates too small or too recent to measure are listed separately instead of being dressed up as a result.", { n: PATCH_WINDOW_DAYS })]} />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import type { MetaMover, ModeBestPicks, Tier } from '@/types/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /* Daily: the movers are recomputed from each day's snapshot, so a weekly page
    that only changed on Mondays would sit stale for six days out of seven. */
@@ -298,6 +299,9 @@ export default async function MetaReportPage() {
           })}
         </section>
       ) : null}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How this page works')} paragraphs={[t("This page compares the last seven days with the seven before, from sampled Ranked battles: the best pick in each mode, the brawlers that changed tier and how far they moved. A tier change needs the brawler's meta score to cross a tier boundary, so small wobbles do not show up as news.")]} />
     </div>
   );
 }

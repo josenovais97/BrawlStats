@@ -9,6 +9,7 @@ import { ensureTodayReport, listDailyReports } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 export const revalidate = 3600;
 
@@ -79,6 +80,9 @@ export default async function DailyArchivePage() {
           ))}
         </ul>
       )}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About the daily reports')} paragraphs={[t("Each daily report is written automatically from that day's sampled battles: which brawlers rose or fell, the standout picks and anything unusual in the numbers. Old reports keep their own address because their data windows roll past and cannot be recomputed later.")]} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { AccountValueForm } from '@/components/account-value/tag-form';
 import { ROAST_PUBLIC } from '@/lib/roast-data';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /**
  * Roast My Account's front door (2026-10-27): a tag box and what happens next.
@@ -59,6 +60,9 @@ export default function RoastLanding() {
       <p className="text-xs leading-relaxed text-muted">
         {t('It is a joke: the roast is about the account and the gameplay, never about the person. It uses the same public stats as your profile. Unofficial fan project, not affiliated with Supercell.')}
       </p>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How the roast works')} paragraphs={[t("Your roast is written from your own public profile, read live from the official Brawl Stars API when you enter your tag: your most played brawler, your Ranked rank and your last games. The lines follow what your numbers actually show, so two accounts rarely get the same roast.")]} />
     </div>
   );
 }

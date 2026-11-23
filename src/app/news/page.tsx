@@ -14,6 +14,7 @@ import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/news' },
@@ -144,6 +145,9 @@ export default async function UpdatesPage() {
           </ol>
         </section>
       ) : null}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About this page')} paragraphs={[t("News collects the Brawl Stars team's own posts and the changes we spot in the game data ourselves, such as a new brawler, gadget or skin turning up, each with a link to where it came from.")]} />
     </div>
   );
 }

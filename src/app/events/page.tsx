@@ -6,6 +6,7 @@ import { PageHeading } from '@/components/ui/section-heading';
 import { getCommunityEvents } from '@/lib/community-events';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /**
  * Community events: the game-wide challenges the whole player base grinds.
@@ -69,6 +70,9 @@ export default async function EventsPage() {
       ) : (
         <CommunityEvents events={community} />
       )}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About community events')} paragraphs={[t("Community events are the game's own: every player works toward one shared milestone, and everyone gets the reward once it is reached. The write-ups here come from the Brawl Stars wiki.")]} />
     </div>
   );
 }

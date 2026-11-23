@@ -8,6 +8,7 @@ import { fankitSkin } from '@/lib/fankit';
 import { getSkinCatalogue } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 export const metadata: Metadata = {
   title: 'Every Brawl Stars skin, ranked by how many players wear it',
@@ -54,6 +55,9 @@ export default async function SkinCataloguePage() {
       ) : (
         <p className="card p-6 text-sm text-muted">{t('Nothing sampled yet. The pool refreshes every two hours.')}</p>
       )}
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How this is measured')} paragraphs={[t("Everything here is measured from what the players we sample have equipped, not listed from the shop's catalogue, so a skin or icon nobody uses does not show up, however new it is.")]} />
     </div>
   );
 }

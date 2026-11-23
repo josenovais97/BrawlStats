@@ -5,6 +5,7 @@ import { AccountValueForm } from '@/components/account-value/tag-form';
 import { currentMonth } from '@/lib/site';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /**
  * The account value calculator's front door: a tag box, and what it measures.
@@ -61,6 +62,9 @@ export default function AccountValueLanding() {
       <p className="text-xs leading-relaxed text-muted">
         {t('Values are in-game currency, not money: what it costs in coins and power points to build the same account. Buffies and skins are not included, because they also come from drops. Unofficial fan project, not affiliated with Supercell.')}
       </p>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How the value is worked out')} paragraphs={[t("The value adds up the coins and power points it takes to bring each of your brawlers to its current power level, plus every star power, gadget, gear and hypercharge you own, at the game's own prices. The ranking compares that total with the active players we track.")]} />
     </div>
   );
 }

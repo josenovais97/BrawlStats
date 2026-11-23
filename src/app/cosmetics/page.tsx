@@ -8,6 +8,7 @@ import { getIconCatalogue, getSkinCatalogue } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 export const metadata: Metadata = {
   title: 'Brawl Stars cosmetics: which skins and icons players actually use',
@@ -109,6 +110,9 @@ export default async function CosmeticsPage() {
           <p>{t('Skin shares are per brawler, icon shares per player. Default skins are left out.')}</p>
         </div>
       </section>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('How this is measured')} paragraphs={[t("Everything here is measured from what the players we sample have equipped, not listed from the shop's catalogue, so a skin or icon nobody uses does not show up, however new it is.")]} />
     </div>
   );
 }

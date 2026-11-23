@@ -16,6 +16,7 @@ import { currentMonth } from '@/lib/site';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
+import { PageNotes } from '@/components/ui/page-notes';
 
 /*
  * Titled for the searches that already find this page ("brawl stars update",
@@ -307,6 +308,9 @@ export default async function ReleaseNotesPage() {
         {'. '}
         <Link href={lp('/patches')} className="text-brand hover:underline">{t('Did the balance changes work? See the measured impact')}</Link>
       </p>
+
+      {/* What this page shows and how, in words (2026-11-23, AdSense "low value content"). */}
+      <PageNotes title={t('About this page')} paragraphs={[t("This page sums up the latest update in our own words and numbers: which brawlers it touched and, once enough games are in, how their win rates moved in our sampled Ranked battles. The full patch notes are Supercell's own, linked from this page.")]} />
     </div>
   );
 }
