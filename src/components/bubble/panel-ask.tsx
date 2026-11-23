@@ -14,7 +14,7 @@ import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
 import { buildIndex, parseAsk, type AskIntent, type AskParsed } from '@/lib/bubble-ask';
 import type { UiKey } from '@/lib/bubble-ui-en';
-import { panelTrack } from '@/lib/panel-telemetry';
+import { appQuest, panelTrack } from '@/lib/panel-telemetry';
 import type { TierBrawlerDetail, TierBrawlerRef } from '@/lib/tier-brawler';
 
 /**
@@ -170,6 +170,7 @@ export function PanelAsk({
     const answer = answerFor(parsed ?? parseAsk(clean, index));
     // What gets asked, and how often it is understood: the kind only, never the text.
     panelTrack('panel_ask', { kind: answer.kind, typed: !parsed });
+    if (answer.kind !== 'unknown') appQuest('ask');
     setTurns((list) => [...list.slice(-7), { id: Date.now(), q: clean, answer }]);
     setText('');
   };

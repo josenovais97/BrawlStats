@@ -134,6 +134,8 @@ object FeedView {
                 }.start()
                 Thread {
                     Feed.send(app, post.id, next)
+                    // 1.43: a reaction counts toward Bubble Pass.
+                    if (next != null) runCatching { Pass.event(app, "react") }
                     activity.runOnUiThread {
                         if (!activity.isFinishing && !activity.isDestroyed) paintReactions(activity, view, post)
                     }

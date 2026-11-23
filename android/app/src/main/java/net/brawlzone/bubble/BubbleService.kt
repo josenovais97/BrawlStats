@@ -100,7 +100,7 @@ class BubbleService : Service() {
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             handler.post {
                 when (key) {
-                    BubbleLook.KEY_SIZE, BubbleLook.KEY_FACE -> rebuildBubble()
+                    BubbleLook.KEY_SIZE, BubbleLook.KEY_FACE, BubbleLook.KEY_RING -> rebuildBubble()
                     // 1.42: a new theme repaints the ring and the panel's accent.
                     BubbleLook.KEY_THEME -> {
                         rebuildBubble()
@@ -583,6 +583,22 @@ class BubbleService : Service() {
         val host = FrameLayout(this).apply {
             setPadding(pad, pad, pad, pad)
             addView(art, FrameLayout.LayoutParams(badge, badge))
+        }
+        /*
+         * A Bubble Pass ring (1.43): on the badge's edge, filling the window's
+         * shadow margin, above the art and under the corner badges. Legendary
+         * rings turn on a hardware layer: the GPU rotates a cached picture.
+         */
+        Rings.byId(BubbleLook.ring(this))?.let { ring ->
+            val ringView = RingView(this, ring, pad * 0.62f).apply {
+                elevation = dp(7).toFloat()
+                outlineProvider = null
+            }
+            host.addView(
+                ringView,
+                FrameLayout.LayoutParams(badge + pad * 2, badge + pad * 2).apply { setMargins(-pad, -pad, -pad, -pad) },
+            )
+            if (ring.legendary) ringView.spin()
         }
 
         val params = WindowManager.LayoutParams(
@@ -2132,6 +2148,17 @@ class BubbleService : Service() {
                 reviewPending = null
                 paintReviewBadge()
             }
+            // 1.43: a post-game review read counts toward Bubble Pass.
+            val app = applicationContext
+            Thread { runCatching { Pass.event(app, "review") } }.start()
+        }
+
+        /** The panel reports a Bubble Pass app quest (1.43): "draft", "ask" or "counters". */
+        @JavascriptInterface
+        fun quest(kind: String) {
+            if (kind !in setOf("draft", "ask", "counters")) return
+            val app = applicationContext
+            Thread { runCatching { Pass.event(app, kind) } }.start()
         }
 
         /**

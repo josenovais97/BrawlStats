@@ -10,7 +10,7 @@ import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/compo
 import { sitePrefix } from '@/components/bubble/panel-counters';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { UiKey } from '@/lib/bubble-ui-en';
-import { panelTrack } from '@/lib/panel-telemetry';
+import { appQuest, panelTrack } from '@/lib/panel-telemetry';
 import { slugify } from '@/lib/slugs';
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 
@@ -248,7 +248,12 @@ export function PanelDraft({
     const timer = setTimeout(() => {
       fetch(`/api/bubble/chance?${params}`, { signal: controller.signal })
         .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-        .then((data: { chance: number | null }) => setChance(typeof data.chance === 'number' ? data.chance : null))
+        .then((data: { chance: number | null }) => {
+          const value = typeof data.chance === 'number' ? data.chance : null;
+          setChance(value);
+          // Bubble Pass (app 1.43): a draft read with picks on both sides.
+          if (value !== null) appQuest('draft');
+        })
         .catch((err) => {
           if ((err as Error).name !== 'AbortError') setChance(null);
         });

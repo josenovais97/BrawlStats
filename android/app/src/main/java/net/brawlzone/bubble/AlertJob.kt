@@ -126,6 +126,8 @@ class AlertJob : JobService() {
             // 1.42: the squad feed's new posts, and friends' reactions on posts about the player.
             Feed.observe(context, season)
             Feed.pollAbout(context, post)
+            // 1.43: Bubble Pass quests, rings and the new week.
+            runCatching { Pass.update(context, post) }
             if (me != null) Versus.fetch(context)
             Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)

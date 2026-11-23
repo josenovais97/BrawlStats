@@ -111,6 +111,10 @@ object Notify {
     fun postGoal(context: Context, id: Int, title: String, text: String) =
         post(context, CH_GOAL, id, title, text, Shortcuts.ACTION_PLAY)
 
+    /** Bubble Pass (1.43): a ring unlocked, or a new week. Tapping opens the pass. */
+    fun postPass(context: Context, id: Int, title: String, text: String) =
+        post(context, CH_PROGRESS, id, title, text, Pass.ACTION_OPEN)
+
     /** A friend's rank-up (1.40, Friends). Tapping opens the app, where the ladder is. */
     fun postFriend(context: Context, id: Int, title: String, text: String) =
         post(context, CH_FRIENDS, id, title, text, null)

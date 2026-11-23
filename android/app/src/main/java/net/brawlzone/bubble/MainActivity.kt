@@ -137,6 +137,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.feed_all).setOnClickListener { startActivity(Intent(this, FeedActivity::class.java)) }
         findViewById<View>(R.id.feed_caption).setOnClickListener { startActivity(Intent(this, FeedActivity::class.java)) }
         if (intent?.action == Feed.ACTION_OPEN) startActivity(Intent(this, FeedActivity::class.java))
+        // 1.43: a Bubble Pass notification opens the pass.
+        if (intent?.action == Pass.ACTION_OPEN) startActivity(Intent(this, PassActivity::class.java))
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -284,6 +286,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, FeedActivity::class.java))
             return
         }
+        if (intent.action == Pass.ACTION_OPEN) {
+            startActivity(Intent(this, PassActivity::class.java))
+            return
+        }
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
@@ -341,6 +347,8 @@ class MainActivity : AppCompatActivity() {
             test.setOnClickListener {
                 askForNotifications()
                 Thread { Notify.test(applicationContext) }.start()
+                // 1.43: a Bubble Pass ring unlock, revealed when the pass opens.
+                Thread { Pass.test(applicationContext) }.start()
                 // With the bubble up: the newest Ranked game as a post-game review (pulse, badge, panel).
                 if (BubbleService.running) {
                     runCatching { startService(Intent(this, BubbleService::class.java).setAction(BubbleService.ACTION_TEST_REVIEW)) }
@@ -370,6 +378,7 @@ class MainActivity : AppCompatActivity() {
         val granted = paintStatus()
         restricted.visibility = if (!granted && asked) View.VISIBLE else View.GONE
         paintWidgets()
+        paintRingRow()
         Stats.opened(this, Account.tag(this).isNotEmpty())
     }
 

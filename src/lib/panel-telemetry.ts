@@ -36,3 +36,16 @@ export function panelTrackOpen(
   const timer = window.setTimeout(() => panelTrack('panel_open', data()), 2500);
   return () => window.clearTimeout(timer);
 }
+
+/**
+ * Tells the app a Bubble Pass quest moved (app 1.43): "draft" (the board read
+ * a draft with picks on both sides), "ask" (an answer shown), "counters" (a
+ * brawler's counters opened). Older apps have no such hook and ignore it.
+ */
+export function appQuest(kind: 'draft' | 'ask' | 'counters'): void {
+  try {
+    (window as Window & { BrawlZoneApp?: { quest?: (k: string) => void } }).BrawlZoneApp?.quest?.(kind);
+  } catch {
+    // Outside the app, or an app without the hook.
+  }
+}

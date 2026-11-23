@@ -10,7 +10,7 @@ import type { DraftBrawler } from '@/components/bubble/panel-draft';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
-import { panelTrack } from '@/lib/panel-telemetry';
+import { appQuest, panelTrack } from '@/lib/panel-telemetry';
 import { slugify } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
@@ -86,6 +86,7 @@ export function PanelCounters({ modes, roster }: { modes: PanelMode[]; roster: D
   const choose = (id: number) => {
     setSelected(id);
     panelTrack('panel_counters', { brawler: byId.get(id)?.brawlerName ?? String(id) });
+    appQuest('counters');
   };
 
   /*

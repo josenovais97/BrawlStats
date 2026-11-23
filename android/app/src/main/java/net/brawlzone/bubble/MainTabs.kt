@@ -74,6 +74,7 @@ internal fun MainActivity.paintHome() {
     }
     findViewById<View>(R.id.first_run).visibility = if (Welcome.wasBubbleUsed(this)) View.GONE else View.VISIBLE
     paintToday(tag)
+    paintPassCard()
     paintLastGame(me, tag)
     paintHomeRank(me, tag)
     paintPin()
@@ -81,6 +82,42 @@ internal fun MainActivity.paintHome() {
 
 private fun MainActivity.colored(text: String, color: Int): CharSequence =
     SpannableStringBuilder(text).apply { setSpan(ForegroundColorSpan(color), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) }
+
+/**
+ * Bubble Pass on Home (1.43): the week's legendary ring turning around the
+ * player's bubble, the tier, the bar to the next one and what is left.
+ */
+private fun MainActivity.paintPassCard() {
+    val card = findViewById<View>(R.id.pass_card)
+    val week = Pass.week(this)
+    if (week == null) {
+        card.visibility = View.GONE
+        return
+    }
+    card.visibility = View.VISIBLE
+    val holder = findViewById<android.widget.FrameLayout>(R.id.pass_card_ring)
+    if (holder.tag != week.legendary.id) {
+        holder.removeAllViews()
+        holder.addView(Rings.preview(this, week.legendary, (40 * resources.displayMetrics.density).toInt(), spin = true))
+        holder.tag = week.legendary.id
+    }
+    findViewById<TextView>(R.id.pass_card_tier).text =
+        if (week.left == 0) getString(R.string.pass_card_done, week.tier)
+        else getString(R.string.pass_card_tier, week.tier, week.left)
+    findViewById<ProgressBar>(R.id.pass_card_bar).progress =
+        if (week.tier >= Pass.TIERS) 100 else week.xpInTier * 100 / Pass.XP_PER_TIER
+    findViewById<TextView>(R.id.pass_card_line).text =
+        getString(R.string.pass_card_line, getString(week.legendary.name), Pass.resetsOn(this, week))
+    card.setOnClickListener { startActivity(Intent(this, PassActivity::class.java)) }
+}
+
+/** The ring row under the bubble look (1.43): what the bubble wears; the pass picks it. */
+internal fun MainActivity.paintRingRow() {
+    val row = findViewById<TextView>(R.id.look_ring)
+    val ring = Rings.byId(BubbleLook.ring(this))
+    row.text = getString(R.string.look_ring, ring?.let { getString(it.name) } ?: getString(R.string.ring_none))
+    row.setOnClickListener { startActivity(Intent(this, PassActivity::class.java)) }
+}
 
 /** Today: Ranked wins–losses on this phone, elo moved since the day began, the daily goal. */
 private fun MainActivity.paintToday(tag: String) {

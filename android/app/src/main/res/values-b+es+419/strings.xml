@@ -32,4 +32,8 @@
     <string name="widgets_added">Agregado</string>
     <string name="widgets_hint">Mantén presionada la pantalla de inicio y elige Widgets para agregar uno.</string>
     <string name="notif_limit_body">Máximo 3 con sonido al día. El resto llega en silencio.</string>
+
+    <!-- 1.43: Bubble Pass (Pass, PassActivity, Rings) -->
+    <string name="pass_needs_tag">Agrega tu ID de jugador en Ajustes para empezar el pase. Las misiones cuentan tus partidas de Competitivo.</string>
+    <string name="pass_unlocked_body">Es tuyo para siempre. ¿Se lo pones a tu burbuja?</string>
 </resources>

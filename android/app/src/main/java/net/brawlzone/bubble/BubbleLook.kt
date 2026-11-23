@@ -32,6 +32,8 @@ object BubbleLook {
     const val KEY_THEME = "theme"
     /** A brawler portrait as the bubble's face (1.42, Face): its URL, or unset for the player's icon. */
     const val KEY_FACE = "face_url"
+    /** A Bubble Pass ring around the bubble (1.43, Rings), or unset for none. */
+    const val KEY_RING = "ring"
 
     /**
      * A theme: the ring's gradient (top to bottom) and its outline, and the
@@ -109,6 +111,14 @@ object BubbleLook {
 
     fun setTilt(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean(KEY_TILT, on).apply()
+    }
+
+    /** The ring the bubble wears (1.43): only one the player owns. */
+    fun ring(context: Context): String? =
+        prefs(context).getString(KEY_RING, null)?.takeIf { it in Pass.owned(context) }
+
+    fun setRing(context: Context, id: String?) {
+        prefs(context).edit().apply { if (id == null) remove(KEY_RING) else putString(KEY_RING, id) }.apply()
     }
 
     fun setTheme(context: Context, id: String) {

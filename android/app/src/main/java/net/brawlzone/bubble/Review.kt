@@ -89,6 +89,8 @@ object Review {
             val post = Alerts.enabled(context)
             Goal.record(context, tag, fresh, firstLook, post)
             Me.last(context)?.let { me -> Season.update(context, me, Alerts.last(context), fresh, post) }
+            // 1.43: a game just played may finish a Bubble Pass quest.
+            if (fresh.isNotEmpty()) runCatching { Pass.update(context, post) }
         }
 
         val game = j.optJSONObject("game") ?: return null
