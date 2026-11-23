@@ -71,7 +71,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
-          'bubblepromo': {'pace': 2}}
+          'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -2437,6 +2437,216 @@ if KIND == 'wrapped':
 
 
 # ================================================================ plan
+# ================================================================ the 2026-11-23 formats
+# Owner (2026-11-23): "make some cool new incredible and viral videos... do
+# them all". Five formats on the week's real Ranked numbers, drawn only by
+# Remotion (deploy/motion/src/Arena.tsx): a tier list for one rank, higher or
+# lower on win rates, the most underrated brawler, a two-week win-rate race
+# and "pick one from each row". Without Remotion they exit 3 and the job
+# draws its fallback.
+NEW_KINDS = ('ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow')
+TIER_ORDER = 'SABCDEF'
+# The rank tier list rotates by episode: (data key, title word, tag, league badges).
+BRACKET_SHOW = [
+    ('pro', 'MASTERS', 'MASTERS+', ['masters', 'pro']),
+    ('legendary', 'LEGENDARY', 'LEGENDARY', ['legendary']),
+    ('mythic', 'MYTHIC', 'MYTHIC', ['mythic']),
+    ('low', 'DIAMOND', 'DIAMOND & BELOW', ['bronze', 'silver', 'gold', 'diamond']),
+]
+NEW_RANK = None  # the rank tag of a list that is not from every rank
+CLASS_COL = {'Tank': (255, 140, 40), 'Damage Dealer': (255, 60, 100), 'Assassin': (150, 105, 255), 'Marksman': (60, 170, 255),
+             'Controller': (70, 215, 120), 'Support': (255, 205, 40), 'Artillery': (255, 106, 213)}
+TAGS = '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone'
+
+
+def popular(pool, q=0.5):
+    """The brawlers people know: picked at least as often as the q-quantile."""
+    uses = sorted(b['use'] for b in pool)
+    floor = uses[int(len(uses) * q)] if uses else 0
+    return [b for b in pool if b['use'] >= floor]
+
+
+def wr1(b): return f"{b['wr'] * 100:.1f}%"
+
+
+if KIND == 'ranktier':
+    RT_KEY, RT_WORD, RT_TAG, RT_BADGES = BRACKET_SHOW[(episode(KIND) - 1) % len(BRACKET_SHOW)]
+    BR = (data.get('brackets') or {}).get(RT_KEY) or {}
+    RT_ROSTER = [b for b in BR.get('all', []) if b.get('tier') in TIER_ORDER and b.get('wr')]
+    if len(RT_ROSTER) < 40:
+        print(f'only {len(RT_ROSTER)} rated brawlers in {RT_KEY}'); sys.exit(3)
+    RT_ROSTER.sort(key=lambda b: (TIER_ORDER.index(b['tier']), -(b.get('score') or b['wr'])))
+    RT_ROWS = [(t, [b for b in RT_ROSTER if b['tier'] == t]) for t in TIER_ORDER]
+    RT_ROWS = [(t, bs) for t, bs in RT_ROWS if bs]
+    RT_GAMES = int((BR.get('battles') or 0) / 6)
+    _allt = {b['id']: b['tier'] for b in data['all'] if b.get('tier')}
+    def _gap(b): return TIER_ORDER.index(_allt[b['id']]) - TIER_ORDER.index(b['tier']) if b['id'] in _allt else 0
+    _known = popular(RT_ROSTER, 0.3)
+    _up, _down = max(_known, key=_gap), min(_known, key=_gap)
+    tl.add(5, 'rt_intro')
+    for t, bs in RT_ROWS: tl.add({'S': 4, 'A': 4, 'B': 3, 'C': 3}.get(t, 2), 'rt_tier', tier=t)
+    tl.add(5, 'rt_top', b=RT_ROSTER[0])
+    if _gap(_up) >= 2 and _gap(_down) <= -2:
+        tl.add(6, 'rt_diff', up=_up, upAll=_allt[_up['id']], down=_down, downAll=_allt[_down['id']])
+    tl.add(7, 'rt_outro')
+    NEW_RANK = (RT_TAG, RT_BADGES)
+    _top3 = ', '.join(nice(b['n']) for b in RT_ROSTER[:3])
+    _w = RT_WORD.capitalize()
+    META = {
+        'title': f'{RT_WORD} tier list: what wins at YOUR rank 🏆 Season {data.get("season")} #Shorts',
+        'titles': {'pt-BR': f'Tier list do {_w}: o que ganha no SEU rank 🏆 #Shorts',
+                   'es-419': f'Tier list de {_w}: lo que gana en TU rango 🏆 #Shorts',
+                   **more_titles(id=f'Tier list {_w}: yang menang di rank KAMU 🏆 #Shorts',
+                                 de=f'{_w} Tier List: was auf DEINEM Rang gewinnt 🏆 #Shorts',
+                                 tr=f'{_w} tier list: SENİN rankında ne kazanıyor 🏆 #Shorts',
+                                 pl=f'Tier lista {_w}: co wygrywa na TWOJEJ randze 🏆 #Shorts')},
+        'description': f"Every brawler ranked from {RT_TAG.title()} Ranked games only ({RT_GAMES:,} games this week, Season "
+                       f"{data.get('season')}). Top 3: {_top3}. The meta at your rank is not the meta at the top. What's your rank? 👇\n\n"
+                       f'The tier list for every rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #tierlist',
+    }
+
+if KIND == 'higherlower':
+    _pool = popular([b for b in data['all'] if b.get('wr') and b.get('use') and (b.get('battles') or 0) >= 5000], 0.35)
+    _last = set(state.get('last_shown', {}).get(KIND, []))
+    HL_LEVELS = ['EASY', 'EASY', 'MEDIUM', 'HARD', 'HARD', 'EXPERT']
+    _gaps = [0.05, 0.035, 0.025, 0.017, 0.011, 0.006]
+    _mid = sorted(_pool, key=lambda b: b['wr'])
+    _start = [b for b in _mid[len(_mid) // 3: 2 * len(_mid) // 3] if str(b['id']) not in _last] or _mid
+    HL = [rnd.choice(_start)]
+    for g in _gaps:
+        cur, up = HL[-1], rnd.random() < 0.5
+        cands = [b for b in _pool if b not in HL and abs(b['wr'] - cur['wr']) >= 0.004]
+        if not cands:
+            print('not enough brawlers for higher or lower'); sys.exit(3)
+        HL.append(min(cands, key=lambda b: abs(abs(b['wr'] - cur['wr']) - g) + (0.012 if (b['wr'] > cur['wr']) != up else 0)
+                      + (0.006 if str(b['id']) in _last else 0)))
+    SHOWN = [str(b['id']) for b in HL]
+    tl.add(3, 'hl_intro')
+    for i in range(6):
+        tl.add(6, 'hl_round', i=i, a=HL[i], b=HL[i + 1], lvl=HL_LEVELS[i], up=HL[i + 1]['wr'] > HL[i]['wr'])
+    tl.add(4, 'hl_score')
+    tl.add(5, 'hl_outro')
+    META = {
+        'title': 'HIGHER or LOWER: Brawl Stars win rate edition 🤔 Only real fans get 6/6 #Shorts',
+        'titles': {'pt-BR': 'MAIOR ou MENOR: taxa de vitória do Brawl Stars 🤔 Só fã de verdade acerta 6/6 #Shorts',
+                   'es-419': 'MAYOR o MENOR: tasa de victoria de Brawl Stars 🤔 Solo los fans sacan 6/6 #Shorts',
+                   **more_titles(id='LEBIH TINGGI atau LEBIH RENDAH: win rate Brawl Stars 🤔 #Shorts',
+                                 de='HÖHER oder TIEFER: Brawl Stars Winrate 🤔 Nur echte Fans schaffen 6/6 #Shorts',
+                                 tr='YÜKSEK mi DÜŞÜK mü: Brawl Stars kazanma oranı 🤔 #Shorts',
+                                 pl='WYŻEJ czy NIŻEJ: win rate w Brawl Stars 🤔 #Shorts')},
+        'description': "Higher or lower: does the next brawler win more or less in Ranked? Six rounds, harder each time, "
+                       f"from this week's Ranked games across all ranks. Comment your score 👇\n\n"
+                       f'Every win rate: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #higherorlower #quiz',
+    }
+
+if KIND == 'hiddenop':
+    _a = [b for b in data['all'] if b.get('wr') and b.get('use') and b.get('tier')]
+    HO_TOTAL = len(_a)
+    HO_USE = {b['id']: i + 1 for i, b in enumerate(sorted(_a, key=lambda b: -b['use']))}
+    HO_WR = {b['id']: i + 1 for i, b in enumerate(sorted(_a, key=lambda b: -b['wr']))}
+    _last = set(state.get('last_shown', {}).get(KIND, []))
+    _hidden = [b for b in sorted(_a, key=lambda b: -b['wr'])
+               if HO_USE[b['id']] > HO_TOTAL * 0.6 and b['wr'] > 0.515 and (b.get('battles') or 0) >= 3000 and str(b['id']) not in _last]
+    if len(_hidden) < 3:
+        print('no hidden pick this week'); sys.exit(3)
+    HERO, HO_MORE = _hidden[0], _hidden[1:3]
+    SHOWN = [str(HERO['id'])]
+    tl.add(5, 'ho_intro')
+    tl.add(3, 'ho_clue', n=1, label='PICK RATE', value=f"#{HO_USE[HERO['id']]} OF {HO_TOTAL}", sub='ALMOST NOBODY PICKS IT', col='#ff5a6e')
+    tl.add(3, 'ho_clue', n=2, label='WIN RATE', value=wr1(HERO), sub=f"#{HO_WR[HERO['id']]} OF {HO_TOTAL} IN RANKED", col='#7cff8a')
+    tl.add(3, 'ho_clue', n=3, label='CLASS', value=(HERO.get('cls') or 'BRAWLER').upper(), sub='GUESS WHO?', col='#ffd23f')
+    tl.add(5, 'ho_reveal')
+    tl.add(5, 'ho_more')
+    tl.add(7, 'ho_outro')
+    _n = nice(HERO['n'])
+    META = {
+        'title': 'The most UNDERRATED brawler in Ranked right now 🤫 #Shorts',
+        'titles': {'pt-BR': 'O brawler mais SUBESTIMADO do Ranqueado agora 🤫 #Shorts',
+                   'es-419': 'El brawler más INFRAVALORADO de Competitivo ahora 🤫 #Shorts',
+                   **more_titles(id='Brawler paling DIREMEHKAN di Ranked sekarang 🤫 #Shorts',
+                                 de='Der UNTERSCHÄTZTESTE Brawler in Ranked gerade 🤫 #Shorts',
+                                 tr="Şu an Aşamalı'nın en HAFİFE ALINAN brawlerı 🤫 #Shorts",
+                                 pl='Najbardziej NIEDOCENIANY brawler w Rankedzie 🤫 #Shorts')},
+        'description': f"{_n} wins {wr1(HERO)} of its Ranked games (#{HO_WR[HERO['id']]} of {HO_TOTAL}) but is only "
+                       f"#{HO_USE[HERO['id']]} of {HO_TOTAL} in picks, across all ranks this week. Also hiding: "
+                       f"{', '.join(nice(b['n']) + ' ' + wr1(b) for b in HO_MORE)}. Who's your hidden pick? 👇\n\n"
+                       f'The hidden meta: https://brawlzone.net/hidden-meta{FOOTER}\n{TAGS} #underrated',
+    }
+
+if KIND == 'wrrace':
+    _T = data.get('trends') or {}
+    RC_DAYS = sorted({d for s in _T.values() for d, _ in s})[-14:]
+    _names = {str(b['id']): b for b in data['all'] if (b.get('battles') or 0) >= 3000}
+    RC_SERIES = {}
+    for bid, s in _T.items():
+        if bid not in _names: continue
+        m, row, last = dict(s), [], None
+        for d in RC_DAYS:
+            last = m.get(d, last); row.append(last)
+        if all(v is not None for v in row): RC_SERIES[bid] = row
+    if len(RC_DAYS) < 7 or len(RC_SERIES) < 20:
+        print('not enough daily win rates for a race'); sys.exit(3)
+    _tops = [sorted(RC_SERIES, key=lambda k: -RC_SERIES[k][i])[:10] for i in range(len(RC_DAYS))]
+    RC_IDS = sorted({k for t in _tops for k in t})
+    _leaders = [t[0] for t in _tops]
+    _streak = 1
+    while _streak < len(_leaders) and _leaders[-1 - _streak] == _leaders[-1]: _streak += 1
+    RC_NOW = _names[_leaders[-1]]
+    RC_STREAK = _streak
+    _ss = data.get('seasonStart') or {}
+    RC_RESET = _ss.get('startedOn') if _ss.get('startedOn') in RC_DAYS[1:] else None
+    tl.add(4, 'r_intro')
+    tl.add(len(RC_DAYS) * 3, 'r_race')
+    tl.add(6, 'r_final', b=RC_NOW)
+    tl.add(7, 'r_outro')
+    _n = nice(RC_NOW['n'])
+    META = {
+        'title': f'Who ruled Ranked the last 2 weeks? 🏁 Win rate race #Shorts',
+        'titles': {'pt-BR': 'Quem dominou o Ranqueado nas últimas 2 semanas? 🏁 #Shorts',
+                   'es-419': '¿Quién dominó Competitivo las últimas 2 semanas? 🏁 #Shorts',
+                   **more_titles(id='Siapa yang menguasai Ranked 2 minggu terakhir? 🏁 #Shorts',
+                                 de='Wer hat Ranked die letzten 2 Wochen dominiert? 🏁 #Shorts',
+                                 tr="Son 2 haftada Aşamalı'ya kim hükmetti? 🏁 #Shorts",
+                                 pl='Kto rządził w Rankedzie przez ostatnie 2 tygodnie? 🏁 #Shorts')},
+        'description': f"The 10 best win rates in Ranked, day by day for two weeks, across all ranks. {_n} is #1 "
+                       f"{'for ' + str(RC_STREAK) + ' days straight' if RC_STREAK > 1 else 'today'}. Who catches up next? 👇\n\n"
+                       f'Live tier list: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #barchartrace',
+    }
+
+if KIND == 'pickrow':
+    _a = [b for b in data['all'] if b.get('wr') and b.get('use') and b.get('cls') and (b.get('battles') or 0) >= 4000]
+    _sets = [('Tank', 'Damage Dealer', 'Support'), ('Assassin', 'Marksman', 'Controller'),
+             ('Tank', 'Artillery', 'Assassin'), ('Damage Dealer', 'Controller', 'Support')]
+    PR_ROWS = []
+    for cls in _sets[(episode(KIND) - 1) % len(_sets)]:
+        group = sorted(popular([b for b in _a if b['cls'] == cls], 0.4), key=lambda b: -b['wr'])
+        if len(group) < 3:
+            print(f'not enough {cls} brawlers'); sys.exit(3)
+        trio = [group[0], group[len(group) // 2], group[-1]]
+        show = trio[:]; rnd.shuffle(show)
+        PR_ROWS.append({'cls': cls, 'items': show, 'best': trio[0], 'worst': trio[-1]})
+    SHOWN = [str(b['id']) for r in PR_ROWS for b in r['items']]
+    tl.add(3, 'pr_intro')
+    tl.add(6, 'pr_board')
+    for i in range(3): tl.add(3, 'pr_row', i=i)
+    tl.add(4, 'pr_best')
+    tl.add(3, 'pr_worst')
+    tl.add(5, 'pr_outro')
+    _best = [r['best'] for r in PR_ROWS]
+    META = {
+        'title': "Pick ONE from each row 👇 we'll rate your team #Shorts",
+        'titles': {'pt-BR': 'Escolha UM de cada linha 👇 a gente avalia seu time #Shorts',
+                   'es-419': 'Elige UNO de cada fila 👇 calificamos tu equipo #Shorts',
+                   **more_titles(id='Pilih SATU dari tiap baris 👇 kami nilai tim kamu #Shorts',
+                                 de='Wähle EINEN aus jeder Reihe 👇 wir bewerten dein Team #Shorts',
+                                 tr='Her sıradan BİR tane seç 👇 takımını puanlayalım #Shorts',
+                                 pl='Wybierz JEDNEGO z każdego rzędu 👇 ocenimy twoją drużynę #Shorts')},
+        'description': "Pick one brawler from each row, then see how each one really does in Ranked this week, across all ranks. "
+                       f"The best team: {', '.join(nice(b['n']) + ' ' + wr1(b) for b in _best)}. Comment your team 👇\n\n"
+                       f'Every brawler, every rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{TAGS} #pickone',
+    }
+
+
 # --plan <dir> (2026-11-13): the same video as data for deploy/motion, the
 # Remotion renderer that draws the formats it knows instead of the frames
 # below (owner: "the design is still the same... make them way better").
@@ -2447,7 +2657,8 @@ if KIND == 'wrapped':
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
-              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo')
+              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo',
+              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2458,9 +2669,10 @@ PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyra
 HOOKS = [{'lead': 'GET YOUR ACCOUNT ROASTED', 'url': 'brawlzone.net/roast'},
          {'lead': 'SEE WHAT YOUR ACCOUNT IS WORTH', 'url': 'brawlzone.net/account-value'}]
 # The lists built from every rank's Ranked games, labelled so (2026-11-23).
-ALL_RANK_KINDS = ('everyrank', 'classrank', 'seasonclimb', 'newseason', 'modes', 'stop', 'broken')
+ALL_RANK_KINDS = ('everyrank', 'classrank', 'seasonclimb', 'newseason', 'modes', 'stop', 'broken',
+                  'higherlower', 'hiddenop', 'wrrace', 'pickrow')
 HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb', 'newseason',
-              'modes', 'ranks', 'stop', 'broken', 'whatsnew')
+              'modes', 'ranks', 'stop', 'broken', 'whatsnew', 'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow')
 
 
 def export_plan(out):
@@ -2582,6 +2794,26 @@ def export_plan(out):
         plan['modes'] = {mk: {'name': MODE_NAME[mk], 'color': hexc(MODE_COL[mk]), 'icon': mode_icon(mk, A)} for mk in MODE_COL}
     if KIND == 'ranks':
         plan.update(low=hexc(LOWC), leg=hexc(LEGC))
+    if KIND == 'ranktier':
+        plan.update(word=RT_WORD, tag=RT_TAG, games=RT_GAMES, season=data.get('season'), total=len(RT_ROSTER),
+                    rows=[{'tier': t, 'items': [bz(b) for b in bs]} for t, bs in RT_ROWS],
+                    big=[save(Image.open(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png").convert('RGBA'), f'c/league-{n}.png')
+                         for n in RT_BADGES if os.path.exists(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png")])
+    if KIND == 'hiddenop':
+        plan.update(total=HO_TOTAL, hero={**bz(HERO, full=True), 'useRank': HO_USE[HERO['id']], 'wrRank': HO_WR[HERO['id']],
+                                          'cls': (HERO.get('cls') or '').upper(),
+                                          'sil': save(silhouette(art(HERO, 900, 1000), (255, 200, 60)), f"c/sil-{HERO['id']}.png")},
+                    more=[{**bz(b, full=True), 'useRank': HO_USE[b['id']], 'wrRank': HO_WR[b['id']]} for b in HO_MORE])
+    if KIND == 'wrrace':
+        import datetime as _dt
+        plan.update(days=[_dt.date.fromisoformat(d).strftime('%b %-d').upper() for d in RC_DAYS],
+                    reset=RC_DAYS.index(RC_RESET) if RC_RESET else None, season=data.get('season'), streak=RC_STREAK,
+                    racers={k: {**bz(by_id[int(k)]), 'color': hexc(CLASS_COL.get(by_id[int(k)].get('cls'), (150, 160, 255))),
+                                'v': [round(v, 4) for v in RC_SERIES[k]]} for k in RC_IDS})
+    if KIND == 'pickrow':
+        plan.update(rows=[{'cls': r['cls'].upper(), 'color': hexc(CLASS_COL.get(r['cls'], (150, 160, 255))),
+                           'items': [bz(b, full=True) for b in r['items']], 'best': str(r['best']['id']), 'worst': str(r['worst']['id'])}
+                          for r in PR_ROWS])
     if KIND == 'stop':
         for o in segs:
             if o.get('b'): o['useRank'] = use_rank[int(o['b']['id'])]
@@ -2672,15 +2904,16 @@ def export_plan(out):
             if os.path.exists(p):
                 leagues.append(save(Image.open(p).convert('RGBA'), f'c/league-{n}.png'))
         plan.update(season=W_SEASON, ends=W_ENDS, days=W_DAYS, card='c/card.jpg', leagues=leagues)
-    if KIND in ALL_RANK_KINDS:
-        # Every frame says which ranks the list is from (RankTag): these all
-        # read the whole Ranked sample, Bronze to Pro.
+    # Every frame says which ranks the list is from (RankTag): most read the
+    # whole Ranked sample, Bronze to Pro; the rank tier list one bracket.
+    spec = ('ALL RANKS', RR_LEAGUES) if KIND in ALL_RANK_KINDS else NEW_RANK
+    if spec:
         badges = []
-        for n in RR_LEAGUES:
+        for n in spec[1]:
             src = f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png"
             if os.path.exists(src):
                 badges.append(save(Image.open(src).convert('RGBA'), f'c/league-{n}.png'))
-        plan['rank'] = {'label': 'ALL RANKS', 'badges': badges}
+        plan['rank'] = {'label': spec[0], 'badges': badges}
     if KIND in HOOK_KINDS:
         import datetime
         try:
@@ -2716,7 +2949,8 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None}[KIND]
+         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
+         **{k: None for k in NEW_KINDS}}[KIND]
 
 
 def frame(t):
@@ -2735,6 +2969,8 @@ if __name__ == '__main__':
         if KIND not in PLAN_KINDS:
             print(f'{KIND} has no Remotion design yet'); sys.exit(4)
         export_plan(OUT); sys.exit()
+    if KIND in NEW_KINDS:  # Remotion only: the job draws its fallback
+        print(f'{KIND} has no Pillow design'); sys.exit(3)
     if SCENE is None:
         print(f'{KIND} has only the Remotion design'); sys.exit(5)
     if ONLY is not None:

@@ -11,6 +11,7 @@ import {NewBrawler} from './NewBrawler';
 import {WhatsNew} from './WhatsNew';
 import {Weekly} from './Weekly';
 import {BubblePromo} from './BubblePromo';
+import {HiddenOp, HigherLower, PickRow, RankTier, WinRace} from './Arena';
 import {Plan, loadFonts} from './theme';
 
 loadFonts();
@@ -35,5 +36,10 @@ export const Root: React.FC = () => (
     <Composition id="WhatsNew" component={WhatsNew} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="NewBrawler" component={NewBrawler} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Broken" component={Broken} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="RankTier" component={RankTier} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="HigherLower" component={HigherLower} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="HiddenOp" component={HiddenOp} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="WinRace" component={WinRace} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="PickRow" component={PickRow} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
   </>
 );

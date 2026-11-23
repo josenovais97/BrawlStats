@@ -16,7 +16,7 @@ import { MAINS } from '@/lib/roast-jokes';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
 import { getStarrDrops } from '@/lib/starr-drops';
-import { getBracketRoster, getRankedMapPicks, getRankedRecentMaps, getScoredRoster } from '@/lib/stats';
+import { getBracketRoster, getRankedMapPicks, getRankedRecentMaps, getRankedTrends, getScoredRoster } from '@/lib/stats';
 
 const BRACKETS = [
   ['low', 1],
@@ -100,9 +100,22 @@ async function main() {
       .sort((a, b) => (b.usageRate ?? 0) - (a.usageRate ?? 0));
     brackets[name] = {
       battles: s.reduce((n, b) => n + b.decidedSampleSize, 0),
+      days: r?.days ?? null,
       top: s.slice(0, 8).map(row),
+      // The bracket's whole tier list (2026-11-23), for the "MASTERS TIER
+      // LIST" Short: the roster the site's /tier-list/ranked/rank pages show.
+      all: (r?.scored ?? []).filter((b) => b.tier).map(row),
     };
   }
+
+  // Each brawler's adjusted Ranked win rate per day, two weeks of it, for the
+  // win-rate race Short (2026-11-23). Brawlers with a tier this week only.
+  const tiered = new Set(week.filter((b) => b.tier).map((b) => b.brawlerId));
+  const trends = Object.fromEntries(
+    Object.entries(await getRankedTrends(14).catch(() => ({}) as Record<number, [string, number][]>))
+      .filter(([id]) => tiered.has(Number(id)))
+      .map(([id, series]) => [id, series.map(([d, wr]) => [d, Math.round(wr * 10_000) / 10_000])]),
+  );
 
   // The drop tables for the "1,000 Chaos Drops" Short (2026-10-29), from the
   // same wiki read as /starr-drops. A failed read leaves them out and make.py
@@ -162,6 +175,7 @@ async function main() {
         }),
       pool,
       brackets,
+      trends,
       drops,
       // Roast My Account's per-brawler lines, English, for the "what your
       // main says about you" Short (2026-11-17). Keyed by the API's name.
