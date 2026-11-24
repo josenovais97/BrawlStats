@@ -4,23 +4,38 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.Outline
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.view.Gravity
+import android.view.View
+import android.view.ViewOutlineProvider
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * One-tap share cards (1.40): "My rank" and "Season Wrapped", drawn by the
- * site as a story-sized PNG (`/api/bubble/card`), saved in the app's cache
- * and handed to Android's share sheet, so they go to TikTok, Instagram,
- * WhatsApp or anywhere else that takes a picture.
+ * Share cards (1.40): "My rank", "Season Wrapped" and this season vs last,
+ * drawn by the site as a story-sized PNG (`/api/bubble/card`) and kept in the
+ * app's cache. A tap shows the card first (1.44; it used to open the share
+ * sheet straight away, so the only way to see a card was to share it), with
+ * Share under it for TikTok, Instagram, WhatsApp or anywhere that takes a
+ * picture.
  *
  * A card takes a few seconds to draw, so the app screen asks for both in the
  * background while the season card is on screen and keeps them for half an
- * hour: a tap then usually opens the share sheet at once. When it has to wait,
- * the caller is told (`onBusy`) so the button can say so.
+ * hour: a tap then usually opens it at once. When it has to wait, the caller
+ * is told (`onBusy`) so the button can say so.
  */
 object Share {
 
@@ -29,6 +44,8 @@ object Share {
     private const val PNG_MAGIC = 0x89.toByte()
     private const val FRESH_MS = 30 * 60 * 1000L
     private val prefetching = AtomicBoolean(false)
+    /** A card on its way to the screen, so a double tap opens one. */
+    private val opening = AtomicBoolean(false)
 
     private fun rankUrl(context: Context, tag: String) = Season.rankCardUrl(context, tag)
 
@@ -36,19 +53,19 @@ object Share {
 
     fun rank(activity: Activity, onBusy: (Boolean) -> Unit = {}) {
         val tag = Account.tag(activity).ifEmpty { return }
-        card(activity, rankUrl(activity, tag), "my-rank", onBusy)
+        card(activity, rankUrl(activity, tag), "my-rank", R.string.share_rank, onBusy)
     }
 
     fun wrapped(activity: Activity, onBusy: (Boolean) -> Unit = {}) {
         val tag = Account.tag(activity).ifEmpty { return }
-        card(activity, wrappedUrl(activity, tag), "season-wrapped", onBusy)
+        card(activity, wrappedUrl(activity, tag), "season-wrapped", R.string.share_wrapped, onBusy)
     }
 
     /** This season against the last one (1.42, Versus). */
     fun versus(activity: Activity, onBusy: (Boolean) -> Unit = {}) {
         val tag = Account.tag(activity).ifEmpty { return }
         val data = Versus.last(activity) ?: return
-        card(activity, Versus.cardUrl(activity, tag, data), "season-vs", onBusy)
+        card(activity, Versus.cardUrl(activity, tag, data), "season-vs", R.string.versus_share, onBusy)
     }
 
     /** Both cards for the current tag, drawn ahead of a tap. Off the main thread. */
@@ -96,26 +113,89 @@ object Share {
         target
     }.getOrNull()
 
-    private fun card(activity: Activity, url: String, name: String, onBusy: (Boolean) -> Unit) {
+    /** The card, from the cache or drawn now, then on screen. */
+    private fun card(activity: Activity, url: String, name: String, label: Int, onBusy: (Boolean) -> Unit) {
+        if (!opening.compareAndSet(false, true)) return
         val app = activity.applicationContext
-        val ready = cached(app, url)
-        if (fresh(ready)) {
-            send(activity, ready, name)
-            return
-        }
-        onBusy(true)
+        val wait = !fresh(cached(app, url))
+        if (wait) onBusy(true)
+        val width = activity.resources.displayMetrics.widthPixels
         Thread {
-            val file = download(app, url)
+            val file = fetch(app, url)
+            val bitmap = file?.let { decode(it, width) }
             activity.runOnUiThread {
-                onBusy(false)
+                opening.set(false)
+                if (wait) onBusy(false)
                 if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
-                if (file == null) {
+                if (file == null || bitmap == null) {
                     Toast.makeText(activity, R.string.share_failed, Toast.LENGTH_LONG).show()
                     return@runOnUiThread
                 }
-                send(activity, file, name)
+                preview(activity, file, bitmap, name, label)
             }
         }.start()
+    }
+
+    /** Decoded no larger than the screen needs: a story is 1080x1920. */
+    private fun decode(file: File, width: Int): Bitmap? = runCatching {
+        val size = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.path, size)
+        var sample = 1
+        while (size.outWidth / (sample * 2) >= width) sample *= 2
+        BitmapFactory.decodeFile(file.path, BitmapFactory.Options().apply { inSampleSize = sample })
+    }.getOrNull()
+
+    /** The card on screen (1.44), with Share and Close under it. It stays up after sharing. */
+    private fun preview(activity: Activity, file: File, bitmap: Bitmap, name: String, label: Int) {
+        val metrics = activity.resources.displayMetrics
+        fun px(dp: Int) = (dp * metrics.density).toInt()
+        val image = ImageView(activity).apply {
+            setImageBitmap(bitmap)
+            adjustViewBounds = true
+            maxHeight = (metrics.heightPixels * 0.68f).toInt()
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = activity.getString(label)
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) =
+                    outline.setRoundRect(0, 0, view.width, view.height, px(14).toFloat())
+            }
+        }
+        val share = TextView(activity).apply {
+            setText(R.string.roast_share)
+            setBackgroundResource(R.drawable.btn_gold)
+            setTextColor(activity.getColor(R.color.brand_ink))
+            textSize = 17f
+            gravity = Gravity.CENTER
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(px(24), px(13), px(24), px(15))
+        }
+        val close = TextView(activity).apply {
+            setText(R.string.roast_close)
+            setTextColor(activity.getColor(R.color.muted))
+            textSize = 15f
+            gravity = Gravity.CENTER
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(px(24), px(14), px(24), px(6))
+        }
+        val content = LinearLayout(activity).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setBackgroundResource(R.drawable.card_surface)
+            setPadding(px(14), px(14), px(14), px(10))
+            addView(image, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            addView(
+                share,
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = px(12) },
+            )
+            addView(close, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        }
+        GameType.apply(activity, content)
+        val dialog = AlertDialog.Builder(activity).setView(content).create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        share.setOnClickListener { send(activity, file, name) }
+        close.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     /** A copy under a readable name ("season-wrapped.png"), then the share sheet. */
