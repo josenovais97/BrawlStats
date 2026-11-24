@@ -171,6 +171,7 @@ LOCAL_ART = [
     (r'mega box', 'rewards/box-red.png'), (r'big box', 'rewards/box-pink.png'),
     (r'starr drop', 'icons/starr-drop.png'), (r'power point', 'icons/power-point.png'),
     (r'coin', 'icons/coin.png'), (r'box', 'rewards/box-blue.png'),
+    (r'\bpins?\b', 'rewards/art/pin.png'),  # our own drawing: a pin, no one's in particular
 ]
 
 

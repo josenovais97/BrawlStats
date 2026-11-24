@@ -62,6 +62,8 @@ const LOCAL_ART: [RegExp, string][] = [
   [/big box/i, '/rewards/box-pink.png'],
   [/starr drop/i, '/icons/starr-drop.png'],
   [/box/i, '/rewards/box-blue.png'],
+  // A pin of our own drawing, nobody's in particular (2026-11-24).
+  [/\bpins?\b/i, '/rewards/art/pin.png'],
 ];
 
 /**
