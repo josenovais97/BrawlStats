@@ -17,7 +17,7 @@ import { DAILY_STORE_URL, nextStoreReset, storeDay, timeLeft } from '@/lib/store
  * minutes, so the browser checks the clock itself.
  */
 export function DailyGift({ gift, children }: {
-  gift: { day: string; name: string; art: string; fallbackArt: string } | null;
+  gift: { day: string; name: string; url: string; art: string; fallbackArt: string } | null;
   /** The sentences that never change, rendered on the server for search. */
   children: React.ReactNode;
 }) {
@@ -66,7 +66,7 @@ export function DailyGift({ gift, children }: {
         </p>
       </div>
       <a
-        href={DAILY_STORE_URL}
+        href={known?.url ?? DAILY_STORE_URL}
         target="_blank"
         rel="noopener noreferrer nofollow"
         data-claim

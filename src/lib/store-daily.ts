@@ -2,9 +2,9 @@
  * The free daily reward in Supercell's Brawl Stars store (2026-11-24).
  *
  * One free reward a day, the same clock for everyone: it changes at 08:00
- * UTC. What it is shows only after signing in, so this site cannot read it;
- * the name comes from Discord (see brawlzone-rewards-watch, "today: 100
- * Coins") and the card stands without one.
+ * UTC. What it is shows only after signing in, so this site cannot see it in
+ * the store: brawlzone-rewards-watch finds its name elsewhere, and the card
+ * stands without one.
  *
  * Plain functions, shared by the page and the browser.
  */
@@ -30,6 +30,13 @@ export function nextStoreReset(ms: number): number {
 export function timeLeft(ms: number): { h: number; m: number } {
   const minutes = Math.max(0, Math.ceil((nextStoreReset(ms) - ms) / 60_000));
   return { h: Math.floor(minutes / 60), m: minutes % 60 };
+}
+
+/** Where the daily card's button goes: the reward's own page when known, else the store. */
+export function dailyGiftUrl(url: unknown): string {
+  return typeof url === 'string' && /^https:\/\/store\.supercell\.com\/brawlstars\/product\/[a-z-]+\/[0-9A-Za-z]+$/.test(url)
+    ? url
+    : DAILY_STORE_URL;
 }
 
 /**

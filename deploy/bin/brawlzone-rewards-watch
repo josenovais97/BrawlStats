@@ -15,10 +15,13 @@
 #   other servers can be followed into it; either is posted within minutes.
 #   Names come from the text on the link's own line ("Mega Box: link...").
 #
-# The same Discord channel also names the store's free daily reward
-# (2026-11-24): a line like "today: 100 Coins" from the owner, or "Daily
-# freebie: 100 Coins" in a followed post, goes to daily.json, which the card
-# on /rewards reads. It only updates the page: no videos, push or Discord.
+# The store's free daily reward (2026-11-24) goes to daily.json, which the card
+# on /rewards reads. It only updates the page: no videos, push or Discord. The
+# store hides it until you sign in, so its name comes from clashloot.gg/bs, a
+# public page that lists it seconds after the 08:00 UTC change: read until
+# today's is known, then not again until tomorrow. A line in the Discord
+# channel ("today: 100 Coins" from the owner, "Daily freebie: 100 Coins" in a
+# followed post) wins over it.
 #
 # Every new link goes to brawlzone-rewards (Discord, TikTok, YouTube,
 # Instagram). Only Supercell's own hosts are accepted there, and a link
@@ -93,6 +96,20 @@ DAILY_POST = re.compile(r"^\W*(?:today'?s\s+|daily\s+)(?:(?:free|daily|store|fre
 DAILY_ITEM = re.compile(r'\b(?:coins?|credits?|bling|gems?|power\s*points?|drops?|doublers?|box(?:es)?|pins?|sprays?|icons?|tickets?|tokens?|skins?|pass(?:es)?)\b', re.I)
 
 
+def tidy_name(name):
+    """ "x1 CHAOS DROP" -> "1x Chaos Drop"; None if it is not a thing the game gives. """
+    name = re.sub(r"[^A-Za-z0-9 .,'×+-]", ' ', name)
+    name = ' '.join(name.split()).strip(" .,'-+")
+    name = re.sub(r'^[x×]\s*(\d[\d.,]*)\s+', r'\1x ', name, flags=re.I)
+    name = re.sub(r'^(\d[\d.,]*)\s*[x×]\s*', r'\1x ', name, flags=re.I)
+    if not 3 <= len(name) <= 40 or not DAILY_ITEM.search(name):
+        return None
+    letters = re.sub(r'^\d[\d.,]*x?\s*', '', name)
+    if letters == letters.upper() or letters == letters.lower():
+        name = ' '.join(w if w[0].isdigit() else w.capitalize() for w in name.lower().split())
+    return name
+
+
 def daily_name(line, owner):
     """The reward a line names as today's store gift, tidied, or None."""
     line = re.sub(r'<a?:\w+:\d+>|https?://\S+', ' ', line).replace('’', "'")
@@ -100,20 +117,37 @@ def daily_name(line, owner):
     m = (DAILY_OWNER if owner else DAILY_POST).match(line.strip())
     if not m:
         return None
-    name = re.sub(r"[^A-Za-z0-9 .,'×+-]", ' ', m.group(1))
-    name = ' '.join(name.split()).strip(" .,'-+")
-    if not 3 <= len(name) <= 40 or not DAILY_ITEM.search(name):
-        return None
-    name = re.sub(r'^(\d[\d.,]*)\s*[x×]\s*', r'\1x ', name, flags=re.I)
-    letters = re.sub(r'^\d[\d.,]*x?\s*', '', name)
-    if letters == letters.upper() or letters == letters.lower():
-        name = ' '.join(w if w[0].isdigit() else w.capitalize() for w in name.lower().split())
-    return name
+    return tidy_name(m.group(1))
 
 
 def store_day(ms):
     """The store's day at `ms`: it changes at 08:00 UTC (as src/lib/store-daily.ts)."""
     return datetime.datetime.fromtimestamp(ms / 1000 - 8 * 3600, datetime.timezone.utc).strftime('%Y-%m-%d')
+
+
+def is_daily_link(u):
+    """The daily reward's own product page: never posted as a new reward."""
+    m = PRODUCT.search(u)
+    return bool(m) and m.group(1).startswith('freebie')
+
+
+def daily_from_page(page, today):
+    """Today's store reward as clashloot.gg/bs lists it, or None. The page
+    carries each reward as JSON; only a Brawl Stars store item whose day is
+    today's counts, so a page not yet updated says nothing."""
+    for m in re.finditer(r'\{[^{}]*"is_daily":true[^{}]*\}', page.replace('\\"', '"')):
+        try:
+            item = json.loads(m.group(0))
+            began = datetime.datetime.fromisoformat(item.get('store_cycle_started_at') or item['created_at'])
+        except (ValueError, KeyError, TypeError):
+            continue
+        if item.get('game') != 'bs' or not item.get('is_supercell_store') or store_day(began.timestamp() * 1000) != today:
+            continue
+        name = tidy_name(str(item.get('title') or ''))
+        if name:
+            link = norm(str(item.get('link') or ''))
+            return {'day': today, 'name': name, **({'url': link} if PRODUCT.search(link) else {})}
+    return None
 
 
 daily = None
@@ -156,7 +190,7 @@ if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
             except ValueError:
                 continue
             u = norm(hit.group(0))
-            if first or added < cutoff or key(u) in seen or u in found:
+            if first or added < cutoff or key(u) in seen or u in found or is_daily_link(u):
                 continue
             # A store product is only a reward when its card is a claim
             # ("Claim from Supercell Store"); never a paid offer.
@@ -167,6 +201,26 @@ if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
         if found:
             batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
             seen |= {key(u) for u in found}
+
+# ---- clashloot.gg/bs: today's store reward, until it is known
+today = store_day(time.time() * 1000)
+try:
+    known = json.load(open(DAILY)).get('day') == today
+except (OSError, ValueError):
+    known = False
+# Every ten minutes in the two hours after the change, then hourly.
+since = (time.time() - 8 * 3600) % 86400
+if not known and time.time() - state.get('polled_daily', 0) >= (600 if since < 7200 else 3600):
+    state['polled_daily'] = time.time()
+    try:
+        req = urllib.request.Request('https://clashloot.gg/bs', headers={
+            'user-agent': 'Mozilla/5.0 (compatible; BrawlZone/1.0; +https://brawlzone.net)'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            daily = daily_from_page(r.read().decode('utf-8', 'ignore'), today)
+        if not daily:
+            print("::notice::clashloot.gg does not list today's store reward yet", file=sys.stderr)
+    except Exception as e:  # noqa: BLE001 -- the card stands without a name
+        print(f'::warning::clashloot.gg: {e}', file=sys.stderr)
 
 # ---- Discord #🎁-rewards-feed
 if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
@@ -215,7 +269,7 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
                 for line in '\n'.join(parts).splitlines():
                     for hit in URL.finditer(line):
                         u = norm(hit.group(0))
-                        if key(u) not in seen and u not in found:
+                        if key(u) not in seen and u not in found and not is_daily_link(u):
                             found[u] = name_for(line, hit.start())
                 if found:
                     batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))

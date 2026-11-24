@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { isHomeScreenGift, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
+import { DAILY_STORE_URL, dailyGiftUrl, isHomeScreenGift, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
 
 const at = (iso: string) => Date.parse(iso);
 
@@ -22,6 +22,14 @@ test('the countdown', () => {
   assert.deepEqual(timeLeft(at('2026-11-24T13:20:00Z')), { h: 18, m: 40 });
   assert.deepEqual(timeLeft(at('2026-11-24T07:59:30Z')), { h: 0, m: 1 });
   assert.deepEqual(timeLeft(at('2026-11-24T08:00:00Z')), { h: 24, m: 0 });
+});
+
+test("the card links only to Supercell's own store", () => {
+  const product = 'https://store.supercell.com/brawlstars/product/freebie--/e76865dc';
+  assert.equal(dailyGiftUrl(product), product);
+  for (const bad of [undefined, '', 'https://example.com/x', `${product}?boost=x`, 'https://store.supercell.com.evil.com/brawlstars/product/a/1', 'javascript:alert(1)']) {
+    assert.equal(dailyGiftUrl(bad), DAILY_STORE_URL);
+  }
 });
 
 test('only the marked store link is a home-screen gift', () => {
