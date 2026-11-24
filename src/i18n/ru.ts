@@ -5427,4 +5427,26 @@ export const RU: Record<string, string> = {
     "Прожарка аккаунта теперь работает в приложении.",
   "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
     "Bubble Pass считает все режимы, а среди предложенных друзей нет случайных игроков из одного матча.",
+  "Today's free store reward":
+    "Бесплатная награда дня в магазине",
+  "Sign in to see today's reward":
+    "Войди, чтобы увидеть награду дня",
+  "Changes in {h}h {m}m":
+    "Сменится через {h} ч {m} мин",
+  "A new one every day at {time}, your time.":
+    "Новая каждый день в {time} по твоему времени.",
+  "Supercell's own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.":
+    "Собственный магазин Supercell даёт одну бесплатную награду в день. Войди через Supercell ID и забери её, пока она не сменилась.",
+  "No other free reward right now":
+    "Других бесплатных наград сейчас нет",
+  "What is the free daily reward in the Brawl Stars store?":
+    "Что за ежедневная бесплатная награда в магазине Brawl Stars?",
+  "Supercell's web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.":
+    "В веб-магазине Supercell для Brawl Stars каждый день есть одна бесплатная награда: монеты, очки силы, блинг, кредиты или приз хаоса. Войди на store.supercell.com/brawlstars через Supercell ID и забери её, она придёт на игровой аккаунт. Награда меняется каждый день в 08:00 UTC, пропущенную уже не вернуть.",
+  "Tap Claim. The store opens: sign in with your Supercell ID.":
+    "Нажми «Забрать». Откроется магазин: войди через Supercell ID.",
+  "Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.":
+    "Добавь магазин на главный экран. Android: в Chrome нажми меню ⋮, затем «Добавить на главный экран» или «Установить приложение». iPhone: в Safari нажми «Поделиться», затем «На экран „Домой“».",
+  "Open the store from its new icon and claim the gift there.":
+    "Открой магазин с новой иконки и забери подарок там.",
 };

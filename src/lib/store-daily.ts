@@ -1,0 +1,42 @@
+/**
+ * The free daily reward in Supercell's Brawl Stars store (2026-11-24).
+ *
+ * One free reward a day, the same clock for everyone: it changes at 08:00
+ * UTC. What it is shows only after signing in, so this site cannot read it;
+ * the name comes from Discord (see brawlzone-rewards-watch, "today: 100
+ * Coins") and the card stands without one.
+ *
+ * Plain functions, shared by the page and the browser.
+ */
+export const DAILY_STORE_URL = 'https://store.supercell.com/brawlstars';
+
+/** The hour, UTC, the store changes its daily reward. */
+export const STORE_RESET_HOUR = 8;
+
+const HOUR = 3_600_000;
+const DAY = 24 * HOUR;
+
+/** The store's day at `ms`, as YYYY-MM-DD: it starts at 08:00 UTC, so 07:59 is still yesterday's. */
+export function storeDay(ms: number): string {
+  return new Date(ms - STORE_RESET_HOUR * HOUR).toISOString().slice(0, 10);
+}
+
+/** When the reward on offer at `ms` goes away. */
+export function nextStoreReset(ms: number): number {
+  return Math.floor((ms - STORE_RESET_HOUR * HOUR) / DAY) * DAY + DAY + STORE_RESET_HOUR * HOUR;
+}
+
+/** Hours and minutes left, never negative. */
+export function timeLeft(ms: number): { h: number; m: number } {
+  const minutes = Math.max(0, Math.ceil((nextStoreReset(ms) - ms) / 60_000));
+  return { h: Math.floor(minutes / 60), m: minutes % 60 };
+}
+
+/**
+ * A store gift that is claimed by adding the store to the phone's home screen
+ * (the 20 Gems of November 2026). Its link is the plain store page with this
+ * marker, which the store ignores and this site reads to show the steps.
+ */
+export function isHomeScreenGift(url: string): boolean {
+  return /^https:\/\/store\.supercell\.com\/(?:[a-z-]+\/)?brawlstars\/?#add-to-home-screen$/.test(url);
+}

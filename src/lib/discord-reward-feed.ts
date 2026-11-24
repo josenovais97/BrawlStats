@@ -16,6 +16,8 @@ const SITE = 'https://brawlzone.net';
 export interface FeedReward {
   name: string;
   url: string;
+  /** How to get it, when it takes more than a tap. */
+  steps?: string[];
 }
 
 /** Three failed posts in a row and the channel is dropped: kicked, deleted or muted. */
@@ -50,6 +52,8 @@ export function canManageServer(permissions: string | undefined): boolean {
 export function rewardFeedMessage(rewards: FeedReward[], imageUrl: string | null) {
   const n = rewards.length;
   const lines = rewards.map((r) => `🎁 **${rewardTitle(r.name)}**: [claim it](${r.url})`).join('\n');
+  // A store gift that takes a few steps (2026-11-24) says them.
+  const steps = rewards.flatMap((r) => (r.steps ?? []).map((x, i) => `**${i + 1}.** ${x}`)).join('\n');
   const claim = rewards.slice(0, 4).map((r) => ({
     type: 2,
     style: 5,
@@ -62,7 +66,9 @@ export function rewardFeedMessage(rewards: FeedReward[], imageUrl: string | null
       {
         title: n === 1 ? `🎁 Free Brawl Stars reward: ${rewardTitle(rewards[0].name)}` : `🎁 ${n} free Brawl Stars rewards`,
         description:
-          `Tap ${n > 1 ? 'each link' : 'the link'} on your phone and claim it in the game while it lasts:\n\n${lines}\n\n` +
+          (steps
+            ? `Free from the Supercell Store:\n\n${lines}\n\n${steps}\n\n`
+            : `Tap ${n > 1 ? 'each link' : 'the link'} on your phone and claim it in the game while it lasts:\n\n${lines}\n\n`) +
           `Every free reward in one place: ${SITE}/rewards`,
         color: 0xffc72c,
         ...(imageUrl ? { image: { url: imageUrl } } : {}),

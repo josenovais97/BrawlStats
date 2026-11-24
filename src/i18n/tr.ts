@@ -5426,4 +5426,26 @@ export const TR: Record<string, string> = {
     "Hesap roast'u artık uygulamada çalışıyor.",
   "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
     "Bubble Pass tüm modları sayar; arkadaş önerileri tek maçlık yabancıları göstermez.",
+  "Today's free store reward":
+    "Mağazadaki bugünün ücretsiz ödülü",
+  "Sign in to see today's reward":
+    "Bugünün ödülünü görmek için giriş yap",
+  "Changes in {h}h {m}m":
+    "{h} sa {m} dk sonra değişir",
+  "A new one every day at {time}, your time.":
+    "Her gün {time} itibarıyla yenisi gelir (senin saatinle).",
+  "Supercell's own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.":
+    "Supercell'in kendi mağazası her gün bir ücretsiz ödül verir. Supercell ID ile giriş yap ve değişmeden al.",
+  "No other free reward right now":
+    "Şu anda başka ücretsiz ödül yok",
+  "What is the free daily reward in the Brawl Stars store?":
+    "Brawl Stars mağazasındaki günlük ücretsiz ödül nedir?",
+  "Supercell's web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.":
+    "Supercell'in Brawl Stars web mağazasında her gün bir ücretsiz ödül olur: altın, güç puanı, bling, kredi veya Kaos Hediyesi gibi. store.supercell.com/brawlstars adresinde Supercell ID ile giriş yapıp al; ödül oyun hesabına gelir. Her gün 08:00 UTC'de değişir, kaçırdığın geri gelmez.",
+  "Tap Claim. The store opens: sign in with your Supercell ID.":
+    "Al düğmesine dokun. Mağaza açılır: Supercell ID ile giriş yap.",
+  "Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.":
+    "Mağazayı ana ekranına ekle. Android: Chrome'da ⋮ menüsüne, ardından Ana ekrana ekle veya Uygulamayı yükle seçeneğine dokun. iPhone: Safari'de Paylaş'a, ardından Ana Ekrana Ekle'ye dokun.",
+  "Open the store from its new icon and claim the gift there.":
+    "Mağazayı yeni simgesinden aç ve hediyeyi oradan al.",
 };

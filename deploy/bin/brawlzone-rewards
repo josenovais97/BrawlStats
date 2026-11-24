@@ -60,7 +60,17 @@ for arg in args[:4]:
         sys.exit(f'::error::not a Supercell link, refusing: {url}')
     if key(url) in seen and not force:
         sys.exit(f'::error::already posted: {url} (FORCE=1 to post it again)')
-    rewards.append({'name': name.strip().strip('"'), 'url': url})
+    reward = {'name': name.strip().strip('"'), 'url': url}
+    # A store gift for adding the store to the home screen (2026-11-24, 20x
+    # Gems): the plain store link plus this marker, which the store ignores.
+    # The slides, captions and Discord then say how, and so does /rewards.
+    if url.endswith('#add-to-home-screen'):
+        reward['steps'] = [
+            'Open the store with the link or the code. Sign in with your Supercell ID.',
+            'Add it to your home screen.\nAndroid: Chrome, three-dot menu, Add to Home screen.\niPhone: Safari, Share, Add to Home Screen.',
+            'Open the store from the new icon and claim the gift.',
+        ]
+    rewards.append(reward)
 json.dump(rewards, open(out, 'w'), ensure_ascii=False)
 print(f'{len(rewards)} reward(s): ' + ', '.join(r['name'] for r in rewards))
 PY
@@ -177,11 +187,14 @@ if not chan:
     sys.exit('no 📢-announcements channel')
 n = len(rewards)
 lines = '\n'.join(f"🎁 **{r['name']}**: [claim]({r['url']})" for r in rewards)
+steps = '\n'.join(f'**{k}.** {x}' for r in rewards for k, x in enumerate(r.get('steps', []), 1))
 call('POST', f'/channels/{chan}/messages', {
     'allowed_mentions': {'parse': []},
     'embeds': [{
         'title': f"🎁 Free Brawl Stars {'rewards' if n > 1 else 'reward'}",
-        'description': f"Tap {'each link' if n > 1 else 'the link'} and claim it in the game while it lasts:\n\n{lines}\n\n"
+        'description': (f"Tap {'each link' if n > 1 else 'the link'} and claim it in the game while it lasts:\n\n{lines}\n\n" if not steps
+                        else f"Free from the Supercell Store:\n\n{lines}\n\n{steps}\n\n")
+                       +
                        f"On PC? Scan the QR {'codes' if n > 1 else 'code'} below with your phone.\n"
                        "Every free reward in one place: https://brawlzone.net/rewards",
         'color': 0xFFC72C,

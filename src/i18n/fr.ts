@@ -5427,4 +5427,26 @@ export const FR: Record<string, string> = {
     "Le roast de ton compte fonctionne dans l'appli.",
   "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
     "Le Bubble Pass compte tous les modes, et les suggestions d'amis écartent les inconnus croisés une seule fois.",
+  "Today's free store reward":
+    "La récompense gratuite du jour en boutique",
+  "Sign in to see today's reward":
+    "Connecte-toi pour voir la récompense du jour",
+  "Changes in {h}h {m}m":
+    "Change dans {h} h {m} min",
+  "A new one every day at {time}, your time.":
+    "Une nouvelle chaque jour à {time}, à ton heure.",
+  "Supercell's own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.":
+    "La boutique officielle de Supercell offre une récompense gratuite par jour. Connecte-toi avec ton Supercell ID et récupère-la avant qu'elle change.",
+  "No other free reward right now":
+    "Pas d'autre récompense gratuite pour le moment",
+  "What is the free daily reward in the Brawl Stars store?":
+    "Qu'est-ce que la récompense quotidienne gratuite de la boutique Brawl Stars ?",
+  "Supercell's web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.":
+    "La boutique web de Supercell pour Brawl Stars propose une récompense gratuite par jour, comme des pièces, des points de pouvoir, du bling, des crédits ou un Prix du chaos. Connecte-toi sur store.supercell.com/brawlstars avec ton Supercell ID et récupère-la : elle arrive sur ton compte de jeu. Elle change chaque jour à 08:00 UTC, celle que tu rates est perdue.",
+  "Tap Claim. The store opens: sign in with your Supercell ID.":
+    "Touche Récupérer. La boutique s'ouvre : connecte-toi avec ton Supercell ID.",
+  "Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.":
+    "Ajoute la boutique à l'écran d'accueil. Android : dans Chrome, touche le menu ⋮ puis Ajouter à l'écran d'accueil ou Installer l'application. iPhone : dans Safari, touche Partager puis Sur l'écran d'accueil.",
+  "Open the store from its new icon and claim the gift there.":
+    "Ouvre la boutique depuis sa nouvelle icône et récupère le cadeau.",
 };

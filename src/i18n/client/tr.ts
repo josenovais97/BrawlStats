@@ -590,4 +590,12 @@ export const CLIENT_TR: Record<string, string> = {
     "{n} ücretsiz ödül aktif. Her birinde Al'a dokun, burada işaretlenir.",
   "Or get the BrawlZone Bubble app: an alert for every new reward, and a widget with the latest one.":
     "Ya da BrawlZone Bubble uygulamasını indir: her yeni ödülde bildirim ve en yenisini gösteren bir widget.",
+  "Today's free store reward":
+    "Mağazadaki bugünün ücretsiz ödülü",
+  "Sign in to see today's reward":
+    "Bugünün ödülünü görmek için giriş yap",
+  "Changes in {h}h {m}m":
+    "{h} sa {m} dk sonra değişir",
+  "A new one every day at {time}, your time.":
+    "Her gün {time} itibarıyla yenisi gelir (senin saatinle).",
 };

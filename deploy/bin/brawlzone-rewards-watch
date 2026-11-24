@@ -15,6 +15,11 @@
 #   other servers can be followed into it; either is posted within minutes.
 #   Names come from the text on the link's own line ("Mega Box: link...").
 #
+# The same Discord channel also names the store's free daily reward
+# (2026-11-24): a line like "today: 100 Coins" from the owner, or "Daily
+# freebie: 100 Coins" in a followed post, goes to daily.json, which the card
+# on /rewards reads. It only updates the page: no videos, push or Discord.
+#
 # Every new link goes to brawlzone-rewards (Discord, TikTok, YouTube,
 # Instagram). Only Supercell's own hosts are accepted there, and a link
 # already posted is skipped, so a reward seen in both sources goes out once.
@@ -80,6 +85,38 @@ except (OSError, ValueError):
     seen = set()
 
 
+DAILY = '/var/lib/brawlzone/social/rewards/daily.json'
+# The owner may be brief ("today: 100 Coins"); a followed post must name it.
+DAILY_OWNER = re.compile(r"^\W*(?:today|daily|hoje|freebie)(?:'?s)?(?:\s+(?:free|daily|store|freebie|gift|reward))*(?:\s+is)?\s*[:=–-]\s*(.+)$", re.I)
+DAILY_POST = re.compile(r"^\W*(?:today'?s\s+|daily\s+)(?:(?:free|daily|store|freebie|gift|reward)\s*)+(?:is\s*)?[:=–-]\s*(.+)$", re.I)
+# Only things the game has: the name goes on a public page by itself.
+DAILY_ITEM = re.compile(r'\b(?:coins?|credits?|bling|gems?|power\s*points?|drops?|doublers?|box(?:es)?|pins?|sprays?|icons?|tickets?|tokens?|skins?|pass(?:es)?)\b', re.I)
+
+
+def daily_name(line, owner):
+    """The reward a line names as today's store gift, tidied, or None."""
+    line = re.sub(r'<a?:\w+:\d+>|https?://\S+', ' ', line).replace('’', "'")
+    line = re.sub(r'[*_`~|>#\[\]()]', ' ', line)
+    m = (DAILY_OWNER if owner else DAILY_POST).match(line.strip())
+    if not m:
+        return None
+    name = re.sub(r"[^A-Za-z0-9 .,'×+-]", ' ', m.group(1))
+    name = ' '.join(name.split()).strip(" .,'-+")
+    if not 3 <= len(name) <= 40 or not DAILY_ITEM.search(name):
+        return None
+    name = re.sub(r'^(\d[\d.,]*)\s*[x×]\s*', r'\1x ', name, flags=re.I)
+    letters = re.sub(r'^\d[\d.,]*x?\s*', '', name)
+    if letters == letters.upper() or letters == letters.lower():
+        name = ' '.join(w if w[0].isdigit() else w.capitalize() for w in name.lower().split())
+    return name
+
+
+def store_day(ms):
+    """The store's day at `ms`: it changes at 08:00 UTC (as src/lib/store-daily.ts)."""
+    return datetime.datetime.fromtimestamp(ms / 1000 - 8 * 3600, datetime.timezone.utc).strftime('%Y-%m-%d')
+
+
+daily = None
 batches = []
 # Whether any source was actually read this run: /rewards shows "checked N
 # minutes ago" from it (2026-10-28), so a run where both failed must not count.
@@ -166,6 +203,14 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
                 for e in m.get('embeds', []):
                     parts += [e.get('title') or '', e.get('description') or '']
                     parts += [f"{f.get('name', '')}: {f.get('value', '')}" for f in e.get('fields', [])]
+                # A message's id carries when it was sent: a name given before
+                # the 08:00 change belongs to the day before.
+                sent_day = store_day((int(m['id']) >> 22) + 1420070400000)
+                if sent_day == store_day(time.time() * 1000):
+                    for line in '\n'.join(parts).splitlines():
+                        name = daily_name(line, m['author']['id'] == owner and not m.get('webhook_id'))
+                        if name:
+                            daily = {'day': sent_day, 'name': name}
                 found = {}
                 for line in '\n'.join(parts).splitlines():
                     for hit in URL.finditer(line):
@@ -179,6 +224,15 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
             read_ok = True
     except Exception as e:  # noqa: BLE001
         print(f'::warning::Discord: {e}', file=sys.stderr)
+
+if daily:
+    try:
+        json.dump({**daily, 'setAt': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')},
+                  open(DAILY + '.tmp', 'w'), ensure_ascii=False)
+        os.replace(DAILY + '.tmp', DAILY)
+        batches.insert(0, '@daily ' + daily['name'])
+    except OSError as e:
+        print(f'::warning::daily.json: {e}', file=sys.stderr)
 
 if read_ok:
     checked = '/var/lib/brawlzone/social/rewards/checked.json'
@@ -196,6 +250,14 @@ PY
 [ -n "$batches" ] || exit 0
 while IFS= read -r line; do
   [ -n "$line" ] || continue
+  # The store's daily reward: only the page changes, so refresh it and move on.
+  if [[ "$line" == "@daily "* ]]; then
+    echo "today's store reward: ${line#@daily }"
+    CRON_SECRET="$(sed -n 's/^CRON_SECRET=//p' "$ENV_FILE" | head -1 | sed 's/^["'"'"']//; s/["'"'"']$//')"
+    curl -s -o /dev/null -w 'revalidate: HTTP %{http_code}\n' --max-time 30 -X POST \
+      -H "Authorization: Bearer $CRON_SECRET" https://brawlzone.net/api/cron/revalidate-rewards || echo "::warning::revalidate not reached"
+    continue
+  fi
   IFS=$'\t' read -r -a args <<< "$line"
   echo "new rewards: ${args[*]}"
   /usr/local/bin/brawlzone-rewards "${args[@]}" || echo "::warning::brawlzone-rewards failed for: ${args[*]}"

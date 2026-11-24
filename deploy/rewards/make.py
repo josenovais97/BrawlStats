@@ -100,6 +100,21 @@ def mark(im):
     ctext(im, 'Unofficial fan project, not affiliated with Supercell.', H - 80, G(30), MUTED, shadow=False)
 
 
+def wrap(dr, txt, font, maxw):
+    """`txt` broken into lines no wider than `maxw`; "\\n" forces one."""
+    out = []
+    for part in txt.split('\n'):
+        line = ''
+        for word in part.split():
+            trial = f'{line} {word}'.strip()
+            if line and dr.textlength(trial, font=font) > maxw:
+                out.append(line); line = word
+            else:
+                line = trial
+        out.append(line)
+    return out
+
+
 def pill(im, txt, y, size=46):
     dr = ImageDraw.Draw(im); f = F(size); tw = dr.textlength(txt, font=f); x = (W - tw) / 2
     dr.rounded_rectangle((x - 34, y - 12, x + tw + 34, y + size + 16), 40, fill=YEL); dr.text((x, y), txt, font=f, fill=NAVY)
@@ -248,7 +263,7 @@ else:
         floating(im, reward_image(r['name']), cx, cy, cell - 80)
         stext(im, names[i].upper(), cy + cell // 2 - 50, F(56), WHITE, maxw=430, cx=cx)
 pill(im, 'Official Brawl Stars gift' + ('s' if n > 1 else '') + ' · claim now', 1450, size=50)
-stext(im, 'SWIPE FOR THE CODE →' if n == 1 else 'SWIPE FOR THE CODES →', 1560, F(64), WHITE)
+stext(im, 'SWIPE FOR THE STEPS →' if n == 1 and rewards[0].get('steps') else 'SWIPE FOR THE CODE →' if n == 1 else 'SWIPE FOR THE CODES →', 1560, F(64), WHITE)
 mark(im); slides.append(im)
 
 # one per reward: the code, and the one-tap way that needs no scanning
@@ -261,6 +276,21 @@ for i, r in enumerate(rewards):
     ctext(im, 'Screenshot → scan it with Google Lens', 1335, G(42), WHITE, shadow=False)
     pill(im, 'or tap Claim on brawlzone.net/rewards', 1420, size=46)
     mark(im); slides.append(im)
+    # A gift with steps (2026-11-24: the store's home-screen gems) gets a slide of them.
+    if r.get('steps'):
+        im = bg(cy=700); logo(im, y=90)
+        stext(im, 'HOW TO GET IT', 210, F(120), YEL)
+        dr = ImageDraw.Draw(im); y = 400
+        for k, step in enumerate(r['steps'], 1):
+            f = G(46); lines = wrap(dr, step, f, 760)
+            h = max(190, 70 + 62 * len(lines))
+            dr.rounded_rectangle((60, y, 1020, y + h), 40, fill=CARD, outline=ACCENTS[(k - 1) % 4], width=5)
+            stext(im, str(k), y + h // 2 - 72, F(120), YEL, cx=140)
+            ty = y + (h - 62 * len(lines)) // 2
+            for line in lines:
+                dr.text((225, ty), line, font=f, fill=WHITE); ty += 62
+            y += h + 34
+        mark(im); slides.append(im)
 
 # all codes on one slide, for a screenshot
 if n > 1:
@@ -298,10 +328,11 @@ for i, s in enumerate(slides, 1):
 
 listed = names[0] if n == 1 else ', '.join(names[:-1]) + ' and ' + names[-1]
 links = '\n'.join(f"🎁 {r['name']}: {r['url']}" for r in rewards)
+steps = ''.join('\nHow to get it:\n' + '\n'.join(f'{k}. {x}' for k, x in enumerate(r['steps'], 1)) + '\n' for r in rewards if r.get('steps'))
 title = f"FREE Brawl Stars {'rewards' if n > 1 else 'reward'}: {listed}"[:90]
 description = (
     f"🎁 FREE Brawl Stars {'rewards' if n > 1 else 'reward'}! Claim {listed} before {'they are' if n > 1 else 'it is'} gone 👀\n\n"
-    f"Scan the QR {'codes' if n > 1 else 'code'} (screenshot → Google Lens works) or use the {'links' if n > 1 else 'link'}:\n{links}\n\n"
+    f"Scan the QR {'codes' if n > 1 else 'code'} (screenshot → Google Lens works) or use the {'links' if n > 1 else 'link'}:\n{links}\n{steps}\n"
     "Claim in one tap, and get a notification for the next one: brawlzone.net/rewards\n"
     "Follow for every free reward the moment it drops, and the best Ranked picks every day.\n"
     "Unofficial fan project, not affiliated with Supercell.\n"

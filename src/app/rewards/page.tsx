@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 
 import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
 import { ClaimNudge } from '@/components/rewards/claim-nudge';
+import { DailyGift } from '@/components/rewards/daily-gift';
 import { DropOdds } from '@/components/rewards/drop-odds';
 import { LastChecked } from '@/components/rewards/last-checked';
 import { NotifyButton } from '@/components/rewards/notify-button';
@@ -10,7 +11,8 @@ import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured
 import { relativeTime } from '@/lib/format';
 import { RewardArt } from '@/components/rewards/reward-art';
 import { ClaimSummary, RewardFlag } from '@/components/rewards/claim-tracker';
-import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
+import { getDailyGift, getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
+import { isHomeScreenGift } from '@/lib/store-daily';
 import { dropForReward, getStarrDrops } from '@/lib/starr-drops';
 import { currentMonth, WHATSAPP_URL } from '@/lib/site';
 import { getT } from '@/lib/t';
@@ -45,7 +47,7 @@ export default async function RewardsPage() {
   const t = getT(requestLocale());
   // The drop tables are cached for twelve hours, well past this page's five
   // minutes, so they cost the wiki nothing extra.
-  const [{ live, earlier }, drops] = await Promise.all([getFreeRewards(), getStarrDrops()]);
+  const [{ live, earlier }, drops, daily] = await Promise.all([getFreeRewards(), getStarrDrops(), getDailyGift()]);
   const drop = drops ? dropForReward(live.map((r) => r.name), drops.types) : null;
 
   const faq = [
@@ -56,6 +58,10 @@ export default async function RewardsPage() {
     {
       question: t('Why does the game say the reward expired or was already claimed?'),
       answer: t('Each link works for a limited time and usually once per account. Supercell does not say for how long, so a link here can stop working before it leaves the list. If it has expired, it is gone for everyone.'),
+    },
+    {
+      question: t('What is the free daily reward in the Brawl Stars store?'),
+      answer: t('Supercell\'s web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.'),
     },
     {
       question: t('Are these links safe?'),
@@ -81,6 +87,10 @@ export default async function RewardsPage() {
         <LastChecked />
       </div>
 
+      <DailyGift gift={daily}>
+        <p className="text-sm text-white/75">{t('Supercell\'s own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.')}</p>
+      </DailyGift>
+
       {/* What this phone has claimed of the live ones (2026-11-11). */}
       <ClaimSummary ids={live.map((r) => r.id)} />
       {hero ? <RewardStage reward={hero} total={live.length} /> : <EmptyStage />}
@@ -101,6 +111,7 @@ export default async function RewardsPage() {
                   {isStoreFreebie(r.url) ? (
                     <p className="text-xs text-muted">{t('Opens the Supercell Store. Sign in with Supercell ID to claim it.')}</p>
                   ) : null}
+                  {isHomeScreenGift(r.url) ? <HomeScreenSteps /> : null}
                   <ClaimButton url={r.url} id={r.id} small />
                 </div>
               </li>
@@ -204,6 +215,7 @@ function RewardStage({ reward, total }: { reward: FreeReward; total: number }) {
             ? t('Opens the Supercell Store. Sign in with Supercell ID to claim it.')
             : t('Opens Brawl Stars. An official Supercell link.')}
         </p>
+        {isHomeScreenGift(reward.url) ? <HomeScreenSteps /> : null}
       </div>
     </section>
   );
@@ -217,7 +229,7 @@ function EmptyStage() {
       <div aria-hidden className="reward-rays opacity-40" />
       {/* eslint-disable-next-line @next/next/no-img-element -- same art as above */}
       <img src={rewardArt('Mega Box')} alt="" width={200} height={200} className="reward-locked mx-auto size-44 object-contain" />
-      <h2 className="display text-game-stroke mt-4 text-3xl text-white sm:text-4xl">{t('No free reward right now')}</h2>
+      <h2 className="display text-game-stroke mt-4 text-3xl text-white sm:text-4xl">{t('No other free reward right now')}</h2>
       <p className="mx-auto mt-3 max-w-md text-sm text-white/75">{t('Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.')}</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <FollowButtons />
@@ -263,7 +275,19 @@ function FollowButtons() {
  * that opens the game, so its card says so.
  */
 function isStoreFreebie(url: string): boolean {
-  return /^https:\/\/store\.supercell\.com\/(?:[^?#]*\/)?product\//.test(url);
+  return isHomeScreenGift(url) || /^https:\/\/store\.supercell\.com\/(?:[^?#]*\/)?product\//.test(url);
+}
+
+/** How to claim a gift the store gives for adding it to the home screen (2026-11-24). */
+function HomeScreenSteps() {
+  const t = getT(requestLocale());
+  return (
+    <ol className="mt-3 list-decimal space-y-1 pl-5 text-left text-xs leading-relaxed text-white/80">
+      <li>{t('Tap Claim. The store opens: sign in with your Supercell ID.')}</li>
+      <li>{t('Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.')}</li>
+      <li>{t('Open the store from its new icon and claim the gift there.')}</li>
+    </ol>
+  );
 }
 
 /** The game's green claim button, in the site's btn-game shape. */

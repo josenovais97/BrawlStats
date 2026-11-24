@@ -2,6 +2,7 @@ import 'server-only';
 
 import { fankitItem } from '@/lib/fankit';
 import { SITE_URL, USER_AGENT } from '@/lib/site';
+import { storeDay } from '@/lib/store-daily';
 import { WIKI_API, fetchWikiJson } from '@/lib/wiki';
 
 /**
@@ -184,4 +185,35 @@ export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: F
     live: newest.filter((r) => Date.parse(r.postedAt) >= cutoff),
     earlier: newest.filter((r) => Date.parse(r.postedAt) < cutoff),
   };
+}
+
+export interface DailyGift {
+  /** The store day it was named for (see `storeDay`). */
+  day: string;
+  name: string;
+  art: string;
+  fallbackArt: string;
+}
+
+/**
+ * The name of today's free reward in the Supercell Store, when it is known:
+ * brawlzone-rewards-watch writes it from a Discord message. Yesterday's is
+ * never returned, so a day nobody names simply has none.
+ */
+export async function getDailyGift(): Promise<DailyGift | null> {
+  try {
+    const res = await fetch(`${SITE_URL}/social/rewards/daily.json`, {
+      headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+      signal: AbortSignal.timeout(10_000),
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const { day, name } = (await res.json()) as { day?: unknown; name?: unknown };
+    if (typeof day !== 'string' || typeof name !== 'string' || !name || name.length > 40) return null;
+    if (day !== storeDay(Date.now())) return null;
+    const [gift] = await withArt([{ id: `daily-${day}`, name, url: '', image: null, postedAt: day }]);
+    return gift ? { day, name, art: gift.art, fallbackArt: gift.fallbackArt } : null;
+  } catch {
+    return null;
+  }
 }

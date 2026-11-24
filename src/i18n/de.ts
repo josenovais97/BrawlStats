@@ -5427,4 +5427,26 @@ export const DE: Record<string, string> = {
     "Der Account-Roast funktioniert jetzt in der App.",
   "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
     "Der Bubble Pass zählt alle Modi, und Freundesvorschläge lassen Fremde aus nur einem Match weg.",
+  "Today's free store reward":
+    "Die heutige Gratis-Belohnung im Store",
+  "Sign in to see today's reward":
+    "Melde dich an, um die heutige Belohnung zu sehen",
+  "Changes in {h}h {m}m":
+    "Wechselt in {h} Std. {m} Min.",
+  "A new one every day at {time}, your time.":
+    "Jeden Tag um {time} Uhr deiner Zeit eine neue.",
+  "Supercell's own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.":
+    "Supercells eigener Store gibt jeden Tag eine Gratis-Belohnung. Melde dich mit deiner Supercell ID an und hol sie ab, bevor sie wechselt.",
+  "No other free reward right now":
+    "Gerade keine weitere Gratis-Belohnung",
+  "What is the free daily reward in the Brawl Stars store?":
+    "Was ist die tägliche Gratis-Belohnung im Brawl-Stars-Store?",
+  "Supercell's web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.":
+    "Supercells Web-Store für Brawl Stars hat jeden Tag eine Gratis-Belohnung, zum Beispiel Münzen, Powerpunkte, Bling, Credits oder einen Chaos-Drop. Melde dich auf store.supercell.com/brawlstars mit deiner Supercell ID an und hol sie ab, sie landet auf deinem Spielkonto. Sie wechselt täglich um 08:00 UTC, eine verpasste ist weg.",
+  "Tap Claim. The store opens: sign in with your Supercell ID.":
+    "Tippe auf Abholen. Der Store öffnet sich: Melde dich mit deiner Supercell ID an.",
+  "Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.":
+    "Füge den Store zum Startbildschirm hinzu. Android: in Chrome auf das Menü ⋮ tippen, dann Zum Startbildschirm hinzufügen oder App installieren. iPhone: in Safari auf Teilen tippen, dann Zum Home-Bildschirm.",
+  "Open the store from its new icon and claim the gift there.":
+    "Öffne den Store über das neue Symbol und hol dir dort das Geschenk.",
 };

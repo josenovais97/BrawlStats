@@ -1062,4 +1062,12 @@ export const CLIENT_ES: Record<string, string> = {
     "{n} recompensas gratis activas. Toca Reclamar en cada una y se marcan aquí.",
   "Or get the BrawlZone Bubble app: an alert for every new reward, and a widget with the latest one.":
     "O descarga la app BrawlZone Bubble: un aviso con cada recompensa nueva y un widget con la última.",
+  "Today's free store reward":
+    "La recompensa gratis de hoy en la tienda",
+  "Sign in to see today's reward":
+    "Inicia sesión para ver la recompensa de hoy",
+  "Changes in {h}h {m}m":
+    "Cambia en {h} h {m} min",
+  "A new one every day at {time}, your time.":
+    "Una nueva cada día a las {time}, en tu hora.",
 };

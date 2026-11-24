@@ -5426,4 +5426,26 @@ export const PT: Record<string, string> = {
     "A zoeira da sua conta já funciona no app.",
   "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
     "O Bubble Pass conta todos os modos, e as sugestões de amigos deixam de fora desconhecidos de uma partida só.",
+  "Today's free store reward":
+    "A recompensa grátis de hoje na loja",
+  "Sign in to see today's reward":
+    "Entre para ver a recompensa de hoje",
+  "Changes in {h}h {m}m":
+    "Muda em {h} h {m} min",
+  "A new one every day at {time}, your time.":
+    "Uma nova todo dia às {time}, no seu horário.",
+  "Supercell's own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.":
+    "A loja oficial da Supercell dá uma recompensa grátis por dia. Entre com seu Supercell ID e resgate antes que mude.",
+  "No other free reward right now":
+    "Nenhuma outra recompensa grátis agora",
+  "What is the free daily reward in the Brawl Stars store?":
+    "O que é a recompensa diária grátis da loja do Brawl Stars?",
+  "Supercell's web store for Brawl Stars has one free reward a day, such as coins, power points, bling, credits or a Chaos Drop. Sign in at store.supercell.com/brawlstars with your Supercell ID and claim it, and it goes to your game account. It changes every day at 08:00 UTC, so one you miss is gone.":
+    "A loja web da Supercell para Brawl Stars tem uma recompensa grátis por dia, como moedas, pontos de poder, bling, créditos ou um Sorteio do Caos. Entre em store.supercell.com/brawlstars com seu Supercell ID e resgate: ela vai para a sua conta do jogo. Ela muda todo dia às 08:00 UTC, então a que você perder já era.",
+  "Tap Claim. The store opens: sign in with your Supercell ID.":
+    "Toque em Resgatar. A loja abre: entre com seu Supercell ID.",
+  "Add the store to your home screen. Android: in Chrome, tap the ⋮ menu, then Add to Home screen or Install app. iPhone: in Safari, tap Share, then Add to Home Screen.":
+    "Adicione a loja à tela inicial. Android: no Chrome, toque no menu ⋮ e depois em Adicionar à tela inicial ou Instalar app. iPhone: no Safari, toque em Compartilhar e depois em Adicionar à Tela de Início.",
+  "Open the store from its new icon and claim the gift there.":
+    "Abra a loja pelo novo ícone e resgate o presente lá.",
 };
