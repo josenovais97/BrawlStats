@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { DAILY_ALERT_DAYS, DAILY_STORE_URL, dailyAlertOn, dailyGiftUrl, isHomeScreenGift, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
+import { DAILY_ALERT_DAYS, DAILY_STORE_URL, blackFridayOn, dailyAlertOn, dailyGiftUrl, dayLabel, isHomeScreenGift, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
 
 const at = (iso: string) => Date.parse(iso);
 
@@ -54,6 +54,17 @@ test('the server script and the app use the same trial week', () => {
   const script = readFileSync('deploy/bin/brawlzone-daily-gift', 'utf8');
   assert.match(script, new RegExp(`^TRIAL_START=${DAILY_ALERT_DAYS.from}$`, 'm'));
   assert.match(script, new RegExp(`^TRIAL_END=${DAILY_ALERT_DAYS.to}$`, 'm'));
+});
+
+test('the Black Friday note goes away by itself', () => {
+  assert.equal(blackFridayOn(at('2026-11-24T16:00:00Z')), true);
+  assert.equal(blackFridayOn(at('2026-12-01T07:59:00Z')), true);
+  assert.equal(blackFridayOn(at('2026-12-01T08:00:00Z')), false);
+});
+
+test("the card's date is the store day, in any time zone", () => {
+  assert.equal(dayLabel('2026-11-24', 'en'), 'November 24');
+  assert.equal(dayLabel('2026-11-24', 'pt-BR'), '24 de novembro');
 });
 
 test('only the marked store link is a home-screen gift', () => {

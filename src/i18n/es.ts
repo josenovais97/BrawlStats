@@ -5448,4 +5448,20 @@ export const ES: Record<string, string> = {
     "Añade la tienda a tu pantalla de inicio. Android: en Chrome, toca el menú ⋮ y luego Añadir a pantalla de inicio o Instalar aplicación. iPhone: en Safari, toca Compartir y luego Añadir a pantalla de inicio.",
   "Open the store from its new icon and claim the gift there.":
     "Abre la tienda desde su nuevo icono y reclama el regalo allí.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No generators.":
+    "Cada link de recompensa gratis que da Supercell, publicado en cuanto aparece: cajas, créditos, puntos de poder. Toca Reclamar y va a tu cuenta. Sin generadores.",
+  "Not in the game. Free rewards come as links from Supercell that add the reward to your account, and its store sometimes takes store codes that Supercell or creators share. You enter those only at store.supercell.com/brawlstars, signed in with your Supercell ID. Any other site that asks for a code, your login or a survey to get free gems is a scam.":
+    "En el juego no. Las recompensas gratis llegan como links de Supercell que añaden la recompensa a tu cuenta, y su tienda a veces acepta códigos que comparten Supercell o los creadores. Solo se escriben en store.supercell.com/brawlstars, con tu Supercell ID. Cualquier otro sitio que pida un código, tu inicio de sesión o una encuesta para darte gemas gratis es una estafa.",
+  "Are there free Brawl Stars rewards on Black Friday 2026?":
+    "¿Hay recompensas gratis de Brawl Stars en el Black Friday 2026?",
+  "Supercell's store runs Black Friday from November 27 to 30, 2026. It says to look out for QR codes from creators that unlock freebies, and does not say which ones. Every one we find is listed on this page.":
+    "La tienda de Supercell celebra el Black Friday del 27 al 30 de noviembre de 2026. Dice que estés atento a los códigos QR de los creadores que desbloquean regalos, sin decir cuáles. Todos los que encontramos están en esta página.",
+  "Supercell Store Black Friday: {from} to {to}":
+    "Black Friday en la tienda de Supercell: del {from} al {to}",
+  "Supercell says to look out for QR codes from creators that unlock freebies. Every one we find goes on this page.":
+    "Supercell dice que estés atento a los códigos QR de los creadores que desbloquean regalos. Todos los que encontremos irán a esta página.",
+  "Supercell's Black Friday page":
+    "Página del Black Friday de Supercell",
+  "Today in the store: {name}":
+    "Hoy en la tienda: {name}",
 };

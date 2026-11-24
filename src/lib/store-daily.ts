@@ -56,6 +56,28 @@ export function dailyGiftUrl(url: unknown): string {
 }
 
 /**
+ * Supercell Store's Black Friday (store.supercell.com/blackfriday, read
+ * 2026-11-24): November 27 to 30. The note on /rewards shows until the last
+ * store day ends.
+ */
+export const BLACK_FRIDAY = { from: '2026-11-27', to: '2026-11-30', noteUntil: '2026-12-01T08:00:00Z', url: 'https://store.supercell.com/blackfriday' };
+
+export function blackFridayOn(ms: number): boolean {
+  return ms < Date.parse(BLACK_FRIDAY.noteUntil);
+}
+
+/** The store's day and whether its Black Friday note is up, now. */
+export function storeNow(): { day: string; blackFriday: boolean } {
+  const ms = Date.now();
+  return { day: storeDay(ms), blackFriday: blackFridayOn(ms) };
+}
+
+/** "November 24", in the reader's language, for a store day. */
+export function dayLabel(day: string, lang: string): string {
+  return new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${day}T12:00:00Z`));
+}
+
+/**
  * A store gift that is claimed by adding the store to the phone's home screen
  * (the 20 Gems of November 2026). Its link is the plain store page with this
  * marker, which the store ignores and this site reads to show the steps.

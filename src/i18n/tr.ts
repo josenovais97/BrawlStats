@@ -5448,4 +5448,20 @@ export const TR: Record<string, string> = {
     "Mağazayı ana ekranına ekle. Android: Chrome'da ⋮ menüsüne, ardından Ana ekrana ekle veya Uygulamayı yükle seçeneğine dokun. iPhone: Safari'de Paylaş'a, ardından Ana Ekrana Ekle'ye dokun.",
   "Open the store from its new icon and claim the gift there.":
     "Mağazayı yeni simgesinden aç ve hediyeyi oradan al.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No generators.":
+    "Supercell'in verdiği her ücretsiz ödül bağlantısı, çıktığı anda paylaşılır: kutular, krediler, güç puanları. Al'a dokun, hesabına gitsin. Üretici yok.",
+  "Not in the game. Free rewards come as links from Supercell that add the reward to your account, and its store sometimes takes store codes that Supercell or creators share. You enter those only at store.supercell.com/brawlstars, signed in with your Supercell ID. Any other site that asks for a code, your login or a survey to get free gems is a scam.":
+    "Oyunda yok. Ücretsiz ödüller Supercell'den ödülü hesabına ekleyen bağlantılar olarak gelir; mağazası bazen Supercell'in veya içerik üreticilerinin paylaştığı mağaza kodlarını kabul eder. Bunlar yalnızca store.supercell.com/brawlstars adresinde, Supercell ID ile giriş yapılarak girilir. Ücretsiz elmas için kod, giriş bilgisi ya da anket isteyen diğer her site dolandırıcıdır.",
+  "Are there free Brawl Stars rewards on Black Friday 2026?":
+    "Black Friday 2026'da ücretsiz Brawl Stars ödülleri var mı?",
+  "Supercell's store runs Black Friday from November 27 to 30, 2026. It says to look out for QR codes from creators that unlock freebies, and does not say which ones. Every one we find is listed on this page.":
+    "Supercell mağazasında Black Friday 27-30 Kasım 2026 arasında. İçerik üreticilerinin hediye açan QR kodlarına dikkat etmeni söylüyor, hangileri olduğunu belirtmiyor. Bulduklarımızın hepsi bu sayfada.",
+  "Supercell Store Black Friday: {from} to {to}":
+    "Supercell mağazasında Black Friday: {from} - {to}",
+  "Supercell says to look out for QR codes from creators that unlock freebies. Every one we find goes on this page.":
+    "Supercell, içerik üreticilerinin hediye açan QR kodlarına dikkat etmeni söylüyor. Bulduğumuz her kod bu sayfaya eklenir.",
+  "Supercell's Black Friday page":
+    "Supercell'in Black Friday sayfası",
+  "Today in the store: {name}":
+    "Bugün mağazada: {name}",
 };

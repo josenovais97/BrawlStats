@@ -12,9 +12,10 @@ import { relativeTime } from '@/lib/format';
 import { RewardArt } from '@/components/rewards/reward-art';
 import { ClaimSummary, RewardFlag } from '@/components/rewards/claim-tracker';
 import { getDailyGift, getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
-import { isHomeScreenGift } from '@/lib/store-daily';
+import { BLACK_FRIDAY, dayLabel, isHomeScreenGift, storeNow } from '@/lib/store-daily';
 import { dropForReward, getStarrDrops } from '@/lib/starr-drops';
 import { currentMonth, WHATSAPP_URL } from '@/lib/site';
+import { HTML_LANG } from '@/lib/i18n';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
 
@@ -25,8 +26,9 @@ import { requestLocale } from '@/lib/request-locale';
  * The job had been posting each one to TikTok, YouTube, Instagram, Discord
  * and WhatsApp since 2026-10-21 while the site itself had nowhere to send
  * anyone, and "free rewards" is one of the most searched things about the
- * game. The FAQ is the other half of the page: there are no redeem codes in
- * Brawl Stars, and the searches for them mostly find gem generators.
+ * game. The FAQ is the other half of the page: the game itself takes no codes
+ * (Supercell's store sometimes does, 2026-11-24), and the searches for them
+ * mostly find gem generators.
  */
 
 const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
@@ -36,7 +38,7 @@ export function generateMetadata(): Metadata {
   return {
     alternates: { canonical: '/rewards' },
     title: t('Free Brawl Stars rewards today ({v}): every claim link', { v: currentMonth() }),
-    description: t('Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No codes, no generators.'),
+    description: t('Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No generators.'),
   };
 }
 
@@ -50,10 +52,20 @@ export default async function RewardsPage() {
   const [{ live, earlier }, drops, daily] = await Promise.all([getFreeRewards(), getStarrDrops(), getDailyGift()]);
   const drop = drops ? dropForReward(live.map((r) => r.name), drops.types) : null;
 
+  const { day, blackFriday } = storeNow();
+  const lang = HTML_LANG[requestLocale()];
   const faq = [
+    ...(blackFriday
+      ? [
+          {
+            question: t('Are there free Brawl Stars rewards on Black Friday 2026?'),
+            answer: t('Supercell\'s store runs Black Friday from November 27 to 30, 2026. It says to look out for QR codes from creators that unlock freebies, and does not say which ones. Every one we find is listed on this page.'),
+          },
+        ]
+      : []),
     {
       question: t('Are there Brawl Stars codes for free gems?'),
-      answer: t('No. Brawl Stars has no redeem codes. Free rewards come as links from Supercell that open the game and add the reward to your account. Any site that asks for a code, your login or to "verify" with a survey to get free gems is a scam.'),
+      answer: t('Not in the game. Free rewards come as links from Supercell that add the reward to your account, and its store sometimes takes store codes that Supercell or creators share. You enter those only at store.supercell.com/brawlstars, signed in with your Supercell ID. Any other site that asks for a code, your login or a survey to get free gems is a scam.'),
     },
     {
       question: t('Why does the game say the reward expired or was already claimed?'),
@@ -87,9 +99,23 @@ export default async function RewardsPage() {
         <LastChecked />
       </div>
 
-      <DailyGift gift={daily}>
+      <DailyGift gift={daily} day={day}>
         <p className="text-sm text-white/75">{t('Supercell\'s own store gives one free reward a day. Sign in with your Supercell ID and claim it before it changes.')}</p>
       </DailyGift>
+
+      {blackFriday ? (
+        <section className="flex flex-col gap-3 rounded-2xl border-2 border-ink bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-2xl space-y-1">
+            <h2 className="display text-xl">
+              {t('Supercell Store Black Friday: {from} to {to}', { from: dayLabel(BLACK_FRIDAY.from, lang), to: dayLabel(BLACK_FRIDAY.to, lang) })}
+            </h2>
+            <p className="text-sm text-muted">{t('Supercell says to look out for QR codes from creators that unlock freebies. Every one we find goes on this page.')}</p>
+          </div>
+          <a href={BLACK_FRIDAY.url} target="_blank" rel="noopener noreferrer nofollow" className="shrink-0 text-sm font-semibold text-brand hover:underline">
+            {t('Supercell\'s Black Friday page')}
+          </a>
+        </section>
+      ) : null}
 
       {/* What this phone has claimed of the live ones (2026-11-11). */}
       <ClaimSummary ids={live.map((r) => r.id)} />
@@ -270,12 +296,12 @@ function FollowButtons() {
 }
 
 /**
- * A free product in the Supercell Store (2026-11-06, the first was 10x Gems):
+ * A gift from the Supercell Store (2026-11-06, the first was 10x Gems):
  * claimed on the store's website with Supercell ID, not by a voucher link
  * that opens the game, so its card says so.
  */
 function isStoreFreebie(url: string): boolean {
-  return isHomeScreenGift(url) || /^https:\/\/store\.supercell\.com\/(?:[^?#]*\/)?product\//.test(url);
+  return /^https:\/\/store\.supercell\.com\//.test(url);
 }
 
 /** How to claim a gift the store gives for adding it to the home screen (2026-11-24). */

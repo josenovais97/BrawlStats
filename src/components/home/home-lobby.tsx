@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { Countdown } from '@/components/giveaway/countdown';
-import { getFreeRewards } from '@/lib/free-rewards';
+import { getDailyGift, getFreeRewards } from '@/lib/free-rewards';
 import { BRAWL_PASS_ART, GIVEAWAY, GIVEAWAY_PUBLIC, PRIZE_FALLBACK_ART, hasClosed } from '@/lib/giveaway';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -26,8 +26,14 @@ export async function HomeLobby() {
   const locale = requestLocale();
   const t = getT(locale);
   const lp = (path: string) => localePath(locale, path);
-  const { live } = await getFreeRewards().catch(() => ({ live: [] as Awaited<ReturnType<typeof getFreeRewards>>['live'] }));
-  const reward = live[0];
+  const [{ live }, daily] = await Promise.all([
+    getFreeRewards().catch(() => ({ live: [] as Awaited<ReturnType<typeof getFreeRewards>>['live'] })),
+    getDailyGift(),
+  ]);
+  // The newest link, or the store's reward of the day when there is none
+  // (2026-11-24): the second line names the day's either way.
+  const reward = live[0] ?? daily;
+  const count = live.length + (daily ? 1 : 0);
   const giveaway = GIVEAWAY_PUBLIC && !hasClosed();
   const today = new Date().toISOString().slice(0, 10);
 
@@ -54,8 +60,9 @@ export async function HomeLobby() {
           href={lp('/rewards')}
           tone="linear-gradient(180deg, #ffbf3a 0%, #f2860f 100%)"
           label={t('Free rewards')}
-          badge={live.length ? t('{n} live', { n: live.length }) : null}
+          badge={count ? t('{n} live', { n: count }) : null}
           title={reward ? reward.name : t('No free link live right now')}
+          note={live[0] && daily ? t('Today in the store: {name}', { name: daily.name }) : null}
           cta={reward ? t('Claim it') : t('Get the next one')}
           ctaClass="bg-[#3ddc63] text-[#0b2a14] [--btn-shadow:#1a7a33]"
           art={
@@ -103,6 +110,7 @@ function LobbyTile({
   label,
   badge,
   title,
+  note,
   cta,
   ctaClass,
   art,
@@ -116,6 +124,8 @@ function LobbyTile({
   label: string;
   badge: ReactNode;
   title: string;
+  /** A second, smaller line under the title. */
+  note?: string | null;
   cta: string;
   ctaClass: string;
   art: ReactNode;
@@ -141,7 +151,8 @@ function LobbyTile({
           {art}
         </span>
         <span className="mt-auto flex flex-col gap-3 px-4 pb-4">
-          <span className="display text-game-stroke min-h-[2.5em] text-2xl leading-[1.1]">{title}</span>
+          <span className={`display text-game-stroke text-2xl leading-[1.1] ${note ? '' : 'min-h-[2.5em]'}`}>{title}</span>
+          {note ? <span className="-mt-1 min-h-[1.25em] text-sm font-bold leading-tight text-white">{note}</span> : null}
           <span className={`btn-game self-start px-5 py-2 text-lg ${ctaClass}`}>{cta}</span>
         </span>
       </Link>

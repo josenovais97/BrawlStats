@@ -5449,4 +5449,20 @@ export const RU: Record<string, string> = {
     "Добавь магазин на главный экран. Android: в Chrome нажми меню ⋮, затем «Добавить на главный экран» или «Установить приложение». iPhone: в Safari нажми «Поделиться», затем «На экран „Домой“».",
   "Open the store from its new icon and claim the gift there.":
     "Открой магазин с новой иконки и забери подарок там.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No generators.":
+    "Каждая ссылка на бесплатную награду от Supercell, сразу как появляется: ящики, кредиты, очки силы. Нажми «Забрать», и она попадёт на твой аккаунт. Без генераторов.",
+  "Not in the game. Free rewards come as links from Supercell that add the reward to your account, and its store sometimes takes store codes that Supercell or creators share. You enter those only at store.supercell.com/brawlstars, signed in with your Supercell ID. Any other site that asks for a code, your login or a survey to get free gems is a scam.":
+    "В игре нет. Бесплатные награды приходят ссылками от Supercell, которые добавляют награду на твой аккаунт, а её магазин иногда принимает коды, которыми делятся Supercell или авторы. Их вводят только на store.supercell.com/brawlstars, войдя через Supercell ID. Любой другой сайт, который за бесплатные гемы просит код, твой логин или опрос, — мошенники.",
+  "Are there free Brawl Stars rewards on Black Friday 2026?":
+    "Будут ли бесплатные награды Brawl Stars в Чёрную пятницу 2026?",
+  "Supercell's store runs Black Friday from November 27 to 30, 2026. It says to look out for QR codes from creators that unlock freebies, and does not say which ones. Every one we find is listed on this page.":
+    "Чёрная пятница в магазине Supercell — с 27 по 30 ноября 2026 года. Там советуют следить за QR-кодами авторов, которые открывают подарки, но не уточняют какие. Все, что мы находим, есть на этой странице.",
+  "Supercell Store Black Friday: {from} to {to}":
+    "Чёрная пятница в магазине Supercell: {from} – {to}",
+  "Supercell says to look out for QR codes from creators that unlock freebies. Every one we find goes on this page.":
+    "Supercell советует следить за QR-кодами авторов, которые открывают подарки. Все, что найдём, появятся на этой странице.",
+  "Supercell's Black Friday page":
+    "Страница Чёрной пятницы Supercell",
+  "Today in the store: {name}":
+    "Сегодня в магазине: {name}",
 };

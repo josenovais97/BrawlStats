@@ -8,7 +8,7 @@ import { useT } from '@/components/i18n/use-t';
 import { RewardFlag } from '@/components/rewards/claim-tracker';
 import { RewardArt } from '@/components/rewards/reward-art';
 import { HTML_LANG } from '@/lib/i18n';
-import { DAILY_STORE_URL, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
+import { DAILY_STORE_URL, dayLabel, nextStoreReset, storeDay, timeLeft } from '@/lib/store-daily';
 
 /**
  * Today's free reward in the Supercell Store (2026-11-24), always on
@@ -16,8 +16,10 @@ import { DAILY_STORE_URL, nextStoreReset, storeDay, timeLeft } from '@/lib/store
  * The name is shown only for the day it was given for; the page is cached for
  * minutes, so the browser checks the clock itself.
  */
-export function DailyGift({ gift, children }: {
+export function DailyGift({ gift, day, children }: {
   gift: { day: string; name: string; url: string; art: string; fallbackArt: string } | null;
+  /** The store day the page was drawn on; the browser checks it. */
+  day: string;
   /** The sentences that never change, rendered on the server for search. */
   children: React.ReactNode;
 }) {
@@ -35,7 +37,8 @@ export function DailyGift({ gift, children }: {
   const known = gift && (now === null || gift.day === storeDay(now)) ? gift : null;
   const left = now === null ? null : timeLeft(now);
   const at = now === null ? null : new Intl.DateTimeFormat(HTML_LANG[lang], { hour: '2-digit', minute: '2-digit' }).format(nextStoreReset(now));
-  const id = `daily-${now === null ? (gift?.day ?? '') : storeDay(now)}`;
+  const today = now === null ? day : storeDay(now);
+  const id = `daily-${today}`;
 
   return (
     <section className="reward-tile flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6" aria-labelledby="daily-gift">
@@ -47,7 +50,7 @@ export function DailyGift({ gift, children }: {
         className="mx-auto size-24 shrink-0 object-contain drop-shadow-[0_6px_8px_rgb(0_0_0/0.5)] sm:mx-0"
       />
       <div className="min-w-0 flex-1 space-y-1.5 text-center sm:text-left">
-        <p className="text-sm font-semibold text-white/70">{t("Today's free store reward")}</p>
+        <p className="text-sm font-semibold text-white/70">{t("Today's free store reward")} · <time dateTime={today}>{dayLabel(today, HTML_LANG[lang])}</time></p>
         <h2 id="daily-gift" className="display text-game-stroke text-2xl leading-tight text-white sm:text-3xl">
           {known ? known.name : t("Sign in to see today's reward")}
         </h2>

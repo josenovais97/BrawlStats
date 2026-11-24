@@ -3,13 +3,16 @@
 #
 #   brawlzone-rewards-watch
 #
-# Run every two minutes by brawlzone-rewards-watch.timer. Two sources:
+# Run every two minutes by brawlzone-rewards-watch.timer. Three sources:
 #
 # - brawlnetwork.com/rewards, read every ten minutes. Brawl Network (Chosen
 #   Network on X) lists every reward link with its name and the day it was
 #   added, and had the 2026-10-21 Mega Box / Credits / Power Points set the
 #   same day. Only links added in the last two days count: the page keeps
 #   pins from 2023, and those must never go out as new.
+# - clashloot.gg/bs, read every ten minutes (2026-11-24): a second list, so a
+#   reward one of them misses still goes out. Only its verified entries added
+#   in the last two days, with a link of Supercell's own.
 # - Discord's #🎁-rewards-feed, private to the server owner and the bot. The
 #   owner can paste links there from a phone, and announcement channels of
 #   other servers can be followed into it; either is posted within minutes.
@@ -55,7 +58,10 @@ except (OSError, ValueError):
 # Supercell Store (store.supercell.com/brawlstars/product/gems/db31bef9),
 # claimed on the store with Supercell ID instead of through a voucher link.
 # Brawl Network listed it; this pattern only knew vouchers, so it went by.
+#
+# And the older spelling of a voucher, /?action=voucher&code=<id> (2026-11-24).
 URL = re.compile(r'(?:https?://)?(?:link\.brawlstars\.com/(?:[a-z-]+/)?voucher/[0-9a-fA-F-]{36}'
+                 r'|link\.brawlstars\.com/(?:[a-z-]+/)?\?action=voucher&(?:amp;)?code=[0-9a-fA-F-]{36}'
                  r'|store\.supercell\.com/[^\s)>\]"\']*voucher=[0-9a-fA-F-]{36}'
                  r'|store\.supercell\.com/(?:[a-z]{2}(?:-[a-zA-Z]{2,4})?/)?brawlstars/product/[a-z-]+/[0-9A-Za-z]+(?:\?[^\s)>\]"\'<]*)?)/?')
 VOUCHER = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
@@ -67,7 +73,12 @@ def norm(u):
     # A store product link loses its language and any tracking query
     # (Brawl Network adds its creator boost, ?boost=chosen): one clean link.
     m = PRODUCT.search(u)
-    return f'https://store.supercell.com/brawlstars/product/{m.group(1)}/{m.group(2)}' if m else u
+    if m:
+        return f'https://store.supercell.com/brawlstars/product/{m.group(1)}/{m.group(2)}'
+    u = u.replace('&amp;', '&')
+    if 'link.brawlstars.com' in u and '?' in u and VOUCHER.search(u):
+        return f'https://link.brawlstars.com/?action=voucher&code={VOUCHER.search(u).group(0).lower()}'
+    return u
 
 
 def key(u):
@@ -80,7 +91,7 @@ def key(u):
 
 
 def arg(name, url):
-    return f'{name}: {url}/' if 'link.brawlstars' in url else f'{name}: {url}'
+    return f'{name}: {url}/' if 'link.brawlstars' in url and '?' not in url else f'{name}: {url}'
 
 
 try:
@@ -90,6 +101,7 @@ except (OSError, ValueError):
 
 
 DAILY = '/var/lib/brawlzone/social/rewards/daily.json'
+HISTORY = '/var/lib/brawlzone/social/rewards/daily-history.json'
 # The owner may be brief ("today: 100 Coins"); a followed post must name it.
 DAILY_OWNER = re.compile(r"^\W*(?:today|daily|hoje|freebie)(?:'?s)?(?:\s+(?:free|daily|store|freebie|gift|reward))*(?:\s+is)?\s*[:=–-]\s*(.+)$", re.I)
 DAILY_POST = re.compile(r"^\W*(?:today'?s\s+|daily\s+)(?:(?:free|daily|store|freebie|gift|reward)\s*)+(?:is\s*)?[:=–-]\s*(.+)$", re.I)
@@ -130,6 +142,46 @@ def is_daily_link(u):
     """The daily reward's own product page: never posted as a new reward."""
     m = PRODUCT.search(u)
     return bool(m) and m.group(1).startswith('freebie')
+
+
+def page_items(page):
+    """The rewards clashloot.gg/bs carries as JSON, by id."""
+    found = {}
+    for m in re.finditer(r'\{"id":\d+,"title":[^{}]*\}', page.replace('\\"', '"')):
+        try:
+            item = json.loads(m.group(0))
+        except ValueError:
+            continue
+        if item.get('game') == 'bs' and isinstance(item.get('id'), int):
+            found[item['id']] = item
+    return list(found.values())
+
+
+def new_reward(item):
+    """(name, link) of an entry worth posting, else None: verified, not the
+    daily one, listed in the last two days, not over, and Supercell's own link."""
+    try:
+        age = time.time() - datetime.datetime.fromisoformat(item['created_at']).timestamp()
+        over = item.get('expires_at') and datetime.datetime.fromisoformat(item['expires_at']).timestamp() < time.time()
+    except (ValueError, KeyError, TypeError):
+        return None
+    if item.get('is_daily') or not item.get('is_verified') or over or not 0 <= age + 300 <= 2 * 86400:
+        return None
+    link = str(item.get('link') or '')
+    hit = URL.fullmatch(link)
+    if not hit or is_daily_link(link):
+        # A bare store address or a store code: nothing to tap, so a person decides.
+        print(f"::warning::clashloot.gg lists {item.get('title')!r} without a link to post: {link[:80]}", file=sys.stderr)
+        return None
+    name = re.sub(r"[^A-Za-z0-9 .'&+!-]", ' ', str(item.get('title') or ''))
+    name = ' '.join(name.split()).strip(" .'-+")
+    name = re.sub(r'^[x×]\s*(\d[\d.]*)\s+', r'\1x ', name, flags=re.I)
+    if not 3 <= len(name) <= 50:
+        return None
+    letters = re.sub(r'^\d[\d.]*x?\s*', '', name)
+    if letters == letters.upper() or letters == letters.lower():
+        name = ' '.join(w if w[0].isdigit() else w.capitalize() for w in name.lower().split())
+    return name, norm(link)
 
 
 def daily_from_page(page, today):
@@ -203,25 +255,41 @@ if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
             batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
             seen |= {key(u) for u in found}
 
-# ---- clashloot.gg/bs: today's store reward, until it is known
+# ---- clashloot.gg/bs: today's store reward, and any new one
 today = store_day(time.time() * 1000)
 try:
     known = json.load(open(DAILY)).get('day') == today
 except (OSError, ValueError):
     known = False
-# Every ten minutes in the two hours after the change, then hourly.
-since = (time.time() - 8 * 3600) % 86400
-if not known and time.time() - state.get('polled_daily', 0) >= (600 if since < 7200 else 3600):
-    state['polled_daily'] = time.time()
+if time.time() - state.get('polled_clashloot', 0) >= 600:
+    state['polled_clashloot'] = time.time()
     try:
         req = urllib.request.Request('https://clashloot.gg/bs', headers={
             'user-agent': 'Mozilla/5.0 (compatible; BrawlZone/1.0; +https://brawlzone.net)'})
         with urllib.request.urlopen(req, timeout=30) as r:
-            daily = daily_from_page(r.read().decode('utf-8', 'ignore'), today)
-        if not daily:
-            print("::notice::clashloot.gg does not list today's store reward yet", file=sys.stderr)
-    except Exception as e:  # noqa: BLE001 -- the card stands without a name
+            page = r.read().decode('utf-8', 'ignore')
+    except Exception as e:  # noqa: BLE001 -- the site being down is not our failure
         print(f'::warning::clashloot.gg: {e}', file=sys.stderr)
+        page = ''
+    items = page_items(page)
+    if items:
+        read_ok = True
+        if not known:
+            daily = daily_from_page(page, today)
+        # The first read only learns what is already listed.
+        listed = set(state.get('clashloot_known') or [])
+        first = 'clashloot_known' not in state
+        found = {}
+        for item in items:
+            if first or item['id'] in listed:
+                continue
+            reward = new_reward(item)
+            if reward and key(reward[1]) not in seen and reward[1] not in found:
+                found[reward[1]] = reward[0]
+        state['clashloot_known'] = sorted(listed | {item['id'] for item in items})[-600:]
+        if found:
+            batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
+            seen |= {key(u) for u in found}
 
 # ---- Discord #🎁-rewards-feed
 if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
@@ -286,6 +354,14 @@ if daily:
                   open(DAILY + '.tmp', 'w'), ensure_ascii=False)
         os.replace(DAILY + '.tmp', DAILY)
         batches.insert(0, '@daily ' + daily['name'])
+        # Every day's, kept: the calendar is drawn from it.
+        try:
+            log = json.load(open(HISTORY))
+        except (OSError, ValueError):
+            log = {}
+        log[daily['day']] = {k: v for k, v in daily.items() if k != 'day'}
+        json.dump(log, open(HISTORY + '.tmp', 'w'), ensure_ascii=False, indent=1, sort_keys=True)
+        os.replace(HISTORY + '.tmp', HISTORY)
     except OSError as e:
         print(f'::warning::daily.json: {e}', file=sys.stderr)
 
