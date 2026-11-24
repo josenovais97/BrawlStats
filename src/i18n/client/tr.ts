@@ -600,4 +600,6 @@ export const CLIENT_TR: Record<string, string> = {
     "Her gün {time} itibarıyla yenisi gelir (senin saatinle).",
   "Claim":
     "Al",
+  "Telegram channel":
+    "Telegram kanalı",
 };

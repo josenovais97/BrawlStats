@@ -106,7 +106,10 @@ for lang in CHANNELS:
     if mode == 'rewards' and len(args) == 2:
         rewards = [r for r in json.load(open(args[1])) if OFFICIAL.match(r['url'])][:4]
         names = [local(r['name'], lang) for r in rewards]
-        text = f'<b>{html.escape(t["new"].format(n=", ".join(names)))}</b>\n\n{html.escape(t["tap"])}'
+        text = f'<b>{html.escape(t["new"].format(n=", ".join(names)))}</b>\n\n'
+        # A gift with steps: said here in English, on the page in the others.
+        steps = [x.replace('with the link or the code', 'with the button') for r in rewards for x in r.get('steps', [])]
+        text += html.escape('\n'.join(f'{k}. {x}' for k, x in enumerate(steps, 1)) if steps and lang == 'en' else t['tap'])
         rows = [[{'text': t['claim'].format(n=n)[:60], 'url': r['url']}] for n, r in zip(names, rewards)]
         ok = bool(rewards) and post(lang, text, rows + [[{'text': t['all'], 'url': site(lang)}]], False)
     elif mode == 'daily' and len(args) == 3:

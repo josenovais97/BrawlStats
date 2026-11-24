@@ -3,6 +3,12 @@
  *
  *   docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/giveaway-draw.ts [skip-tag ...]
  *
+ *   … scripts/giveaway-draw.ts --rehearsal [skip-tag ...]
+ *
+ * The rehearsal (2026-11-24) runs the whole thing before the close, on the
+ * newest randomness already published, and says only that it worked: never
+ * who it would have picked.
+ *
  * Only after entries close. Uses the first drand round published at or after
  * the close, so the randomness did not exist while anyone could still enter.
  * Prints the winner (tag, name, email: for the owner only) and writes the
@@ -20,8 +26,9 @@ const DRAND = 'https://api.drand.sh';
 
 async function main(): Promise<void> {
   const close = Date.parse(GIVEAWAY.closesAt);
-  if (Date.now() < close) throw new Error(`entries are open until ${GIVEAWAY.closesAt}`);
-  const skip = new Set(process.argv.slice(2).map((t) => `#${t.replace(/^#/, '').toUpperCase()}`));
+  const rehearsal = process.argv.includes('--rehearsal');
+  if (!rehearsal && Date.now() < close) throw new Error(`entries are open until ${GIVEAWAY.closesAt}`);
+  const skip = new Set(process.argv.slice(2).filter((t) => t !== '--rehearsal').map((t) => `#${t.replace(/^#/, '').toUpperCase()}`));
 
   const prisma = getPrisma();
   if (!prisma) throw new Error('no DATABASE_URL');
@@ -46,12 +53,18 @@ async function main(): Promise<void> {
   }));
 
   const info = (await (await fetch(`${DRAND}/info`)).json()) as { period: number; genesis_time: number };
-  const round = Math.ceil((close / 1000 - info.genesis_time) / info.period) + 1;
+  const at = rehearsal ? Date.now() - 120_000 : close;
+  const round = Math.ceil((at / 1000 - info.genesis_time) / info.period) + 1;
   const beacon = (await (await fetch(`${DRAND}/public/${round}`)).json()) as { round: number; randomness: string };
   if (beacon.round !== round || !/^[0-9a-f]{64}$/.test(beacon.randomness)) throw new Error('bad beacon reply');
 
   const result = drawWinner(tickets, beacon.randomness);
   const winner = valid.find((r) => r.code === result.winner.code)!;
+  if (rehearsal) {
+    const finalRound = Math.ceil((close / 1000 - info.genesis_time) / info.period) + 1;
+    console.log(`REHEARSAL ok: entrants ${tickets.length}, tickets ${result.total}, a ticket was drawn on round ${round}. The real round is ${finalRound}, published at ${new Date((info.genesis_time + (finalRound - 1) * info.period) * 1000).toISOString()}.`);
+    return;
+  }
   console.log(`entrants ${tickets.length}, entries ${result.total}, drand round ${round}`);
   console.log(`WINNER ${winner.playerTag} (${winner.playerName}) with ${result.winner.entries} entries: ${winner.email}`);
   console.log(

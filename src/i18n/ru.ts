@@ -5465,4 +5465,6 @@ export const RU: Record<string, string> = {
     "Страница Чёрной пятницы Supercell",
   "Today in the store: {name}":
     "Сегодня в магазине: {name}",
+  "Telegram channel":
+    "Канал в Telegram",
 };

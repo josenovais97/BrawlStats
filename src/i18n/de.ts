@@ -5465,4 +5465,6 @@ export const DE: Record<string, string> = {
     "Supercells Black-Friday-Seite",
   "Today in the store: {name}":
     "Heute im Store: {name}",
+  "Telegram channel":
+    "Telegram-Kanal",
 };

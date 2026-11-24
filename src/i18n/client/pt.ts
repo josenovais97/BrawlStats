@@ -1072,4 +1072,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Uma nova todo dia às {time}, no seu horário.",
   "Claim":
     "Resgatar",
+  "Telegram channel":
+    "Canal do Telegram",
 };

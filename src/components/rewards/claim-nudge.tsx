@@ -7,7 +7,7 @@ import { NotifyButton } from '@/components/rewards/notify-button';
 import { useT } from '@/components/i18n/use-t';
 import { GooglePlayBadge } from '@/components/store-badges';
 import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
-import { WHATSAPP_URL } from '@/lib/site';
+import { TELEGRAM_URL, WHATSAPP_URL } from '@/lib/site';
 
 /**
  * "Claimed! Want the next one first?" (2026-10-28), right after a Claim tap.
@@ -142,6 +142,16 @@ export function ClaimNudge({ vapidKey, discordUrl }: { vapidKey: string; discord
                 className="btn-game inline-flex items-center gap-2 bg-[#25d366] px-5 py-3 text-[#06260f] [--btn-shadow:#12803c]"
               >
                 {t('WhatsApp channel')}
+              </a>
+              <a
+                href={TELEGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="nudge_follow"
+                data-umami-event-to="telegram"
+                className="btn-game inline-flex items-center gap-2 bg-[#2aabee] px-5 py-3 text-[#04243a] [--btn-shadow:#14699a]"
+              >
+                {t('Telegram channel')}
               </a>
               <a
                 href={discordUrl}

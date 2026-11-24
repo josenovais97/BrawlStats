@@ -14,7 +14,7 @@ import { ClaimSummary, RewardFlag } from '@/components/rewards/claim-tracker';
 import { getDailyGift, getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
 import { BLACK_FRIDAY, dayLabel, isHomeScreenGift, storeNow } from '@/lib/store-daily';
 import { dropForReward, getStarrDrops } from '@/lib/starr-drops';
-import { currentMonth, WHATSAPP_URL } from '@/lib/site';
+import { currentMonth, TELEGRAM_URL, WHATSAPP_URL } from '@/lib/site';
 import { HTML_LANG } from '@/lib/i18n';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
@@ -287,6 +287,9 @@ function FollowButtons() {
       <NotifyButton vapidKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
       <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-game inline-flex items-center gap-2 bg-[#25d366] px-5 py-3 text-[#06260f] [--btn-shadow:#12803c]">
         {t('WhatsApp channel')}
+      </a>
+      <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" data-umami-event="telegram_open" data-umami-event-from="rewards" className="btn-game inline-flex items-center gap-2 bg-[#2aabee] px-5 py-3 text-[#04243a] [--btn-shadow:#14699a]">
+        {t('Telegram channel')}
       </a>
       <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="btn-game inline-flex items-center gap-2 bg-[#5865f2] px-5 py-3 text-white [--btn-shadow:#343c9e]">
         {t('Discord server')}

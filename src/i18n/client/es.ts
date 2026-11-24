@@ -1072,4 +1072,6 @@ export const CLIENT_ES: Record<string, string> = {
     "Una nueva cada día a las {time}, en tu hora.",
   "Claim":
     "Reclamar",
+  "Telegram channel":
+    "Canal de Telegram",
 };

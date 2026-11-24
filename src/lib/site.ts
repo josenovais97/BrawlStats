@@ -100,6 +100,9 @@ export function currentMonth(): string {
 /** The account the box posts to. `@brawlzone` is a different account. */
 export const TIKTOK_PROFILE_URL = 'https://www.tiktok.com/@brawlzone.net';
 
+/** Every free reward and the store's daily one, posted by brawlzone-telegram (2026-11-24). In English; one channel for every language so far. */
+export const TELEGRAM_URL = 'https://t.me/brawlzone_rewards';
+
 /**
  * Free rewards and the map of the day, posted by hand (2026-10-21): Channels
  * have no posting API. Links are clickable there, unlike TikTok or Instagram.

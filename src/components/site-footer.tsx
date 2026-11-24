@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, Coffee, Mail, MessageCircle, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
+import { Camera, Coffee, Mail, MessageCircle, MessagesSquare, Music2, PlayCircle, Send } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -9,7 +9,7 @@ import { useT } from '@/components/i18n/use-t';
 import { localePath, type Locale } from '@/lib/i18n';
 import { GooglePlayBadge } from '@/components/store-badges';
 import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
-import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL, WHATSAPP_URL } from '@/lib/site';
+import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TELEGRAM_URL, TIKTOK_PROFILE_URL, WHATSAPP_URL } from '@/lib/site';
 
 /*
  * Our own app, not the game's (2026-10-15). The footer used to link Brawl
@@ -282,6 +282,9 @@ export function SiteFooter() {
             </a>
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className={chip}>
               <MessageCircle aria-hidden className="size-4" />WhatsApp
+            </a>
+            <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className={chip}>
+              <Send aria-hidden className="size-4" />Telegram
             </a>
             <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noreferrer" className={`${chip.replace('bz-chip', 'bz-chip-on')}`}>
               <Coffee aria-hidden className="size-4" />{t('coffee')}

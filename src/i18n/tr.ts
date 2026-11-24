@@ -5464,4 +5464,6 @@ export const TR: Record<string, string> = {
     "Supercell'in Black Friday sayfası",
   "Today in the store: {name}":
     "Bugün mağazada: {name}",
+  "Telegram channel":
+    "Telegram kanalı",
 };
