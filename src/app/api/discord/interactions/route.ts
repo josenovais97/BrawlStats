@@ -24,8 +24,9 @@ import { comparePath } from '@/lib/compare';
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { verifyDiscordRequest } from '@/lib/discord-verify';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
-import { canManageServer, postToChannel, rewardFeedMessage } from '@/lib/discord-reward-feed';
-import { getFreeRewards } from '@/lib/free-rewards';
+import { FEED_HERE, canManageServer, dailyFeedMessage, postToChannel, rewardFeedMessage } from '@/lib/discord-reward-feed';
+import { getDailyGift, getFreeRewards } from '@/lib/free-rewards';
+import { nextStoreReset } from '@/lib/store-daily';
 import { DISCORD_BONUS, GIVEAWAY_PUBLIC } from '@/lib/giveaway';
 import { confirmDiscord } from '@/lib/giveaway-data';
 import { mains } from '@/lib/player-showcase';
@@ -838,37 +839,44 @@ async function rewardsFeedCommand(token: string, options: unknown, guildId: stri
     return;
   }
 
+  // Off only when asked: most servers that want the links want this too.
+  const daily = String(sub?.options?.find((o) => o.name === 'daily')?.value ?? 'true') !== 'false';
   const channelId = sub?.options?.find((o) => o.name === 'channel')?.value;
   if (!channelId) {
     await respond(token, { content: 'Pick a channel: `/rewards-feed setup #free-rewards`.' });
     return;
   }
 
-  const { batch, codes } = await liveRewards();
+  await respond(token, { content: await startFeed(guildId, channelId, userId, daily) });
+}
+
+/** Turns the feed on in a channel, shows what is live now, and says how it went. */
+async function startFeed(guildId: string, channelId: string, userId: string, daily: boolean): Promise<string> {
+  const prisma = getPrisma();
+  if (!prisma) return 'Something went wrong on our side. Try again in a minute.';
+  const [{ batch, codes }, gift] = await Promise.all([liveRewards(), daily ? getDailyGift() : null]);
   const hello = {
     allowed_mentions: { parse: [] },
-    content: batch.length
-      ? '✅ **BrawlZone free rewards feed is on.** Every new free Brawl Stars reward will be posted here the moment it drops. Here is what you can claim right now:'
-      : '✅ **BrawlZone free rewards feed is on.** Every new free Brawl Stars reward will be posted here the moment it drops.',
+    content:
+      `✅ **BrawlZone free rewards feed is on.** Every new free Brawl Stars reward will be posted here the moment it drops${daily ? ", and the store's free reward every day" : ''}.` +
+      (batch.length || gift ? ' Here is what you can claim right now:' : ''),
   };
   const first = await postToChannel(channelId, hello, BOT_TOKEN);
   if (first.result !== 'sent') {
-    await respond(token, {
-      content:
-        `I can't post in <#${channelId}>. Open that channel's settings → Permissions, add **BrawlZone**, and allow **View Channel**, **Send Messages** and **Embed Links**. Then run \`/rewards-feed setup\` again.`,
-    });
-    return;
+    return `I can't post in <#${channelId}>. Open that channel's settings → Permissions, add **BrawlZone**, and allow **View Channel**, **Send Messages** and **Embed Links**. Then run \`/rewards-feed setup\` again.`;
   }
   if (batch.length) await postToChannel(channelId, rewardFeedMessage(batch, codes), BOT_TOKEN);
+  if (gift) await postToChannel(channelId, dailyFeedMessage(gift.name, gift.url, nextStoreReset(Date.now())), BOT_TOKEN);
 
   await prisma.discordRewardFeed.upsert({
     where: { guildId },
-    create: { guildId, channelId, addedBy: userId },
-    update: { channelId, addedBy: userId, failures: 0 },
+    create: { guildId, channelId, addedBy: userId, daily },
+    update: { channelId, addedBy: userId, daily, failures: 0 },
   });
-  await respond(token, {
-    content: `Done: free rewards will be posted in <#${channelId}>. \`/rewards-feed stop\` turns it off. (One channel per server; running setup again moves it.)`,
-  });
+  return (
+    `Done: free rewards will be posted in <#${channelId}>${daily ? ', with the store\'s daily one' : ''}. ` +
+    '`/rewards-feed stop` turns it off. (One channel per server; running setup again moves it.)'
+  );
 }
 
 async function helpCommand(token: string, home: boolean) {
@@ -891,7 +899,7 @@ async function helpCommand(token: string, home: boolean) {
           '`/leaderboard` — the global top 10',
           '`/daily [zoom|shadow]` — today’s puzzle: guess the brawler, then share your score',
           '`/rewards` — free Brawl Stars rewards you can claim right now',
-          '`/rewards-feed setup #channel` — (admins) every new free reward posted in that channel',
+          '`/rewards-feed setup #channel` — (admins) every new free reward, and the store\'s daily one, posted in that channel',
           '`/unlink` — remove your link and roles',
           '',
           `**Add the bot** to your server, or to your account to use it in any chat: ${INSTALL_URL}`,
@@ -1039,9 +1047,23 @@ export async function POST(request: Request): Promise<Response> {
     member?: { user?: { id?: string }; permissions?: string };
     user?: { id?: string };
     guild_id?: string;
+    channel_id?: string;
   };
 
   if (interaction.type === 1) return Response.json({ type: 1 });
+
+  // The welcome message's button: the feed on, in this channel (2026-11-24).
+  if (interaction.type === 3 && interaction.data?.custom_id === FEED_HERE) {
+    const { guild_id: guildId, channel_id: channelId, member } = interaction;
+    if (!guildId || !channelId || !canManageServer(member?.permissions)) {
+      return Response.json({ type: 4, data: { content: 'Only server admins (Manage Server permission) can turn this on.', flags: 64 } });
+    }
+    after(async () => {
+      const said = await startFeed(guildId, channelId, member?.user?.id ?? '', true).catch(() => 'Something went wrong setting that up. Try again in a minute.');
+      await respond(interaction.token, { content: said });
+    });
+    return Response.json({ type: 5, data: { flags: 64 } });
+  }
 
   // /daily's buttons (3) and its guess box (5). State is in the custom_id.
   if (interaction.type === 3 || interaction.type === 5) {

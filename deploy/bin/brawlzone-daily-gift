@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
-# Tell people about today's free reward in the Supercell Store: a one-week
-# trial (owner, 2026-11-24), 2026-11-25 to 2026-12-01, then it stops by itself.
+# Tell people about today's free reward in the Supercell Store (2026-11-24).
 #
 #   brawlzone-daily-gift [--dry-run]
 #
-# Run by brawlzone-rewards-watch every two minutes; does nothing unless
-# daily.json names today's reward, the trial is on, it is past 15:00 UTC and
-# today has not been sent. 15:00 and not 08:00, when the reward changes: that
-# is the middle of the night in America, and a reward with 17 hours left needs
-# no hurry. A push to browsers that asked for reward alerts and one line in
-# Discord's general, no ping. The Bubble app announces it too, by itself, from
-# /api/bubble/alerts (src/lib/store-daily.ts has the same week). No videos: the same one every day would be
-# repetitive, and the upload limits are already nearly used up.
+# Run by brawlzone-rewards-watch every two minutes. Two parts, each once a day
+# and only once /rewards shows the reward in every language (owner's rule,
+# 2026-11-06), three tries at most:
 #
-# As with every reward (owner, 2026-11-06), nothing goes out until /rewards
-# shows it in every language. Three tries a day at most.
+# 1. feeds, as soon as it is known: the Discord servers that took it with
+#    /rewards-feed, and our Telegram channels. They asked for it, and both are
+#    silent.
+# 2. alerts, a one-week trial (owner), 2026-11-25 to 2026-12-01, then it stops
+#    by itself: after 15:00 UTC, a push to browsers that asked for reward
+#    alerts and one line in our Discord's general, no ping. 15:00 and not
+#    08:00, when the reward changes: that is the middle of the night in
+#    America, and a reward with 17 hours left needs no hurry. The Bubble app
+#    announces it too, by itself, from /api/bubble/alerts
+#    (src/lib/store-daily.ts has the same week). No videos: the same one every
+#    day would be repetitive, and the upload limits are already nearly used up.
 set -uo pipefail
 
 TRIAL_START=2026-11-25
@@ -30,7 +33,7 @@ MARK=/var/lib/brawlzone/daily-gift.json
 dry=0
 [ "${1:-}" = "--dry-run" ] && dry=1
 
-# "day<TAB>name<TAB>url" when there is something to send, nothing otherwise.
+# "day<TAB>name<TAB>url<TAB>parts due" when there is something to send, nothing otherwise.
 todo=$(python3 - "$DAILY" "$MARK" "$TRIAL_START" "$TRIAL_END" "$SEND_AFTER_HOUR" "$dry" <<'PY'
 import datetime, json, sys
 daily_path, mark_path, start, end, hour, dry = sys.argv[1:7]
@@ -44,32 +47,41 @@ def read(p):
 d, mark = read(daily_path), read(mark_path)
 if d.get('day') != day or not d.get('name'):
     sys.exit()
-if dry != '1':
-    # The store's day runs 08:00 to 08:00: after midnight is too late to send.
-    if not start <= day <= end or now.strftime('%Y-%m-%d') != day or now.hour < int(hour):
-        sys.exit()
-    if mark.get('day') == day and (mark.get('done') or mark.get('tries', 0) >= 3):
-        sys.exit()
-print(day, d['name'], d.get('url') or 'https://store.supercell.com/brawlstars', sep='\t')
+mark = mark if mark.get('day') == day else {}
+def due(part):
+    p = mark.get(part) or {}
+    return dry == '1' or not (p.get('done') or p.get('tries', 0) >= 3)
+parts = []
+# The store's day runs 08:00 to 08:00: after midnight is too late to send.
+if dry == '1' or now.strftime('%Y-%m-%d') == day:
+    if due('feeds'):
+        parts.append('feeds')
+    if due('alerts') and (dry == '1' or (start <= day <= end and now.hour >= int(hour))):
+        parts.append('alerts')
+if parts:
+    print(day, d['name'], d.get('url') or 'https://store.supercell.com/brawlstars', ','.join(parts), sep='\t')
 PY
 )
 [ -n "$todo" ] || exit 0
-IFS=$'\t' read -r day name url <<< "$todo"
+IFS=$'\t' read -r day name url parts <<< "$todo"
 
-mark() { # done(true|false)
-  python3 - "$MARK" "$day" "$1" <<'PY'
+mark() { # part done(true|false)
+  python3 - "$MARK" "$day" "$1" "$2" <<'PY'
 import json, os, sys
-path, day, done = sys.argv[1], sys.argv[2], sys.argv[3] == 'true'
+path, day, part, done = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == 'true'
 try:
     m = json.load(open(path))
 except (OSError, ValueError):
     m = {}
-tries = m.get('tries', 0) if m.get('day') == day else 0
-json.dump({'day': day, 'tries': tries + (0 if done else 1), 'done': done}, open(path + '.tmp', 'w'))
+if m.get('day') != day:
+    m = {'day': day}
+p = m.get(part) or {}
+m[part] = {'tries': p.get('tries', 0) + (0 if done else 1), 'done': done}
+json.dump(m, open(path + '.tmp', 'w'))
 os.replace(path + '.tmp', path)
 PY
 }
-[ "$dry" = 1 ] || mark false
+[ "$dry" = 1 ] || for part in ${parts//,/ }; do mark "$part" false; done
 
 if [ "$dry" = 0 ]; then
   CRON_SECRET="$(sed -n 's/^CRON_SECRET=//p' "$ENV_FILE" | head -1 | sed 's/^["'"'"']//; s/["'"'"']$//')"
@@ -91,17 +103,25 @@ for attempt in $(seq 1 20); do
 done
 [ "$shown" = 1 ] || { echo "::error::/rewards does not show $day's $name in every language yet; nothing sent" >&2; exit 1; }
 echo "site: /rewards shows $name for $day in all 7 languages"
-[ "$dry" = 0 ] || { echo "--dry-run: nothing sent"; exit 0; }
+[ "$dry" = 0 ] || { echo "--dry-run: nothing sent (due: $parts)"; exit 0; }
 
-# Sent once: a failure after this point must not send twice.
-mark true
-(cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts --daily "$name") 2>&1 \
-  | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
+# Each part is marked done first: a failure after that must not send twice.
+if [[ ",$parts," == *",feeds,"* ]]; then
+  mark feeds true
+  (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/discord-reward-feeds.ts --daily "$name" "$url") 2>&1 \
+    | grep -E '^discord feeds:' || echo "::warning::Discord daily feeds not posted (not fatal)"
+  /usr/local/bin/brawlzone-telegram daily "$name" "$url" || echo "::warning::Telegram daily not posted (not fatal)"
+fi
 
-DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
-DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
-if [ -n "$DISCORD_TOKEN" ] && [ -n "$DISCORD_GUILD" ]; then
-  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" python3 - "$name" "$url" <<'PY' || echo "::warning::Discord message failed (not fatal)"
+if [[ ",$parts," == *",alerts,"* ]]; then
+  mark alerts true
+  (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts --daily "$name") 2>&1 \
+    | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
+
+  DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+  DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+  if [ -n "$DISCORD_TOKEN" ] && [ -n "$DISCORD_GUILD" ]; then
+    DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" python3 - "$name" "$url" <<'PY' || echo "::warning::Discord message failed (not fatal)"
 import json, os, sys, urllib.request
 name, url = sys.argv[1:3]
 api = 'https://discord.com/api/v10'
@@ -122,4 +142,6 @@ call('POST', f'/channels/{chan}/messages', {
 })
 print('discord: posted in general')
 PY
+  fi
 fi
+exit 0

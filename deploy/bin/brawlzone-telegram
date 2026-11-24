@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# Post free rewards to the BrawlZone Telegram channels (2026-11-24).
+#
+#   brawlzone-telegram rewards <rewards.json>     a new batch (brawlzone-rewards)
+#   brawlzone-telegram daily "<name>" "<url>"     the store's daily reward (brawlzone-daily-gift)
+#   brawlzone-telegram check                      the bot and its channels, nothing posted
+#   add --dry-run to see the messages instead of sending them
+#
+# Set up by the owner in ~/.brawlzone-telegram (mode 600, never printed):
+#   {"token": "<from BotFather>", "channels": {"tr": "@channel"}}
+# One channel per language; no file, and this does nothing. The bot must be an
+# admin of each channel with "Post messages". Turkish first: it is the country
+# most /rewards visitors come from.
+set -uo pipefail
+CONF="${BRAWLZONE_TELEGRAM:-$HOME/.brawlzone-telegram}"
+[ -r "$CONF" ] || { [ "${1:-}" = check ] && echo "no $CONF yet"; exit 0; }
+exec python3 - "$CONF" "$@" <<'PY'
+import html, json, re, sys, time, urllib.parse, urllib.request
+
+conf_path, args = sys.argv[1], sys.argv[2:]
+dry = '--dry-run' in args
+args = [a for a in args if a != '--dry-run']
+conf = json.load(open(conf_path))
+TOKEN, CHANNELS = conf['token'], conf.get('channels') or {}
+
+# Same words as the site's own dictionaries.
+WORDS = {
+    'tr': {'coins': 'Altın', 'power points': 'Güç Puanı', 'credits': 'Kredi', 'gems': 'Elmas', 'chaos drop': 'Kaos Hediyesi', 'starr drop': 'Starr Hediyesi'},
+    'pt': {'coins': 'Moedas', 'power points': 'Pontos de poder', 'credits': 'Créditos', 'gems': 'Gemas', 'chaos drop': 'Sorteio do Caos', 'starr drop': 'Sorteio Starr'},
+    'es': {'coins': 'Monedas', 'power points': 'Puntos de fuerza', 'credits': 'Créditos', 'gems': 'Gemas', 'chaos drop': 'Premio del caos', 'starr drop': 'Premio Starr'},
+    'de': {'coins': 'Münzen', 'power points': 'Powerpunkte', 'credits': 'Credits', 'gems': 'Juwelen', 'chaos drop': 'Chaos-Drop', 'starr drop': 'Starr-Drop'},
+    'ru': {'coins': 'Монеты', 'power points': 'Очки силы', 'credits': 'Кредиты', 'gems': 'Гемы', 'chaos drop': 'Приз хаоса', 'starr drop': 'Приз Старр'},
+    'fr': {'coins': 'Pièces', 'power points': 'Points de pouvoir', 'credits': 'Crédits', 'gems': 'Gemmes', 'chaos drop': 'Prix du chaos', 'starr drop': 'Prix Starr'},
+    'en': {},
+}
+TEXT = {
+    'en': {'new': '🎁 New free Brawl Stars reward: {n}', 'tap': 'Tap the button on the phone with the game and claim it before it expires.', 'day': "🎁 Today's free store reward: {n}", 'how': "Sign in to Supercell's store with your Supercell ID and claim it. It changes every day at 08:00 UTC.", 'claim': 'Claim: {n}', 'all': 'All free rewards'},
+    'tr': {'new': '🎁 Yeni ücretsiz Brawl Stars ödülü: {n}', 'tap': 'Oyunun olduğu telefonda düğmeye dokun ve süresi dolmadan al.', 'day': '🎁 Mağazadaki bugünün ücretsiz ödülü: {n}', 'how': 'Supercell mağazasında Supercell ID ile giriş yapıp al. Her gün Türkiye saatiyle 11:00’de değişir.', 'claim': 'Al: {n}', 'all': 'Tüm ücretsiz ödüller'},
+    'pt': {'new': '🎁 Nova recompensa grátis de Brawl Stars: {n}', 'tap': 'Toque no botão no celular com o jogo e resgate antes que expire.', 'day': '🎁 A recompensa grátis de hoje na loja: {n}', 'how': 'Entre na loja da Supercell com seu Supercell ID e resgate. Muda todo dia às 5h (horário de Brasília).', 'claim': 'Resgatar: {n}', 'all': 'Todas as recompensas grátis'},
+    'es': {'new': '🎁 Nueva recompensa gratis de Brawl Stars: {n}', 'tap': 'Toca el botón en el móvil con el juego y reclámala antes de que expire.', 'day': '🎁 La recompensa gratis de hoy en la tienda: {n}', 'how': 'Entra en la tienda de Supercell con tu Supercell ID y reclámala. Cambia cada día a las 08:00 UTC.', 'claim': 'Reclamar: {n}', 'all': 'Todas las recompensas gratis'},
+    'de': {'new': '🎁 Neue Gratis-Belohnung für Brawl Stars: {n}', 'tap': 'Tippe auf dem Handy mit dem Spiel auf den Knopf und hol sie ab, bevor sie abläuft.', 'day': '🎁 Die heutige Gratis-Belohnung im Store: {n}', 'how': 'Melde dich mit deiner Supercell ID im Supercell Store an und hol sie ab. Sie wechselt täglich um 08:00 UTC.', 'claim': 'Abholen: {n}', 'all': 'Alle Gratis-Belohnungen'},
+    'ru': {'new': '🎁 Новая бесплатная награда Brawl Stars: {n}', 'tap': 'Нажми кнопку на телефоне с игрой и забери, пока не истекла.', 'day': '🎁 Бесплатная награда дня в магазине: {n}', 'how': 'Войди в магазин Supercell через Supercell ID и забери её. Меняется каждый день в 11:00 по Москве.', 'claim': 'Забрать: {n}', 'all': 'Все бесплатные награды'},
+    'fr': {'new': '🎁 Nouvelle récompense Brawl Stars gratuite : {n}', 'tap': 'Touche le bouton sur le téléphone avec le jeu et récupère-la avant qu’elle expire.', 'day': '🎁 La récompense gratuite du jour en boutique : {n}', 'how': 'Connecte-toi à la boutique Supercell avec ton Supercell ID et récupère-la. Elle change chaque jour à 08:00 UTC.', 'claim': 'Récupérer : {n}', 'all': 'Toutes les récompenses gratuites'},
+}
+OFFICIAL = re.compile(r'^https://(?:link\.brawlstars\.com|store\.supercell\.com)/')
+STORE = 'https://store.supercell.com/brawlstars'
+
+
+def local(name, lang):
+    """ "100x Coins" -> "100x Altın": the thing in the channel's language, the count as it is. """
+    m = re.match(r'^(\d[\d.,]*\s*x?\s+)?(.+)$', name.strip())
+    count, thing = (m.group(1) or ''), m.group(2)
+    count = '' if re.match(r'^1x?\s*$', count) else count
+    words = WORDS[lang]
+    key = thing.lower()
+    return count + (words.get(key) or words.get(key + 's') or thing)
+
+
+def call(method, **params):
+    data = urllib.parse.urlencode({k: json.dumps(v) if isinstance(v, (dict, list, bool)) else v for k, v in params.items()}).encode()
+    try:
+        with urllib.request.urlopen(urllib.request.Request(f'https://api.telegram.org/bot{TOKEN}/{method}', data=data), timeout=30) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        # Telegram says why in the body; the address holds the token, so it is never shown.
+        try:
+            return json.loads(e.read())
+        except ValueError:
+            return {'ok': False, 'description': f'HTTP {e.code}'}
+    except OSError as e:
+        return {'ok': False, 'description': type(e).__name__}
+
+
+def post(lang, text, buttons, silent):
+    chat = CHANNELS[lang]
+    if dry:
+        print(f'--- {lang} {chat}{" (silent)" if silent else ""}\n{text}\n' + '\n'.join(f'[{b["text"]}] {b["url"]}' for row in buttons for b in row))
+        return True
+    r = call('sendMessage', chat_id=chat, text=text, parse_mode='HTML', disable_notification=silent,
+             link_preview_options={'is_disabled': True}, reply_markup={'inline_keyboard': buttons})
+    if not r.get('ok'):
+        print(f'::warning::telegram {lang}: {r.get("description")}', file=sys.stderr)
+    return bool(r.get('ok'))
+
+
+def site(lang):
+    return f'https://brawlzone.net/{"" if lang == "en" else lang + "/"}rewards?from=telegram'
+
+
+mode = args[0] if args else ''
+sent = 0
+if mode == 'check':
+    me = call('getMe')
+    print('bot:', ('@' + me['result']['username']) if me.get('ok') else me.get('description'))
+    for lang, chat in CHANNELS.items():
+        who = call('getChat', chat_id=chat)
+        member = call('getChatMember', chat_id=chat, user_id=me['result']['id']) if me.get('ok') else {}
+        st = (member.get('result') or {})
+        print(lang, chat, '|', (who.get('result') or {}).get('title') or who.get('description'), '| can post:', st.get('status') == 'administrator' and st.get('can_post_messages', False))
+    sys.exit(0)
+for lang in CHANNELS:
+    if lang not in TEXT:
+        print(f'::warning::telegram: no texts for {lang}', file=sys.stderr)
+        continue
+    t = TEXT[lang]
+    if mode == 'rewards' and len(args) == 2:
+        rewards = [r for r in json.load(open(args[1])) if OFFICIAL.match(r['url'])][:4]
+        names = [local(r['name'], lang) for r in rewards]
+        text = f'<b>{html.escape(t["new"].format(n=", ".join(names)))}</b>\n\n{html.escape(t["tap"])}'
+        rows = [[{'text': t['claim'].format(n=n)[:60], 'url': r['url']}] for n, r in zip(names, rewards)]
+        ok = bool(rewards) and post(lang, text, rows + [[{'text': t['all'], 'url': site(lang)}]], False)
+    elif mode == 'daily' and len(args) == 3:
+        n, url = local(args[1], lang), args[2] if OFFICIAL.match(args[2]) else STORE
+        text = f'<b>{html.escape(t["day"].format(n=n))}</b>\n\n{html.escape(t["how"])}'
+        ok = post(lang, text, [[{'text': t['claim'].format(n=n)[:60], 'url': url}], [{'text': t['all'], 'url': site(lang)}]], True)
+    else:
+        sys.exit('usage: brawlzone-telegram rewards <rewards.json> | daily "<name>" "<url>" | check')
+    sent += ok
+    time.sleep(0.3)
+print(f'telegram: {sent} of {len(CHANNELS)} channels')
+PY

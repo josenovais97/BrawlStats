@@ -160,7 +160,10 @@ const COMMANDS = [
         name: 'setup',
         type: 1,
         description: 'Choose the channel for free reward posts',
-        options: [{ name: 'channel', type: 7, required: true, channel_types: [0, 5], description: 'Where to post them' }],
+        options: [
+          { name: 'channel', type: 7, required: true, channel_types: [0, 5], description: 'Where to post them' },
+          { name: 'daily', type: 5, required: false, description: "Also the store's free daily reward (on by default)" },
+        ],
       },
       { name: 'stop', type: 1, description: 'Stop posting free rewards in this server' },
     ],
@@ -199,7 +202,7 @@ await call('PATCH', '/applications/@me', { interactions_endpoint_url: ENDPOINT }
 console.log(`endpoint set and verified: ${ENDPOINT}`);
 
 await call('PATCH', '/applications/@me', {
-  description: 'Brawl Stars stats in Discord: counters, the Ranked meta, best picks per map, drafts and player cards, from real sampled battles. Free, by brawlzone.net.',
+  description: 'Free Brawl Stars rewards posted in your server, plus counters, the Ranked meta, best picks per map, drafts and player cards. Free, by brawlzone.net.',
   tags: ['brawl stars', 'stats', 'gaming', 'meta', 'tier list'],
   integration_types_config: {
     // View Channel + Send Messages + Embed Links (1024 + 2048 + 16384): what

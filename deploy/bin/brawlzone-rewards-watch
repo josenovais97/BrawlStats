@@ -307,6 +307,35 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
         before = re.sub(r'\b(claim|here|link|free|get|use)\b', ' ', before, flags=re.I)
         return ' '.join(before.split()[-5:]).strip(' .-') or 'Free Reward'
 
+    # A server that just added the bot gets one message in its system channel
+    # (2026-11-24): what it can do, and a button that turns the rewards feed on
+    # right there. The first run only learns which servers already have it.
+    try:
+        servers = {g['id'] for g in call('/users/@me/guilds?limit=200')}
+        if 'guilds_known' in state:
+            for gid in sorted(servers - set(state['guilds_known'])):
+                place = call(f'/guilds/{gid}').get('system_channel_id')
+                if not place:
+                    continue
+                welcome = {
+                    'allowed_mentions': {'parse': []},
+                    'content': '👋 Thanks for adding **BrawlZone**! It can post every free Brawl Stars reward the moment it drops, and the store\'s free reward every day.\n'
+                               'Admins: tap the button to use this channel, or run `/rewards-feed setup #channel`. Everything else it does: `/help`.',
+                    'components': [{'type': 1, 'components': [
+                        {'type': 2, 'style': 3, 'label': 'Post free rewards here', 'custom_id': 'rewards-feed:here'},
+                        {'type': 2, 'style': 5, 'label': 'Free rewards now', 'url': 'https://brawlzone.net/rewards?from=discord-bot'}]}],
+                }
+                try:
+                    req = urllib.request.Request(f'{api}/channels/{place}/messages', method='POST', data=json.dumps(welcome).encode(),
+                                                 headers={**headers, 'Content-Type': 'application/json'})
+                    urllib.request.urlopen(req, timeout=30).read()
+                    print('::notice::welcome sent to a new server', file=sys.stderr)
+                except Exception:  # noqa: BLE001 -- it may not let the bot write there
+                    print('::notice::a new server does not let the bot write in its system channel', file=sys.stderr)
+        state['guilds_known'] = sorted(servers)
+    except Exception as e:  # noqa: BLE001 -- never in the way of the rewards
+        print(f'::warning::Discord servers: {e}', file=sys.stderr)
+
     try:
         guild = os.environ['DISCORD_GUILD']
         channel = next((c for c in call(f'/guilds/{guild}/channels') if c.get('name') == '🎁-rewards-feed'), None)
@@ -393,5 +422,5 @@ while IFS= read -r line; do
   /usr/local/bin/brawlzone-rewards "${args[@]}" || echo "::warning::brawlzone-rewards failed for: ${args[*]}"
 done <<< "$batches"
 
-# Alerts for the daily reward while their one-week trial runs (it checks).
+# The daily reward's own posts: other servers, Telegram, and the alert trial (it checks what is due).
 /usr/local/bin/brawlzone-daily-gift || echo "::warning::brawlzone-daily-gift failed"

@@ -75,9 +75,38 @@ export function rewardFeedMessage(rewards: FeedReward[], imageUrl: string | null
         footer: { text: 'Official Supercell links · posted by BrawlZone, an unofficial fan project · admins: /rewards-feed stop' },
       },
     ],
-    components: [{ type: 1, components: [...claim, { type: 2, style: 5, label: 'All free rewards', url: `${SITE}/rewards` }].slice(0, 5) }],
+    components: [{ type: 1, components: [...claim, { type: 2, style: 5, label: 'All free rewards', url: `${SITE}/rewards?from=discord-bot` }].slice(0, 5) }],
   };
 }
+
+/** The store's free daily reward, for servers that take it (2026-11-24): silent, one embed, gone at `changesAt` (ms). */
+export function dailyFeedMessage(name: string, url: string, changesAt: number) {
+  const t = Math.floor(changesAt / 1000);
+  return {
+    allowed_mentions: { parse: [] },
+    flags: 4096, // no notification sound: it comes every day
+    embeds: [
+      {
+        title: `🎁 Today's free store reward: ${rewardTitle(name)}`.slice(0, 250),
+        description: `Free for everyone in Supercell's Brawl Stars store: sign in with your Supercell ID and claim it. It changes <t:${t}:R> (at <t:${t}:t> your time).`,
+        color: 0xffc72c,
+        footer: { text: 'Posted by BrawlZone, an unofficial fan project · admins: /rewards-feed setup daily:False turns these off' },
+      },
+    ],
+    components: [
+      {
+        type: 1,
+        components: [
+          { type: 2, style: 5, label: 'Claim', url },
+          { type: 2, style: 5, label: 'All free rewards', url: `${SITE}/rewards?from=discord-bot` },
+        ],
+      },
+    ],
+  };
+}
+
+/** The one-tap button in the welcome message (brawlzone-rewards-watch): the feed, in the channel it is in. */
+export const FEED_HERE = 'rewards-feed:here';
 
 export type FeedResult = 'sent' | 'gone' | 'failed';
 

@@ -759,6 +759,8 @@ model DiscordRewardFeed {
   guildId    String    @id @map("guild_id")
   channelId  String    @map("channel_id")
   addedBy    String    @map("added_by")
+  /// Also the store's free daily reward (2026-11-24).
+  daily      Boolean   @default(true)
   failures   Int       @default(0)
   createdAt  DateTime  @default(now()) @map("created_at")
   lastSentAt DateTime? @map("last_sent_at")

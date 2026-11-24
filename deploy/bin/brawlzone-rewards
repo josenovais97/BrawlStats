@@ -213,4 +213,7 @@ CODES_SLIDE=$(python3 -c 'import json,sys; n=len(json.load(open(sys.argv[1]))); 
   "$(cat "$OUT/rewards.json")" "$SITE/social/rewards/$ID/$CODES_SLIDE.jpg") 2>&1 \
   | grep -E '^discord feeds:' || echo "::warning::Discord reward feeds not posted (not fatal)"
 
+# Telegram channels, when set up (2026-11-24).
+/usr/local/bin/brawlzone-telegram rewards "$OUT/rewards.json" || echo "::warning::Telegram not posted (not fatal)"
+
 FORCE=1 exec /usr/local/bin/brawlzone-tiktok rewards "$ID"
