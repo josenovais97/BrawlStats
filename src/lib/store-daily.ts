@@ -32,6 +32,22 @@ export function timeLeft(ms: number): { h: number; m: number } {
   return { h: Math.floor(minutes / 60), m: minutes % 60 };
 }
 
+/** The week the daily reward is also announced (owner's trial): the same dates as deploy/bin/brawlzone-daily-gift. */
+export const DAILY_ALERT_DAYS = { from: '2026-11-25', to: '2026-12-01' };
+
+/**
+ * Whether the Bubble app is told about today's reward at `ms`: in the trial
+ * week, from 15:00 UTC (08:00 is the middle of the night in America) until two
+ * hours before it changes, so a phone that checks late is not sent to a reward
+ * about to go.
+ */
+export function dailyAlertOn(ms: number): boolean {
+  const day = storeDay(ms);
+  if (day < DAILY_ALERT_DAYS.from || day > DAILY_ALERT_DAYS.to) return false;
+  const left = nextStoreReset(ms) - ms;
+  return left <= 17 * HOUR && left >= 2 * HOUR;
+}
+
 /** Where the daily card's button goes: the reward's own page when known, else the store. */
 export function dailyGiftUrl(url: unknown): string {
   return typeof url === 'string' && /^https:\/\/store\.supercell\.com\/brawlstars\/product\/[a-z-]+\/[0-9A-Za-z]+$/.test(url)

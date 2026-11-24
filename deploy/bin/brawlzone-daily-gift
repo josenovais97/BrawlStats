@@ -9,7 +9,8 @@
 # today has not been sent. 15:00 and not 08:00, when the reward changes: that
 # is the middle of the night in America, and a reward with 17 hours left needs
 # no hurry. A push to browsers that asked for reward alerts and one line in
-# Discord's general, no ping. No videos: the same one every day would be
+# Discord's general, no ping. The Bubble app announces it too, by itself, from
+# /api/bubble/alerts (src/lib/store-daily.ts has the same week). No videos: the same one every day would be
 # repetitive, and the upload limits are already nearly used up.
 #
 # As with every reward (owner, 2026-11-06), nothing goes out until /rewards

@@ -3,10 +3,11 @@ import type { NextRequest } from 'next/server';
 import { brawlerIconUrl, getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { appNames } from '@/lib/bubble-app-l10n';
-import { getFreeRewards } from '@/lib/free-rewards';
+import { getDailyGift, getFreeRewards } from '@/lib/free-rewards';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
+import { dailyAlertOn } from '@/lib/store-daily';
 import {
   getBrawlerStatsForWindow,
   getFilterableModes,
@@ -39,8 +40,9 @@ export async function GET(request: NextRequest) {
   const filterable = await getFilterableModes(30, 150, 'ranked').catch(() => []);
   const modeKeys = filterable.map((m) => m.mode);
 
-  const [rewards, season, today, art, name, edges, modeMeta, allRows, perMode] = await Promise.all([
+  const [rewards, gift, season, today, art, name, edges, modeMeta, allRows, perMode] = await Promise.all([
     getFreeRewards().catch(() => ({ live: [], earlier: [] })),
+    dailyAlertOn(Date.now()) ? getDailyGift().catch(() => null) : null,
     getSeasonState().catch(() => null),
     getMetaIndex('ranked', 1).catch(() => new Map()),
     getBrawlerArtMap().catch(() => new Map()),
@@ -70,13 +72,19 @@ export async function GET(request: NextRequest) {
 
   return okResponse(
     {
-      rewards: rewards.live.slice(0, 5).map((r) => ({
-        id: r.id,
-        name: r.name,
-        url: r.url,
-        image: absolute(r.image),
-        postedAt: r.postedAt,
-      })),
+      rewards: [
+        ...rewards.live.slice(0, 5).map((r) => ({
+          id: r.id,
+          name: r.name,
+          url: r.url,
+          image: absolute(r.image),
+          postedAt: r.postedAt,
+        })),
+        // Today's reward in the store (a trial): last, so the widgets, which
+        // show the first, keep the link rewards. Its id is the day's, so each
+        // phone announces it once.
+        ...(gift ? [{ id: `daily-${gift.day}`, name: gift.name, url: gift.url, image: null, postedAt: `${gift.day}T08:00:00Z` }] : []),
+      ],
       season: current ? { number: current.number, startsOn: current.startsOn, endsOn: current.endsOn } : null,
       nextSeason: season?.nextStartsOn ? { startsOn: season.nextStartsOn } : null,
       topPick: pick
