@@ -5416,4 +5416,14 @@ export const TR: Record<string, string> = {
     "Draft tahtası seçim yaparken kazanma şansını gösterir.",
   "Choose which notifications you get, with quiet hours.":
     "Hangi bildirimleri alacağını seç, sessiz saatlerle.",
+  "Notifications open the right screen in the app instead of starting Brawl Stars.":
+    "Bildirimler Brawl Stars'ı başlatmak yerine uygulamadaki doğru ekranı açar.",
+  "A recap when you stop playing: wins, losses, elo, Star Player, MVP and best run.":
+    "Oynamayı bırakınca özet: galibiyet, mağlubiyet, elo, Yıldız Oyuncu, MVP ve en iyi seri.",
+  "Season Wrapped and the other cards open on screen first, with a Share button.":
+    "Sezon özeti ve diğer kartlar önce ekranda açılır, altında Paylaş butonu olur.",
+  "Roast my account works in the app.":
+    "Hesap roast'u artık uygulamada çalışıyor.",
+  "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
+    "Bubble Pass tüm modları sayar; arkadaş önerileri tek maçlık yabancıları göstermez.",
 };

@@ -5416,4 +5416,14 @@ export const ES: Record<string, string> = {
     "El draft muestra tu probabilidad de ganar mientras eliges.",
   "Choose which notifications you get, with quiet hours.":
     "Elige qué notificaciones recibir, con horas de silencio.",
+  "Notifications open the right screen in the app instead of starting Brawl Stars.":
+    "Las notificaciones abren la pantalla correcta de la app en lugar de iniciar Brawl Stars.",
+  "A recap when you stop playing: wins, losses, elo, Star Player, MVP and best run.":
+    "Un resumen cuando dejas de jugar: victorias, derrotas, elo, Jugador estelar, MVP y mejor racha.",
+  "Season Wrapped and the other cards open on screen first, with a Share button.":
+    "El resumen de temporada y las demás tarjetas se abren primero en pantalla, con un botón para compartir.",
+  "Roast my account works in the app.":
+    "El roast de tu cuenta ya funciona en la app.",
+  "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
+    "El Bubble Pass cuenta todos los modos, y las sugerencias de amigos omiten a desconocidos de una sola partida.",
 };

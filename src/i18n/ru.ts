@@ -5417,4 +5417,14 @@ export const RU: Record<string, string> = {
     "Доска драфта показывает шанс на победу прямо во время пиков.",
   "Choose which notifications you get, with quiet hours.":
     "Выбирай, какие уведомления получать, есть тихие часы.",
+  "Notifications open the right screen in the app instead of starting Brawl Stars.":
+    "Уведомления открывают нужный экран приложения, а не запускают Brawl Stars.",
+  "A recap when you stop playing: wins, losses, elo, Star Player, MVP and best run.":
+    "Итоги, когда заканчиваешь играть: победы, поражения, эло, звёздный игрок, MVP и лучшая серия.",
+  "Season Wrapped and the other cards open on screen first, with a Share button.":
+    "Итоги сезона и другие карточки сначала открываются на экране, с кнопкой «Поделиться».",
+  "Roast my account works in the app.":
+    "Прожарка аккаунта теперь работает в приложении.",
+  "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.":
+    "Bubble Pass считает все режимы, а среди предложенных друзей нет случайных игроков из одного матча.",
 };

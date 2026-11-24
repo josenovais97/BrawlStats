@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.43',
+  version: '1.44',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 56,
+  versionCode: 57,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.43.apk',
+  path: '/downloads/brawlzone-bubble-1.44.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,11 +62,11 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 4020587,
-  sha256: 'a2e5332b551b565eca6443fd54df367351c82badcf362102e1bb227feb3ba857',
+  size: 4037735,
+  sha256: 'e6821cdbd7591701b76cb7a8759dbcd382603dd87b4765a4d5bd7a6a5e9c29a7',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-11-23',
+  released: '2026-11-24',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -95,6 +95,18 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.44',
+    versionCode: 57,
+    date: '2026-11-24',
+    changes: [
+      "Notifications open the right screen in the app instead of starting Brawl Stars.",
+      "A recap when you stop playing: wins, losses, elo, Star Player, MVP and best run.",
+      "Season Wrapped and the other cards open on screen first, with a Share button.",
+      "Roast my account works in the app.",
+      "Bubble Pass counts every mode, and friend suggestions skip one-match strangers.",
+    ],
+  },
   {
     version: '1.43',
     versionCode: 56,
