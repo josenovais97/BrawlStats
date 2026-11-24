@@ -598,4 +598,6 @@ export const CLIENT_TR: Record<string, string> = {
     "{h} sa {m} dk sonra değişir",
   "A new one every day at {time}, your time.":
     "Her gün {time} itibarıyla yenisi gelir (senin saatinle).",
+  "Claim":
+    "Al",
 };

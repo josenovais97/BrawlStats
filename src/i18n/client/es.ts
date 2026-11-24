@@ -1070,4 +1070,6 @@ export const CLIENT_ES: Record<string, string> = {
     "Cambia en {h} h {m} min",
   "A new one every day at {time}, your time.":
     "Una nueva cada día a las {time}, en tu hora.",
+  "Claim":
+    "Reclamar",
 };

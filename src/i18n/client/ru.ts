@@ -598,4 +598,6 @@ export const CLIENT_RU: Record<string, string> = {
     "Сменится через {h} ч {m} мин",
   "A new one every day at {time}, your time.":
     "Новая каждый день в {time} по твоему времени.",
+  "Claim":
+    "Забрать",
 };

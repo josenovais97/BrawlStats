@@ -598,4 +598,6 @@ export const CLIENT_DE: Record<string, string> = {
     "Wechselt in {h} Std. {m} Min.",
   "A new one every day at {time}, your time.":
     "Jeden Tag um {time} Uhr deiner Zeit eine neue.",
+  "Claim":
+    "Abholen",
 };
