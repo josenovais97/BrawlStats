@@ -47,6 +47,7 @@ const LOCAL_ART: [RegExp, string][] = [
   // Supercell's Fan Kit art (fankit.supercell.com, 2026-10-29), in
   // public/rewards/art: the reward posts read the same files.
   [/ranked starr drop/i, '/rewards/art/ranked-starr-drop.png'],
+  [/chaos drop/i, '/rewards/art/chaos-drop.png'],
   [/credit/i, '/rewards/art/credits.png'],
   [/gem/i, '/rewards/art/gems.png'],
   [/bling/i, '/rewards/art/bling.png'],

@@ -30,7 +30,8 @@ esac
 if [ -n "$style" ] && [ -s "$WORK/rewards.json" ]; then
   chmod 755 "$WORK"
   docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
-    -v "${CARD_CODE:-$REPO/deploy/rewards}:/code:ro" -v "$REPO/public:/public:ro" -v "$WORK:/out" -v "$CACHE:/cache" \
+    -v "${CARD_CODE:-$REPO/deploy/rewards}:/code:ro" -v "${CARD_PUBLIC:-$REPO/public}:/public:ro" -v "$WORK:/out" -v "$CACHE:/cache" \
+    -v /var/lib/brawlzone/viral-cache/drops:/drops:ro \
     "python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1" \
     sh -c "PYTHONPATH=/cache/py python /code/make.py /out/rewards.json /out /cache/assets /cache/icons /public $style" >/dev/null 2>&1 \
     && [ -s "$WORK/card.jpg" ] && PICTURE="$WORK/card.jpg" || echo "::warning::telegram: no picture, posting the text alone" >&2

@@ -10,7 +10,8 @@ Writes 1.jpg.. and meta.json ({count, title, description}) to the out dir.
 
 Art, best first (2026-10-28): a high-res file for the reward in
 public/rewards/art (`art_slug`, e.g. credits.png; from Supercell's Fan Kit,
-which has no Chaos Drop or plain Starr Drop), the brawler's portrait
+and the Chaos Drop the drops videos use), the drops videos' art of boxes and
+drops (/drops, 2026-11-24), the brawler's portrait
 when the reward names one ("Wendy Box"), the site's own icons for what it has
 them for, and a plain gift for anything else. The first set (2026-10-21, by
 hand in ~/shots/vouchers) cropped Supercell's announcement image; a post that
@@ -188,6 +189,12 @@ def reward_image(name):
         for s in (slug, re.sub(r'(box)es$', r'\1', slug), slug.rstrip('s'), slug + 's'):
             hi = open_rgba(f'{PUBLIC}/rewards/art/{s}.png')
             if hi: return hi
+    # The drops videos' own art (2026-11-24), mounted by the job: "Vince Box" is
+    # vince-boxes.png there, "Nano Drop" nano-drops.png.
+    slug = art_slug(name)
+    for s in (slug, slug + 's', re.sub(r'box$', 'boxes', slug)):
+        hi = open_rgba(f'/drops/{s}.png')
+        if hi: return hi
     face = portrait(name)
     if face: return face
     if PUBLIC:
