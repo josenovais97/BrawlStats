@@ -2,6 +2,9 @@
 
     python make.py <rewards.json> <out dir> <assets dir> <portrait cache dir> [public dir]
 
+With a sixth argument, `card` or `daily` (2026-11-24), it draws one wide
+picture instead, <out dir>/card.jpg, for brawlzone-telegram.
+
 rewards.json is [{"name": "Mega Box", "url": "https://link.brawlstars.com/..."}].
 Writes 1.jpg.. and meta.json ({count, title, description}) to the out dir.
 
@@ -245,6 +248,32 @@ def qr(url, size):
 
 
 n = len(rewards)
+
+# One wide picture, for a Telegram post: the reward on the stage, its name beside it.
+if len(sys.argv) > 6 and sys.argv[6] in ('card', 'daily'):
+    W, H = 1280, 720
+    im = bg(cy=360)
+    if n == 1:
+        floating(im, reward_image(rewards[0]['name']), 360, 350, 430)
+    else:
+        for i, r in enumerate(rewards):
+            floating(im, reward_image(r['name']), 220 + (i % 2) * 270, 350 if n == 2 else 220 + (i // 2) * 270, 230)
+    stext(im, "TODAY'S FREE" if sys.argv[6] == 'daily' else 'FREE', 120, F(92 if sys.argv[6] == 'daily' else 150), YEL, maxw=600, cx=905)
+    if sys.argv[6] == 'daily':
+        stext(im, 'STORE REWARD', 225, F(92), YEL, maxw=600, cx=905)
+    y = 350 if sys.argv[6] == 'daily' else 310
+    for r in rewards:
+        size = 96 if n == 1 else 58
+        stext(im, display_name(r['name']).upper(), y, F(size), WHITE, maxw=620, cx=905)
+        y += int(size * 1.35)
+    dr = ImageDraw.Draw(im); f = F(44); t = 'brawlzone.net/rewards'; tw = dr.textlength(t, font=f)
+    dr.rounded_rectangle((905 - tw / 2 - 30, 590, 905 + tw / 2 + 30, 660), 35, fill=YEL)
+    dr.text((905 - tw / 2, 600), t, font=f, fill=NAVY)
+    dr.text((40, H - 44), 'Unofficial fan project, not affiliated with Supercell.', font=G(24), fill=MUTED)
+    im.save(f'{OUT}/card.jpg', quality=92)
+    print('card')
+    sys.exit()
+
 slides = []
 names = [display_name(r['name']) for r in rewards]
 

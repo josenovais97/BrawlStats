@@ -14,9 +14,33 @@
 set -uo pipefail
 CONF="${BRAWLZONE_TELEGRAM:-$HOME/.brawlzone-telegram}"
 [ -r "$CONF" ] || { [ "${1:-}" = check ] && echo "no $CONF yet"; exit 0; }
-exec python3 - "$CONF" "$@" <<'PY'
-import html, json, re, sys, time, urllib.parse, urllib.request
 
+# The post's picture, drawn like the reward slides (deploy/rewards/make.py). A
+# failure costs the picture, never the post.
+REPO=/home/ubuntu/brawlstats
+CACHE=/var/lib/brawlzone/rewards-cache
+PICTURE=""
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+case "${1:-}" in
+  rewards) cp "${2:-}" "$WORK/rewards.json" 2>/dev/null; style=card ;;
+  daily) python3 -c 'import json,sys; json.dump([{"name": sys.argv[1], "url": sys.argv[2]}], open(sys.argv[3], "w"))' "${2:-}" "${3:-}" "$WORK/rewards.json"; style=daily ;;
+  *) style="" ;;
+esac
+if [ -n "$style" ] && [ -s "$WORK/rewards.json" ]; then
+  chmod 755 "$WORK"
+  docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+    -v "${CARD_CODE:-$REPO/deploy/rewards}:/code:ro" -v "$REPO/public:/public:ro" -v "$WORK:/out" -v "$CACHE:/cache" \
+    "python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1" \
+    sh -c "PYTHONPATH=/cache/py python /code/make.py /out/rewards.json /out /cache/assets /cache/icons /public $style" >/dev/null 2>&1 \
+    && [ -s "$WORK/card.jpg" ] && PICTURE="$WORK/card.jpg" || echo "::warning::telegram: no picture, posting the text alone" >&2
+fi
+[ -n "${KEEP_CARD:-}" ] && [ -n "$PICTURE" ] && cp "$PICTURE" "$KEEP_CARD"
+
+PICTURE="$PICTURE" python3 - "$CONF" "$@" <<'PY'
+import html, json, os, re, sys, time, urllib.parse, urllib.request, uuid
+
+PICTURE = os.environ.get('PICTURE') or None
 conf_path, args = sys.argv[1], sys.argv[2:]
 dry = '--dry-run' in args
 args = [a for a in args if a != '--dry-run']
@@ -56,10 +80,20 @@ def local(name, lang):
     return count + (words.get(key) or words.get(key + 's') or thing)
 
 
-def call(method, **params):
-    data = urllib.parse.urlencode({k: json.dumps(v) if isinstance(v, (dict, list, bool)) else v for k, v in params.items()}).encode()
+def call(method, _file=None, **params):
+    fields = {k: json.dumps(v) if isinstance(v, (dict, list, bool)) else str(v) for k, v in params.items()}
+    headers = {}
+    if _file:
+        key, path = _file
+        edge = uuid.uuid4().hex
+        data = b''.join(f'--{edge}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode() for k, v in fields.items())
+        data += f'--{edge}\r\nContent-Disposition: form-data; name="{key}"; filename="card.jpg"\r\nContent-Type: image/jpeg\r\n\r\n'.encode()
+        data += open(path, 'rb').read() + f'\r\n--{edge}--\r\n'.encode()
+        headers['Content-Type'] = f'multipart/form-data; boundary={edge}'
+    else:
+        data = urllib.parse.urlencode(fields).encode()
     try:
-        with urllib.request.urlopen(urllib.request.Request(f'https://api.telegram.org/bot{TOKEN}/{method}', data=data), timeout=30) as r:
+        with urllib.request.urlopen(urllib.request.Request(f'https://api.telegram.org/bot{TOKEN}/{method}', data=data, headers=headers), timeout=60) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
         # Telegram says why in the body; the address holds the token, so it is never shown.
@@ -76,8 +110,12 @@ def post(lang, text, buttons, silent):
     if dry:
         print(f'--- {lang} {chat}{" (silent)" if silent else ""}\n{text}\n' + '\n'.join(f'[{b["text"]}] {b["url"]}' for row in buttons for b in row))
         return True
-    r = call('sendMessage', chat_id=chat, text=text, parse_mode='HTML', disable_notification=silent,
-             link_preview_options={'is_disabled': True}, reply_markup={'inline_keyboard': buttons})
+    common = {'chat_id': chat, 'parse_mode': 'HTML', 'disable_notification': silent, 'reply_markup': {'inline_keyboard': buttons}}
+    r = call('sendPhoto', _file=('photo', PICTURE), caption=text[:1024], **common) if PICTURE else {'ok': False}
+    if not r.get('ok'):
+        if PICTURE:
+            print(f'::warning::telegram {lang}: picture refused: {r.get("description")}', file=sys.stderr)
+        r = call('sendMessage', text=text, link_preview_options={'is_disabled': True}, **common)
     if not r.get('ok'):
         print(f'::warning::telegram {lang}: {r.get("description")}', file=sys.stderr)
     return bool(r.get('ok'))
