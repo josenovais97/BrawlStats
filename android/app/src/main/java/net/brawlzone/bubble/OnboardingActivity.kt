@@ -45,6 +45,7 @@ class OnboardingActivity : AppCompatActivity() {
         GameType.apply(this, findViewById(R.id.onb_root))
         fitSystemBars()
         // 1.43: the setup funnel, anonymously (Stats): seen, each step, done or skipped.
+        Stats.firstOpen(this)
         Stats.once(this, "app_onb_view")
 
         tagField = findViewById(R.id.onb_tag)

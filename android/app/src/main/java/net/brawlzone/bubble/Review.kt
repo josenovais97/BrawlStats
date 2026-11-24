@@ -80,7 +80,7 @@ object Review {
         val games = j.optJSONArray("games")?.let { a ->
             (0 until a.length()).mapNotNull { i ->
                 val g = a.optJSONObject(i) ?: return@mapNotNull null
-                Me.Game(g.optString("t"), g.optBoolean("win"), g.optBoolean("star"), g.optString("brawler").takeIf { it.isNotEmpty() && it != "null" })
+                Me.Game(g.optString("t"), g.optBoolean("win"), g.optBoolean("star"), g.optString("brawler").takeIf { it.isNotEmpty() && it != "null" }, g.optString("mode").takeIf { it.isNotEmpty() && it != "null" })
             }
         }.orEmpty()
         if (games.isNotEmpty()) {

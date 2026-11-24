@@ -3430,8 +3430,8 @@ export const PT: Record<string, string> = {
     "Instalado pelo Google Play, o app também é coberto pela política de privacidade do Google para a Play Store, e o Google nos dá estatísticas agregadas como número de instalações e relatórios de falhas. Baixado pela",
   "Its panel is a web view of":
     "O painel dele é uma visualização web de",
-  "No account, no ads, no trackers, and it cannot see your screen.":
-    "Sem conta, sem anúncios, sem rastreadores, e ele não consegue ver sua tela.",
+  "No account, no ads, and it cannot see your screen.":
+    "Sem conta, sem anúncios, e ele não consegue ver sua tela.",
   "Nothing to delete on our side for most people.":
     "Para a maioria das pessoas, não há nada a excluir do nosso lado.",
   "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":

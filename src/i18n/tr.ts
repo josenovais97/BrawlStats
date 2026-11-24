@@ -3430,8 +3430,8 @@ export const TR: Record<string, string> = {
     "Google Play'den yüklendiğinde uygulama, Google'ın Play Store için kendi gizlilik politikasının kapsamındadır ve Google bize yükleme sayıları ve çökme raporları gibi toplu istatistikler verir. Şuradan indirildiğinde:",
   "Its panel is a web view of":
     "Paneli şunun bir web görünümüdür:",
-  "No account, no ads, no trackers, and it cannot see your screen.":
-    "Hesap yok, reklam yok, izleyici yok ve ekranını göremez.",
+  "No account, no ads, and it cannot see your screen.":
+    "Hesap yok, reklam yok ve ekranını göremez.",
   "Nothing to delete on our side for most people.":
     "Çoğu kişi için bizim tarafımızda silinecek bir şey yok.",
   "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":

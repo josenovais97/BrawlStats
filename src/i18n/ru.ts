@@ -3431,8 +3431,8 @@ export const RU: Record<string, string> = {
     "При установке из Google Play на приложение распространяется собственная политика конфиденциальности Google для Play Маркета, и Google передаёт нам сводную статистику, например число установок и отчёты о сбоях. При загрузке со",
   "Its panel is a web view of":
     "Его панель — это веб-просмотр",
-  "No account, no ads, no trackers, and it cannot see your screen.":
-    "Без аккаунта, без рекламы, без трекеров, и оно не видит твой экран.",
+  "No account, no ads, and it cannot see your screen.":
+    "Без аккаунта, без рекламы, и оно не видит твой экран.",
   "Nothing to delete on our side for most people.":
     "Для большинства у нас нечего удалять.",
   "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":

@@ -27,8 +27,12 @@ object Pass {
     const val XP_PER_TIER = 100
     const val TIERS = 10
     val REWARD_TIERS = listOf(2, 4, 6, 8, 10)
-    /** The seven base quests' XP, scaled to this every week: tier 10 (1,000) leaves room to skip one small quest. */
-    const val WEEK_XP = 1100
+    /**
+     * The seven base quests' XP, scaled to this every week. At 1,200 every mix
+     * of quests reaches tier 10 (1,000) with its smallest quest skipped; at
+     * 1,100 about one mix in eight did not.
+     */
+    const val WEEK_XP = 1200
 
     private const val PREFS = "brawlzone-pass"
     private const val KEY_OWNED = "owned"
@@ -119,9 +123,7 @@ object Pass {
         update(context, post = true)
     }
 
-    private fun progress(context: Context, tag: String, start: ZonedDateTime, kind: Kind, mode: String?): Int {
-        val since = start.toInstant().toEpochMilli()
-        val games = Tally.battles(context, tag).filter { it.at >= since }.sortedBy { it.at }
+    private fun progress(context: Context, tag: String, start: ZonedDateTime, games: List<Tally.Battle>, kind: Kind, mode: String?): Int {
         val wins = games.filter { it.win }
         val week = weekId(start)
         return when (kind) {
@@ -166,8 +168,11 @@ object Pass {
         val picked = pick(context, tag, start)
         // Scaled so every week is worth the same: the kinds' XP sets the split, WEEK_XP the total.
         val factor = WEEK_XP.toDouble() / picked.take(7).sumOf { it.first.xp }
+        // The week's games, read once for all seven quests (this runs on the main thread).
+        val since = start.toInstant().toEpochMilli()
+        val games = Tally.battles(context, tag).filter { it.at >= since }.sortedBy { it.at }
         val quests = picked.map { (kind, mode) ->
-            Quest(kind, progress(context, tag, start, kind, mode), mode, (Math.round(kind.xp * factor / 25.0) * 25).toInt())
+            Quest(kind, progress(context, tag, start, games, kind, mode), mode, (Math.round(kind.xp * factor / 25.0) * 25).toInt())
         }
         val xp = quests.filter { it.done }.sumOf { it.xp }
         val tier = (xp / XP_PER_TIER).coerceAtMost(TIERS)

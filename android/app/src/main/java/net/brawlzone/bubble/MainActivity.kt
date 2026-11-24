@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         // 1.43: four tabs over a bottom bar.
         for ((index, id) in Tabs.NAV.withIndex()) findViewById<View>(id).setOnClickListener { selectTab(index) }
         selectTab(savedInstanceState?.getInt(KEY_TAB, Tabs.HOME) ?: Tabs.HOME, track = false)
-        Stats.once(this, "app_first_open")
+        Stats.firstOpen(this)
 
         statusText = findViewById(R.id.status_text)
         statusDot = findViewById(R.id.status_dot)

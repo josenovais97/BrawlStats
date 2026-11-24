@@ -238,7 +238,7 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('The Android app')}
-          subtitle={t('No account, no ads, no trackers, and it cannot see your screen.')}
+          subtitle={t('No account, no ads, and it cannot see your screen.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">

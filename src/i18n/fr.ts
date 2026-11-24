@@ -3431,8 +3431,8 @@ export const FR: Record<string, string> = {
     "Installée depuis Google Play, l'appli est couverte par la propre politique de confidentialité de Google pour le Play Store, et Google nous donne des statistiques agrégées comme le nombre d'installations et les rapports de plantage. Téléchargée depuis la",
   "Its panel is a web view of":
     "Son panneau affiche",
-  "No account, no ads, no trackers, and it cannot see your screen.":
-    "Pas de compte, pas de pub, pas de traceurs, et elle ne peut pas voir ton écran.",
+  "No account, no ads, and it cannot see your screen.":
+    "Pas de compte, pas de pub, et elle ne peut pas voir ton écran.",
   "Nothing to delete on our side for most people.":
     "Rien à supprimer de notre côté pour la plupart des gens.",
   "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":

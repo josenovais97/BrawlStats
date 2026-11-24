@@ -26,7 +26,6 @@ object Stats {
     private const val WEBSITE = "09f04c04-b76c-41a0-927e-a6c88041a4e3"
     private const val PREFS = "brawlzone-stats"
     private const val KEY_IID = "iid"
-    private const val KEY_FIRST = "first_day"
     private const val KEY_OPEN_DAY = "open_day"
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -37,19 +36,33 @@ object Stats {
         val p = prefs(context)
         p.getString(KEY_IID, null)?.let { return it }
         val id = UUID.randomUUID().toString()
-        p.edit().putString(KEY_IID, id).putString(KEY_FIRST, LocalDate.now().toString()).apply()
+        p.edit().putString(KEY_IID, id).apply()
         return id
     }
 
-    /** Days since this install's first event: 0 on the first day. */
+    private fun installed(context: Context): android.content.pm.PackageInfo? =
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0) }.getOrNull()
+
+    /** Days since the app was installed (not since this version): 0 on the first day. */
     private fun dayIndex(context: Context): Long {
-        installId(context)
-        val first = runCatching { LocalDate.parse(prefs(context).getString(KEY_FIRST, null)) }.getOrNull() ?: return 0
-        return java.time.temporal.ChronoUnit.DAYS.between(first, LocalDate.now()).coerceAtLeast(0)
+        val at = installed(context)?.firstInstallTime ?: return 0
+        val day = java.time.Instant.ofEpochMilli(at).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        return java.time.temporal.ChronoUnit.DAYS.between(day, LocalDate.now()).coerceAtLeast(0)
+    }
+
+    /** Google's test devices (Play's pre-launch report runs on them): robots, not players. */
+    private fun testLab(context: Context): Boolean =
+        runCatching { android.provider.Settings.System.getString(context.contentResolver, "firebase.test.lab") == "true" }.getOrDefault(false)
+
+    /** The first open of a new install; an update from an older version is not one. */
+    fun firstOpen(context: Context) {
+        val info = installed(context) ?: return
+        if (info.firstInstallTime == info.lastUpdateTime) once(context, "app_first_open")
     }
 
     fun event(context: Context, name: String, data: Map<String, Any> = emptyMap()) {
         val app = context.applicationContext
+        if (testLab(app)) return
         val iid = installId(app)
         val day = dayIndex(app)
         val lang = AppLang.current(app)

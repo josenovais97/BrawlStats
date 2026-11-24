@@ -62,7 +62,10 @@ object Tally {
             .filter { it.at >= cutoff && it.at !in seen }
             .distinctBy { it.at }
             .sortedBy { it.at }
-        val all = (known + fresh).filter { it.at >= cutoff }.sortedBy { it.at }
+        // 1.44: rows saved before the bubble's poll carried the mode get it now.
+        val modes = games.mapNotNull { g -> g.mode?.let { m -> time(g.time)?.let { it to m } } }.toMap()
+        val filled = known.map { b -> if (b.mode == null) b.copy(mode = modes[b.at]) else b }
+        val all = (filled + fresh).filter { it.at >= cutoff }.sortedBy { it.at }
         val out = JSONArray()
         for (b in all) {
             out.put(JSONArray().put(b.at).put(if (b.win) 1 else 0).put(b.brawler ?: "").put(b.mode ?: "").put(if (b.star) 1 else 0))

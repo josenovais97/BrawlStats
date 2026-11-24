@@ -3431,8 +3431,8 @@ export const DE: Record<string, string> = {
     "Aus Google Play installiert, gilt für die App Googles eigene Datenschutzerklärung für den Play Store, und Google gibt uns zusammengefasste Statistiken wie Installationszahlen und Absturzberichte. Von der",
   "Its panel is a web view of":
     "Ihr Panel ist eine Web-Ansicht von",
-  "No account, no ads, no trackers, and it cannot see your screen.":
-    "Kein Account, keine Werbung, keine Tracker, und sie kann deinen Bildschirm nicht sehen.",
+  "No account, no ads, and it cannot see your screen.":
+    "Kein Account, keine Werbung, und sie kann deinen Bildschirm nicht sehen.",
   "Nothing to delete on our side for most people.":
     "Für die meisten gibt es bei uns nichts zu löschen.",
   "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":

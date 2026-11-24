@@ -70,6 +70,9 @@ export async function GET(request: NextRequest) {
       win: e.battle.result === 'victory',
       star: e.battle.starPlayer?.tag?.toUpperCase() === me,
       brawler: mine?.brawler?.name ? name(mine.brawler.name) : null,
+      // Same key as /api/bubble/me: the app keeps whichever answer saw a game
+      // first, and without it games seen by the bubble had no mode (2026-11-24).
+      mode: e.event?.mode ?? e.battle.mode ?? null,
     };
   });
   // Battle times sort as strings: fixed width, most significant first.
