@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# Tell people about today's free reward in the Supercell Store: a one-week
+# trial (owner, 2026-11-24), 2026-11-25 to 2026-12-01, then it stops by itself.
+#
+#   brawlzone-daily-gift [--dry-run]
+#
+# Run by brawlzone-rewards-watch every two minutes; does nothing unless
+# daily.json names today's reward, the trial is on, it is past 15:00 UTC and
+# today has not been sent. 15:00 and not 08:00, when the reward changes: that
+# is the middle of the night in America, and a reward with 17 hours left needs
+# no hurry. A push to browsers that asked for reward alerts and one line in
+# Discord's general, no ping. No videos: the same one every day would be
+# repetitive, and the upload limits are already nearly used up.
+#
+# As with every reward (owner, 2026-11-06), nothing goes out until /rewards
+# shows it in every language. Three tries a day at most.
+set -uo pipefail
+
+TRIAL_START=2026-11-25
+TRIAL_END=2026-12-01
+SEND_AFTER_HOUR=15
+
+REPO=/home/ubuntu/brawlstats
+SITE=https://brawlzone.net
+ENV_FILE="$REPO/.env.production"
+DAILY=/var/lib/brawlzone/social/rewards/daily.json
+MARK=/var/lib/brawlzone/daily-gift.json
+
+dry=0
+[ "${1:-}" = "--dry-run" ] && dry=1
+
+# "day<TAB>name<TAB>url" when there is something to send, nothing otherwise.
+todo=$(python3 - "$DAILY" "$MARK" "$TRIAL_START" "$TRIAL_END" "$SEND_AFTER_HOUR" "$dry" <<'PY'
+import datetime, json, sys
+daily_path, mark_path, start, end, hour, dry = sys.argv[1:7]
+now = datetime.datetime.now(datetime.timezone.utc)
+day = (now - datetime.timedelta(hours=8)).strftime('%Y-%m-%d')  # as src/lib/store-daily.ts
+def read(p):
+    try:
+        return json.load(open(p))
+    except (OSError, ValueError):
+        return {}
+d, mark = read(daily_path), read(mark_path)
+if d.get('day') != day or not d.get('name'):
+    sys.exit()
+if dry != '1':
+    # The store's day runs 08:00 to 08:00: after midnight is too late to send.
+    if not start <= day <= end or now.strftime('%Y-%m-%d') != day or now.hour < int(hour):
+        sys.exit()
+    if mark.get('day') == day and (mark.get('done') or mark.get('tries', 0) >= 3):
+        sys.exit()
+print(day, d['name'], d.get('url') or 'https://store.supercell.com/brawlstars', sep='\t')
+PY
+)
+[ -n "$todo" ] || exit 0
+IFS=$'\t' read -r day name url <<< "$todo"
+
+mark() { # done(true|false)
+  python3 - "$MARK" "$day" "$1" <<'PY'
+import json, os, sys
+path, day, done = sys.argv[1], sys.argv[2], sys.argv[3] == 'true'
+try:
+    m = json.load(open(path))
+except (OSError, ValueError):
+    m = {}
+tries = m.get('tries', 0) if m.get('day') == day else 0
+json.dump({'day': day, 'tries': tries + (0 if done else 1), 'done': done}, open(path + '.tmp', 'w'))
+os.replace(path + '.tmp', path)
+PY
+}
+[ "$dry" = 1 ] || mark false
+
+if [ "$dry" = 0 ]; then
+  CRON_SECRET="$(sed -n 's/^CRON_SECRET=//p' "$ENV_FILE" | head -1 | sed 's/^["'"'"']//; s/["'"'"']$//')"
+  curl -s -o /dev/null -w 'revalidate: HTTP %{http_code}\n' --max-time 30 -X POST \
+    -H "Authorization: Bearer $CRON_SECRET" "$SITE/api/cron/revalidate-rewards" || echo "::warning::revalidate not reached"
+fi
+# The card's data as the page carries it: today's date beside today's name.
+want="\\\"day\\\":\\\"$day\\\",\\\"name\\\":\\\"$name\\\""
+shown=0
+for attempt in $(seq 1 20); do
+  missing=0
+  for path in rewards es/rewards pt/rewards tr/rewards de/rewards ru/rewards fr/rewards; do
+    page="$(curl -s --max-time 20 "$SITE/$path?d=$day-$attempt")" || { missing=1; break; }
+    grep -qF "$want" <<<"$page" || { missing=1; break; }
+  done
+  [ "$missing" = 0 ] && { shown=1; break; }
+  [ "$dry" = 1 ] && break
+  sleep 15
+done
+[ "$shown" = 1 ] || { echo "::error::/rewards does not show $day's $name in every language yet; nothing sent" >&2; exit 1; }
+echo "site: /rewards shows $name for $day in all 7 languages"
+[ "$dry" = 0 ] || { echo "--dry-run: nothing sent"; exit 0; }
+
+# Sent once: a failure after this point must not send twice.
+mark true
+(cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts --daily "$name") 2>&1 \
+  | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
+
+DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+if [ -n "$DISCORD_TOKEN" ] && [ -n "$DISCORD_GUILD" ]; then
+  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" python3 - "$name" "$url" <<'PY' || echo "::warning::Discord message failed (not fatal)"
+import json, os, sys, urllib.request
+name, url = sys.argv[1:3]
+api = 'https://discord.com/api/v10'
+headers = {'Authorization': f"Bot {os.environ['DISCORD_TOKEN']}", 'Content-Type': 'application/json',
+           'User-Agent': 'BrawlZone (https://brawlzone.net, 1.0)'}
+def call(method, path, body=None):
+    req = urllib.request.Request(api + path, method=method, headers=headers,
+                                 data=None if body is None else json.dumps(body).encode())
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read() or b'{}')
+chan = next((c['id'] for c in call('GET', f"/guilds/{os.environ['DISCORD_GUILD']}/channels") if c.get('name') == '💬-general'), None)
+if not chan:
+    sys.exit('no 💬-general channel')
+call('POST', f'/channels/{chan}/messages', {
+    'allowed_mentions': {'parse': []},
+    'flags': 4 | 4096,  # no link previews, no notification sound
+    'content': f"🎁 Today's free store reward: **{name}**. [Claim it](<{url}>) before 08:00 UTC · <https://brawlzone.net/rewards?from=daily-discord>",
+})
+print('discord: posted in general')
+PY
+fi

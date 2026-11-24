@@ -26,9 +26,22 @@ const TEXT: Record<Locale, { title: string; body: (names: string) => string; pat
   fr: { title: '🎁 Nouvelle récompense gratuite Brawl Stars !', body: (n) => `${n}. Touche pour la récupérer avant qu’elle expire.`, path: '/fr/rewards' },
 };
 
+/** Today's reward in the Supercell Store (brawlzone-daily-gift, a trial): its own words, link and tag, so one day's replaces the last. */
+const DAILY: Record<Locale, { title: string; body: (name: string) => string }> = {
+  en: { title: "🎁 Today's free Brawl Stars store reward", body: (n) => `${n}. Claim it before it changes.` },
+  es: { title: '🎁 La recompensa gratis de hoy en la tienda de Brawl Stars', body: (n) => `${n}. Reclámala antes de que cambie.` },
+  pt: { title: '🎁 A recompensa grátis de hoje na loja do Brawl Stars', body: (n) => `${n}. Resgate antes que mude.` },
+  tr: { title: '🎁 Brawl Stars mağazasında bugünün ücretsiz ödülü', body: (n) => `${n}. Değişmeden al.` },
+  de: { title: '🎁 Die heutige Gratis-Belohnung im Brawl-Stars-Store', body: (n) => `${n}. Hol sie ab, bevor sie wechselt.` },
+  ru: { title: '🎁 Бесплатная награда дня в магазине Brawl Stars', body: (n) => `${n}. Забери, пока не сменилась.` },
+  fr: { title: '🎁 La récompense gratuite du jour, boutique Brawl Stars', body: (n) => `${n}. Récupère-la avant qu’elle change.` },
+};
+
 async function main(): Promise<void> {
-  const names = process.argv.slice(2).filter(Boolean);
-  if (!names.length) throw new Error('usage: push-rewards.ts <reward name> ...');
+  const args = process.argv.slice(2).filter(Boolean);
+  const daily = args[0] === '--daily';
+  const names = daily ? args.slice(1) : args;
+  if (!names.length) throw new Error('usage: push-rewards.ts [--daily] <reward name> ...');
   const prisma = getPrisma();
   if (!prisma) throw new Error('no DATABASE_URL');
   const subs = await prisma.pushSubscription.findMany();
@@ -38,8 +51,12 @@ async function main(): Promise<void> {
   for (let i = 0; i < subs.length; i += 10) {
     await Promise.all(
       subs.slice(i, i + 10).map(async (s) => {
-        const text = isIntlLocale(s.lang) ? TEXT[s.lang] : TEXT.en;
-        const result = await sendPush(s, { title: text.title, body: text.body(listed), url: `${text.path}?from=push`, tag: 'brawlzone-reward' });
+        const lang: Locale = isIntlLocale(s.lang) ? s.lang : 'en';
+        const text = TEXT[lang];
+        const message = daily
+          ? { title: DAILY[lang].title, body: DAILY[lang].body(listed), url: `${text.path}?from=daily-push`, tag: 'brawlzone-daily' }
+          : { title: text.title, body: text.body(listed), url: `${text.path}?from=push`, tag: 'brawlzone-reward' };
+        const result = await sendPush(s, message);
         tally[result] += 1;
         if (result === 'gone') await prisma.pushSubscription.delete({ where: { id: s.id } }).catch(() => {});
         if (result === 'sent') await prisma.pushSubscription.update({ where: { id: s.id }, data: { lastSentAt: new Date() } }).catch(() => {});

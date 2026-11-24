@@ -16,7 +16,8 @@
 #   Names come from the text on the link's own line ("Mega Box: link...").
 #
 # The store's free daily reward (2026-11-24) goes to daily.json, which the card
-# on /rewards reads. It only updates the page: no videos, push or Discord. The
+# on /rewards reads. Only the page changes here; brawlzone-daily-gift may tell
+# people about it (a trial), and it never becomes a video. The
 # store hides it until you sign in, so its name comes from clashloot.gg/bs, a
 # public page that lists it seconds after the 08:00 UTC change: read until
 # today's is known, then not again until tomorrow. A line in the Discord
@@ -301,7 +302,6 @@ print('\n'.join(batches))
 PY
 ) || { echo "::error::the rewards watcher failed" >&2; exit 1; }
 
-[ -n "$batches" ] || exit 0
 while IFS= read -r line; do
   [ -n "$line" ] || continue
   # The store's daily reward: only the page changes, so refresh it and move on.
@@ -316,3 +316,6 @@ while IFS= read -r line; do
   echo "new rewards: ${args[*]}"
   /usr/local/bin/brawlzone-rewards "${args[@]}" || echo "::warning::brawlzone-rewards failed for: ${args[*]}"
 done <<< "$batches"
+
+# Alerts for the daily reward while their one-week trial runs (it checks).
+/usr/local/bin/brawlzone-daily-gift || echo "::warning::brawlzone-daily-gift failed"
