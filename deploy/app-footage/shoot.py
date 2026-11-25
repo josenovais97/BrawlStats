@@ -29,6 +29,9 @@ def shot(name):
         return
     png = adb('exec-out', 'screencap', '-p', raw=True)
     open(f'{OUT}/{name}.png', 'wb').write(png)
+    if name[:2] in ('t_', 's_', 'la') or name.startswith('pass'):
+        sh('uiautomator dump --compressed /sdcard/d.xml >/dev/null 2>&1', t=40)
+        open(f'{OUT}/{name}.xml', 'wb').write(adb('exec-out', 'cat', '/sdcard/d.xml', raw=True))
     say('shot', name, len(png))
 
 
@@ -109,27 +112,33 @@ def record(name, seconds, act):
     say('recorded', name)
 
 
+def top():
+    for _ in range(3):
+        sh('input swipe 540 900 540 2100 120'); time.sleep(0.5)
+    time.sleep(2.5)
+
+
 def page_set(prefix):
     """Every screen of the app, as it is now."""
     start(wait=4)
-    tap('nav_home'); time.sleep(2.2)
+    tap('nav_home'); tap('nav_home'); time.sleep(2.2)
     shot(prefix + 'home')
-    tap('nav_season'); time.sleep(2.5)
+    tap('nav_season'); time.sleep(2.5); tap('nav_season'); time.sleep(1.5)
     shot(prefix + 'season_rank')
     tap(text='Stats'); time.sleep(2.2)
     shot(prefix + 'season_stats')
     tap(text='Brawlers'); time.sleep(2.2)
     shot(prefix + 'season_brawlers')
-    tap(text='K/D'); time.sleep(1.6)
+    tap(text='Best K/D'); time.sleep(1.6)
     shot(prefix + 'season_brawlers_kd')
-    tap(text='Played'); time.sleep(1)
+    tap(text='Most played'); time.sleep(1)
     if tap(text='Season 50', wait=2.5):
         shot(prefix + 'last_brawlers')
         tap(text='Rank'); time.sleep(2)
         shot(prefix + 'last_rank')
         tap(text='Season 51', wait=1.5)
     tap(text='Rank')
-    tap('nav_squad'); time.sleep(2.5)
+    tap('nav_squad'); time.sleep(1.5); tap('nav_squad'); time.sleep(1.5)
     shot(prefix + 'squad')
     tap('nav_settings'); time.sleep(1.5)
     shot(prefix + 'settings')
@@ -198,17 +207,19 @@ prefs('brawlzone-friends', '<string name="tags">' + html.escape(json.dumps(tags[
 
 def warm():
     start(wait=14)
-    sh('input swipe 540 700 540 1700 400'); time.sleep(16)
+    top(); time.sleep(16)
     tap('nav_season'); time.sleep(8)
     tap(text='Stats'); time.sleep(4)
     tap(text='Brawlers'); time.sleep(4)
     for _ in range(2):
         sh('input swipe 540 1800 540 700 500'); time.sleep(1.5)
+    tap('nav_season'); time.sleep(2)
     tap(text='Season 50'); time.sleep(8)
+    tap(text='Rank'); time.sleep(3)
     tap(text='Season 51'); time.sleep(2)
     tap('nav_squad'); time.sleep(6)
-    sh('input swipe 540 700 540 1700 400'); time.sleep(16)
-    page_set('live_')
+    top(); time.sleep(16)
+    tap('nav_home'); time.sleep(3)
 
 
 step('warm', warm)
@@ -220,6 +231,7 @@ sh('svc wifi disable; svc data disable'); time.sleep(3)
 
 def rename():
     d = f'/data/data/{PKG}/shared_prefs'
+    sh(f'rm -f {d}/brawlzone-mates.xml')
     for f in sh(f'ls {d}').split():
         raw = adb('exec-out', 'cat', f'{d}/{f}', raw=True).decode('utf-8', 'replace')
         new = raw
@@ -240,7 +252,7 @@ step('rename', rename)
 
 def notifications():
     start(wait=3)
-    tap('nav_settings')
+    tap('nav_settings'); tap('nav_settings')
     tap(has='Notifications') or tap(has='alerts')
     time.sleep(1)
     shot('settings_notifications')
@@ -255,8 +267,8 @@ step('notifications', notifications)
 
 def look():
     start(wait=3)
-    tap('nav_settings')
-    tap(has='look'); time.sleep(1.2)
+    tap('nav_settings'); tap('nav_settings')
+    tap(text='Bubble'); time.sleep(1.2)
     shot('settings_look')
 
 
@@ -265,8 +277,8 @@ step('look', look)
 
 def widgets():
     start(wait=3)
-    tap('nav_settings')
-    tap(has='Widgets'); time.sleep(1.2)
+    tap('nav_settings'); tap('nav_settings')
+    tap(text='Widgets'); time.sleep(1.2)
     shot('settings_widgets')
     for i in range(8):
         adds = [n for n in nodes() if (n.get('text') or '').strip().lower() == 'add']
@@ -276,12 +288,12 @@ def widgets():
         sh(f'input tap {x} {y}'); time.sleep(2)
         if i == 0:
             shot('widget_dialog')
-        if not (tap(has='Add to home', wait=2) or tap(has='Add automatically', wait=2)):
+        if not (tap(has='Add to home', wait=2) or tap(has='Add automatically', wait=2) or tap(text='Add', wait=2)):
             sh('input keyevent 4')
             break
         start(wait=2)
         if find(text='Add') is None:
-            tap('nav_settings'); tap(has='Widgets')
+            tap('nav_settings'); tap('nav_settings'); tap(text='Widgets')
     time.sleep(4)
     sh('input keyevent 3'); time.sleep(3)
     shot('launcher1')
