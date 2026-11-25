@@ -73,7 +73,7 @@ export async function computeRankNumbers(rank: RankKey): Promise<RankNumbers> {
   return {
     rank,
     battles,
-    bans: [...total].map(([id, n]): [number, number] => [id, rate(n, battles)]).filter(([, r]) => r >= 0.005).sort(byRate),
+    bans: [...total].map(([id, n]): [number, number] => [id, rate(n, battles)]).sort(byRate),
     maps: [...maps.values()]
       .filter((m) => modes.has(m.mode) && m.map && m.battles >= MIN_MAP_BATTLES)
       .map((m) => ({ ...m, bans: m.bans.map(([id, n]): [number, number] => [id, rate(n, m.battles)]).sort(byRate).slice(0, MAP_LIST) }))
@@ -83,14 +83,14 @@ export async function computeRankNumbers(rank: RankKey): Promise<RankNumbers> {
         .filter(([mode, m]) => modes.has(mode) && m.battles >= MIN_MAP_BATTLES)
         .map(([mode, m]) => [
           mode,
-          { battles: m.battles, bans: [...m.bans].map(([id, n]): [number, number] => [id, rate(n, m.battles)]).filter(([, r]) => r >= 0.005).sort(byRate) },
+          { battles: m.battles, bans: [...m.bans].map(([id, n]): [number, number] => [id, rate(n, m.battles)]).sort(byRate) },
         ]),
     ),
     stats,
   };
 }
 
-const cached = unstable_cache(async (rank: RankKey) => computeRankNumbers(rank), ['rank-numbers-2'], { revalidate: 7200 });
+const cached = unstable_cache(async (rank: RankKey) => computeRankNumbers(rank), ['rank-numbers-3'], { revalidate: 7200 });
 
 /** `computeRankNumbers`, cached for pages: two hours, the sampler's own rhythm. */
 export const getRankNumbers = cache(async (rank: RankKey): Promise<RankNumbers> => cached(rank));
