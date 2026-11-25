@@ -6,6 +6,8 @@ PKG = 'net.brawlzone.bubble.test'
 ACT = PKG + '/net.brawlzone.bubble.MainActivity'
 OUT = 'out'
 SITE = 'https://brawlzone.net'
+# Only the app's own pages, when the rest is already filmed.
+QUICK = os.path.exists('deploy/app-footage/quick')
 NAMES = ['Nova', 'Kiro', 'Luna', 'Zed', 'Mika']
 
 
@@ -199,7 +201,8 @@ def bubble():
     sh(f'am stopservice {PKG}/net.brawlzone.bubble.BubbleService'); time.sleep(1)
 
 
-step('bubble', bubble)
+if not QUICK:
+    step('bubble', bubble)
 stop()
 prefs('brawlzone-account', f'<string name="tag">{tags[0]}</string>')
 prefs('brawlzone-friends', '<string name="tags">' + html.escape(json.dumps(tags[1:5])) + '</string>')
@@ -262,7 +265,8 @@ def notifications():
     sh('cmd statusbar collapse'); time.sleep(1)
 
 
-step('notifications', notifications)
+if not QUICK:
+    step('notifications', notifications)
 
 
 def look():
@@ -272,7 +276,8 @@ def look():
     shot('settings_look')
 
 
-step('look', look)
+if not QUICK:
+    step('look', look)
 
 
 def widgets():
@@ -302,7 +307,8 @@ def widgets():
         shot(f'launcher{i}')
 
 
-step('widgets', widgets)
+if not QUICK:
+    step('widgets', widgets)
 
 
 def passes():
@@ -318,7 +324,8 @@ def passes():
         shot('feed')
 
 
-step('pass', passes)
+if not QUICK:
+    step('pass', passes)
 
 
 def motion():
@@ -339,11 +346,13 @@ def motion():
     record('v_home', 12, b)
 
 
-step('motion', motion)
+if not QUICK:
+    step('motion', motion)
 
 
 step('still', lambda: page_set('s_'))
-step('still pass', passes)
+if not QUICK:
+    step('still pass', passes)
 
 
 def tall():
