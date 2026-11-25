@@ -113,8 +113,9 @@ export async function GET(request: NextRequest) {
   const best = gaps.filter((g) => g.kind === 'kd' && g.gap >= 0.25).sort((a, b) => b.gap - a.gap)[0] ?? null;
   const coach = [worst, best].filter((g): g is NonNullable<typeof g> => g !== null).map((g) => ({ ...g, gap: round(g.gap) }));
 
-  // How often each of the player's brawlers is banned at their rank.
-  const bans = ref && ref.battles >= 500 ? new Map(ref.bans) : null;
+  // How often each of the player's brawlers is banned at their rank. Bans are
+  // counted from 2026-11-25, so the last season has none to show.
+  const bans = which === 'now' && ref && ref.battles >= 500 ? new Map(ref.bans) : null;
   const brawlers = [...view.brawlers]
     .sort((a, b) => b.games - a.games)
     .slice(0, 40)
