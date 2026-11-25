@@ -2625,7 +2625,7 @@ if KIND in ('bubblepromo', 'appfilm'):
              [(0.4, 'pop'), (1.4, 'pop'), (2.4, 'pop'), (3.4, 'pop'), (4.6, 'impact')]),
             ('a2_alerts', 0, 'Widgets, and an alert when a free reward drops.', '*WIDGETS,* AND AN ALERT WHEN A *FREE REWARD* DROPS', 9,
              [(0.3, 'whoosh'), (3.5, 'ding'), (4.8, 'pop'), (5.7, 'pop')]),
-            ('a2_bento', 0, 'All of it free. In twenty one languages.', 'ALL OF IT *FREE.* IN *21* *LANGUAGES*', 8,
+            ('a2_bento', 0, 'All of it free. In twenty two languages.', 'ALL OF IT *FREE.* IN *22* *LANGUAGES*', 8,
              [(0.2, 'impact'), (2.6, 'whoosh')]),
             ('a2_outro', 0, 'Brawl Zone Bubble, on Google Play.', '*BRAWLZONE BUBBLE,* ON GOOGLE PLAY', 8,
              [(0.2, 'impact'), (1.4, 'pop'), (2.6, 'ding')]),
@@ -2649,7 +2649,7 @@ if KIND in ('bubblepromo', 'appfilm'):
         'description': 'BrawlZone Bubble floats over Brawl Stars: who gets banned on your map at your rank, the best picks for your '
                        'draft, who beats theirs, and after the game a scoreboard with kills, deaths and damage for all six players. '
                        'Your season next to others at your rank, cards to share, weekly quests, friends, widgets and free reward alerts. Free, no ads, in '
-                       '21 languages. Search "BrawlZone Bubble" on Google Play \U0001f447\n\n'
+                       '22 languages. Search "BrawlZone Bubble" on Google Play \U0001f447\n\n'
                        f'https://play.google.com/store/apps/details?id=net.brawlzone.bubble{FOOTER}\n'
                        '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone #app',
     } if KIND == 'appfilm' else {

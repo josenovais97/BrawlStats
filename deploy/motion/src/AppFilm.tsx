@@ -527,7 +527,7 @@ const Alerts: React.FC<P> = ({plan, seg, frame, t, spb}) => {
         for (let j = i + 1; j < notes.length; j++) y += (notes[j].h + 26) * clamp(sp(frame - hs[j], 15, 0.6));
         const w = 900;
         return (
-          <div key={i} style={{position: 'absolute', left: CX - w / 2, top: y - 420 * (1 - clamp(k)), width: w, zIndex: 20 - i, opacity: clamp(k * 2.5), transform: `perspective(1600px) translateZ(${140 * (1 - clamp(k))}px) rotateX(${-46 * (1 - clamp(k)) + 2 * Math.sin(t * 1.4 + i)}deg) rotateY(${3 * Math.sin(t + i)}deg)`}}>
+          <div key={i} style={{position: 'absolute', left: CX - w / 2, top: y - 70 * (1 - clamp(k)), width: w, zIndex: 20 - i, opacity: clamp(k * 2.5), transformOrigin: '50% 0', transform: `perspective(1600px) translateZ(${-420 * (1 - clamp(k))}px) rotateX(${-58 * (1 - clamp(k)) + 2 * Math.sin(t * 1.4 + i)}deg) rotateY(${3 * Math.sin(t + i)}deg)`}}>
             <div style={{height: n.h, borderRadius: 46, background: 'linear-gradient(180deg, rgba(58,64,92,0.97), rgba(40,45,68,0.98))', boxShadow: `inset 0 2px 0 rgba(255,255,255,0.25), 0 0 0 3px rgba(255,255,255,0.12), 0 44px 80px rgba(0,0,0,0.6)`, position: 'relative', overflow: 'hidden'}}>
               <Img src={staticFile('app-icon.png')} style={{position: 'absolute', left: 30, top: 34, width: 96, height: 96, borderRadius: 26}} />
               <div style={{position: 'absolute', left: 156, top: 30, fontFamily: BODY, fontSize: 30, color: '#aeb8dc'}}>BrawlZone Bubble · now</div>
@@ -572,7 +572,7 @@ const Bento: React.FC<P> = ({plan, seg, frame, t, spb}) => {
     {c: 0, n: 2, r: 4, label: '', bg: 'linear-gradient(150deg, #5b6cff, #1d1a66)', body: <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22}}><span style={{fontFamily: BODY, fontSize: 40, color: '#cfd6ff'}}>Ask</span><span style={{fontFamily: BODY, fontSize: 46, color: '#1A1200', background: GOLD, borderRadius: 28, padding: '12px 30px 16px'}}>{f.ask}</span></div>},
     {c: 2, n: 1, r: 4, label: '', bg: 'linear-gradient(150deg, #1ac9b4, #073d3a)', body: <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontFamily: BODY, fontSize: 46, color: '#fff'}}><span style={{fontSize: 70}}>🎁</span>Rewards</div>},
     {c: 0, n: 3, r: 5, label: '', bg: 'linear-gradient(120deg, #ffd768, #ff9a1f)', body: (
-      <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', fontFamily: HEAD, fontSize: 58, color: '#241500'}}><span>FREE</span><span style={{opacity: 0.4}}>·</span><span>NO ADS</span><span style={{opacity: 0.4}}>·</span><span>21 LANGUAGES</span></div>)},
+      <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', fontFamily: HEAD, fontSize: 58, color: '#241500'}}><span>FREE</span><span style={{opacity: 0.4}}>·</span><span>NO ADS</span><span style={{opacity: 0.4}}>·</span><span>22 LANGUAGES</span></div>)},
   ];
   const p = inOut((frame - pull) / 24);
   const s0 = 1.46, cx0 = x(0) + w(2) / 2, cy0 = y[0] + hs[0] / 2;
