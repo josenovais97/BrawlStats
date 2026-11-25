@@ -92,6 +92,7 @@ internal fun MainActivity.paintHome() {
     }
     findViewById<View>(R.id.first_run).visibility = if (Welcome.wasBubbleUsed(this)) View.GONE else View.VISIBLE
     paintToday(tag)
+    paintHomeFight()
     paintPassCard()
     paintLastGame(me, tag)
     paintHomeRank(me, tag)
@@ -110,6 +111,7 @@ private fun MainActivity.paintPassCard() {
     val week = Pass.week(this)
     if (week == null) {
         card.visibility = View.GONE
+        findViewById<View>(R.id.pass_card_quests).visibility = View.GONE
         return
     }
     card.visibility = View.VISIBLE
@@ -126,6 +128,7 @@ private fun MainActivity.paintPassCard() {
         if (week.tier >= Pass.TIERS) 100 else week.xpInTier * 100 / Pass.XP_PER_TIER
     findViewById<TextView>(R.id.pass_card_line).text =
         getString(R.string.pass_card_line, getString(week.legendary.name), Pass.resetsOn(this, week))
+    paintPassQuests(week)
     card.setOnClickListener { startActivity(Intent(this, PassActivity::class.java)) }
 }
 
@@ -334,6 +337,10 @@ internal fun MainActivity.paintSeasonPage() {
     val tag = Account.tag(this)
     findViewById<View>(R.id.season_empty).visibility = if (tag.isEmpty()) View.VISIBLE else View.GONE
     paintInsights(tag)
+    paintSeasonPages()
+    // The phone's own reading of the running season sits under the site's numbers.
+    findViewById<View>(R.id.season_insights).visibility =
+        if (tag.isNotEmpty() && SeasonPages.page == SeasonPages.STATS && SeasonPages.which == SeasonPages.NOW) View.VISIBLE else View.GONE
 }
 
 private fun MainActivity.paintInsights(tag: String) {
@@ -394,6 +401,7 @@ internal fun MainActivity.paintSquad() {
     findViewById<View>(R.id.squad_no_tag).visibility = if (tag.isEmpty()) View.VISIBLE else View.GONE
     val hasFriends = Friends.tags(this).isNotEmpty()
     findViewById<View>(R.id.squad_empty_head).visibility = if (tag.isNotEmpty() && !hasFriends) View.VISIBLE else View.GONE
+    paintSquadTable()
     paintMates()
     if (tag.isNotEmpty() && Teammates.isStale(this) && Friends.tags(this).size < Friends.MAX) {
         val app = applicationContext

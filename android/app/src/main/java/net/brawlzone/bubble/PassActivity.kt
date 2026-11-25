@@ -167,39 +167,9 @@ class PassActivity : AppCompatActivity() {
         }
     }
 
-    private fun questTitle(q: Pass.Quest): String = when (q.kind) {
-        Pass.Kind.PLAY -> getString(R.string.q_play)
-        Pass.Kind.WIN, Pass.Kind.WIN_BIG -> getString(R.string.q_win)
-        Pass.Kind.STREAK -> getString(R.string.q_streak)
-        Pass.Kind.STAR -> getString(R.string.q_star)
-        Pass.Kind.BRAWLERS -> getString(R.string.q_brawlers)
-        Pass.Kind.MODES -> getString(R.string.q_modes)
-        Pass.Kind.GOAL -> getString(R.string.q_goal)
-        Pass.Kind.MODE_WIN -> getString(R.string.q_mode_win, Me.last(this)?.modes?.get(q.mode ?: "") ?: q.mode ?: "")
-        Pass.Kind.MAIN -> getString(R.string.q_main)
-        Pass.Kind.DRAFT -> getString(R.string.q_draft)
-        Pass.Kind.ASK -> getString(R.string.q_ask)
-        Pass.Kind.COUNTERS -> getString(R.string.q_counters)
-        Pass.Kind.REVIEW -> getString(R.string.q_review)
-        Pass.Kind.REACT -> getString(R.string.q_react)
-    }
+    private fun questTitle(q: Pass.Quest): String = PassText.title(this, q)
 
-    private fun questIcon(k: Pass.Kind): String = when (k) {
-        Pass.Kind.PLAY -> "🎮"
-        Pass.Kind.WIN, Pass.Kind.WIN_BIG -> "🏆"
-        Pass.Kind.STREAK -> "🔥"
-        Pass.Kind.STAR -> "⭐"
-        Pass.Kind.BRAWLERS -> "🧩"
-        Pass.Kind.MODES -> "🗺️"
-        Pass.Kind.GOAL -> "🎯"
-        Pass.Kind.MODE_WIN -> "⚔️"
-        Pass.Kind.MAIN -> "💪"
-        Pass.Kind.DRAFT -> "🧠"
-        Pass.Kind.ASK -> "✨"
-        Pass.Kind.COUNTERS -> "🛡️"
-        Pass.Kind.REVIEW -> "🔍"
-        Pass.Kind.REACT -> "👏"
-    }
+    private fun questIcon(k: Pass.Kind): String = PassText.icon(k)
 
     /** Quests to do first, done ones after, each with its bar and XP. */
     private fun paintQuests(week: Pass.Week) {

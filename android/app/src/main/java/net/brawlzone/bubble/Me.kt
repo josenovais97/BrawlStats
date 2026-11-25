@@ -11,7 +11,19 @@ import org.json.JSONObject
 object Me {
 
     /** `mode` is the game's mode key (1.42, for the squad feed); null from an older site answer. */
-    data class Game(val time: String, val win: Boolean, val star: Boolean, val brawler: String?, val mode: String? = null)
+    /** 1.45 adds the brawler's id (its face), the map, and the player's kills, deaths and damage (-1: the log had none). */
+    data class Game(
+        val time: String,
+        val win: Boolean,
+        val star: Boolean,
+        val brawler: String?,
+        val mode: String? = null,
+        val kills: Int = -1,
+        val deaths: Int = -1,
+        val damage: Int = -1,
+        val bid: Int = 0,
+        val map: String? = null,
+    )
 
     data class Data(
         val tag: String,
@@ -32,6 +44,9 @@ object Me {
         val list: List<Game>,
         /** 1.42: each mode key's name in the app's language. */
         val modes: Map<String, String> = emptyMap(),
+        /** 1.45: brawler faces by id and mode art by key, for the games listed. */
+        val icons: Map<Int, String> = emptyMap(),
+        val modeIcons: Map<String, String> = emptyMap(),
     )
 
     private const val KEY = "me"
@@ -56,19 +71,27 @@ object Me {
         return data.takeIf { it.tag == Account.tag(context) }
     }
 
+    /** One game of a site answer (`/api/bubble/me` and `/api/bubble/review` list them alike). */
+    fun game(g: JSONObject) = Game(
+        time = g.optString("t"),
+        win = g.optBoolean("win"),
+        star = g.optBoolean("star"),
+        brawler = g.optString("brawler").takeIf { it.isNotEmpty() && it != "null" },
+        mode = g.optString("mode").takeIf { it.isNotEmpty() && it != "null" },
+        kills = g.optInt("k", -1),
+        deaths = g.optInt("d", -1),
+        damage = g.optInt("dmg", -1),
+        bid = g.optInt("bid", 0),
+        map = g.optString("map").takeIf { it.isNotEmpty() && it != "null" },
+    )
+
     fun parse(body: String): Data {
         val j = JSONObject(body)
         val recent = j.optJSONObject("recent")
         val list = j.optJSONArray("games")?.let { a ->
             (0 until a.length()).mapNotNull { i ->
                 val g = a.optJSONObject(i) ?: return@mapNotNull null
-                Game(
-                    time = g.optString("t"),
-                    win = g.optBoolean("win"),
-                    star = g.optBoolean("star"),
-                    brawler = g.optString("brawler").takeIf { it.isNotEmpty() && it != "null" },
-                    mode = g.optString("mode").takeIf { it.isNotEmpty() && it != "null" },
-                )
+                game(g)
             }
         }.orEmpty()
         fun optInt(key: String): Int? = if (j.isNull(key) || !j.has(key)) null else j.optInt(key)
@@ -91,6 +114,13 @@ object Me {
             stars = recent?.optInt("stars") ?: 0,
             list = list,
             modes = j.optJSONObject("modes")?.let { o -> o.keys().asSequence().associateWith { o.optString(it) } }.orEmpty(),
+            icons = j.optJSONObject("icons")?.let { o ->
+                o.keys().asSequence().mapNotNull { k -> k.toIntOrNull()?.let { id -> id to o.optString(k) } }
+                    .filter { it.second.startsWith("https://") }.toMap()
+            }.orEmpty(),
+            modeIcons = j.optJSONObject("modeIcons")?.let { o ->
+                o.keys().asSequence().associateWith { o.optString(it) }.filterValues { it.startsWith("https://") }
+            }.orEmpty(),
         )
     }
 }

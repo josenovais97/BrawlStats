@@ -18,7 +18,8 @@ import java.time.ZoneId
  */
 object Records {
 
-    data class Data(val streak: Int, val day: Int, val elo: Int)
+    /** 1.45 adds the most kills and the most damage in one game. */
+    data class Data(val streak: Int, val day: Int, val elo: Int, val kills: Int = 0, val damage: Int = 0)
 
     private const val PREFS = "brawlzone-records"
 
@@ -26,7 +27,10 @@ object Records {
 
     fun get(context: Context, tag: String): Data {
         val p = prefs(context)
-        return Data(p.getInt("streak_$tag", 0), p.getInt("day_$tag", 0), p.getInt("elo_$tag", 0))
+        return Data(
+            p.getInt("streak_$tag", 0), p.getInt("day_$tag", 0), p.getInt("elo_$tag", 0),
+            p.getInt("kills_$tag", 0), p.getInt("damage_$tag", 0),
+        )
     }
 
     private fun day(at: Long): LocalDate = Instant.ofEpochMilli(at).atZone(ZoneId.systemDefault()).toLocalDate()
@@ -56,8 +60,16 @@ object Records {
         val dayRecord = maxOf(p.getInt("day_$tag", 0), bestDay)
         val eloRecord = maxOf(p.getInt("elo_$tag", 0), me.elo ?: 0)
 
+        // 1.45: one game's most kills and most damage. The first look with numbers only learns.
+        val fought = all.filter { it.fought }
+        val bestGame = fought.maxByOrNull { it.kills }
+        val killRecord = maxOf(p.getInt("kills_$tag", 0), bestGame?.kills ?: 0)
+        val damageRecord = maxOf(p.getInt("damage_$tag", 0), fought.maxOfOrNull { it.damage } ?: 0)
+
         val old = get(context, tag)
         val edit = p.edit()
+            .putInt("kills_$tag", killRecord)
+            .putInt("damage_$tag", damageRecord)
             .putBoolean("seeded_$tag", true)
             .putInt("run_$tag", run)
             .putInt("streak_$tag", streak)
@@ -77,6 +89,12 @@ object Records {
                 }
                 dayRecord > old.day && dayRecord >= 3 -> once("day") {
                     Notify.postProgress(context, 7702, local.getString(R.string.record_day_title, dayRecord), local.getString(R.string.record_text))
+                }
+                killRecord > old.kills && old.kills >= 3 -> once("kills") {
+                    Notify.postProgress(
+                        context, 7704, local.getString(R.string.record_kills_title, killRecord),
+                        listOfNotNull(bestGame?.brawler, bestGame?.map).joinToString(" · ").ifEmpty { local.getString(R.string.record_text) },
+                    )
                 }
                 eloRecord > old.elo && old.elo > 0 -> once("elo") {
                     Notify.postProgress(context, 7703, local.getString(R.string.record_elo_title, NumberFormat.getIntegerInstance().format(eloRecord)), local.getString(R.string.record_text))

@@ -1,14 +1,16 @@
 import type { NextRequest } from 'next/server';
 
-import { getGameModeMap, modeLabel, playerIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap, modeLabel, playerIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { appNames, localRank } from '@/lib/bubble-app-l10n';
+import { combatFromLog } from '@/lib/combat';
 import { RANK_ELO_FLOORS, rankProgress, winsToNext } from '@/lib/ranked-elo';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
 import { getRankedEloRates } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
-import type { BAGameMode } from '@/types/brawlapi';
+import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import { lastBubble, rememberBubble } from '@/lib/bubble-last';
 import { toApiError } from '@/lib/errors';
 
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
   if (!tag) return Response.json({ error: 'no tag' }, { status: 400 });
 
   let failure: unknown = null;
-  const [player, log, rates, name, modeMeta] = await Promise.all([
+  const [player, log, rates, name, modeMeta, art] = await Promise.all([
     getPlayer(tag).catch((err) => {
       failure = err;
       return null;
@@ -44,6 +46,7 @@ export async function GET(request: NextRequest) {
     getRankedEloRates().catch(() => ({})),
     appNames(params.get('lang')),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
   ]);
   if (!player) {
     // During an outage, the last good answer (see lib/bubble-last), so the
@@ -71,6 +74,11 @@ export async function GET(request: NextRequest) {
         brawler: mine?.brawler?.name ? name(mine.brawler.name) : null,
         // 1.42: the mode, for the squad feed's "best in Heist" award.
         mode: e.event?.mode ?? e.battle.mode ?? null,
+        // 1.45: the brawler's id for its face, the map, and the player's own
+        // kills, deaths and damage (the log carries them since November).
+        bid: mine?.brawler?.id ?? null,
+        map: e.event?.map ? name(e.event.map) : null,
+        ...gameNumbers(e, tag),
       };
     });
   // Each mode's name in the app's language, once rather than per game.
@@ -79,6 +87,11 @@ export async function GET(request: NextRequest) {
   );
 
   const icon = absolute(playerIconUrl(player.icon?.id));
+  // 1.45: faces and mode art for the games above, once each.
+  const icons = Object.fromEntries(
+    [...new Set(games.map((g) => g.bid).filter((id): id is number => id !== null))].map((id) => [id, absolute(art.get(id)?.imageUrl ?? brawlerIconUrl(id))]),
+  );
+  const modeIcons = Object.fromEntries(Object.keys(modes).map((m) => [m, absolute(modeMeta.get(m.toLowerCase())?.imageUrl ?? null)]));
 
   const body = {
       tag,
@@ -100,11 +113,19 @@ export async function GET(request: NextRequest) {
       },
       games,
       modes,
+      icons,
+      modeIcons,
   };
   rememberBubble('me', tag, body).catch(() => {
     /* A lost copy only matters during the next outage. */
   });
   return okResponse(body, 600);
+}
+
+/** k, d and dmg of the player's own game, or nothing for an older one. */
+function gameNumbers(entry: Parameters<typeof combatFromLog>[0], tag: string): { k?: number; d?: number; dmg?: number } {
+  const c = combatFromLog(entry, tag);
+  return c ? { k: c.kills, d: c.deaths, dmg: c.damage } : {};
 }
 
 function absolute(url: string | null): string | null {

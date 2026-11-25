@@ -141,6 +141,9 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action == Pass.ACTION_OPEN) startActivity(Intent(this, PassActivity::class.java))
         // 1.44: a notification about the season, the squad or today opens that tab.
         Tabs.forAction(intent?.action)?.let { selectTab(it, track = false) }
+        // 1.45: pull down on any tab; swipe between the Season pages; Settings as a short menu.
+        wireRefresh()
+        wireSettingsPages()
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
         if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
@@ -423,6 +426,9 @@ class MainActivity : AppCompatActivity() {
         tab = next
         paintTabs(next)
         if (next == Tabs.SQUAD) paintSquad()
+        // 1.45: leaving Settings closes the open group, so it starts at its menu again.
+        if (next == Tabs.SETTINGS) paintSettingsPages() else if (SettingsPages.open >= 0) SettingsPages.open = -1
+        if (next == Tabs.SEASON) refreshSeasonData()
     }
 
     /** The tab holding a view, shown and scrolled to it (Welcome's tips, the tag field). */
@@ -433,6 +439,8 @@ class MainActivity : AppCompatActivity() {
         val index = Tabs.PAGES.indexOf(page?.id ?: return)
         if (index < 0) return
         selectTab(index, track = false)
+        // 1.45: a setting lives in a group of the Settings menu; open the one that holds it.
+        if (index == Tabs.SETTINGS) openSettingsGroupOf(target)
         val scroll = page as android.widget.ScrollView
         scroll.post {
             val box = android.graphics.Rect()
@@ -455,6 +463,34 @@ class MainActivity : AppCompatActivity() {
 
     // ---------------------------------------------------------- 1.40: season, goal, friends
 
+    /** 1.45: a sideways swipe on the Season tab changes its page (SettingsPages.wireRefresh). */
+    internal var seasonSwipe: android.view.GestureDetector? = null
+
+    override fun dispatchTouchEvent(ev: android.view.MotionEvent): Boolean {
+        if (tab == Tabs.SEASON) seasonSwipe?.onTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    /** Pull to refresh (1.45): the hourly check and the open season, now. */
+    internal fun pullRefresh(done: () -> Unit) {
+        val app = applicationContext
+        Thread {
+            runCatching { AlertJob.runNow(app) }
+            runCatching { SeasonData.fetch(app, SeasonPages.which) }
+            if (Friends.tags(app).isNotEmpty()) runCatching { Online.check(app, post = false) }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                paintSeason()
+                paintVersus()
+                paintFriends()
+                paintFeed()
+                paintHome()
+                paintSeasonPage()
+                done()
+            }
+        }.start()
+    }
+
     private val standingAfterTag = Runnable { refreshStanding(force = true) }
 
     /**
@@ -468,6 +504,7 @@ class MainActivity : AppCompatActivity() {
         paintFeed()
         paintHome()
         paintSeasonPage()
+        refreshSeasonData(force = force)
         // 1.42: friends' reactions on the newest posts.
         if (Feed.posts(this).isNotEmpty()) {
             val app = applicationContext
@@ -512,7 +549,8 @@ class MainActivity : AppCompatActivity() {
         for ((button, label) in buttons) {
             button.isEnabled = !busy
             button.alpha = if (busy && button !== tapped) 0.5f else 1f
-            button.setText(if (busy && button === tapped) R.string.share_making else label)
+            // 1.45: the season button names its season (SeasonPages); only the rank button is renamed here.
+            if (button.id == R.id.share_rank) button.setText(if (busy && button === tapped) R.string.share_making else label)
         }
         findViewById<View>(R.id.share_progress).visibility = if (busy) View.VISIBLE else View.GONE
         if (busy && tapped == null) {
@@ -524,19 +562,11 @@ class MainActivity : AppCompatActivity() {
         val rank = findViewById<TextView>(R.id.share_rank)
         val wrapped = findViewById<TextView>(R.id.share_wrapped)
         rank.setOnClickListener { Share.rank(this) { busy -> shareBusy(rank, busy) } }
-        wrapped.setOnClickListener { Share.wrapped(this) { busy -> shareBusy(wrapped, busy) } }
+        wrapped.setOnClickListener { Share.season(this, SeasonPages.NOW) { busy -> shareBusy(wrapped, busy) } }
         // 1.42: today's roast of this account.
         findViewById<TextView>(R.id.roast_me).setOnClickListener { Roast.show(this, Account.tag(this)) }
         // The whole season on brawlzone.net (1.41): the profile's Ranked tab.
-        findViewById<TextView>(R.id.open_site_season).setOnClickListener {
-            val tag = Account.tag(this)
-            if (tag.isEmpty()) return@setOnClickListener
-            val lang = AppLang.current(this).lowercase().substringBefore('-')
-            val prefix = if (lang in setOf("es", "pt", "tr", "de", "ru", "fr")) "/$lang" else ""
-            runCatching {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${Http.SITE}$prefix/player/$tag#ranked")))
-            }
-        }
+        findViewById<TextView>(R.id.open_site_season).setOnClickListener { openSiteSeason() }
         findViewById<View>(R.id.season_goal_row).setOnClickListener {
             val choices = Goal.CHOICES
             val labels = choices.map { if (it == 0) getString(R.string.goal_off) else it.toString() }.toTypedArray()
@@ -554,6 +584,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun paintSeason() {
+        tintSeasonCard(Me.last(this)?.rankIndex ?: -1)
         val caption = findViewById<View>(R.id.season_caption)
         val card = findViewById<View>(R.id.season_card)
         val me = Me.last(this)
@@ -579,6 +610,8 @@ class MainActivity : AppCompatActivity() {
         tile(R.id.record_streak_tile, "\uD83D\uDD25", records.streak.toString(), R.string.record_streak)
         tile(R.id.record_day_tile, "\uD83D\uDCC5", records.day.toString(), R.string.record_day)
         tile(R.id.record_elo_tile, "\u2B50", if (records.elo > 0) java.text.NumberFormat.getIntegerInstance().format(records.elo) else "–", R.string.record_elo)
+        // 1.45: the most kills and damage in one game, under the first three.
+        paintFightRecords(records)
         // 1.42: elo through the season, drawn once the card has its width.
         val graph = findViewById<ImageView>(R.id.season_graph)
         val points = EloLog.points(this, me.tag, Alerts.last(this)?.season?.number)
@@ -1368,6 +1401,7 @@ class MainActivity : AppCompatActivity() {
          */
         findViewById<TextView>(R.id.setup_cta).setOnClickListener {
             selectTab(Tabs.SETTINGS, track = false)
+            openSettingsGroup(SettingsPages.ACCOUNT)
             setEditing(true)
             tag.requestFocus()
             scroll.post {

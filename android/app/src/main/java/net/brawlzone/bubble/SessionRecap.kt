@@ -84,7 +84,7 @@ object SessionRecap {
     private fun latest(context: Context, me: Me.Data): Session? {
         val known = Tally.battles(context, me.tag)
         val seen = known.mapTo(HashSet()) { it.at }
-        val extra = me.list.mapNotNull { g -> Tally.time(g.time)?.let { Tally.Battle(it, g.win, g.brawler, g.mode, g.star) } }
+        val extra = me.list.mapNotNull { g -> Tally.of(g) }
             .filter { it.at !in seen }
         val battles = (known + extra).sortedBy { it.at }
         if (battles.isEmpty()) return null
@@ -140,6 +140,17 @@ object SessionRecap {
         if (stars > 0) lines += "⭐ " + local.getString(R.string.recap_stars, stars)
         session.filter { it.win && it.brawler != null }.groupBy { it.brawler!! }.maxByOrNull { it.value.size }?.let { (name, list) ->
             lines += "🏆 " + local.getString(R.string.recap_mvp, name, list.size)
+        }
+        // 1.45: kills and deaths, and the game with the most kills over deaths.
+        val fight = Combat.of(session)
+        if (fight.games >= 2) {
+            lines += "⚔️ " + local.getString(R.string.recap_kd, Combat.ratio(fight.kd), fight.kills, fight.deaths)
+            session.filter { it.fought }.maxByOrNull { (it.kills - it.deaths) * 100 + it.kills }?.takeIf { it.kills >= 3 && it.kills > it.deaths }?.let { b ->
+                lines += "💥 " + (
+                    if (b.deaths == 0) local.getString(R.string.recap_best_clean, b.kills, b.brawler ?: "")
+                    else local.getString(R.string.recap_best, b.kills, b.deaths, b.brawler ?: "")
+                    ).trim()
+            }
         }
         var run = 0
         var best = 0

@@ -61,6 +61,12 @@ object Share {
         card(activity, wrappedUrl(activity, tag), "season-wrapped", R.string.share_wrapped, onBusy)
     }
 
+    /** One season's card (1.45): the running one ("so far") or the last ("wrapped"). */
+    fun season(activity: Activity, which: String, onBusy: (Boolean) -> Unit = {}) {
+        val tag = Account.tag(activity).ifEmpty { return }
+        card(activity, Season.cardUrlFor(activity, tag, which), if (which == SeasonPages.LAST) "season-last" else "season", R.string.share_wrapped, onBusy)
+    }
+
     /** This season against the last one (1.42, Versus). */
     fun versus(activity: Activity, onBusy: (Boolean) -> Unit = {}) {
         val tag = Account.tag(activity).ifEmpty { return }
@@ -76,7 +82,7 @@ object Share {
         val app = context.applicationContext
         Thread {
             try {
-                for (url in listOf(rankUrl(app, tag), wrappedUrl(app, tag))) {
+                for (url in listOf(rankUrl(app, tag), Season.cardUrlFor(app, tag, SeasonPages.NOW))) {
                     if (!fresh(cached(app, url))) download(app, url)
                 }
             } finally {

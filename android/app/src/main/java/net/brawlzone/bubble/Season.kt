@@ -208,6 +208,21 @@ object Season {
         return b.build().toString()
     }
 
+    /**
+     * The card of one of the two seasons (1.45): the running one, or the last.
+     * The phone's own counts go along when they are about that season; the
+     * site answers for it either way.
+     */
+    fun cardUrlFor(context: Context, tag: String, which: String): String {
+        val page = SeasonData.last(context, SeasonPages.NOW)
+        if (which == SeasonPages.LAST) {
+            val s = previous(context, tag)?.takeIf { page?.lastNumber == null || it.number == page.lastNumber }
+            return cardUrl(context, tag, s) + if (s == null) "&which=last" else ""
+        }
+        val s = current(context, tag)?.takeIf { page?.number == null || it.number == page.number }
+        return cardUrl(context, tag, s)
+    }
+
     fun rankCardUrl(context: Context, tag: String): String =
         Uri.parse("${Http.SITE}/api/bubble/card").buildUpon()
             .appendQueryParameter("kind", "rank")

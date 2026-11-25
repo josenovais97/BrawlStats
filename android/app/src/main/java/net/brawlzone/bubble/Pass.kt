@@ -61,6 +61,10 @@ object Pass {
         GOAL("goal", 200, 3),
         MODE_WIN("mode_win", 100, 2),
         MAIN("main", 100, 5),
+        /** 1.45: the numbers the battle log carries since November. */
+        CLEAN_WIN("clean_win", 150, 1),
+        KILLS("kills", 150, 30),
+        KD_DAY("kd_day", 150, 2),
         DRAFT("draft", 100, 1, true),
         ASK("ask", 75, 1, true),
         COUNTERS("counters", 75, 1, true),
@@ -100,7 +104,8 @@ object Pass {
     private fun pick(context: Context, tag: String, start: ZonedDateTime): List<Pair<Kind, String?>> {
         val random = Random((weekId(start) + tag).hashCode())
         val win = if (random.nextBoolean()) Kind.WIN else Kind.WIN_BIG
-        val pool = listOf(Kind.PLAY, win, Kind.STREAK, Kind.STAR, Kind.BRAWLERS, Kind.MODES, Kind.GOAL, Kind.MODE_WIN, Kind.MAIN)
+        val pool = listOf(Kind.PLAY, win, Kind.STREAK, Kind.STAR, Kind.BRAWLERS, Kind.MODES, Kind.GOAL, Kind.MODE_WIN, Kind.MAIN) +
+            (if (combatWeek(start)) listOf(Kind.CLEAN_WIN, Kind.KILLS, Kind.KD_DAY) else emptyList())
         val order = pool.shuffled(random)
         val chosen = order.take(5).toMutableList()
         if (Kind.GOAL in chosen && Goal.goal(context) <= 0) {
@@ -111,6 +116,14 @@ object Pass {
         val mode = RANKED_MODES[random.nextInt(RANKED_MODES.size)]
         return (chosen + apps).map { it to if (it == Kind.MODE_WIN) mode else null }
     }
+
+    /**
+     * Whether a week has the kill quests (1.45): weeks from Monday 7 December
+     * 2026 on, so the quests of a week already under way are never reshuffled
+     * by updating the app in the middle of it.
+     */
+    private fun combatWeek(start: ZonedDateTime): Boolean = !start.toLocalDate().isBefore(COMBAT_FROM)
+    private val COMBAT_FROM: LocalDate = LocalDate.of(2026, 12, 7)
 
     private fun count(context: Context, week: String, key: String): Int = prefs(context).getInt("c_${week}_$key", 0)
 
@@ -157,6 +170,15 @@ object Pass {
             }
             Kind.MODE_WIN -> wins.count { it.mode.equals(mode, ignoreCase = true) }
             Kind.MAIN -> games.mapNotNull { it.brawler }.groupingBy { it }.eachCount().values.maxOrNull() ?: 0
+            Kind.CLEAN_WIN -> wins.count { it.fought && it.deaths == 0 }
+            Kind.KILLS -> games.sumOf { maxOf(0, it.kills) }
+            // A day of three games or more with more kills than deaths.
+            Kind.KD_DAY -> {
+                val zone = ZoneId.systemDefault()
+                games.filter { it.fought }
+                    .groupBy { java.time.Instant.ofEpochMilli(it.at).atZone(zone).toLocalDate() }
+                    .count { (_, list) -> list.size >= 3 && list.sumOf { it.kills } > list.sumOf { it.deaths } }
+            }
             Kind.DRAFT, Kind.ASK, Kind.COUNTERS, Kind.REVIEW, Kind.REACT -> count(context, week, kind.key)
         }
     }

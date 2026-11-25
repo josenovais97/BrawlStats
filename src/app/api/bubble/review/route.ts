@@ -74,6 +74,13 @@ export async function GET(request: NextRequest) {
       // Same key as /api/bubble/me: the app keeps whichever answer saw a game
       // first, and without it games seen by the bubble had no mode (2026-11-24).
       mode: e.event?.mode ?? e.battle.mode ?? null,
+      // 1.45, as in /api/bubble/me.
+      bid: mine?.brawler?.id ?? null,
+      map: e.event?.map ? name(e.event.map) : null,
+      ...(() => {
+        const c = combatFromLog(e, tag);
+        return c ? { k: c.kills, d: c.deaths, dmg: c.damage } : {};
+      })(),
     };
   });
   // Battle times sort as strings: fixed width, most significant first.

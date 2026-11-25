@@ -36,8 +36,8 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 57
-    versionName = "1.44"
+    versionCode = 58
+    versionName = "1.45"
 
     // The launcher name. The test build (qa, below) overrides it so it can sit
     // next to the real app on the same phone without looking identical.
@@ -163,6 +163,8 @@ dependencies {
   testImplementation("junit:junit:4.13.2")
   implementation("androidx.core:core-ktx:1.13.1")
   implementation("androidx.appcompat:appcompat:1.7.0")
+  // Pull down to refresh on the app screen (1.45).
+  implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
   /*
    * Google Play's in-app review and in-app update (1.40). Play build only:
    * the site APK is not installed from Play, and both would do nothing there

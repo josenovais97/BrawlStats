@@ -19,11 +19,17 @@
     android:background="@drawable/bg_screen"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/pages"
+    <!-- 1.45: pull down on any tab to look again. -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+
+    <FrameLayout
+        android:id="@+id/pages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ScrollView
             android:id="@+id/scroll"
@@ -499,6 +505,31 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- 1.45: today's kills and deaths, then the last five games. -->
+                <LinearLayout
+                    android:id="@+id/home_fight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/home_games"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/home_coach"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
                 <!-- 1.43: Bubble Pass on Home: the week's legendary ring, the tier and what is left. -->
                 <LinearLayout
                     android:id="@+id/pass_card"
@@ -572,6 +603,15 @@
                         android:textSize="26sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <!-- 1.45: this week's next quests, under the pass card. -->
+                <LinearLayout
+                    android:id="@+id/pass_card_quests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
 
                 <!-- 1.43: the last Ranked game the bubble reviewed, one tap from the full review. -->
                 <LinearLayout
@@ -1178,6 +1218,29 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
+                <!-- 1.45: which season and which page (SeasonPages), and an example before a tag. -->
+                <LinearLayout
+                    android:id="@+id/season_top"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/season_example"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/season_rank_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
                 <!--
                   My season (1.40): rank and progress, the daily goal and its streak,
                   the season so far, and the two share cards. Shown once the player
@@ -1478,6 +1541,24 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
+                    <!-- 1.45: the last season's card, beside the running one's. -->
+                    <TextView
+                        android:id="@+id/share_last"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/btn_outline"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingTop="13dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="15dp"
+                        android:textColor="@color/foreground"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
                     <!-- 1.42: today's roast of this account, to share (Roast). -->
                     <TextView
                         android:id="@+id/roast_me"
@@ -1521,44 +1602,6 @@
                         android:indeterminate="true"
                         android:indeterminateTint="@color/brand"
                         android:visibility="gone" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/insights_caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="26dp"
-                    android:letterSpacing="0.12"
-                    android:text="@string/ins_caption"
-                    android:textColor="@color/muted"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <!-- 1.43: what wins for this player, read from the games kept on this phone. -->
-                <LinearLayout
-                    android:id="@+id/insights_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/card_cta"
-                    android:orientation="vertical"
-                    android:padding="18dp"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:id="@+id/insights_rows"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <TextView
-                        android:id="@+id/insights_note"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:textColor="@color/muted"
-                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <!--
@@ -1684,6 +1727,80 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
                 </LinearLayout>
+                </LinearLayout>
+
+                <!-- 1.45: the last season's Rank page, then Stats and Brawlers for either season. -->
+                <LinearLayout
+                    android:id="@+id/season_last_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/season_stats_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/season_insights"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/insights_caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="26dp"
+                    android:letterSpacing="0.12"
+                    android:text="@string/ins_caption"
+                    android:textColor="@color/muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <!-- 1.43: what wins for this player, read from the games kept on this phone. -->
+                <LinearLayout
+                    android:id="@+id/insights_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/card_cta"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/insights_rows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:id="@+id/insights_note"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/season_brawlers_page"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </ScrollView>
 
@@ -1743,6 +1860,23 @@
                         android:textSize="15sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <!-- 1.45: the week as a table (wins, K/D, kills), and you against one friend. -->
+                <LinearLayout
+                    android:id="@+id/squad_table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/squad_versus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
 
                 <!--
                   Friends and rivals (1.40): up to five tags, a ladder by elo with each
@@ -2044,6 +2178,7 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="28dp">
                 <TextView
+                    android:id="@+id/settings_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tab_settings"
@@ -2051,7 +2186,16 @@
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
+                <!-- 1.45: a short menu; each row opens its group below (SettingsPages). -->
+                <LinearLayout
+                    android:id="@+id/settings_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical" />
+
                 <TextView
+                    android:id="@+id/settings_account_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
@@ -2570,6 +2714,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/settings_alerts_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="26dp"
@@ -2898,6 +3043,7 @@
                     as it rests, so each choice is made against what it produces.
                 -->
                 <TextView
+                    android:id="@+id/settings_look_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
@@ -3121,6 +3267,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/settings_widgets_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="26dp"
@@ -3151,6 +3298,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/settings_app_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="26dp"
@@ -3441,6 +3589,7 @@
         </ScrollView>
 
     </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/bottom_nav"

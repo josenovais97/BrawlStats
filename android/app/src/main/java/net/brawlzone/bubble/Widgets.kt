@@ -241,7 +241,13 @@ object Widgets {
         v.setTextViewText(R.id.widget_rank_player, me.name)
         v.setTextViewText(R.id.widget_rank_name, me.rank)
         val eloText = me.elo?.let { local.getString(R.string.widget_elo, NumberFormat.getIntegerInstance().format(it)) } ?: ""
-        v.setTextViewText(R.id.widget_rank_elo, eloText)
+        // 1.45: the season's kills per death so far, from the games on the phone.
+        val from = Season.current(context, me.tag)?.from?.let { day ->
+            runCatching { java.time.LocalDate.parse(day).atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli() }.getOrNull()
+        }
+        val fight = if (from != null) Combat.between(context, me.tag, from) else Combat.thisWeek(context, me.tag)
+        val kd = if (fight.games >= Combat.MIN_GAMES) "${local.getString(R.string.kd)} ${Combat.ratio(fight.kd)}" else null
+        v.setTextViewText(R.id.widget_rank_elo, listOfNotNull(eloText.takeIf { it.isNotEmpty() }, kd).joinToString(" · "))
         cached(context, me.rankIcon)?.let { v.setImageViewBitmap(R.id.widget_rank_badge, it) }
         v.setProgressBar(R.id.widget_rank_bar, 100, ((me.share ?: 1.0) * 100).toInt().coerceIn(0, 100), false)
         // 1.42: the season graph, when the widget has the height for it.
@@ -549,6 +555,18 @@ object Widgets {
         if (url == null) return null
         download(context, url, round = false)
         return cached(context, url)
+    }
+
+    /** A large picture (1.45: the brawler behind a Season card), up to 520 px, kept beside the small ones. */
+    fun picture(context: Context, url: String?): Bitmap? {
+        if (url == null) return null
+        val target = file(context, "big:$url")
+        if (!target.exists()) {
+            val bitmap = runCatching { Http.open(url).use { BitmapFactory.decodeStream(it) } }.getOrNull() ?: return null
+            val out = fit(bitmap, 520)
+            runCatching { target.outputStream().use { out.compress(Bitmap.CompressFormat.PNG, 100, it) } }
+        }
+        return runCatching { if (target.exists()) BitmapFactory.decodeFile(target.path) else null }.getOrNull()
     }
 
     private fun file(context: Context, url: String): File {
