@@ -81,7 +81,7 @@ internal fun MainActivity.paintHomeFight() {
             Ui.row(this, 10).apply {
                 below(4)
                 val bar = Ui.bar(this@paintHomeFight, wins.toDouble() / goal, Ui.GOLD, 10)
-                bar.layoutParams = LinearLayout.LayoutParams(Ui.px(this@paintHomeFight, 132), Ui.px(this@paintHomeFight, 10))
+                bar.layoutParams = LinearLayout.LayoutParams(Ui.px(this@paintHomeFight, 96), Ui.px(this@paintHomeFight, 10))
                 addView(bar)
                 addView(Ui.text(this@paintHomeFight, getString(R.string.home_goal, wins, goal), 13f, bold = true))
             },

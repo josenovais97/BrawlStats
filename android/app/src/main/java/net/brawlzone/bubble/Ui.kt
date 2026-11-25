@@ -279,22 +279,24 @@ internal object Ui {
         if (url == null) return
         val view = ImageView(activity).apply {
             scaleType = ImageView.ScaleType.FIT_END
-            adjustViewBounds = true
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
         frame.addView(
             view, 0,
-            FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, px(activity, heightDp), Gravity.BOTTOM or Gravity.END).apply {
+            // A width of its own, so a wide brawler gets smaller instead of reaching the words.
+            FrameLayout.LayoutParams(px(activity, ART_DP), px(activity, heightDp), Gravity.BOTTOM or Gravity.END).apply {
                 marginEnd = -px(activity, 8)
                 bottomMargin = -px(activity, 10)
             },
         )
         // The words keep to the other side of the card.
         (frame.getChildAt(frame.childCount - 1) as? LinearLayout)?.let {
-            it.setPaddingRelative(it.paddingStart, it.paddingTop, px(activity, 138), it.paddingBottom)
+            it.setPaddingRelative(it.paddingStart, it.paddingTop, px(activity, ART_DP), it.paddingBottom)
         }
         load(activity, view, url, large = true)
     }
+
+    private const val ART_DP = 148
 
     private fun lighten(color: Int, k: Float): Int {
         fun c(shift: Int) = (((color shr shift) and 0xFF) * k).toInt().coerceIn(0, 255)
