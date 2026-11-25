@@ -24,6 +24,7 @@ import {
   getScoredRoster,
   getScoredRosterForBrackets,
 } from '@/lib/stats';
+import { computeWeekTrend } from '@/lib/week-trend';
 
 const BRACKETS = [
   ['low', 1],
@@ -112,6 +113,8 @@ async function main() {
       // The bracket's whole tier list (2026-11-23), for the "MASTERS TIER
       // LIST" Short: the roster the site's /tier-list/ranked/rank pages show.
       all: (r?.scored ?? []).filter((b) => b.tier).map(row),
+      // Up or down against the week before (2026-11-25, owner), by brawler id.
+      trend: r ? await computeWeekTrend(id).catch(() => ({})) : {},
     };
   }
 

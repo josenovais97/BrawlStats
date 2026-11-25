@@ -128,3 +128,33 @@ export function panelTrend(movers: MetaMover[], perSide = 3, minDelta = 1): Reco
   for (const m of [...big].filter((x) => x.metaScoreDelta < 0).sort((a, b) => a.metaScoreDelta - b.metaScoreDelta).slice(0, perSide)) out[m.brawlerId] = -1;
   return out;
 }
+
+/** One brawler's games over a span: the two halves of a week-on-week arrow. */
+export interface SpanGames {
+  brawlerId: number;
+  wins: number;
+  games: number;
+}
+
+/**
+ * The arrows on a rank's tier list (2026-11-25, owner: "arrows to show players
+ * that a brawler is increasing or decreasing"): 1 for a brawler whose win rate
+ * rose against the week before, -1 for one that fell.
+ *
+ * A point at least, and a move the sample can tell from luck (2.5 standard
+ * errors, 1,000 games on each side): measured on 2026-11-25 that is 15 of 104
+ * brawlers in Mythic and 25 of 107 in Legendary. Fewer games than that draw no
+ * arrow rather than a coin toss.
+ */
+export function weekTrend(now: SpanGames[], before: SpanGames[], minGames = 1000, minMove = 0.01, sure = 2.5): Record<number, 1 | -1> {
+  const prev = new Map(before.map((b) => [b.brawlerId, b]));
+  const out: Record<number, 1 | -1> = {};
+  for (const n of now) {
+    const p = prev.get(n.brawlerId);
+    if (!p || n.games < minGames || p.games < minGames) continue;
+    const move = n.wins / n.games - p.wins / p.games;
+    const error = Math.sqrt(0.25 / n.games + 0.25 / p.games);
+    if (Math.abs(move) >= minMove && Math.abs(move) >= sure * error) out[n.brawlerId] = move > 0 ? 1 : -1;
+  }
+  return out;
+}

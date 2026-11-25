@@ -7,7 +7,8 @@
 import React from 'react';
 import {AbsoluteFill, Img, staticFile, useCurrentFrame} from 'remotion';
 import {Arrow, Art, Backdrop, Burst, Chip, Confetti, Crown, Flare, Halo, HoloCard, Label, RankTag, Ring, SearchBar, SpeedLines, Title} from './fx';
-import {BODY, DEEP, INK, W, alpha, clamp, mix, outBack, outCubic, shade, Plan} from './theme';
+import {BODY, DEEP, INK, TIER, W, alpha, clamp, mix, outBack, outCubic, shade, Plan} from './theme';
+import {TrendArrow} from './Tier';
 
 const pop = (frame: number, at: number, len = 9, s = 2) => (frame < at ? 0 : outBack((frame - at) / len, s));
 type P = {plan: Plan; frame: number; t: number};
@@ -238,7 +239,62 @@ const Telegram: React.FC<P> = ({plan, frame, t}) => (
   </AbsoluteFill>
 );
 
-const KINDS: Record<string, React.FC<P>> = {reward: Reward, duel: Duel, roast: Roast, gems: List, traps: List, guess: Guess, giveaway: Give, telegram: Telegram};
+// ----------------------------------------------------------------- tiers
+const RANK_COL: Record<string, string> = {MASTERS: '#ffb21e', LEGENDARY: '#ff4f6a', MYTHIC: '#b05cff', DIAMOND: '#36b6ff'};
+const PER = 8, FACE = 92, LINE = 101, ROW_X = 178;
+const Tiers: React.FC<P> = ({plan, frame, t}) => {
+  let y = 470;
+  const rows = plan.rows.map((r: any) => {
+    const lines = Math.max(1, Math.ceil((r.items.length + (r.more ? 1 : 0)) / PER));
+    const out = {...r, y, h: lines * LINE + 14};
+    y += out.h + 12;
+    return out;
+  });
+  const arrowsAt = 26 + rows.length * 22 + 14;
+  return (
+    <AbsoluteFill>
+      <Backdrop color={RANK_COL[plan.word] || '#ffb21e'} t={t} rays={0.6} cy={860} dark />
+      <Title text={`${plan.word} TIER LIST`} size={106} maxWidth={920} gold frame={frame} stagger={0.8} y={325} glow="#1a0a3a" />
+      <div style={{position: 'absolute', left: W / 2, top: 412, transform: `translate(-50%,-50%) scale(${pop(frame, arrowsAt, 9, 1.6)})`, display: 'flex', alignItems: 'center', gap: 12, whiteSpace: 'nowrap'}}>
+        <TrendArrow dir={1} size={50} /><Label text="RISING" size={42} color="#8dffab" /><span style={{width: 26}} />
+        <TrendArrow dir={-1} size={50} /><Label text="FALLING THIS WEEK" size={42} color="#ff9aa9" />
+      </div>
+      {rows.map((r: any, i: number) => {
+        const at = 18 + i * 22;
+        if (frame < at) return null;
+        const k = outBack((frame - at) / 9, 1.5);
+        const col = TIER[r.tier];
+        return (
+          <div key={r.tier} style={{position: 'absolute', left: 40, top: r.y, width: 1000, height: r.h, transform: `translateX(${(1 - k) * -900}px)`}}>
+            <div style={{position: 'absolute', left: 0, top: 0, width: 124, height: r.h, borderRadius: 24, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: `linear-gradient(180deg, ${mix(col, '#fff', 0.35)} 0%, ${col} 50%, ${shade(col, 0.7)} 100%)`, boxShadow: `0 0 0 5px ${INK}, 0 9px 0 5px ${DEEP}`}}><Label text={r.tier} size={88} /></div>
+            <div style={{position: 'absolute', left: 136, top: 0, width: 864, height: r.h, borderRadius: 24, background: 'rgba(10,12,30,0.78)', boxShadow: `0 0 0 5px ${INK}`}} />
+            {r.items.map((b: any, j: number) => {
+              const f = frame - at - 5 - j * 0.9;
+              if (f < 0) return null;
+              const x = ROW_X - 28 + (j % PER) * (FACE + 13), yy = 10 + Math.floor(j / PER) * LINE;
+              const a = pop(frame, arrowsAt + 4 + (j % 5) * 2, 9, 2.6);
+              return (
+                <React.Fragment key={b.id}>
+                  <div style={{position: 'absolute', left: x, top: yy, width: FACE, height: FACE, borderRadius: 20, overflow: 'hidden', transform: `scale(${outBack(f / 7, 2)})`, boxShadow: `0 0 0 3px ${INK}`, background: shade(col, 0.6),
+                    opacity: b.dir || a === 0 ? 1 : 1 - 0.14 * clamp((frame - arrowsAt) / 10)}}>
+                    <Img src={staticFile(b.face)} style={{width: FACE, height: FACE}} />
+                  </div>
+                  {b.dir !== 0 && a > 0 && <div style={{position: 'absolute', left: x + FACE - 40, top: yy + FACE - 42, transform: `scale(${a * (1 + 0.06 * Math.sin(t * 6 + j))})`}}><TrendArrow dir={b.dir} size={52} /></div>}
+                </React.Fragment>
+              );
+            })}
+            {r.more > 0 && frame > at + 14 && <div style={{position: 'absolute', left: ROW_X - 28 + (r.items.length % PER) * (FACE + 13) + 6, top: 10 + Math.floor(r.items.length / PER) * LINE + 24}}><Label text={`+${r.more}`} size={44} color="#cfd6ff" stroke={5} /></div>}
+          </div>
+        );
+      })}
+      {frame > arrowsAt + 30 && <div style={{position: 'absolute', left: W / 2, top: Math.min(1355, y + 34), transform: `translate(-50%,-50%) scale(${pop(frame, arrowsAt + 30)})`}}><Label text="AGREE? REPLY WITH YOUR MAIN" size={50} color="#ffe45a" /></div>}
+      <Ask frame={frame} at={arrowsAt + 44} url="brawlzone.net/tier-list" chip="EVERY RANK: LINK IN BIO" y={1462} />
+    </AbsoluteFill>
+  );
+};
+
+const KINDS: Record<string, React.FC<P>> = {reward: Reward, duel: Duel, roast: Roast, gems: List, traps: List, tiers: Tiers, guess: Guess, giveaway: Give, telegram: Telegram};
 export const Story: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const Scene = KINDS[plan.story as string];

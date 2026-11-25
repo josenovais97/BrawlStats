@@ -7,6 +7,7 @@ import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {Art, Backdrop, Banner, BrandBug, Burst, Chip, Confetti, Crown, Flare, Halo, Label, Ring, SpeedLines, Title} from './fx';
 import {Ending, Face, StatPill, Stamp, pop} from './Formats';
 import {SceneProps, Stage} from './Stage';
+import {TrendArrow} from './Tier';
 import {DEEP, INK, LEVEL, TIER, W, alpha, clamp, hookOf, mix, outBack, outCubic, shade, Plan} from './theme';
 
 const GREEN = '#3ce07a', RED = '#ff4a62', GOLD = '#ffc53d';
@@ -72,10 +73,14 @@ const Board: React.FC<{plan: Plan; upto: number; frame: number; now?: number}> =
               const cx = BOARD.left + BOARD.label + 22 + (j % BOARD.per) * (r.face + 7) + r.face / 2;
               const cy = r.y + Math.floor(j / BOARD.per) * r.lineH + r.lineH / 2 - 2;
               return (
-                <div key={b.id} style={{position: 'absolute', left: cx - r.face / 2, top: cy - r.face / 2, width: r.face, height: r.face, borderRadius: r.face * 0.2,
-                  overflow: 'hidden', transform: `translateY(${(1 - k) * -60}px) scale(${k})`, boxShadow: `0 0 0 3px ${INK}`, background: shade(col, 0.6)}}>
-                  {b.face && <Img src={staticFile(b.face)} style={{width: r.face, height: r.face}} />}
-                </div>
+                <React.Fragment key={b.id}>
+                  <div style={{position: 'absolute', left: cx - r.face / 2, top: cy - r.face / 2, width: r.face, height: r.face, borderRadius: r.face * 0.2,
+                    overflow: 'hidden', transform: `translateY(${(1 - k) * -60}px) scale(${k})`, boxShadow: `0 0 0 3px ${INK}`, background: shade(col, 0.6)}}>
+                    {b.face && <Img src={staticFile(b.face)} style={{width: r.face, height: r.face}} />}
+                  </div>
+                  {b.dir && <div style={{position: 'absolute', left: cx + r.face * 0.08, top: cy + r.face * 0.08, transform: `scale(${lit ? outBack((frame - at - 10) / 8, 2.4) : 1})`}}>
+                    <TrendArrow dir={b.dir} size={r.face * 0.5} /></div>}
+                </React.Fragment>
               );
             })}
           </React.Fragment>
@@ -129,7 +134,13 @@ const RtTier: React.FC<SceneProps> = ({plan, seg, frame, t}) => {
         </div>
       )}
       <Flare f={frame - 2} y={900} color={col} />
-      <div style={{position: 'absolute', left: W / 2, top: 1560, transform: 'translate(-50%,-50%)', opacity: 0.85}}><Label text="brawlzone.net" size={40} stroke={6} /></div>
+      {rows.some((r) => r.items.some((b: any) => b.dir)) && (
+        <div style={{position: 'absolute', left: W / 2, top: 1536, transform: 'translate(-50%,-50%)', display: 'flex', alignItems: 'center', gap: 14}}>
+          <TrendArrow dir={1} size={46} /><Label text="RISING" size={38} stroke={6} /><span style={{width: 24}} />
+          <TrendArrow dir={-1} size={46} /><Label text="FALLING THIS WEEK" size={38} stroke={6} />
+        </div>
+      )}
+      <div style={{position: 'absolute', left: W / 2, top: 1600, transform: 'translate(-50%,-50%)', opacity: 0.85}}><Label text="brawlzone.net" size={40} stroke={6} /></div>
     </AbsoluteFill>
   );
 };

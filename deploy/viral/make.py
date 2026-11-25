@@ -2539,6 +2539,7 @@ if KIND == 'ranktier':
     RT_ROWS = [(t, [b for b in RT_ROSTER if b['tier'] == t]) for t in TIER_ORDER]
     RT_ROWS = [(t, bs) for t, bs in RT_ROWS if bs]
     RT_GAMES = int((BR.get('battles') or 0) / 6)
+    RT_TREND = BR.get('trend') or {}  # up or down against the week before (2026-11-25)
     _allt = {b['id']: b['tier'] for b in data['all'] if b.get('tier')}
     def _gap(b): return TIER_ORDER.index(_allt[b['id']]) - TIER_ORDER.index(b['tier']) if b['id'] in _allt else 0
     _known = popular(RT_ROSTER, 0.3)
@@ -2859,7 +2860,8 @@ def export_plan(out):
                            for n in RR_LEAGUES if os.path.exists(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png")]
     if KIND == 'ranktier':
         plan.update(word=RT_WORD, tag=RT_TAG, games=RT_GAMES, season=data.get('season'), total=len(RT_ROSTER),
-                    rows=[{'tier': t, 'items': [bz(b) for b in bs]} for t, bs in RT_ROWS],
+                    rows=[{'tier': t, 'items': [dict(bz(b), **({'dir': RT_TREND[str(b['id'])]} if str(b['id']) in RT_TREND else {})) for b in bs]}
+                          for t, bs in RT_ROWS],
                     big=[save(Image.open(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png").convert('RGBA'), f'c/league-{n}.png')
                          for n in RT_BADGES if os.path.exists(f"{os.environ.get('ASSETS', '.')}/ranked/league-{n}.png")])
     if KIND == 'hiddenop':

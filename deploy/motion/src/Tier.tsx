@@ -34,3 +34,11 @@ export const TierChange: React.FC<{was: string; now: string; f: number; y: numbe
     </>
   );
 };
+
+/** Up or down against the week before, on a portrait's corner (2026-11-25). */
+export const TrendArrow: React.FC<{dir: 1 | -1; size: number}> = ({dir, size}) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" style={{display: 'block'}}>
+    <circle cx="20" cy="20" r="18" fill={dir > 0 ? '#2fd06a' : '#ff3c58'} stroke={INK} strokeWidth="4" />
+    <path d={dir > 0 ? 'M20 8 L32 22 H25 V31 H15 V22 H8 Z' : 'M20 32 L32 18 H25 V9 H15 V18 H8 Z'} fill="#fff" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+  </svg>
+);

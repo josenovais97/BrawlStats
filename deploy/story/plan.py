@@ -7,11 +7,12 @@ kind   reward    today's free reward in the Supercell Store
        roast     a roast line for a brawler's mains
        gems      three brawlers few pick that win a lot
        traps     three brawlers many pick that lose
+       tiers     a rank's tier list with the week's risers and fallers marked
        guess     the first zoom steps of the site's daily puzzle, never the answer
        giveaway  days left and players in, until it closes
        telegram  the Telegram channel; "manual" leaves room for a link sticker
 in     {"day", "snapshot" (a viral-data file), "daily" (daily.json), "entrants",
-       "days", "zooms" [paths], "manual"}, whichever the kind needs.
+       "days", "zooms" [paths], "manual", "tiers" (a scripts/story-tiers.ts file)}, whichever the kind needs.
 state  what recent Stories showed, so they do not repeat; read only here.
 
 Writes <out>/plan.json, <out>/public (the pictures it names), <out>/sfx.wav and
@@ -144,6 +145,28 @@ if KIND in ('gems', 'traps'):
     used = {KIND: [b['id'] for b in rows]}
     frames = 255
     cues = [(0.0, 'impact', .7)] + [(0.8 + i * 26 / FPS, 'whoosh', .6) for i in range(3)] + [(1.2 + i * 26 / FPS, 'ding' if KIND == 'gems' else 'buzz', .6) for i in range(3)] + [(3.8, 'pop', .7)]
+
+if KIND == 'tiers':
+    d = json.load(open(data['tiers']))
+    caps = {'S': 16, 'A': 16, 'B': 16, 'C': 8}
+    rows = []
+    for r in d['rows']:
+        cap = caps[r['tier']]
+        # A row that overflows keeps its last place for the "+N".
+        # Whoever moved is always on it, in the list's own order.
+        shown = r['items']
+        if len(shown) > cap:
+            keep = {b['id'] for b in ([b for b in shown if b['dir']] + [b for b in shown if not b['dir']])[:cap - 1]}
+            shown = [b for b in shown if b['id'] in keep]
+        rows.append({'tier': r['tier'], 'more': len(r['items']) - len(shown),
+                     'items': [{'id': b['id'], 'dir': b['dir'], 'face': save(load_face(b).resize((184, 184), Image.LANCZOS), f"c/{b['id']}-face.png")} for b in shown]})
+    rows = [r for r in rows if r['items']]
+    if sum(len(r['items']) for r in rows) < 15: nothing(f"too few rated brawlers in {d['rank']}")
+    plan.update(word=d['rank'].upper(), rows=rows)
+    frames = 345
+    cues = [(0.0, 'impact', .7)] + [((18 + i * 22) / FPS, 'whoosh', .6) for i in range(len(rows))] + [((18 + i * 22 + 6) / FPS, 'impact', .35) for i in range(len(rows))]
+    up = 26 + len(rows) * 22 + 14
+    cues += [(up / FPS, 'chime', .8), ((up + 30) / FPS, 'pop', .7), ((up + 44) / FPS, 'whoosh', .5)]
 
 if KIND == 'guess':
     zooms = [Image.open(z).convert('RGBA').resize((760, 760), Image.LANCZOS) for z in data.get('zooms', [])]

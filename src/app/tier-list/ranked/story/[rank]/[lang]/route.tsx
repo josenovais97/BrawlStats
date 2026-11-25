@@ -8,6 +8,7 @@ import { BG, BODY, BRAND, DIM, DISPLAY, FG, SLIDE_SIZE, loadIcon, slideFonts } f
 import { getBracketRoster, getScoredRoster, type ScoredBrawler } from '@/lib/stats';
 import { TIER_COLOR } from '@/lib/tiers';
 import { translate } from '@/lib/t';
+import { getWeekTrend } from '@/lib/week-trend';
 
 /**
  * The Ranked tier list as a phone-story image (1080x1920), to share.
@@ -19,7 +20,8 @@ import { translate } from '@/lib/t';
  *
  * S, A and B (at most sixteen each) and C (twelve), with "+N" beyond: what fits a story
  * above the margin its own buttons cover, and the bottom of a tier list is not
- * what anyone shares it for.
+ * what anyone shares it for. An arrow marks a brawler whose win rate at that
+ * rank clearly rose or fell against the week before (2026-11-25, owner).
  */
 
 export const revalidate = 3600;
@@ -29,6 +31,18 @@ const TIERS = ['S', 'A', 'B', 'C'] as const;
 /* C gets two rows at most: it is the last thing that fits above the margin. */
 const CAP: Record<(typeof TIERS)[number], number> = { S: PER_TIER, A: PER_TIER, B: PER_TIER, C: 12 };
 const ICON = 104;
+const UP = '#3cd26e';
+const DOWN = '#ff4d63';
+
+/** A round arrow: up in green, down in red, as on the rank's own list. */
+function Arrow({ dir, size }: { dir: 1 | -1; size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill={dir > 0 ? UP : DOWN} stroke={BG} strokeWidth="4" />
+      <path d={dir > 0 ? 'M20 9 L31 22 H24 V30 H16 V22 H9 Z' : 'M20 31 L31 18 H24 V10 H16 V18 H9 Z'} fill="#ffffff" />
+    </svg>
+  );
+}
 
 /* Runtime ISR -- see AGENTS.md trap 1. */
 export async function generateStaticParams() {
@@ -43,12 +57,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ran
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
   const bracket = bracketBySlug(rank);
 
-  const [fonts, roster, season] = await Promise.all([
+  const [fonts, roster, season, trend] = await Promise.all([
     slideFonts(),
     bracket
       ? getBracketRoster(bracket.id).then((r) => r?.scored ?? null).catch(() => null)
       : Promise.resolve(null),
     getSeasonState().catch(() => null),
+    getWeekTrend(bracket?.id).catch((): Record<number, 1 | -1> => ({})),
   ]);
   const scored: ScoredBrawler[] = roster ?? (await getScoredRoster(7, undefined, 'ranked').catch(() => []));
   const rankName = bracket && roster ? rankLabel(bracket, locale) : t('All ranks');
@@ -63,6 +78,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ran
     ),
   );
   const seasonNo = season?.current?.number;
+  // The rank's own list only: with too few games for it, the picture falls
+  // back to every rank and the rank's arrows would be about another list.
+  const arrows: Record<number, 1 | -1> = bracket && !roster ? {} : trend;
+  const anyArrow = byTier.some((row) => row.shown.some((b) => arrows[b.brawlerId]));
 
   const png = new ImageResponse(
     (
@@ -99,8 +118,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ran
             {seasonNo ? t('Season {n} · last 7 days', { n: seasonNo }) : t('Last 7 days')}
           </div>
         </div>
+        {anyArrow ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14, fontSize: 32, color: DIM, flexShrink: 0 }}>
+            <Arrow dir={1} size={40} />
+            <div style={{ display: 'flex', marginRight: 18 }}>{t('Rising this week')}</div>
+            <Arrow dir={-1} size={40} />
+            <div style={{ display: 'flex' }}>{t('Falling this week')}</div>
+          </div>
+        ) : null}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, marginTop: 44, flexShrink: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: anyArrow ? 18 : 22, marginTop: anyArrow ? 28 : 44, flexShrink: 0 }}>
           {byTier.map((row) => (
             <div key={row.tier} style={{ display: 'flex', gap: 18 }}>
               <div
@@ -123,11 +150,21 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ran
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, width: 768, alignItems: 'center' }}>
                 {row.shown.map((b) => {
                   const src = icons.get(b.brawlerId);
-                  return src ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- Satori draws a plain <img>
-                    <img key={b.brawlerId} src={src} alt="" width={ICON} height={ICON} style={{ borderRadius: 16 }} />
-                  ) : (
-                    <div key={b.brawlerId} style={{ display: 'flex', width: ICON, height: ICON, borderRadius: 16, background: '#151a2e' }} />
+                  const dir = arrows[b.brawlerId];
+                  return (
+                    <div key={b.brawlerId} style={{ display: 'flex', position: 'relative', width: ICON, height: ICON }}>
+                      {src ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- Satori draws a plain <img>
+                        <img src={src} alt="" width={ICON} height={ICON} style={{ borderRadius: 16 }} />
+                      ) : (
+                        <div style={{ display: 'flex', width: ICON, height: ICON, borderRadius: 16, background: '#151a2e' }} />
+                      )}
+                      {dir ? (
+                        <div style={{ display: 'flex', position: 'absolute', right: -6, bottom: -6 }}>
+                          <Arrow dir={dir} size={44} />
+                        </div>
+                      ) : null}
+                    </div>
                   );
                 })}
                 {row.more > 0 ? (

@@ -4,7 +4,9 @@
 #
 #   brawlzone-ig-story [--no-post] [slot or kind]
 #
-#   (nothing)  15:00  the Ranked tier list for one rank, a picture of the site's
+#   tiers      15:00  (also with no slot named) one rank's tier list, with the
+#                     week's risers and fallers marked; the site's own picture
+#                     of it if the moving one cannot be drawn
 #   reward     08:40  today's free reward in the Supercell Store; tried again
 #                     later if it was not on the site yet
 #   duel       12:30  two brawlers, which wins more
@@ -13,8 +15,8 @@
 #   giveaway   16:40  days left, until it closes (2026-11-30)
 #   roast, gems, traps, guess, telegram: one of them, by hand
 #
-# Everything but the tier list is a few seconds of video, drawn by deploy/motion
-# (src/Story.tsx) from what deploy/story/plan.py picks. Each kind goes out once
+# Each is a few seconds of video, drawn by deploy/motion (src/Story.tsx) from
+# what deploy/story/plan.py picks. Each kind goes out once
 # a day, remembered in $DIR/state.json with what it showed so the next ones
 # differ. The API cannot put a link sticker on a Story: they say "link in bio".
 # `telegram --no-post --manual` leaves room for one, to post from a phone.
@@ -86,32 +88,30 @@ PY
 }
 
 # ------------------------------------------------------------ the tier list
-if [ -z "$slot" ] || [ "$slot" = tiers ]; then
-  # The rank turns with the weekday, so the Story is a different list each day
-  # rather than the same picture moving by one brawler. The image is the site's
-  # own /tier-list/ranked/story/<rank>/en, with deploy/story/make.py adding a
-  # question and a "link in bio" pill underneath.
-  case "$(date -u +%u)" in  # Monday is 1. Mythic twice: the rank most players are climbing through.
-    1|6) rank=all;       prompt='AGREE? REPLY WITH YOUR MAIN' ;;
-    2)   rank=diamond;   prompt='DIAMOND AND BELOW: WHO DO YOU PICK?' ;;
-    3|7) rank=mythic;    prompt='MYTHIC PLAYERS: AGREE?' ;;
-    4)   rank=legendary; prompt='LEGENDARY: WHO IS MISSING FROM S?' ;;
-    5)   rank=masters;   prompt='WHAT THE BEST PLAYERS PICK' ;;
-  esac
+[ -z "$slot" ] && slot=tiers
+# The rank turns with the weekday, so the Story is a different list each day
+# rather than the same one moving by a brawler. Mythic and up only (owner,
+# 2026-11-23: never every rank, most people are Mythic+).
+case "$(date -u +%u)" in
+  1|3|6) rank=mythic;    prompt='MYTHIC PLAYERS: AGREE?' ;;
+  2|4|7) rank=legendary; prompt='LEGENDARY: WHO IS MISSING FROM S?' ;;
+  5)     rank=masters;   prompt='WHAT THE BEST PLAYERS PICK' ;;
+esac
+picture_tiers () {
+  # The site's own /tier-list/ranked/story/<rank>/en, with deploy/story/make.py
+  # adding a question and a "link in bio" pill underneath.
   cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" "$CACHE/assets/" \
     || die "::error::fonts missing from the checkout"
-
   # A cold render of the tier image queries the roster; give it time.
   curl -sf --max-time 180 -o "$WORK/tier.png" "$SITE/tier-list/ranked/story/$rank/en?d=$(date -u +%Y%m%d)" \
     || die "::error::the tier-list story image ($rank) did not load"
-
   docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
     -v "$REPO/deploy/story:/code:ro" -v "$WORK:/w" -v "$CACHE:/cache" \
     "$PYTHON_IMAGE" sh -c '
       [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
       PYTHONPATH=/cache/py python /code/make.py /w/tier.png "$1" /w/story.jpg /cache/assets' _ "$prompt" \
     > "$WORK/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$WORK/make.log")"
-  echo "story drawn: $rank"
+  echo "story drawn: $rank, the site's picture"
   if [ "$post" = 0 ]; then
     cp "$WORK/story.jpg" "/tmp/brawlzone-story-$rank.jpg"
     echo "--no-post: /tmp/brawlzone-story-$rank.jpg"
@@ -120,11 +120,16 @@ if [ -z "$slot" ] || [ "$slot" = tiers ]; then
   /usr/local/bin/brawlzone-instagram --story "$WORK/story.jpg" || die "::error::the Story was not published"
   remember tiers
   exit 0
-fi
+}
+# The tier list always goes out: what cannot be drawn moving goes as a picture.
+fail () {
+  if [ "$slot" = tiers ]; then echo "::warning::$*"; picture_tiers; fi
+  die "::error::$*"
+}
 
 # ------------------------------------------------------------ the moving ones
 case "$slot" in
-  reward|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
+  tiers|reward|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
   # What the day's is, then what to show if it has nothing to say.
   evening) case "$(date -u +%u)" in
       1|4) kinds="roast gems guess" ;;
@@ -140,10 +145,10 @@ if [ "$post" = 1 ]; then
     posted "$k" && { echo "$k: already posted today"; exit 0; }
   done
 fi
-[ -x "$MOTION_APP/node_modules/.bin/remotion" ] || die "::error::deploy/motion is not installed in $MOTION_APP"
+[ -x "$MOTION_APP/node_modules/.bin/remotion" ] || fail "deploy/motion is not installed in $MOTION_APP"
 
 # One render at a time among the Stories; the Shorts have their own hours.
-exec 9> "$DIR/lock"; flock -w 1800 9 || die "::error::another Story is still being drawn"
+exec 9> "$DIR/lock"; flock -w 1800 9 || fail "another Story is still being drawn"
 
 if [ "$first" = reward ]; then
   # Only once the site shows it in every language (owner's rule): the daily
@@ -154,6 +159,15 @@ try: m = json.load(open('/var/lib/brawlzone/daily-gift.json'))
 except Exception: sys.exit(1)
 sys.exit(0 if m.get('day') == sys.argv[1] and (m.get('feeds') or {}).get('done') else 1)
 PY
+fi
+
+if [ "$first" = tiers ]; then
+  for r in "$rank" legendary mythic; do
+    (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/story-tiers.ts "$r") 2> "$WORK/tiers.err" | grep '^{' > "$WORK/tiers.json"
+    [ -s "$WORK/tiers.json" ] && { rank=$r; break; }
+    echo "tiers: no $r list: $(tail -c 200 "$WORK/tiers.err")"
+  done
+  [ -s "$WORK/tiers.json" ] || fail "scripts/story-tiers.ts gave no list"
 fi
 
 snapshot=$(find /var/lib/brawlzone/viral/history -maxdepth 1 -name '20*.json' -mtime -3 -printf '%f\n' | sort | tail -n 1)
@@ -170,7 +184,7 @@ import json, os, sys
 work, day, snap, days, entrants, manual = sys.argv[1:7]
 try: daily = json.load(open('/var/lib/brawlzone/social/rewards/daily.json'))
 except (OSError, ValueError): daily = {}
-json.dump({'day': day, 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
+json.dump({'day': day, 'tiers': '/work/tiers.json', 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
            'zooms': [f'/work/zoom-{i}.webp' for i in range(3) if os.path.exists(f'{work}/zoom-{i}.webp')]}, open(f'{work}/in.json', 'w'))
 PY
 
@@ -184,9 +198,9 @@ for k in $kinds; do
   rc=$?
   [ "$rc" = 0 ] && { kind=$k; break; }
   echo "$k: $(tail -n 1 "$WORK/plan.log")"
-  [ "$rc" = 3 ] || die "::error::plan.py $k failed: $(tail -c 600 "$WORK/plan.log")"
+  [ "$rc" = 3 ] || fail "plan.py $k failed: $(tail -c 600 "$WORK/plan.log")"
 done
-[ -n "$kind" ] || { echo "nothing to show today"; exit 0; }
+[ -n "$kind" ] || { [ "$slot" = tiers ] && fail "the list is too short"; echo "nothing to show today"; exit 0; }
 
 mkdir -p "$OUT/public/fonts"
 cp "$VCACHE/fonts/Nougat-ExtraBlack-tight.ttf" "$OUT/public/fonts/head.ttf" 2>/dev/null  # into this render only, never the site
@@ -197,7 +211,7 @@ timeout 1500 docker run --rm --cpus=2 -e MOTION_CONCURRENCY=2 --user "$(id -u):$
   -v "$MOTION_APP/node_modules:/m/node_modules" -v "$REPO/deploy/motion/src:/m/src:ro" \
   -v "$REPO/deploy/motion/render.mjs:/m/render.mjs:ro" -v "$REPO/deploy/motion/package.json:/m/package.json:ro" \
   -v "$OUT:/out" -w /m "$PLAYWRIGHT_IMAGE" node render.mjs video /out /out/silent.mp4 > "$WORK/motion.log" 2>&1 \
-  && [ -s "$OUT/silent.mp4" ] || die "::error::the render failed: $(tail -c 500 "$WORK/motion.log")"
+  && [ -s "$OUT/silent.mp4" ] || fail "the render failed: $(tail -c 500 "$WORK/motion.log")"
 
 DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/plan.json")
 FADE=$(python3 -c "print(max(0, $DUR - 1.2))")
@@ -212,7 +226,7 @@ docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "
   -hide_banner -loglevel error -y -i silent.mp4 -ss "${TR[1]}" -i "/m/${TR[0]}" -i sfx.wav \
   -filter_complex "[1:a]aresample=44100,volume=0.6,afade=t=in:d=0.1,afade=t=out:st=$FADE:d=1.2[m];[2:a]aresample=44100,volume=1.1[s];[m][s]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]" \
   -map 0:v -map '[a]' -t "$DUR" -c:v copy -c:a aac -b:a 160k -movflags +faststart story.mp4 \
-  || die "::error::ffmpeg could not encode the Story"
+  || fail "ffmpeg could not encode the Story"
 echo "story drawn: $kind, ${DUR}s"
 
 if [ "$post" = 0 ]; then
