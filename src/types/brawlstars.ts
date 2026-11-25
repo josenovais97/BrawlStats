@@ -113,6 +113,20 @@ export interface BSBattlePlayer {
   brawler: BSBattleBrawler;
   /** Present in some showdown payloads where a player fields several brawlers. */
   brawlers?: BSBattleBrawler[];
+  /** Ranked and tournament battles since November 2026: who this player banned. */
+  bannedBrawler?: { id: number; name: string } | null;
+  /** The player's numbers in the battle, since November 2026. */
+  stats?: BSBattleStats | null;
+}
+
+export interface BSBattleStats {
+  kills: number;
+  deaths: number;
+  damageDealt: number;
+  healing: number;
+  damageTaken: number;
+  /** The mode's own number: safe damage, gems and so on. */
+  modeStat?: { type: string; value: number } | null;
 }
 
 export interface BSBattleEvent {

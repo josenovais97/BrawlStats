@@ -9,6 +9,7 @@ import {
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
+import { Prisma } from '@/generated/prisma/client';
 import { battleModeOf } from '@/lib/battle-mode';
 import { isOptedOut } from '@/lib/opted-out';
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
@@ -16,6 +17,7 @@ import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
 import { eloObservation, rankGroup } from '@/lib/ranked-elo';
 import { bracketForRankName, bracketForTier, lobbyTier, RANK_BRACKETS } from '@/lib/rank-brackets';
+import { BRAWLER_ID_BASE, STATS_HEAD, STATS_PER_PLAYER, rankedExtras } from '@/lib/ranked-extras';
 import { COMPETITIVE_BATTLE_TYPES, windowStartUtc } from '@/lib/stats';
 import { ALL_REGIONS, POPULAR_REGION_CODES } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
@@ -210,6 +212,8 @@ const DEFAULT_BATCH_SIZE = POOL_TARGET;
  * careful to deduplicate.
  */
 const ROLLUP_REBUILD_DAYS = 3;
+/** How far back an unfolded day of bans is looked for: the raw window's margin. */
+const EXTRAS_LOOKBACK_DAYS = 6;
 
 /**
  * Older team days rebuilt per run when the team fold changes method.
@@ -1249,6 +1253,12 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
     }
 
     rows += await rollUpLineups(competitive);
+    // Never at the lineups' expense: these are extra, and a failure here must
+    // not park the prune (see the catch below).
+    rows += await rollUpRankedExtras(competitive).catch((error) => {
+      console.warn(`[ranked-extras] ${(error as Error).message}`);
+      return 0;
+    });
 
     return { rows, error: null };
   } catch (err) {
@@ -1349,6 +1359,100 @@ async function rollUpLineups(competitive: string[]): Promise<number> {
       DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
     `;
     rows += inserted;
+  }
+  return rows;
+}
+
+/**
+ * Folds the bans and combat numbers of Ranked battles (2026-11-25) into
+ * `ranked_ban_daily` and `ranked_stat_daily`, de-duplicated exactly as the
+ * lineups are. Its own watermark, and only days with anything recorded.
+ */
+async function rollUpRankedExtras(competitive: string[]): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const days = await prisma.$queryRaw<{ day: Date; watermark: Date }[]>`
+    WITH candidates AS (
+      SELECT b.battle_time::date AS day, MAX(b.created_at) AS watermark
+      FROM battle_team_samples b
+      WHERE b.battle_type = ANY(${competitive}::text[])
+        AND b.battle_time > now() - make_interval(days => ${EXTRAS_LOOKBACK_DAYS}::int)
+        AND cardinality(b.ban_ids) > 0
+      GROUP BY 1
+    )
+    SELECT c.day, c.watermark
+    FROM candidates c
+    LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'ranked-extras'
+    WHERE (c.day > current_date - ${ROLLUP_REBUILD_DAYS}::int OR w.day IS NULL)
+      AND w.raw_watermark IS DISTINCT FROM c.watermark
+    ORDER BY c.day
+  `;
+
+  let rows = 0;
+  for (const { day, watermark } of days) {
+    const battles = Prisma.sql`
+      seen AS (
+        SELECT t.battle_time, t.mode, COALESCE(t.map_name, '') AS map_name, s.lobby_rank, t.ban_ids, t.lineup_stats,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.ally_brawler_ids || t.brawler_id) x) AS own,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.enemy_brawler_ids) x) AS foe
+        FROM battle_team_samples t
+        LEFT JOIN battle_samples s ON s.battle_key = t.battle_key
+        WHERE t.battle_time >= ${day}::date AND t.battle_time < ${day}::date + 1
+          AND t.battle_type = ANY(${competitive}::text[])
+          AND cardinality(t.ban_ids) > 0
+      ),
+      battles AS (
+        SELECT DISTINCT ON (battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text))
+               mode, map_name, ban_ids, lineup_stats,
+               -- Must match RANK_BRACKETS in lib/rank-brackets (a test checks).
+               CASE
+                 WHEN lobby_rank IS NULL THEN 0
+                 WHEN lobby_rank <= 12 THEN 1
+                 WHEN lobby_rank <= 15 THEN 2
+                 WHEN lobby_rank <= 18 THEN 3
+                 ELSE 4
+               END AS bracket
+        FROM seen
+        ORDER BY battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text), lobby_rank NULLS LAST
+      )`;
+    const [, bans, , stats] = await prisma.$transaction([
+      prisma.$executeRaw`DELETE FROM ranked_ban_daily WHERE day = ${day}`,
+      prisma.$executeRaw`
+        INSERT INTO ranked_ban_daily (day, mode, map_name, rank_bracket, brawler_id, battles)
+        WITH ${battles}
+        SELECT ${day}::date, b.mode, b.map_name, b.bracket, ${BRAWLER_ID_BASE}::int + x.id, COUNT(*)
+        FROM battles b, LATERAL (SELECT DISTINCT unnest(b.ban_ids) AS id) x
+        GROUP BY 1, 2, 3, 4, 5
+        UNION ALL
+        SELECT ${day}::date, b.mode, b.map_name, b.bracket, 0, COUNT(*) FROM battles b GROUP BY 1, 2, 3, 4
+      `,
+      prisma.$executeRaw`DELETE FROM ranked_stat_daily WHERE day = ${day}`,
+      prisma.$executeRaw`
+        INSERT INTO ranked_stat_daily
+          (day, mode, rank_bracket, brawler_id, games, kills, deaths, deathless, stars, damage, healing, seconds)
+        WITH ${battles}
+        SELECT ${day}::date, b.mode, b.bracket, ${BRAWLER_ID_BASE}::int + b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 1],
+               COUNT(*),
+               SUM(b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 2]),
+               SUM(b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 3]),
+               COUNT(*) FILTER (WHERE b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 3] = 0),
+               COUNT(*) FILTER (WHERE b.lineup_stats[2] = p.i),
+               SUM(b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 4]::bigint),
+               SUM(b.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 5]::bigint),
+               SUM(b.lineup_stats[1]::bigint)
+        FROM battles b, generate_series(0, 5) AS p(i)
+        WHERE cardinality(b.lineup_stats) = ${STATS_HEAD + 6 * STATS_PER_PLAYER}::int
+        GROUP BY 1, 2, 3, 4
+      `,
+    ]);
+    await prisma.$executeRaw`
+      INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
+      VALUES (${day}, 'ranked-extras', ${watermark}, now())
+      ON CONFLICT (day, source)
+      DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
+    `;
+    rows += bans + stats;
   }
   return rows;
 }
@@ -1476,6 +1580,10 @@ export async function pruneOldSamples(): Promise<number> {
         },
       }),
     ]);
+
+    // Bans and combat numbers, on the lineups' window.
+    await prisma.$executeRaw`DELETE FROM ranked_ban_daily WHERE day < ${pairingCutoff}`;
+    await prisma.$executeRaw`DELETE FROM ranked_stat_daily WHERE day < ${pairingCutoff}`;
 
     return (
       battles +
@@ -1920,6 +2028,11 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
         allyBrawlerIds: sides.allies,
         enemyBrawlerIds: sides.enemies,
         battleTime,
+        // Bans and combat numbers (2026-11-25): Ranked and tournaments only,
+        // the rest is four times the rows and nothing reads it.
+        ...((COMPETITIVE_BATTLE_TYPES as readonly string[]).includes(type) || type === 'tournament'
+          ? rankedExtras(entry, normalized)
+          : { banIds: [], lineupStats: [] }),
       });
     }
   }

@@ -190,6 +190,10 @@ model BattleTeamSample {
   enemyBrawlerIds Int[]    @map("enemy_brawler_ids")
   battleTime      DateTime @map("battle_time")
   createdAt       DateTime @default(now()) @map("created_at")
+  /// Ranked and tournament battles since 2026-11-25 (lib/ranked-extras): the
+  /// brawlers banned, less 16,000,000, and the lineup's numbers.
+  banIds          Int[]    @map("ban_ids") @db.SmallInt
+  lineupStats     Int[]    @map("lineup_stats")
 
   @@index([battleTime])
   // Plus battle_team_samples_ranked_player_idx (player_tag, battle_time) WHERE
@@ -549,6 +553,41 @@ model RankedLineupDaily {
 
   @@id([day, mode, mapName, rankBracket, brawlerId])
   @@map("ranked_lineup_daily")
+}
+
+/// Ranked bans by day, map and rank bracket (2026-11-25): the battles in which
+/// somebody banned the brawler. `brawlerId` 0 is the battles whose bans were
+/// recorded, the denominator.
+model RankedBanDaily {
+  day         DateTime @db.Date
+  mode        String
+  mapName     String   @map("map_name")
+  rankBracket Int      @map("rank_bracket") @db.SmallInt
+  brawlerId   Int      @map("brawler_id")
+  battles     Int
+
+  @@id([day, mode, mapName, rankBracket, brawlerId])
+  @@map("ranked_ban_daily")
+}
+
+/// What a brawler does in Ranked battles, by day, mode and rank bracket
+/// (2026-11-25): sums over the battles whose numbers were recorded.
+model RankedStatDaily {
+  day         DateTime @db.Date
+  mode        String
+  rankBracket Int      @map("rank_bracket") @db.SmallInt
+  brawlerId   Int      @map("brawler_id")
+  games       Int
+  kills       Int
+  deaths      Int
+  deathless   Int
+  stars       Int
+  damage      BigInt
+  healing     BigInt
+  seconds     BigInt
+
+  @@id([day, mode, rankBracket, brawlerId])
+  @@map("ranked_stat_daily")
 }
 
 /// Ranked matchups per rank bracket (1-4): how a brawler does against
