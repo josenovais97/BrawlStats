@@ -9,6 +9,7 @@ kind   reward    today's free reward in the Supercell Store
        gems      three brawlers few pick that win a lot
        traps     three brawlers many pick that lose
        tiers     a rank's tier list with the week's risers and fallers marked
+       wdraft    a real draft of the World Finals 2026, who won it (data['worlds'])
        guess     the first zoom steps of the site's daily puzzle, never the answer
        giveaway  days left and players in, until it closes
        telegram  the Telegram channel; "manual" leaves room for a link sticker
@@ -175,6 +176,29 @@ if KIND == 'tiers':
     cues = [(0.0, 'impact', .7)] + [((18 + i * 22) / FPS, 'whoosh', .6) for i in range(len(rows))] + [((18 + i * 22 + 6) / FPS, 'impact', .35) for i in range(len(rows))]
     up = 26 + len(rows) * 22 + 14
     cues += [(up / FPS, 'chime', .8), ((up + 30) / FPS, 'pop', .7), ((up + 44) / FPS, 'whoosh', .5)]
+
+if KIND == 'wdraft':
+    # The final day's sets (proven complete), less the four in the Short.
+    wf = json.load(open(data['worlds']))
+    out = {('GF', 'heist'), ('GF', 'brawlBall'), ('LF', 'bounty'), ('UF', 'knockout')}
+    q = [x for x in wf['quiz'] if x['series'] in ('GF', 'UF', 'LF', 'LS') and (x['series'], x['mode']) not in out and x['win']]
+    gone = set(state.get('wdraft', []))
+    q = [x for x in q if f"{x['series']}|{x['mode']}" not in gone]
+    if not q: nothing('every Worlds draft has been shown')
+    x = rnd.choice(q)
+    teams = list(x['teams']); rnd.shuffle(teams)
+    def side(t):
+        o = teams[1 - teams.index(t)]
+        return {'name': t.upper(), 'win': x['win'] == t, 'score': f"{x['score'].get(t, 0)}-{x['score'].get(o, 0)}", 'trio': [brawler(b) for b in x['teams'][t]]}
+    MODE = {'gemGrab': 'GEM GRAB', 'brawlBall': 'BRAWL BALL', 'heist': 'HEIST', 'bounty': 'BOUNTY', 'hotZone': 'HOT ZONE', 'knockout': 'KNOCKOUT'}
+    icon = f"{ASSETS}/modes/{x['mode']}.png"
+    ln = 9
+    plan.update(seg={'a': side(teams[0]), 'b': side(teams[1]), 'mode': MODE[x['mode']], 'map': x['map'], 'len': ln, 'color': '#7a3cff',
+                     'icon': save(Image.open(icon), 'c/mode.png') if os.path.exists(icon) else None})
+    used = {'wdraft': [f"{x['series']}|{x['mode']}"]}
+    frames = ln * FPS + 45
+    r = ln - 2.6
+    cues = [(0.0, 'impact', .7), (0.4, 'whoosh', .7), (0.8, 'whoosh', .7), (r - 3, 'tap', .8), (r - 2, 'tap', .9), (r - 1, 'tap', 1), (r - 1, 'riser', .8), (r, 'impact', 1), (r + .1, 'chime', .8), (r + .8, 'pop', .6)]
 
 if KIND == 'guess':
     zooms = [Image.open(z).convert('RGBA').resize((760, 760), Image.LANCZOS) for z in data.get('zooms', [])]

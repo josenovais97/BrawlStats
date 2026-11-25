@@ -13,9 +13,10 @@
 #              shows it, once for each batch
 #   duel       12:30  two brawlers, which wins more
 #   evening    19:00  by weekday: a roast, hidden gems, brawlers to stop
-#                     picking, or today's puzzle
+#                     picking, or today's puzzle; until 2026-12-02 a draft of
+#                     the World Finals
 #   giveaway   16:40  days left, until it closes (2026-11-30)
-#   roast, gems, traps, guess, telegram: one of them, by hand
+#   roast, gems, traps, guess, wdraft, telegram: one of them, by hand
 #
 # Each is a few seconds of video, drawn by deploy/motion (src/Story.tsx) from
 # what deploy/story/plan.py picks. Each kind goes out once
@@ -131,14 +132,16 @@ fail () {
 
 # ------------------------------------------------------------ the moving ones
 case "$slot" in
-  tiers|reward|new|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
+  tiers|reward|new|duel|giveaway|roast|gems|traps|guess|wdraft|telegram) kinds=$slot ;;
   # What the day's is, then what to show if it has nothing to say.
   evening) case "$(date -u +%u)" in
       1|4) kinds="roast gems guess" ;;
       2|7) kinds="gems roast guess" ;;
       3|6) kinds="guess roast gems" ;;
       5)   kinds="traps roast guess" ;;
-    esac ;;
+    esac
+    # The week after the World Finals 2026 (2026-11-25): a real draft each night.
+    [[ "$DAY" < 2026-12-03 ]] && kinds="wdraft $kinds" ;;
   *) die "::error::unknown Story '$slot'" ;;
 esac
 first=${kinds%% *}
@@ -202,7 +205,7 @@ import json, os, sys
 work, day, snap, days, entrants, manual, fresh = sys.argv[1:8]
 try: daily = json.load(open('/var/lib/brawlzone/social/rewards/daily.json'))
 except (OSError, ValueError): daily = {}
-json.dump({'day': day, 'new': json.loads(fresh), 'tiers': '/work/tiers.json', 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
+json.dump({'day': day, 'worlds': '/viral-data/worlds2026.json', 'new': json.loads(fresh), 'tiers': '/work/tiers.json', 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
            'zooms': [f'/work/zoom-{i}.webp' for i in range(3) if os.path.exists(f'{work}/zoom-{i}.webp')]}, open(f'{work}/in.json', 'w'))
 PY
 
@@ -211,7 +214,7 @@ for k in $kinds; do
   OUT="$WORK/$k"; mkdir -p "$OUT"
   docker run --rm --cpus=1 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PYTHONDONTWRITEBYTECODE=1 \
     -v "$REPO/deploy/story:/code:ro" -v "$REPO/deploy/viral:/viral:ro" -v "$REPO:/repo:ro" -v "$VCACHE:/cache" \
-    -v /var/lib/brawlzone/viral/history:/history:ro -v "$DIR:/state:ro" -v "$WORK:/work" -v "$OUT:/out" -w /code \
+    -v /var/lib/brawlzone/viral/history:/history:ro -v /var/lib/brawlzone/viral:/viral-data:ro -v "$DIR:/state:ro" -v "$WORK:/work" -v "$OUT:/out" -w /code \
     "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python plan.py $k /work/in.json /state/state.json /out" > "$WORK/plan.log" 2>&1
   rc=$?
   [ "$rc" = 0 ] && { kind=$k; break; }

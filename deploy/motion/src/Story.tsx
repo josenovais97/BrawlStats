@@ -9,6 +9,7 @@ import {AbsoluteFill, Img, staticFile, useCurrentFrame} from 'remotion';
 import {Arrow, Art, Backdrop, Burst, Chip, Confetti, Crown, Flare, Halo, HoloCard, Label, RankTag, Ring, SearchBar, SpeedLines, Title} from './fx';
 import {BODY, DEEP, INK, TIER, W, alpha, clamp, mix, outBack, outCubic, shade, Plan} from './theme';
 import {TrendArrow} from './Tier';
+import {Draft} from './Worlds';
 
 const pop = (frame: number, at: number, len = 9, s = 2) => (frame < at ? 0 : outBack((frame - at) / len, s));
 type P = {plan: Plan; frame: number; t: number};
@@ -294,7 +295,20 @@ const Tiers: React.FC<P> = ({plan, frame, t}) => {
   );
 };
 
-const KINDS: Record<string, React.FC<P>> = {reward: Reward, new: Reward, duel: Duel, roast: Roast, gems: List, traps: List, tiers: Tiers, guess: Guess, giveaway: Give, telegram: Telegram};
+// ---------------------------------------------------- a Worlds draft
+const WDraft: React.FC<P> = ({plan, frame, t}) => {
+  const reveal = Math.round(30 * (plan.seg.len - 2.6));
+  return (
+    <AbsoluteFill>
+      <Draft seg={plan.seg} plan={plan} frame={frame} beat={frame / 30} t={t} spb={30} />
+      <RankTag rank={{label: 'WORLD FINALS 2026', badges: []}} y={196} scale={0.9} />
+      {frame < reveal && <div style={{position: 'absolute', left: W / 2, top: 1545, transform: 'translate(-50%,-50%)'}}><Label text="PICK A TEAM BEFORE THE TIMER ENDS" size={52} color="#ffe45a" /></div>}
+      {frame > reveal + 24 && <Chip text="MORE WORLDS ON OUR PROFILE" color="#ff3c64" size={58} x={W / 2} y={1545} rot={-2} scale={pop(frame, reveal + 24)} />}
+    </AbsoluteFill>
+  );
+};
+
+const KINDS: Record<string, React.FC<P>> = {reward: Reward, new: Reward, duel: Duel, roast: Roast, gems: List, traps: List, tiers: Tiers, wdraft: WDraft, guess: Guess, giveaway: Give, telegram: Telegram};
 export const Story: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const Scene = KINDS[plan.story as string];

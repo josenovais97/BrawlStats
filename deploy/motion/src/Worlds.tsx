@@ -219,7 +219,7 @@ const Trio: React.FC<{items: any[]; size: number; dim?: boolean; color: string}>
     </div>))}
   </div>
 );
-const Draft: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
+export const Draft: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => {
   const reveal = Math.round(spb * (seg.len - 2.6));
   const shown = frame >= reveal;
   const left = reveal - frame;
