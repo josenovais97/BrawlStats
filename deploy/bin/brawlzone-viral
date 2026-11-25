@@ -102,20 +102,22 @@ if [ "$kind" = extra ]; then
        done ;;
     2) kind=higherlower ;;
     3) kind=ranktier ;;
-    4) if [ "$(date -u +%-d)" -ge 15 ] && [ "$(date -u +%-d)" -le 21 ]; then kind=seasonclimb; else kind=whatsnew; fi ;;
+    # Thursday and Saturday (2026-11-25): bans, kills, deaths and damage in
+    # Ranked, in turn, in place of whatsnew and modes.
+    4) if [ "$(date -u +%-d)" -ge 15 ] && [ "$(date -u +%-d)" -le 21 ]; then kind=seasonclimb; else kind=numbers; fi ;;
     # The Friday after a reset (the third Thursday), from December: the new
     # season's top ten so far (newseason, 2026-11-19); else broken.
     5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway
        elif [ "$(date -u +%-d)" -ge 16 ] && [ "$(date -u +%-d)" -le 22 ]; then kind=newseason
        else kind=hiddenop; fi ;;
-    6) kind=modes ;;
+    6) kind=numbers ;;
     7) kind=everyrank ;;
     *) kind=classrank ;;
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw|worlds) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, ranktier, higherlower, hiddenop, wrrace, pickrow, gwdraw or worlds)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw|worlds|numbers) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, ranktier, higherlower, hiddenop, wrrace, pickrow, gwdraw, worlds or numbers)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -143,6 +145,25 @@ elif [ "$kind" = worlds ]; then
   DATA_IN=/data/worlds2026.json
   PREV=-
   [ -r "$ROOT/worlds2026.json" ] || die "::error::no $ROOT/worlds2026.json"
+elif [ "$kind" = numbers ]; then
+  # Bans, kills, deaths and damage in Ranked (2026-11-25): what the site's own
+  # /ranked/stats shows, read from the address the page reads. NUMBERS=<episode>.
+  OUT="$PUBLIC/$DAY-numbers${NUMBERS:+-$NUMBERS}"
+  DATA_IN=/data/numbers.json
+  PREV=-
+  python3 - "$SITE" "$ROOT" <<'PY' || die "::error::the Ranked numbers could not be read from the site"
+import json, os, sys, urllib.request
+site, root = sys.argv[1:3]
+def get(rank):
+    r = urllib.request.Request(f'{site}/api/ranked-numbers/{rank}', headers={'User-Agent': 'BrawlZone viral (https://brawlzone.net)'})
+    return json.load(urllib.request.urlopen(r, timeout=120))
+ranks = {k: get(k) for k in ('mythic-plus', 'mythic', 'legendary', 'masters')}
+newest = sorted(f for f in os.listdir(f'{root}/history') if f.endswith('.json'))[-1]
+snap = json.load(open(f'{root}/history/{newest}'))
+names = {b['id']: b['n'] for b in snap['newest'] + snap['all']}
+json.dump({'date': newest[:10], 'ranks': ranks, 'names': names}, open(f'{root}/numbers.json.new', 'w'))
+os.replace(f'{root}/numbers.json.new', f'{root}/numbers.json')
+PY
 elif [ "$kind" = daily ]; then
   OUT="$PUBLIC/$DAY-daily"
   DATA_IN=/out/daily.json
@@ -167,7 +188,7 @@ TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
 extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason', 'bubblepromo',
-                        'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'worlds')
+                        'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'worlds', 'numbers')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -218,7 +239,7 @@ if [ "$kind" = wrapped ]; then
     "$SITE/player/${WRAPPED_TAG#\#}/season-story/en" || die "::error::could not fetch the Season Wrapped card for that tag"
 fi
 
-if [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != gwdraw ] && [ "$kind" != worlds ]; then
+if [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != gwdraw ] && [ "$kind" != worlds ] && [ "$kind" != numbers ]; then
 
 # ---------------------------------------------------------------- data
 cd "$REPO" || die "::error::no checkout at $REPO"
@@ -416,7 +437,7 @@ if gem and cached_from('/cache/drops/gems.png') != gem:
         print(f"no gem icon: {e}")
 PY
 [ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
-fi  # not newbrawler, daily, gwdraw or worlds
+fi  # not newbrawler, daily, gwdraw, worlds or numbers
 
 # ---------------------------------------------------------------- render
 # The Remotion look (2026-11-13, owner: "the design is still the same... make
@@ -425,7 +446,7 @@ fi  # not newbrawler, daily, gwdraw or worlds
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo ranktier higherlower hiddenop wrrace pickrow gwdraw worlds "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo ranktier higherlower hiddenop wrrace pickrow gwdraw worlds numbers "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1
@@ -441,7 +462,7 @@ motion_ready () {
 }
 motion_draw () { # kind: 0 drawn into $OUT/silent.mp4, 3 nothing to say today, else failed
   rm -rf "$OUT/public" "$OUT/plan.json" "$OUT/silent.mp4"
-  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" -e WORLDS="${WORLDS:-}" -e VOICE="${VOICE:-}" -e VOICE_SPEED="${VOICE_SPEED:-}" \
+  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" -e WORLDS="${WORLDS:-}" -e NUMBERS="${NUMBERS:-}" -e VOICE="${VOICE:-}" -e VOICE_SPEED="${VOICE_SPEED:-}" \
     -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
     "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out --plan" \
     > "$CACHE/make-0.log" 2>&1
@@ -504,7 +525,7 @@ recent () { # kind: drawn in the last 13 days, whichever folder it went to
 
 draw "$kind"; rc=$?
 if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] || [ "$kind" = whatsnew ] || [ "$kind" = seasonclimb ] || [ "$kind" = newseason ] \
-     || [ "$kind" = ranktier ] || [ "$kind" = higherlower ] || [ "$kind" = hiddenop ] || [ "$kind" = wrrace ]; }; then
+     || [ "$kind" = ranktier ] || [ "$kind" = higherlower ] || [ "$kind" = hiddenop ] || [ "$kind" = wrrace ] || [ "$kind" = numbers ]; }; then
   # The 14:00 slot never falls back to the quiz the 15:30 slot may already be
   # posting today. From 2026-11-04 (make.py fresh_or_exit: a format that
   # would repeat itself steps aside) it takes the next drop or box simulation,

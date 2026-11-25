@@ -7,7 +7,7 @@ import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {Art, Backdrop, Burst, Chip, Confetti, Crown, Flare, Halo, Label, Ring, SpeedLines, Title} from './fx';
 import {Ending, pop} from './Formats';
 import {SceneProps, Stage} from './Stage';
-import {DEEP, INK, W, alpha, clamp, hookOf, mix, outBack, outCubic, shade, Plan} from './theme';
+import {DEEP, INK, TIER, W, alpha, clamp, hookOf, mix, outBack, outCubic, shade, Plan} from './theme';
 
 const GOLD = '#ffc72c', BLUE = '#3c7bff', RED = '#ff3c64', GREEN = '#7dff9b', VIOLET = '#7a3cff';
 
@@ -298,11 +298,54 @@ const Say: React.FC<SceneProps> = ({seg, frame, t, spb}) => (
   </AbsoluteFill>
 );
 
+// ----------------------------------------------------------- ban tiers
+const PER = 7, BF = 106;
+const BanTiers: React.FC<SceneProps> = ({seg, frame, t, spb}) => {
+  let y = 520;
+  const rows = (seg.rows || []).map((r: any) => {
+    const h = Math.max(1, Math.ceil(r.items.length / PER)) * 152 + 18;
+    const out = {...r, y, h};
+    y += h + 14;
+    return out;
+  });
+  return (
+    <AbsoluteFill>
+      <Backdrop color={seg.color || '#c8245a'} t={t} rays={0.5} cy={960} dark />
+      <Title text={seg.title} size={132} maxWidth={860} gold frame={frame} stagger={0.7} y={310} glow="#3a0010" />
+      {seg.sub && <div style={{position: 'absolute', left: W / 2, top: 428, transform: 'translate(-50%,-50%)'}}><Label text={seg.sub} size={fit(seg.sub, 48, 900)} color="#ffe45a" /></div>}
+      {rows.map((r: any, i: number) => {
+        const at = spb * (0.5 + i * 1.0);
+        if (frame < at) return null;
+        const col = TIER[r.tier];
+        const k = outBack((frame - at) / 9, 1.5);
+        return (
+          <div key={r.tier} style={{position: 'absolute', left: 36, top: r.y, width: 1008, height: r.h, transform: `translateX(${(1 - k) * -1000}px)`}}>
+            <div style={{position: 'absolute', left: 0, top: 0, width: 150, height: r.h, borderRadius: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+              background: `linear-gradient(180deg, ${mix(col, '#fff', 0.35)} 0%, ${col} 50%, ${shade(col, 0.7)} 100%)`, boxShadow: `0 0 0 6px ${INK}, 0 10px 0 6px ${DEEP}`}}>
+              <Label text={r.tier} size={88} /><Label text={r.cut} size={38} /></div>
+            <div style={{position: 'absolute', left: 164, top: 0, width: 844, height: r.h, borderRadius: 28, background: 'rgba(10,12,30,0.82)', boxShadow: `0 0 0 6px ${INK}`}} />
+            {r.items.map((b: any, j: number) => {
+              const f = frame - at - 6 - j * 1.6;
+              if (f < 0) return null;
+              return (
+                <div key={b.b.id} style={{position: 'absolute', left: 182 + (j % PER) * 118, top: 14 + Math.floor(j / PER) * 152, width: BF, textAlign: 'center', transform: `scale(${outBack(f / 7, 2)})`}}>
+                  <Face src={b.b.face} size={BF} color={col} />
+                  <div style={{marginTop: 6}}><Label text={b.v} size={34} color="#ffffff" stroke={5} /></div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
 const Outro: React.FC<SceneProps> = ({plan, seg, frame, t, spb}) => (
   <Ending frame={frame} t={t} spb={spb} color={VIOLET} big={seg.big} line1={seg.line1} line2={seg.line2} {...hookOf(plan, seg.lead || 'MORE WORLDS NUMBERS ON')} />
 );
 
 export const Worlds: React.FC<{plan: Plan}> = ({plan}) => (
-  <Stage plan={plan} scenes={{wf_intro: Intro, wf_compare: Compare, wf_rows: Rows, wf_hero: Hero, wf_grid: Grid, wf_bans: Bans, wf_draft: Draft, wf_set: SetScene, wf_say: Say, wf_outro: Outro}}
-    swipeInto={['wf_compare', 'wf_rows', 'wf_hero', 'wf_grid', 'wf_bans', 'wf_draft', 'wf_set', 'wf_outro']} />
+  <Stage plan={plan} scenes={{wf_intro: Intro, wf_compare: Compare, wf_rows: Rows, wf_hero: Hero, wf_grid: Grid, wf_bans: Bans, wf_draft: Draft, wf_set: SetScene, wf_say: Say, wf_bantiers: BanTiers, wf_outro: Outro}}
+    swipeInto={['wf_compare', 'wf_rows', 'wf_hero', 'wf_grid', 'wf_bans', 'wf_draft', 'wf_set', 'wf_bantiers', 'wf_outro']} />
 );

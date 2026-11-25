@@ -38,6 +38,8 @@ kind     quiz    "Guess the brawler #N": five rounds, medium to expert, each a
                  answer, which is at brawlzone.net/daily-challenge. data is
                  {"date", "number"}; zoom-0..3 and shadow images beside it in
                  OUT, fetched from the site by the caller.
+         numbers bans, kills, deaths and damage in Ranked (2026-11-25): NUMBERS=<episode>
+                 or the next in turn. data is the site's /api/ranked-numbers.
          worlds  the World Finals 2026 series (2026-11-25): WORLDS=<episode> or the
                  next one not out yet. data is /data/worlds2026.json.
          gwdraw  the giveaway draw, replayed (2026-11-25): every ticket running
@@ -89,7 +91,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
           'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0},
-          'gwdraw': {'pace': 2}, 'worlds': {'pace': 2}}
+          'gwdraw': {'pace': 2}, 'worlds': {'pace': 2}, 'numbers': {'pace': 2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -1691,6 +1693,66 @@ if KIND == 'worlds':
                     f"{W_SRC}. NAVI beat FUT 4-3, starting one set up from the upper bracket. FUT had {sum(p['kills'] for p in fut)} kills to NAVI's {sum(p['kills'] for p in navi)}.")
 
 
+# ================================================================ numbers
+# Bans, kills, deaths and damage in Ranked (2026-11-25, owner: "we need a page
+# with all this info! and content!"): what /ranked/stats shows, as Shorts. data
+# is {"names": {id: name}, "ranks": {rank key: what /api/ranked-numbers sends}}.
+# Drawn with the World Finals' scenes; Mythic and up, tagged so.
+if KIND == 'numbers':
+    NR = data['ranks']; NM_ = {int(k): v for k, v in data['names'].items()}
+    N_ORDER = ['bantier', 'killers', 'damage', 'survivors']
+    EP = os.environ.get('NUMBERS') or N_ORDER[(episode(KIND) - 1) % len(N_ORDER)]
+    MP_ = NR['mythic-plus']
+    if EP not in N_ORDER or MP_['battles'] < 20000:
+        print(f"numbers: {MP_['battles']} games so far"); sys.exit(3)
+    nb_ = lambda i: {'id': i, 'n': NM_[i]}
+    up_ = lambda i: nice(NM_[i]).upper()
+    st_all = [r for r in MP_['stats']['all'] if r['games'] >= 1000 and r['id'] in NM_]
+    N_GAMES = f"{MP_['battles']:,} GAMES THIS WEEK"
+    N_TAGS = '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone'
+    def nmeta(title, pt, es, idn, de, tr, pl, desc):
+        return {'title': title + ' #Shorts', 'titles': {'pt-BR': pt + ' #Shorts', 'es-419': es + ' #Shorts', **more_titles(id=idn + ' #Shorts', de=de + ' #Shorts', tr=tr + ' #Shorts', pl=pl + ' #Shorts')},
+                'description': f"{desc}\n\nEvery rank, every map: https://brawlzone.net/ranked/stats{FOOTER}\n{N_TAGS}"}
+    def nrows(rows, val, sub, c, hot=True):
+        return [{'rank': i + 1, 'b': nb_(r['id']), 'name': up_(r['id']), 'sub': sub(r), 'val': val(r), 'color': c, 'hot': hot and i == 0} for i, r in enumerate(rows)]
+    if EP == 'bantier':
+        cuts = [('S', .4), ('A', .2), ('B', .1), ('C', .05)]
+        top, board = 9, []
+        for tier, lo in cuts:
+            it = [x for x in MP_['bans'] if lo <= x[1] < top and x[0] in NM_][:14]; top = lo
+            if it: board.append({'tier': tier, 'cut': f'{lo * 100:.0f}%+', 'items': [{'b': nb_(i), 'v': f'{r * 100:.0f}%'} for i, r in it]})
+        RK = [('mythic', 'MYTHIC'), ('legendary', 'LEGENDARY'), ('masters', 'MASTERS TO PRO')]
+        mapb = sorted(((m['bans'][0][1], m['bans'][0][0], m['map'], m['mode']) for m in MP_['maps'] if m['battles'] >= 400 and m['bans']), reverse=True)
+        tl.add(4, 'wf_intro', lines=['THE BAN', 'TIER LIST', 'OF RANKED'], gold=1, chip=N_GAMES, color='#c8245a', faces=[nb_(i) for i, _ in MP_['bans'][:5]])
+        tl.add(8, 'wf_bantiers', title='MOST BANNED', sub='SHARE OF GAMES, MYTHIC AND UP', rows=board)
+        tl.add(7, 'wf_rows', title='#1 BAN BY RANK', sub='IT CHANGES WITH YOUR RANK', step=1.0, color='#2a56d8',
+               rows=[{'b': nb_(NR[k]['bans'][0][0]), 'name': up_(NR[k]['bans'][0][0]), 'sub': w, 'val': f"{NR[k]['bans'][0][1] * 100:.0f}%", 'valSub': 'OF GAMES', 'color': '#ffe45a'} for k, w in RK if NR[k]['battles'] >= 3000 and NR[k]['bans']])
+        if mapb:
+            tl.add(6, 'wf_hero', title='BANNED THE MOST ON', b=nb_(mapb[0][1]), color='#ffc72c', lines=[{'t': mapb[0][2].upper(), 'c': '#ffe45a'}, {'t': f'IN {mapb[0][0] * 100:.0f}% OF THE GAMES'}])
+        tl.add(6, 'wf_outro', big='YOUR BAN?', line1='WHO DO YOU', line2='ALWAYS BAN?', lead='BANS FOR YOUR RANK AND MAP')
+        META = nmeta('The Ranked BAN tier list 🚫 Mythic+', 'Tier list de BANS do Ranqueado 🚫', 'Tier list de BANEOS de Competitivo 🚫', 'Tier list BAN Ranked 🚫', 'Die Ranked-BAN-Tierlist 🚫', 'Aşamalı YASAK tier listesi 🚫', 'Tier lista BANÓW w rankedach 🚫',
+                     f"The most banned brawlers in {MP_['battles']:,} Mythic to Pro Ranked games this week: " + ', '.join(f"{nice(NM_[i])} {r * 100:.0f}%" for i, r in MP_['bans'][:6]) + '.')
+    else:
+        SPEC = {'killers': ('kills', True, ['WHO KILLS', 'THE MOST', 'IN RANKED?'], 'MOST KILLS', 'KILLS A GAME', 'FEWEST KILLS', lambda r: f"{r['kills']:.2f}", '#c8245a', '#ff9aa9', 'YOUR MAIN?', 'HOW MANY KILLS', 'DO YOU GET?'),
+                'damage': ('damage', True, ['HIGHEST', 'DPS', 'IN RANKED'], 'MOST DAMAGE', 'DAMAGE A SECOND', 'LEAST DAMAGE', lambda r: f"{r['damage']:.0f}", '#b06a00', '#ffe45a', 'SURPRISED?', 'WHO DID YOU', 'EXPECT?'),
+                'survivors': ('deaths', False, ['WHO DIES', 'THE LEAST', 'IN RANKED?'], 'DIE THE LEAST', 'DEATHS A GAME', 'DIE THE MOST', lambda r: f"{r['deaths']:.2f}", '#169a58', '#7dff9b', 'YOUR MAIN?', 'HOW OFTEN DO', 'YOU DIE?')}[EP]
+        f_, high, intro, t1, unit, t2, val, col, c1, big, l1, l2 = SPEC
+        rk_ = sorted(st_all, key=lambda r: -r[f_] if high else r[f_]); best, worst = rk_[:5], rk_[::-1][:3]
+        if len(rk_) < 40:
+            print('numbers: not enough brawlers with 1,000 games'); sys.exit(3)
+        sub_ = lambda r: f"{r['games']:,} GAMES"
+        tl.add(4, 'wf_intro', lines=intro, gold=1, chip=N_GAMES, color=col)
+        tl.add(9, 'wf_rows', title=t1, sub=unit, up=True, step=1.1, color=col, rows=nrows(best, val, sub_, c1))
+        b0 = best[0]
+        tl.add(5, 'wf_hero', title=t1, b=nb_(b0['id']), color='#ffc72c', lines=[{'t': f"{val(b0)} {unit}", 'c': '#ffe45a'}, {'t': f"K/D {b0['kd']:.2f}"}])
+        tl.add(6, 'wf_rows', title=t2, sub=unit, step=1.0, color='#3a3f70', rows=nrows(worst, val, sub_, '#cfd6ff', hot=False))
+        tl.add(6, 'wf_outro', big=big, line1=l1, line2=l2, lead='EVERY BRAWLER, EVERY RANK')
+        T = {'killers': ('Who KILLS the most in Ranked? ☠️', 'Quem MATA mais no Ranqueado? ☠️', '¿Quién MATA más en Competitivo? ☠️', 'Siapa paling banyak KILL di Ranked? ☠️', 'Wer KILLT am meisten in Ranked? ☠️', "Aşamalı'da en çok kim ÖLDÜRÜYOR? ☠️", 'Kto ZABIJA najwięcej w rankedach? ☠️'),
+             'damage': ('The highest DPS in Ranked ⚡', 'O maior DPS do Ranqueado ⚡', 'El mayor DPS de Competitivo ⚡', 'DPS tertinggi di Ranked ⚡', 'Der höchste DPS in Ranked ⚡', "Aşamalı'nın en yüksek DPS'i ⚡", 'Najwyższe DPS w rankedach ⚡'),
+             'survivors': ('Who DIES the least in Ranked? 🛡️', 'Quem MORRE menos no Ranqueado? 🛡️', '¿Quién MUERE menos en Competitivo? 🛡️', 'Siapa paling jarang MATI di Ranked? 🛡️', 'Wer STIRBT am seltensten in Ranked? 🛡️', "Aşamalı'da en az kim ÖLÜYOR? 🛡️", 'Kto UMIERA najrzadziej w rankedach? 🛡️')}[EP]
+        META = nmeta(*T, f"{unit.capitalize()} in {MP_['battles']:,} Mythic to Pro Ranked games this week: " + ', '.join(f"{nice(NM_[r['id']])} {val(r)}" for r in best) + '. Brawlers with 1,000 games or more.')
+
+
 # ================================================================ the draw, replayed
 # The giveaway draw as a Short (2026-11-25, owner: "shouldnt you record the
 # drafting?"). Remotion only (src/Draw.tsx). data is what giveaway-draw.ts
@@ -2871,7 +2933,7 @@ if KIND == 'pickrow':
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
               'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo',
-              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw', 'worlds')
+              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw', 'worlds', 'numbers')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2992,7 +3054,7 @@ def export_plan(out):
         elif k == 'w_outro' and KIND == 'whatsnew':
             o['faces'] = [save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
                           for b in list(NEWEST) + [b for b, _ in BUFFIES]]
-        elif KIND == 'worlds':
+        elif KIND in ('worlds', 'numbers'):
             def wconv(v, big=False):
                 if isinstance(v, dict) and 'n' in v and 'id' in v: return bz({'n': v['n'], 'id': v['id']}, full=big)
                 if isinstance(v, dict): return {kk: wconv(x, big) for kk, x in v.items()}
@@ -3045,9 +3107,9 @@ def export_plan(out):
         for o in segs:
             if o.get('b'): o['useRank'] = use_rank[int(o['b']['id'])]
         plan.update(total=TOTAL, over=[{**bz(b), 'useRank': use_rank[b['id']]} for b in over[::-1]])
-    if KIND == 'worlds':
+    if KIND in ('worlds', 'numbers'):
         import sfx
-        plan['rank'] = {'label': 'WORLD FINALS 2026', 'badges': []}
+        if KIND == 'worlds': plan['rank'] = {'label': 'WORLD FINALS 2026', 'badges': []}
         cues = []
         for g in tl.segments:
             t0, k, ln = g['start'] * tl.step, g['kind'], g['len'] * tl.step
@@ -3057,6 +3119,7 @@ def export_plan(out):
             elif k == 'wf_rows': cues += [(t0 + (.7 + i * g.get('step', .8)) * tl.step, 'ding' if i == len(g['rows']) - 1 else 'pop', .6) for i in range(len(g['rows']))]
             elif k == 'wf_hero': cues += [(t0 + .5 * tl.step, 'impact', .8), (t0 + (1.4 + len(g['lines']) * .9) * tl.step, 'impact', .8 if g.get('stamp') else 0)]
             elif k == 'wf_grid': cues += [(t0 + .6 * tl.step + i * max(1.6 / FPS, ln * .75 / len(g['items'])), 'tap', .5) for i in range(len(g['items']))] + [(t0 + ln - 1.7 * tl.step, 'buzz', .8)]
+            elif k == 'wf_bantiers': cues += [(t0 + (.5 + i) * tl.step, 'impact', .6) for i in range(len(g['rows']))]
             elif k == 'wf_bans': cues += [(t0 + (.6 + i * .95) * tl.step, 'pop', .6) for i in range(len(g['rows']))]
             elif k == 'wf_draft':
                 rv = t0 + ln - 2.6 * tl.step
@@ -3177,7 +3240,7 @@ def export_plan(out):
     # Every frame says which ranks the list is from (RankTag): most read the
     # whole Ranked sample, Bronze to Pro; the rank tier list one bracket.
     spec = ((('MYTHIC+', ['mythic', 'legendary', 'masters', 'pro']) if MYTHIC_PLUS else ('ALL RANKS', RR_LEAGUES))
-            if KIND in ALL_RANK_KINDS else NEW_RANK)
+            if KIND in ALL_RANK_KINDS else ('MYTHIC+', ['mythic', 'legendary', 'masters', 'pro']) if KIND == 'numbers' else NEW_RANK)
     if spec:
         badges = []
         for n in spec[1]:
@@ -3220,7 +3283,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'gwdraw': None, 'worlds': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
+         'rankedrefresh': rr_scene, 'gwdraw': None, 'worlds': None, 'numbers': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
          **{k: None for k in NEW_KINDS}}[KIND]
 
 
