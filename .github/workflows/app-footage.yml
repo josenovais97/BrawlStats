@@ -31,33 +31,35 @@ jobs:
 
       - name: Emulator
         run: |
-          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
-          if [ -z "$SDK" ] || [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
-            SDK="$HOME/android-sdk"
-            mkdir -p "$SDK/cmdline-tools"
-            curl -fsSL -o /tmp/cmdline.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-            unzip -q /tmp/cmdline.zip -d "$SDK/cmdline-tools"
-            mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
-          fi
-          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
-          export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK"
-          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-          "$SDK/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-34" "system-images;android-34;google_apis;x86_64" > /dev/null
-          echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -f -n phone -k "system-images;android-34;google_apis;x86_64" -d pixel_7
-          cat >> "$HOME/.android/avd/phone.avd/config.ini" <<CFG
-          hw.ramSize=4096
-          hw.cpu.ncore=4
-          hw.keyboard=yes
-          disk.dataPartition.size=4G
-          CFG
-          nohup "$SDK/emulator/emulator" -avd phone -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -cores 4 -memory 4096 > emulator.log 2>&1 &
-          timeout 400 "$SDK/platform-tools/adb" wait-for-device
-          for i in $(seq 1 120); do
-            [ "$("$SDK/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
-            sleep 4
-          done
-          "$SDK/platform-tools/adb" shell getprop ro.build.version.release
+          mkdir -p out
+          set -o pipefail
+          {
+            set -x
+            SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+            if [ -z "$SDK" ] || [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+              SDK="$HOME/android-sdk"
+              mkdir -p "$SDK/cmdline-tools"
+              curl -fsSL -o /tmp/cmdline.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+              unzip -q /tmp/cmdline.zip -d "$SDK/cmdline-tools"
+              mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
+            fi
+            export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK" ANDROID_USER_HOME="$HOME/.android" ANDROID_AVD_HOME="$HOME/.android/avd"
+            mkdir -p "$ANDROID_AVD_HOME"
+            for v in ANDROID_HOME ANDROID_SDK_ROOT ANDROID_USER_HOME ANDROID_AVD_HOME; do echo "$v=${!v}" >> "$GITHUB_ENV"; done
+            (yes || true) | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+            "$SDK/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-34" "system-images;android-34;google_apis;x86_64" | tail -3
+            echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -f -n phone -k "system-images;android-34;google_apis;x86_64" -d pixel_7
+            ls -la "$ANDROID_AVD_HOME"
+            printf 'hw.ramSize=4096\nhw.cpu.ncore=4\nhw.keyboard=yes\n' >> "$ANDROID_AVD_HOME/phone.avd/config.ini"
+            nohup "$SDK/emulator/emulator" -avd phone -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -cores 4 -memory 4096 > out/emulator.log 2>&1 &
+            timeout 500 "$SDK/platform-tools/adb" wait-for-device
+            for i in $(seq 1 120); do
+              [ "$("$SDK/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
+              sleep 4
+            done
+            "$SDK/platform-tools/adb" shell getprop ro.build.version.release
+            echo booted
+          } > out/setup.log 2>&1 || { tail -40 out/setup.log; exit 1; }
 
       - name: Shoot
         run: |
@@ -72,7 +74,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p out
-          cp emulator.log out/ 2>/dev/null || true
+          date > out/when.txt
           (cd out && zip -qr ../footage.zip .)
           for try in 1 2 3; do
             gh release delete app-footage --cleanup-tag --yes || true
