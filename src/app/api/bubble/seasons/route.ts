@@ -6,6 +6,7 @@ import { getPlayer } from '@/lib/bs-api';
 import { appNames, localRank } from '@/lib/bubble-app-l10n';
 import { isOptedOut } from '@/lib/opted-out';
 import { RANK_ELO_FLOORS, rankProgress } from '@/lib/ranked-elo';
+import { firstSureDay } from '@/lib/ranked-season';
 import { getSeasonPair, type SeasonWindow } from '@/lib/ranked-seasons';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     if (!season) return null;
     const [stats, peakRead] = hidden
       ? [null, null]
-      : await Promise.all([getPlayerSeasonStats(tag, season.from, season.to), getPlayerPeakElo(tag, season.from, season.to)]);
+      : await Promise.all([getPlayerSeasonStats(tag, season.from, season.to), getPlayerPeakElo(tag, firstSureDay(season.from), season.to)]);
     const peakElo = Math.max(peakRead ?? -1, gameHigh ?? -1);
     const peak = peakElo >= 0 ? rankProgress(peakElo) : null;
     const readIndex = peak ? RANK_ELO_FLOORS.findIndex(([n]) => n === peak.rank.toUpperCase()) : -1;
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
   const [now, last, series] = await Promise.all([
     side(pair.now, high >= 0 ? high : null, ''),
     side(pair.last, null, 'l'),
-    hidden ? Promise.resolve([]) : getPlayerEloSeries(tag, pair.now.from, pair.now.to),
+    hidden ? Promise.resolve([]) : getPlayerEloSeries(tag, firstSureDay(pair.now.from), pair.now.to),
   ]);
   // The season graph (1.42): daily readings, the app adds its own hourly ones.
   return okResponse({ tag, now: now ? { ...now, series: series.map((r) => [r.day, r.elo]) } : null, last }, 900);

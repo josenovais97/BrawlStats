@@ -12,6 +12,7 @@ import {
   seasonView,
   streaks,
   type RankedGame,
+  firstSureDay,
 } from '@/lib/ranked-season';
 import type { BSBattleLogEntry } from '@/types/brawlstars';
 
@@ -125,4 +126,9 @@ test('with no stored season the log is all there is', () => {
   const view = seasonView([], [], [game(1_000, true), game(2_000, false)], 10_000);
   assert.equal(view.hasSeason, false);
   assert.equal(view.games, 2);
+});
+
+test('the first day of a season is not trusted for Elo: the reset falls inside it', () => {
+  assert.equal(firstSureDay('2026-11-19'), '2026-11-20');
+  assert.equal(firstSureDay('2026-12-31'), '2027-01-01');
 });

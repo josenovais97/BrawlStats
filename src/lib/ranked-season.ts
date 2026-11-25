@@ -217,6 +217,15 @@ export function dayBefore(day: string): string {
   return new Date(Date.parse(`${day}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
 }
 
+/**
+ * The first day whose Elo readings are certainly a season's: the reset falls
+ * inside its first day, so a reading that morning is the season before's
+ * (2026-11-25: 11,299 read on the 19th showed as the new season's peak).
+ */
+export function firstSureDay(from: string): string {
+  return new Date(Date.parse(`${from}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+}
+
 /** Season days with games, plus the log's unsampled games on their UTC day. */
 export function addGamesToDays(days: SeasonDay[], extra: RankedGame[]): SeasonDay[] {
   const by = new Map(days.map((d) => [d.day, { ...d }]));

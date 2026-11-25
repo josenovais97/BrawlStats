@@ -9,6 +9,7 @@ import { appNames, localRank } from '@/lib/bubble-app-l10n';
 import { MIN_COMBAT_GAMES, combatRates } from '@/lib/combat';
 import { isIntlLocale, type Locale } from '@/lib/i18n';
 import { RANK_ELO_FLOORS, rankProgress, winsToNext } from '@/lib/ranked-elo';
+import { firstSureDay } from '@/lib/ranked-season';
 import { getSeasonPair } from '@/lib/ranked-seasons';
 import { BG, BODY, BRAND, DIM, DISPLAY, FG, loadIcon, loadLogo, slideFonts } from '@/lib/slide-chrome';
 import { getPlayerCombat } from '@/lib/player-combat';
@@ -268,7 +269,7 @@ export async function GET(request: NextRequest) {
 
     // The game's "highest this season" and today's rank are the running season's:
     // a season that is over has only what we read during it, or the app's own.
-    const readPeak = !running && dated ? await getPlayerPeakElo(tag, dated.from, dated.to) : null;
+    const readPeak = !running && dated ? await getPlayerPeakElo(tag, firstSureDay(dated.from), dated.to) : null;
     const peakIndex = running
       ? Math.max(indexOf(player.highestSeasonRankedRankName ?? null), int(q.get('peak')) ?? -1, rankIndex)
       : Math.max(readPeak !== null ? indexOf(rankProgress(readPeak)?.rank) : -1, int(q.get('peak')) ?? -1);

@@ -21,6 +21,7 @@ import {
   bestBrawler,
   bestKeyed,
   dayBefore,
+  firstSureDay,
   todayUtc,
   winRate,
   type BrawlerRecord,
@@ -450,7 +451,7 @@ export async function PlayerSeason({
         now={player.rankedElo ?? null}
         seasonBest={player.highestSeasonRankedElo ?? null}
         allTime={player.highestAllTimeRankedElo ?? null}
-        points={eloPoints(data?.elo ?? [], player.rankedElo ?? null, live)}
+        points={eloPoints((data?.elo ?? []).filter((p) => !from || p.day >= firstSureDay(from)), player.rankedElo ?? null, live)}
         from={from ?? todayUtc()}
         to={last ?? todayUtc()}
       />
