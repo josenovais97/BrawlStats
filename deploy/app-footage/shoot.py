@@ -143,7 +143,8 @@ def step(name, f):
         say('FAILED', name, repr(e)[:300])
 
 
-tags = [t for t in urllib.request.urlopen(SITE + '/social/viral/' + open('deploy/app-footage/where.txt').read().strip(), timeout=30).read().decode().split() if t]
+tags = [t for t in urllib.request.urlopen(urllib.request.Request(
+    SITE + '/social/viral/' + open('deploy/app-footage/where.txt').read().strip(), headers={'User-Agent': 'BrawlZoneBubble'}), timeout=30).read().decode().split() if t]
 people = {}
 for t in tags:
     try:
