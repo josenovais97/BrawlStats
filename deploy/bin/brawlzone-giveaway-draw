@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# The giveaway draw, recorded (2026-11-25, owner: "shouldnt you record the
+# drafting?"). Runs scripts/giveaway-draw.ts once entries have closed and
+# keeps everything it said, with the time, the commit and the checksums of the
+# code that drew, in a private folder. Nothing is published and nobody but the
+# owner is told: the winner goes out by mail, and the replay's data waits in
+# /var/lib/brawlzone/viral/gwdraw.json for `brawlzone-viral gwdraw`.
+#
+#   brawlzone-giveaway-draw [skip-tag ...]   the draw
+#   brawlzone-giveaway-draw --rehearsal ...  proves it works, names nobody
+#
+# Safe to run again: the same round over the same list picks the same winner.
+set -uo pipefail
+umask 077
+REPO=/home/ubuntu/brawlstats
+DIR=/var/lib/brawlzone/giveaway
+VIDEO=/var/lib/brawlzone/viral/gwdraw.json
+mkdir -p "$DIR" && chmod 700 "$DIR" || { echo "::error::cannot create $DIR" >&2; exit 1; }
+cd "$REPO" || exit 1
+rehearsal=0
+for a in "$@"; do [ "$a" = --rehearsal ] && rehearsal=1; done
+LOG="$DIR/$([ "$rehearsal" = 1 ] && echo rehearsal || echo draw)-$(date -u +%Y%m%dT%H%M%SZ).log"
+
+{
+  echo "started    $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "commit     $(git rev-parse HEAD)"
+  sha256sum scripts/giveaway-draw.ts src/lib/giveaway-draw.ts src/lib/giveaway.ts
+  echo "arguments  $*"
+  echo "----"
+} > "$LOG"
+# The drand round is out a few seconds after the close; a first try can be early.
+rc=1
+for try in 1 2 3 4 5; do
+  out=$(docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/giveaway-draw.ts "$@" 2>&1); rc=$?
+  printf 'try %s, exit %s\n%s\n' "$try" "$rc" "$out" >> "$LOG"
+  [ "$rc" = 0 ] && break
+  sleep 60
+done
+echo "finished   $(date -u +%Y-%m-%dT%H:%M:%SZ) exit $rc" >> "$LOG"
+if [ "$rc" != 0 ]; then
+  { echo "The giveaway draw failed. Nothing was published. The log is $LOG on the server."; echo; printf '%s\n' "$out" | tail -c 800; } \
+    | /usr/local/bin/brawlzone-alert "[brawlzone] The giveaway draw failed" || true
+  echo "::error::the draw failed, see $LOG" >&2; exit 1
+fi
+if [ "$rehearsal" = 1 ]; then printf '%s\n' "$out" | grep '^REHEARSAL'; exit 0; fi
+
+printf '%s\n' "$out" | sed -n 's/^VIDEO //p' | tail -n 1 > "$VIDEO.new" && [ -s "$VIDEO.new" ] && mv "$VIDEO.new" "$VIDEO"
+printf '%s\n' "$out" | sed -n 's/^PROOF //p' | tail -n 1 > "${LOG%.log}.proof.json"
+{
+  printf '%s\n' "$out" | grep -E '^(entrants|WINNER) '
+  echo
+  echo "Nothing has been published. Email the winner from contact@brawlzone.net; they have until December 14."
+  echo "The recording is $LOG on the server."
+} | /usr/local/bin/brawlzone-alert "[brawlzone] Giveaway: the winner has been drawn" || true
+echo "drawn, recorded in $LOG"

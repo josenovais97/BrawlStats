@@ -2,11 +2,12 @@
 # Publish one MP4 to the BrawlZone Instagram account as a Reel (2026-10-20).
 #
 #   brawlzone-instagram <video.mp4> <caption-file>
-#   brawlzone-instagram --story <image.jpg>
+#   brawlzone-instagram --story <image.jpg|video.mp4>
 #
-# --story publishes a JPEG as a Story instead (2026-10-21, for
-# brawlzone-ig-story). The API takes no stickers, so a Story from here cannot
-# carry a link sticker; the image itself has to point at the bio link.
+# --story publishes a JPEG (2026-10-21) or a short MP4 (2026-11-25) as a Story
+# instead, for brawlzone-ig-story. The API takes no stickers, so a Story from
+# here cannot carry a link sticker; the picture itself has to point at the bio
+# link.
 #
 # The daily TikTok job calls this with the same slides it posts, rendered by
 # its own render_video. Instagram's carousels cannot be 9:16, so the slides go
@@ -35,7 +36,7 @@ die() { echo "$*" >&2; exit 1; }
 story=0
 if [ "${1:-}" = "--story" ]; then
   story=1; video="${2:-}"; caption_file=""
-  [ -f "$video" ] || die "usage: brawlzone-instagram --story <image.jpg>"
+  [ -f "$video" ] || die "usage: brawlzone-instagram --story <image.jpg|video.mp4>"
 else
   video="${1:-}"; caption_file="${2:-}"
   [ -f "$video" ] && [ -f "$caption_file" ] || die "usage: brawlzone-instagram <video.mp4> <caption-file>"
@@ -81,7 +82,8 @@ fi
 # 1. Where Instagram will fetch it. Anything older than a day is a leftover
 # from a run that was killed before its trap.
 find "$REEL_DIR" -maxdepth 1 \( -name '*.mp4' -o -name '*.jpg' \) -mmin +1440 -delete 2>/dev/null
-name="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n').$([ "$story" = 1 ] && echo jpg || echo mp4)"
+moving=1; [ "$story" = 1 ] && [[ "$video" != *.mp4 ]] && moving=0
+name="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n').$([ "$moving" = 1 ] && echo mp4 || echo jpg)"
 install -m 644 "$video" "${REEL_DIR}/${name}" || die "::error::could not stage the video in $REEL_DIR"
 trap 'rm -f "${REEL_DIR}/${name}"' EXIT
 curl -sf -o /dev/null --max-time 60 "${SITE}/reels/${name}" || die "::error::${SITE}/reels/ does not serve the video"
@@ -89,7 +91,7 @@ curl -sf -o /dev/null --max-time 60 "${SITE}/reels/${name}" || die "::error::${S
 # 2. The container. Instagram caps captions at 2,200 characters; a Story has none.
 if [ "$story" = 1 ]; then
   reply=$(curl -s --max-time 60 -X POST "${API}/me/media" -H "Authorization: Bearer ${token}" \
-    -d media_type=STORIES --data-urlencode "image_url=${SITE}/reels/${name}")
+    -d media_type=STORIES --data-urlencode "$([ "$moving" = 1 ] && echo video_url || echo image_url)=${SITE}/reels/${name}")
 else
   caption=$(head -c 2200 "$caption_file")
   reply=$(curl -s --max-time 60 -X POST "${API}/me/media" -H "Authorization: Bearer ${token}" \
@@ -102,12 +104,12 @@ container=$(printf '%s' "$reply" | json_field id)
 # 3. Instagram transcodes before it will publish; a minute is usual.
 status=""
 for _ in $(seq 1 40); do
-  sleep "$([ "$story" = 1 ] && echo 3 || echo 15)"
+  sleep "$([ "$moving" = 1 ] && { [ "$story" = 1 ] && echo 8 || echo 15; } || echo 3)"
   status=$(curl -s --max-time 30 -G "${API}/${container}" -H "Authorization: Bearer ${token}" \
     -d fields=status_code | json_field status_code)
   case "$status" in FINISHED|ERROR|EXPIRED) break ;; esac
 done
-[ "$status" = "FINISHED" ] || die "::error::Instagram did not finish processing the Reel (status ${status:-unknown})"
+[ "$status" = "FINISHED" ] || die "::error::Instagram did not finish processing the $([ "$story" = 1 ] && echo Story || echo Reel) (status ${status:-unknown})"
 
 # 4. Publish, then ask for the link to put in the mail.
 reply=$(curl -s --max-time 60 -X POST "${API}/me/media_publish" -H "Authorization: Bearer ${token}" \

@@ -1,0 +1,11 @@
+[Unit]
+Description=Instagram Story: a roast, gems, traps or the puzzle
+
+[Timer]
+# After the 18:10 teaser has rendered.
+OnCalendar=*-*-* 19:00:00
+Persistent=false
+Unit=brawlzone-ig-story@evening.service
+
+[Install]
+WantedBy=timers.target

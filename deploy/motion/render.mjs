@@ -11,7 +11,7 @@ import {renderMedia, renderStill, selectComposition} from '@remotion/renderer';
 
 const [mode, dir, out, ...frames] = process.argv.slice(2);
 const plan = JSON.parse(fs.readFileSync(path.join(dir, 'plan.json'), 'utf8'));
-const ids = {modes: 'Modes', ranks: 'Ranks', stop: 'Stop', giveaway: 'Giveaway', drops: 'Drops', wrapped: 'Wrapped', roastmains: 'RoastMains', daily: 'Daily', broken: 'Broken', newbrawler: 'NewBrawler', whatsnew: 'WhatsNew', weekly: 'Weekly', bubblepromo: 'BubblePromo',
+const ids = {modes: 'Modes', ranks: 'Ranks', stop: 'Stop', giveaway: 'Giveaway', gwdraw: 'Draw', story: 'Story', drops: 'Drops', wrapped: 'Wrapped', roastmains: 'RoastMains', daily: 'Daily', broken: 'Broken', newbrawler: 'NewBrawler', whatsnew: 'WhatsNew', weekly: 'Weekly', bubblepromo: 'BubblePromo',
   ranktier: 'RankTier', higherlower: 'HigherLower', hiddenop: 'HiddenOp', wrrace: 'WinRace', pickrow: 'PickRow'};
 const id = plan.kind.endsWith('quiz') ? 'Quiz' : ids[plan.kind] || 'Countdown';
 const here = path.dirname(new URL(import.meta.url).pathname);

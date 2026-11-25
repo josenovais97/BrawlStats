@@ -1,0 +1,10 @@
+[Unit]
+Description=Instagram Story: which of two brawlers wins more
+
+[Timer]
+OnCalendar=*-*-* 12:30:00
+Persistent=false
+Unit=brawlzone-ig-story@duel.service
+
+[Install]
+WantedBy=timers.target

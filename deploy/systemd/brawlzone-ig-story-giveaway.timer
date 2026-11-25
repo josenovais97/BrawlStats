@@ -1,0 +1,11 @@
+[Unit]
+Description=Instagram Story: the giveaway's last days
+
+[Timer]
+# Over with the giveaway.
+OnCalendar=2026-11-25..30 16:40:00
+Persistent=false
+Unit=brawlzone-ig-story@giveaway.service
+
+[Install]
+WantedBy=timers.target

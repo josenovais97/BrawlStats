@@ -6,9 +6,11 @@ import {Quiz} from './Quiz';
 import {RoastMains} from './Roast';
 import {Wrapped} from './Wrapped';
 import {Daily} from './Daily';
+import {Draw} from './Draw';
 import {Broken} from './Broken';
 import {NewBrawler} from './NewBrawler';
 import {WhatsNew} from './WhatsNew';
+import {Story} from './Story';
 import {Weekly} from './Weekly';
 import {BubblePromo} from './BubblePromo';
 import {HiddenOp, HigherLower, PickRow, RankTier, WinRace} from './Arena';
@@ -30,6 +32,8 @@ export const Root: React.FC = () => (
     <Composition id="Drops" component={Drops} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="RoastMains" component={RoastMains} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Wrapped" component={Wrapped} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="Draw" component={Draw} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="Story" component={Story} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Daily" component={Daily} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="BubblePromo" component={BubblePromo} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Weekly" component={Weekly} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />

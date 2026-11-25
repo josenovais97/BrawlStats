@@ -38,6 +38,8 @@ kind     quiz    "Guess the brawler #N": five rounds, medium to expert, each a
                  answer, which is at brawlzone.net/daily-challenge. data is
                  {"date", "number"}; zoom-0..3 and shadow images beside it in
                  OUT, fetched from the site by the caller.
+         gwdraw  the giveaway draw, replayed (2026-11-25): every ticket running
+                 past until the winning one. data is giveaway-draw.ts's VIDEO line.
 data     scripts/viral-data.ts output.
 state    what earlier episodes used (episode numbers, recent quiz answers);
          read only here, deploy/bin/brawlzone-viral updates it after posting.
@@ -84,7 +86,8 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
-          'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0}}
+          'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0},
+          'gwdraw': {'pace': 2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -1536,6 +1539,51 @@ if KIND == 'giveaway':
     }
 
 
+# ================================================================ the draw, replayed
+# The giveaway draw as a Short (2026-11-25, owner: "shouldnt you record the
+# drafting?"). Remotion only (src/Draw.tsx). data is what giveaway-draw.ts
+# prints on its VIDEO line: {"entrants", "tickets", "ticket" (1-based),
+# "winner": {"name", "tag", "tickets"}, "line": [{"n": name, "k": tickets}, ...]}
+# in the order the draw used, no emails. {"sample": true} marks a test with
+# made-up names, which says so on screen and is never posted.
+if KIND == 'gwdraw':
+    import re
+    def gw_name(n):  # the game's colour codes are not part of the name
+        return re.sub(r'</?c[0-9a-fA-F]*>', '', n or '').strip() or '???'
+    GD_NAMES = [gw_name(e['n']) for e in data['line']]
+    GD_LINE = [i for i, e in enumerate(data['line']) for _ in range(e['k'])]
+    GD_TOTAL, GD_AT = len(GD_LINE), int(data['ticket']) - 1
+    if GD_TOTAL != data['tickets'] or len(GD_NAMES) != data['entrants'] or not 0 <= GD_AT < GD_TOTAL:
+        sys.exit('gwdraw: the line does not add up to the draw')
+    GD_WIN = {'name': gw_name(data['winner']['name']), 'tag': data['winner'].get('tag') or None, 'tickets': data['winner']['tickets']}
+    if GD_LINE[GD_AT] != next((i for i, e in enumerate(data['line']) if e.get('winner')), GD_LINE[GD_AT]):
+        sys.exit('gwdraw: the winning ticket is not the winner\'s')
+    tl.add(4, 'gd_intro')
+    tl.add(11, 'gd_reel')
+    tl.add(6, 'gd_win')
+    tl.add(5, 'gd_outro')
+    META = {
+        'title': 'Who won the FREE Brawl Pass? 🎁 Giveaway draw #Shorts',
+        'titles': {'pt-BR': 'Quem ganhou o Brawl Pass GRÁTIS? 🎁 Sorteio #Shorts',
+                   'es-419': '¿Quién ganó el Brawl Pass GRATIS? 🎁 Sorteo #Shorts',
+                   **more_titles(id='Siapa yang menang Brawl Pass GRATIS? 🎁 Undian #Shorts',
+                                 de='Wer hat den GRATIS Brawl Pass gewonnen? 🎁 Auslosung #Shorts',
+                                 tr='ÜCRETSİZ Brawl Pass\'ı kim kazandı? 🎁 Çekiliş #Shorts',
+                                 pl='Kto wygrał DARMOWY Brawl Pass? 🎁 Losowanie #Shorts')},
+        'description': f"{data['entrants']} players, {data['tickets']} tickets, one winner. This is a replay of the draw, which used public "
+                       'randomness anyone can check.\n\n'
+                       f'Free rewards every day: https://brawlzone.net/rewards{FOOTER}\n'
+                       '#brawlstars #brawlpass #giveaway #brawlstarsgiveaway #brawlzone',
+    }
+
+
+def gd_positions(frames, land):
+    """Where the line stands on each frame: once past every ticket, then on to
+    the winning one, easing to a stop a little off its centre at `land`."""
+    end = GD_TOTAL + GD_AT + 0.62
+    return [round(end * (1 - (1 - min(1, f / land)) ** 3.4), 4) for f in range(frames)]
+
+
 _prize = []
 def prize_art(w):
     """The Brawl Pass ticket the owner supplied (in the cache), else a box."""
@@ -2670,7 +2718,7 @@ if KIND == 'pickrow':
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
               'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo',
-              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow')
+              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2833,6 +2881,30 @@ def export_plan(out):
         for o in segs:
             if o.get('b'): o['useRank'] = use_rank[int(o['b']['id'])]
         plan.update(total=TOTAL, over=[{**bz(b), 'useRank': use_rank[b['id']]} for b in over[::-1]])
+    if KIND == 'gwdraw':
+        import sfx
+        pa = prize_art(700)
+        reel = next(g for g in tl.segments if g['kind'] == 'gd_reel')
+        n = round(reel['len'] * tl.step * FPS)
+        land = n - round(1.5 * FPS)  # then a second and a half on the winning ticket
+        pos = gd_positions(n, land)
+        plan.update(prize=save(pa, 'c/prize.png') if pa is not None else None, sample=bool(data.get('sample')),
+                    entrants=data['entrants'], tickets=data['tickets'], ticket=data['ticket'], winner=GD_WIN,
+                    names=GD_NAMES, line=GD_LINE, pos=pos, land=land)
+        at = {g['kind']: g['start'] * tl.step for g in tl.segments}
+        cues = [(at['gd_intro'] + 2.4 * tl.step, 'pop', 0.7), (at['gd_intro'] + 2.9 * tl.step, 'pop', 0.7),
+                (at['gd_reel'] - 0.16, 'whoosh', 0.8), (at['gd_reel'] + land / FPS - 1.0, 'riser', 0.8),
+                (at['gd_reel'] + land / FPS, 'impact', 0.9), (at['gd_reel'] + land / FPS + 0.08, 'chime', 0.7),
+                (at['gd_win'] - 0.16, 'whoosh', 0.6), (at['gd_win'] + 0.7 * tl.step, 'impact', 0.9),
+                (at['gd_win'] + 1.1 * tl.step, 'ding', 0.6), (at['gd_win'] + 2.6 * tl.step, 'pop', 0.7),
+                (at['gd_outro'] - 0.16, 'whoosh', 0.6), (at['gd_outro'] + 2.6 * tl.step, 'pop', 0.7)]
+        # A tick as each ticket passes, once they are slow enough to hear apart.
+        last = -9.0
+        for f in range(1, n):
+            if int(pos[f]) != int(pos[f - 1]) and f / FPS - last >= 0.05:
+                last = f / FPS
+                cues.append((at['gd_reel'] + last, 'tap', 0.35 + 0.45 * min(1, f / land) ** 3))
+        sfx.track(cues, tl.dur, f'{out}/sfx.wav')
     if KIND == 'giveaway':
         pa = prize_art(700)
         plan.update(days=DAYS, prize=save(pa, 'c/prize.png') if pa is not None else None)
@@ -2965,7 +3037,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
+         'rankedrefresh': rr_scene, 'gwdraw': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
          **{k: None for k in NEW_KINDS}}[KIND]
 
 

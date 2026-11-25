@@ -11,15 +11,19 @@
  *
  * Only after entries close. Uses the first drand round published at or after
  * the close, so the randomness did not exist while anyone could still enter.
- * Prints the winner (tag, name, email: for the owner only) and writes the
- * public proof -- every tag with its entries, the list digest, the round and
- * its randomness, no emails -- to stdout as one JSON line prefixed PROOF.
+ * Prints the winner (tag, name, email: for the owner only), a VIDEO line for
+ * the replay (deploy/viral/make.py gwdraw: names and tickets in the order the
+ * draw used, no emails and no codes) and the public proof -- every tag with
+ * its entries, the list digest, the round and its randomness, no emails -- as
+ * one JSON line prefixed PROOF. deploy/bin/brawlzone-giveaway-draw runs it and
+ * keeps the recording.
  *
  * A winner who does not reply in 14 days, or breaks the rules, is passed as
  * skip-tag and the draw is run again: same round, same list minus them.
  */
 import { GIVEAWAY, entriesFor } from '@/lib/giveaway';
 import { drawWinner, type Ticket } from '@/lib/giveaway-draw';
+import { isOptedOut } from '@/lib/opted-out';
 import { getPrisma } from '@/lib/prisma';
 
 const DRAND = 'https://api.drand.sh';
@@ -60,13 +64,30 @@ async function main(): Promise<void> {
 
   const result = drawWinner(tickets, beacon.randomness);
   const winner = valid.find((r) => r.code === result.winner.code)!;
+  // The replay's data: every ticket in the order the draw used.
+  const nameOf = new Map(valid.map((r) => [r.code, isOptedOut(r.playerTag) ? '' : r.playerName]));
+  const video = {
+    entrants: tickets.length,
+    tickets: result.total,
+    ticket: result.point + 1,
+    round,
+    winner: { name: winner.playerName, tag: winner.playerTag, tickets: result.winner.entries },
+    line: [...tickets]
+      .sort((a, b) => a.code.localeCompare(b.code))
+      .map((t) => ({ n: nameOf.get(t.code) ?? '', k: t.entries, ...(t.code === result.winner.code ? { winner: true } : {}) })),
+  };
+  let reached = 0;
+  const holder = video.line.find((t) => (reached += t.k) > result.point);
+  if (!holder?.winner || video.line.reduce((n, t) => n + t.k, 0) !== result.total) throw new Error('the replay does not match the draw');
+
   if (rehearsal) {
     const finalRound = Math.ceil((close / 1000 - info.genesis_time) / info.period) + 1;
-    console.log(`REHEARSAL ok: entrants ${tickets.length}, tickets ${result.total}, a ticket was drawn on round ${round}. The real round is ${finalRound}, published at ${new Date((info.genesis_time + (finalRound - 1) * info.period) * 1000).toISOString()}.`);
+    console.log(`REHEARSAL ok: entrants ${tickets.length}, tickets ${result.total}, a ticket was drawn on round ${round} and the replay's line matches it. The real round is ${finalRound}, published at ${new Date((info.genesis_time + (finalRound - 1) * info.period) * 1000).toISOString()}.`);
     return;
   }
   console.log(`entrants ${tickets.length}, entries ${result.total}, drand round ${round}`);
   console.log(`WINNER ${winner.playerTag} (${winner.playerName}) with ${result.winner.entries} entries: ${winner.email}`);
+  console.log('VIDEO ' + JSON.stringify(video));
   console.log(
     'PROOF ' +
       JSON.stringify({

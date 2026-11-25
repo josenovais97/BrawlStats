@@ -1,56 +1,224 @@
 #!/usr/bin/env bash
-# The daily Instagram Story: today's Ranked tier list for one rank (2026-10-21).
+# The Instagram Stories (2026-10-21; several a day since 2026-11-25, owner:
+# "we need to post at least 3 good ones, with nice stuff").
 #
-#   brawlzone-ig-story [--no-post]
+#   brawlzone-ig-story [--no-post] [slot or kind]
 #
-# Run at 15:00 UTC by brawlzone-ig-story.timer: afternoon in Brazil, evening
-# in India, Bangladesh and Pakistan, the site's biggest countries.
+#   (nothing)  15:00  the Ranked tier list for one rank, a picture of the site's
+#   reward     08:40  today's free reward in the Supercell Store; tried again
+#                     later if it was not on the site yet
+#   duel       12:30  two brawlers, which wins more
+#   evening    19:00  by weekday: a roast, hidden gems, brawlers to stop
+#                     picking, or today's puzzle
+#   giveaway   16:40  days left, until it closes (2026-11-30)
+#   roast, gems, traps, guess, telegram: one of them, by hand
 #
-# The rank turns with the weekday, so the Story is a different list each day
-# rather than the same picture moving by one brawler. The image is the site's
-# own /tier-list/ranked/story/<rank>/en, with deploy/story/make.py adding a
-# question and a "link in bio" pill underneath -- the API cannot put a link
-# sticker on a Story.
+# Everything but the tier list is a few seconds of video, drawn by deploy/motion
+# (src/Story.tsx) from what deploy/story/plan.py picks. Each kind goes out once
+# a day, remembered in $DIR/state.json with what it showed so the next ones
+# differ. The API cannot put a link sticker on a Story: they say "link in bio".
+# `telegram --no-post --manual` leaves room for one, to post from a phone.
 #
-# --no-post draws the image and stops, printing where it is.
+# --no-post draws it and stops, printing where it is.
 set -uo pipefail
 
 REPO=/home/ubuntu/brawlstats
 SITE=https://brawlzone.net
 CACHE=/var/lib/brawlzone/rewards-cache   # Pillow, shared with brawlzone-rewards
+VCACHE=/var/lib/brawlzone/viral-cache    # brawler art, fonts, Pillow and numpy
+DIR=/var/lib/brawlzone/story
+MOTION_APP=/var/lib/brawlzone/motion/app
+MUSIC_DIR="$HOME/youtube-music"
 PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
+FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
+GIVEAWAY_END=2026-11-30
 
 die() { echo "$*" >&2; exit 1; }
 
-# Monday is 1. Mythic twice: it is the rank most players are climbing through.
-case "$(date -u +%u)" in
-  1|6) rank=all;       prompt='AGREE? REPLY WITH YOUR MAIN' ;;
-  2)   rank=diamond;   prompt='DIAMOND AND BELOW: WHO DO YOU PICK?' ;;
-  3|7) rank=mythic;    prompt='MYTHIC PLAYERS: AGREE?' ;;
-  4)   rank=legendary; prompt='LEGENDARY: WHO IS MISSING FROM S?' ;;
-  5)   rank=masters;   prompt='WHAT THE BEST PLAYERS PICK' ;;
-esac
-
+post=1 manual=false slot=
+for a in "$@"; do
+  case "$a" in --no-post) post=0 ;; --manual) manual=true ;; *) slot=$a ;; esac
+done
+DAY=$(date -u +%Y-%m-%d)
+mkdir -p "$DIR" "$CACHE/assets" || die "::error::cannot create $DIR"
 WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
-mkdir -p "$CACHE/assets"
-cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" "$CACHE/assets/" \
-  || die "::error::fonts missing from the checkout"
 
-# A cold render of the tier image queries the roster; give it time.
-curl -sf --max-time 180 -o "$WORK/tier.png" "$SITE/tier-list/ranked/story/$rank/en?d=$(date -u +%Y%m%d)" \
-  || die "::error::the tier-list story image ($rank) did not load"
+# How many saw the Stories still up, kept because Instagram forgets a Story's
+# numbers with the Story: the last line for each is close to its final count.
+python3 - "$HOME/.brawlzone-instagram.json" "$DIR/reach.jsonl" <<'PY' || true
+import json, sys, time, urllib.request
+try:
+    token = json.load(open(sys.argv[1]))['access_token']
+    def get(path):
+        r = urllib.request.Request('https://graph.instagram.com/v23.0/' + path, headers={'Authorization': 'Bearer ' + token})
+        return json.load(urllib.request.urlopen(r, timeout=20))
+    with open(sys.argv[2], 'a') as out:
+        for m in get('me/stories?fields=id,media_type,timestamp').get('data', []):
+            try:
+                ins = {x['name']: x['values'][0]['value'] for x in get(f"{m['id']}/insights?metric=reach,views,replies,navigation")['data']}
+            except Exception:
+                continue  # fewer than five viewers: Instagram gives no numbers
+            out.write(json.dumps({'at': int(time.time()), **m, **ins}) + '\n')
+except Exception as e:
+    print(f'reach not read: {e}')
+PY
 
-docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
-  -v "$REPO/deploy/story:/code:ro" -v "$WORK:/w" -v "$CACHE:/cache" \
-  "$PYTHON_IMAGE" sh -c '
-    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
-    PYTHONPATH=/cache/py python /code/make.py /w/tier.png "$1" /w/story.jpg /cache/assets' _ "$prompt" \
-  > "$WORK/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$WORK/make.log")"
-echo "story drawn: $rank"
+posted () { # kind: already out today?
+  python3 -c 'import json,sys
+try: s=json.load(open(sys.argv[1]))
+except Exception: s={}
+sys.exit(0 if sys.argv[3] in s.get("posted",{}).get(sys.argv[2],[]) else 1)' "$DIR/state.json" "$DAY" "$1"
+}
+remember () { # kind [used.json]
+  python3 - "$DIR/state.json" "$DAY" "$1" "${2:-}" <<'PY'
+import json, os, sys
+path, day, kind, used = sys.argv[1:5]
+try: s = json.load(open(path))
+except (OSError, ValueError): s = {}
+s.setdefault('posted', {}).setdefault(day, []).append(kind)
+s['posted'] = {d: s['posted'][d] for d in sorted(s['posted'])[-30:]}
+if used and os.path.exists(used):
+    for k, v in json.load(open(used)).items():
+        s[k] = (s.get(k, []) + v)[-90:]
+json.dump(s, open(path + '.tmp', 'w')); os.replace(path + '.tmp', path)
+PY
+}
 
-if [ "${1:-}" = "--no-post" ]; then
-  cp "$WORK/story.jpg" "/tmp/brawlzone-story-$rank.jpg"
-  echo "--no-post: /tmp/brawlzone-story-$rank.jpg"
+# ------------------------------------------------------------ the tier list
+if [ -z "$slot" ] || [ "$slot" = tiers ]; then
+  # The rank turns with the weekday, so the Story is a different list each day
+  # rather than the same picture moving by one brawler. The image is the site's
+  # own /tier-list/ranked/story/<rank>/en, with deploy/story/make.py adding a
+  # question and a "link in bio" pill underneath.
+  case "$(date -u +%u)" in  # Monday is 1. Mythic twice: the rank most players are climbing through.
+    1|6) rank=all;       prompt='AGREE? REPLY WITH YOUR MAIN' ;;
+    2)   rank=diamond;   prompt='DIAMOND AND BELOW: WHO DO YOU PICK?' ;;
+    3|7) rank=mythic;    prompt='MYTHIC PLAYERS: AGREE?' ;;
+    4)   rank=legendary; prompt='LEGENDARY: WHO IS MISSING FROM S?' ;;
+    5)   rank=masters;   prompt='WHAT THE BEST PLAYERS PICK' ;;
+  esac
+  cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" "$CACHE/assets/" \
+    || die "::error::fonts missing from the checkout"
+
+  # A cold render of the tier image queries the roster; give it time.
+  curl -sf --max-time 180 -o "$WORK/tier.png" "$SITE/tier-list/ranked/story/$rank/en?d=$(date -u +%Y%m%d)" \
+    || die "::error::the tier-list story image ($rank) did not load"
+
+  docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+    -v "$REPO/deploy/story:/code:ro" -v "$WORK:/w" -v "$CACHE:/cache" \
+    "$PYTHON_IMAGE" sh -c '
+      [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
+      PYTHONPATH=/cache/py python /code/make.py /w/tier.png "$1" /w/story.jpg /cache/assets' _ "$prompt" \
+    > "$WORK/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$WORK/make.log")"
+  echo "story drawn: $rank"
+  if [ "$post" = 0 ]; then
+    cp "$WORK/story.jpg" "/tmp/brawlzone-story-$rank.jpg"
+    echo "--no-post: /tmp/brawlzone-story-$rank.jpg"
+    exit 0
+  fi
+  /usr/local/bin/brawlzone-instagram --story "$WORK/story.jpg" || die "::error::the Story was not published"
+  remember tiers
   exit 0
 fi
-/usr/local/bin/brawlzone-instagram --story "$WORK/story.jpg"
+
+# ------------------------------------------------------------ the moving ones
+case "$slot" in
+  reward|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
+  # What the day's is, then what to show if it has nothing to say.
+  evening) case "$(date -u +%u)" in
+      1|4) kinds="roast gems guess" ;;
+      2|7) kinds="gems roast guess" ;;
+      3|6) kinds="guess roast gems" ;;
+      5)   kinds="traps roast guess" ;;
+    esac ;;
+  *) die "::error::unknown Story '$slot'" ;;
+esac
+first=${kinds%% *}
+if [ "$post" = 1 ]; then
+  for k in $kinds; do
+    posted "$k" && { echo "$k: already posted today"; exit 0; }
+  done
+fi
+[ -x "$MOTION_APP/node_modules/.bin/remotion" ] || die "::error::deploy/motion is not installed in $MOTION_APP"
+
+# One render at a time among the Stories; the Shorts have their own hours.
+exec 9> "$DIR/lock"; flock -w 1800 9 || die "::error::another Story is still being drawn"
+
+if [ "$first" = reward ]; then
+  # Only once the site shows it in every language (owner's rule): the daily
+  # gift job marks that when it tells the channels.
+  python3 - "$DAY" <<'PY' || { echo "reward: not on the site yet"; exit 0; }
+import json, sys
+try: m = json.load(open('/var/lib/brawlzone/daily-gift.json'))
+except Exception: sys.exit(1)
+sys.exit(0 if m.get('day') == sys.argv[1] and (m.get('feeds') or {}).get('done') else 1)
+PY
+fi
+
+snapshot=$(find /var/lib/brawlzone/viral/history -maxdepth 1 -name '20*.json' -mtime -3 -printf '%f\n' | sort | tail -n 1)
+days=$(( ( $(date -u -d "$GIVEAWAY_END" +%s) - $(date -u -d "$DAY" +%s) ) / 86400 ))
+entrants=0
+[ "$first" = giveaway ] && entrants=$(docker exec brawlstats-db-1 psql -U brawlzone -d brawlzone -Atc "select count(*) from giveaway_entries where giveaway = 'gw1'" 2>/dev/null || echo 0)
+if [[ " $kinds " == *" guess "* ]]; then
+  for i in 0 1 2; do
+    curl -sf --max-time 60 -A 'BrawlZone story (https://brawlzone.net)' -o "$WORK/zoom-$i.webp" "$SITE/api/brawldle/picture?mode=zoom&step=$i&d=$DAY" || rm -f "$WORK/zoom-$i.webp"
+  done
+fi
+python3 - "$WORK" "$DAY" "$snapshot" "$days" "${entrants:-0}" "$manual" <<'PY' || die "::error::could not write the Story's input"
+import json, os, sys
+work, day, snap, days, entrants, manual = sys.argv[1:7]
+try: daily = json.load(open('/var/lib/brawlzone/social/rewards/daily.json'))
+except (OSError, ValueError): daily = {}
+json.dump({'day': day, 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
+           'zooms': [f'/work/zoom-{i}.webp' for i in range(3) if os.path.exists(f'{work}/zoom-{i}.webp')]}, open(f'{work}/in.json', 'w'))
+PY
+
+kind=
+for k in $kinds; do
+  OUT="$WORK/$k"; mkdir -p "$OUT"
+  docker run --rm --cpus=1 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PYTHONDONTWRITEBYTECODE=1 \
+    -v "$REPO/deploy/story:/code:ro" -v "$REPO/deploy/viral:/viral:ro" -v "$REPO:/repo:ro" -v "$VCACHE:/cache" \
+    -v /var/lib/brawlzone/viral/history:/history:ro -v "$DIR:/state:ro" -v "$WORK:/work" -v "$OUT:/out" -w /code \
+    "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python plan.py $k /work/in.json /state/state.json /out" > "$WORK/plan.log" 2>&1
+  rc=$?
+  [ "$rc" = 0 ] && { kind=$k; break; }
+  echo "$k: $(tail -n 1 "$WORK/plan.log")"
+  [ "$rc" = 3 ] || die "::error::plan.py $k failed: $(tail -c 600 "$WORK/plan.log")"
+done
+[ -n "$kind" ] || { echo "nothing to show today"; exit 0; }
+
+mkdir -p "$OUT/public/fonts"
+cp "$VCACHE/fonts/Nougat-ExtraBlack-tight.ttf" "$OUT/public/fonts/head.ttf" 2>/dev/null  # into this render only, never the site
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$OUT/public/fonts/lilita.ttf" && cp "$REPO/public/bubble/app-icon.png" "$OUT/public/app-icon.png" \
+  || die "::error::fonts or icon missing from the checkout"
+# Whole CPUs only: a fractional quota makes Remotion refuse (see brawlzone-viral).
+timeout 1500 docker run --rm --cpus=2 -e MOTION_CONCURRENCY=2 --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$MOTION_APP/node_modules:/m/node_modules" -v "$REPO/deploy/motion/src:/m/src:ro" \
+  -v "$REPO/deploy/motion/render.mjs:/m/render.mjs:ro" -v "$REPO/deploy/motion/package.json:/m/package.json:ro" \
+  -v "$OUT:/out" -w /m "$PLAYWRIGHT_IMAGE" node render.mjs video /out /out/silent.mp4 > "$WORK/motion.log" 2>&1 \
+  && [ -s "$OUT/silent.mp4" ] || die "::error::the render failed: $(tail -c 500 "$WORK/motion.log")"
+
+DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/plan.json")
+FADE=$(python3 -c "print(max(0, $DUR - 1.2))")
+mapfile -t TR < <(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
+import datetime, json, sys
+t = json.load(open(sys.argv[1])); names = sorted(t)
+x = t[names[(datetime.date.today().toordinal() + len(sys.argv[2])) % len(names)]]
+print(x['file']); print(x['start'])
+PY
+)
+docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$MUSIC_DIR:/m:ro" -w /w "$FFMPEG_IMAGE" \
+  -hide_banner -loglevel error -y -i silent.mp4 -ss "${TR[1]}" -i "/m/${TR[0]}" -i sfx.wav \
+  -filter_complex "[1:a]aresample=44100,volume=0.6,afade=t=in:d=0.1,afade=t=out:st=$FADE:d=1.2[m];[2:a]aresample=44100,volume=1.1[s];[m][s]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]" \
+  -map 0:v -map '[a]' -t "$DUR" -c:v copy -c:a aac -b:a 160k -movflags +faststart story.mp4 \
+  || die "::error::ffmpeg could not encode the Story"
+echo "story drawn: $kind, ${DUR}s"
+
+if [ "$post" = 0 ]; then
+  cp "$OUT/story.mp4" "/tmp/brawlzone-story-$kind.mp4"
+  echo "--no-post: /tmp/brawlzone-story-$kind.mp4"
+  exit 0
+fi
+/usr/local/bin/brawlzone-instagram --story "$OUT/story.mp4" || die "::error::the Story was not published"
+remember "$kind" "$OUT/used.json"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Instagram Story: today's free store reward
+
+[Timer]
+# The store changes at 08:00 UTC; later tries for a day it was not known yet.
+OnCalendar=*-*-* 08:40:00
+OnCalendar=*-*-* 10:40:00
+OnCalendar=*-*-* 13:10:00
+Persistent=false
+Unit=brawlzone-ig-story@reward.service
+
+[Install]
+WantedBy=timers.target
