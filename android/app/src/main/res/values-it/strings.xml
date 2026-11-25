@@ -144,6 +144,7 @@
     <string name="widget_rank_top">Grado massimo raggiunto</string>
     <string name="widget_rank_last">Ultime %1$d: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">%1$s elo</string>
+    <string name="elo">Elo</string>
     <string name="wcfg_title">Impostazioni del widget</string>
     <string name="wcfg_mode">SCELTE MIGLIORI PER</string>
     <string name="wcfg_all_modes">Tutte le modalità</string>

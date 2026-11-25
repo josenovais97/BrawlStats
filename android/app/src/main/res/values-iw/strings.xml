@@ -144,6 +144,7 @@
     <string name="widget_rank_top">הגעתם לדרגה הגבוהה ביותר</string>
     <string name="widget_rank_last">%1$d אחרונים: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">%1$s אלו</string>
+    <string name="elo">אלו</string>
     <string name="wcfg_title">הגדרות הווידג׳ט</string>
     <string name="wcfg_mode">הבחירות המובילות עבור</string>
     <string name="wcfg_all_modes">כל המצבים</string>

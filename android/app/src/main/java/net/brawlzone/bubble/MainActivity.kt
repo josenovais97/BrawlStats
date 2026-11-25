@@ -97,7 +97,13 @@ class MainActivity : AppCompatActivity() {
         gameType(findViewById(R.id.root))
         fitSystemBars()
         // 1.43: four tabs over a bottom bar.
-        for ((index, id) in Tabs.NAV.withIndex()) findViewById<View>(id).setOnClickListener { selectTab(index) }
+        for ((index, id) in Tabs.NAV.withIndex()) findViewById<View>(id).setOnClickListener {
+            // 1.45: the open tab's own button goes back to its start: the Settings menu, or the top of the page.
+            if (index == tab) {
+                if (index == Tabs.SETTINGS && SettingsPages.open >= 0) openSettingsGroup(-1)
+                else findViewById<android.widget.ScrollView>(Tabs.PAGES[index]).smoothScrollTo(0, 0)
+            } else selectTab(index)
+        }
         selectTab(savedInstanceState?.getInt(KEY_TAB, Tabs.HOME) ?: Tabs.HOME, track = false)
         Stats.firstOpen(this)
 

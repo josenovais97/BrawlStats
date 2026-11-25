@@ -144,6 +144,7 @@
     <string name="widget_rank_top">En yüksek rütbeye ulaştın</string>
     <string name="widget_rank_last">Son %1$d: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">%1$s elo</string>
+    <string name="elo">Elo</string>
     <string name="wcfg_title">Widget ayarları</string>
     <string name="wcfg_mode">EN İYİ SEÇİMLER</string>
     <string name="wcfg_all_modes">Tüm modlar</string>

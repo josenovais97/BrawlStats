@@ -289,6 +289,10 @@ internal object Ui {
                 bottomMargin = -px(activity, 10)
             },
         )
+        // The words keep to the other side of the card.
+        (frame.getChildAt(frame.childCount - 1) as? LinearLayout)?.let {
+            it.setPaddingRelative(it.paddingStart, it.paddingTop, px(activity, 138), it.paddingBottom)
+        }
         load(activity, view, url, large = true)
     }
 

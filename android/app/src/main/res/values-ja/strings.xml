@@ -132,7 +132,7 @@
     <string name="widget_meta_name">ガチバトルのメタ</string>
     <string name="widget_meta_description">全モードまたは1モードのガチバトルのトップ5ピック、無料報酬、シーズンのカウントダウン。</string>
     <string name="widget_rank_name">自分のランク</string>
-    <string name="widget_rank_description">ガチバトルのランク、エロ、次のランクまでの進み具合、最近の試合。</string>
+    <string name="widget_rank_description">ガチバトルのランク、Elo、次のランクまでの進み具合、最近の試合。</string>
     <string name="widget_meta_label">ガチバトルのトップピック</string>
     <string name="widget_mode_label">トップピック · %1$s</string>
     <string name="widget_mode_pick_label">トップピック · %1$s</string>
@@ -140,10 +140,11 @@
     <string name="widget_updated">%1$s に更新</string>
     <string name="widget_rank_none">アプリでプレイヤータグを追加すると、ここにランクが表示されます。</string>
     <string name="widget_rank_wins">%2$sまであと約%1$d勝</string>
-    <string name="widget_rank_elo_to">%2$sまであと%1$sエロ</string>
+    <string name="widget_rank_elo_to">%2$sまであと%1$s Elo</string>
     <string name="widget_rank_top">最高ランクに到達</string>
     <string name="widget_rank_last">直近%1$d試合: %2$d勝%3$d敗 · ★%4$d</string>
-    <string name="widget_elo">%1$sエロ</string>
+    <string name="widget_elo">%1$s Elo</string>
+    <string name="elo">Elo</string>
     <string name="wcfg_title">ウィジェットの設定</string>
     <string name="wcfg_mode">トップピックのモード</string>
     <string name="wcfg_all_modes">すべてのモード</string>
@@ -156,8 +157,8 @@
     <string name="alert_rankup_text">%2$sまであと約%1$d勝。この調子で！</string>
     <string name="alert_rankup_plain">全マップのベストピックで上を目指そう。</string>
     <string name="alert_week_title">📊 今週のガチバトル</string>
-    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$sエロ · ベスト: %4$s</string>
-    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$sエロ</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s Elo · ベスト: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s Elo</string>
     <!-- 1.40: follow BrawlZone -->
     <string name="follow_caption">BRAWLZONEをフォロー</string>
     <string name="follow_body">無料報酬の最新情報、毎日の新しい動画、そしてコミュニティ。</string>
@@ -196,7 +197,7 @@
     <string name="rate_title">ほかのプレイヤーにBubbleを知ってもらおう</string>
     <string name="rate_button">⭐ Google Playで評価する</string>
     <string name="widget_friends_name">フレンド</string>
-    <string name="widget_friends_description">あなたと最大5人のフレンドをエロ順に、今週の戦績つきで表示。</string>
+    <string name="widget_friends_description">あなたと最大5人のフレンドをElo順に、今週の戦績つきで表示。</string>
     <string name="widget_friends_none">アプリでフレンドを追加すると、ここにランキングが表示されます。</string>
     <string name="widget_friends_label">フレンドランキング</string>
     <string name="widget_today">今日 %1$d/%2$d</string>
@@ -208,8 +209,8 @@
     <string name="goal_remind_title">⏳ 連続記録をキープしよう</string>
     <string name="goal_remind_text">今日の残り勝利数：%1$d。連続：%2$d 🔥</string>
     <string name="friend_rankup_title">%1$sが%2$sに到達</string>
-    <string name="friend_ahead">まだあなたが%1$sエロ リードしています。</string>
-    <string name="friend_behind">あなたより%1$sエロ上になりました。あなたの番！</string>
+    <string name="friend_ahead">まだあなたが%1$s Eloリードしています。</string>
+    <string name="friend_behind">あなたより%1$s Elo上になりました。あなたの番！</string>
     <string name="friend_rankup_plain">あなたの番！</string>
     <string name="alert_wrapped_title">🎁 シーズン%1$dのまとめができました</string>
     <string name="alert_wrapped_text">最高ランク、試合数、勝率、ベストキャラ。タップしてシェア。</string>
@@ -344,7 +345,7 @@
     <string name="welcome_friend_title">フレンドを追加しよう</string>
     <string name="welcome_friend_text">今週の対決で競い合い、プレイ中かどうかも分かります。</string>
     <string name="welcome_widget_title">ホーム画面にランクを表示</string>
-    <string name="welcome_widget_text">タップで「自分のランク」ウィジェットを追加：ランク、エロ、シーズングラフ。</string>
+    <string name="welcome_widget_text">タップで「自分のランク」ウィジェットを追加：ランク、Elo、シーズングラフ。</string>
     <string name="welcome_ask_title">Bubbleに何でも聞こう</string>
     <string name="welcome_ask_text">エドガーに勝てるのは？このマップのおすすめは？次に強化するのは？タップして質問。</string>
     <string name="roast_me">🔥 アカウントをイジる</string>
@@ -364,7 +365,7 @@
     <string name="feed_see_all">フィードをすべて見る</string>
     <string name="feed_new">新着 %1$d件</string>
     <string name="feed_pass">%1$sがチームランキングで%2$sを追い抜いた</string>
-    <string name="feed_pass_sub">いまエロ %1$s 差でリード 👀</string>
+    <string name="feed_pass_sub">いまElo %1$s 差でリード 👀</string>
     <string name="feed_streak">%1$sが%2$d連勝中</string>
     <string name="feed_streak_sub">誰か止めて！</string>
     <string name="feed_tilt">%1$sが%2$d連敗</string>
@@ -409,7 +410,7 @@
     <string name="pin_label">プレイ＋バブル</string>
     <string name="today_caption">今日</string>
     <string name="today_games">ガチバトル</string>
-    <string name="today_elo">今日のエロ</string>
+    <string name="today_elo">今日のElo</string>
     <string name="today_goal">今日の目標</string>
     <string name="last_review">詳しい振り返り</string>
     <string name="last_history">今日の試合</string>
@@ -519,7 +520,7 @@
 
     <!-- 1.44: the session recap's lines (SessionRecap) -->
     <string name="recap_title">セッション終了: %1$d–%2$d</string>
-    <string name="recap_title_elo">セッション終了: %1$d–%2$d · %3$sエロ</string>
+    <string name="recap_title_elo">セッション終了: %1$d–%2$d · %3$s Elo</string>
     <string name="recap_record">%1$d勝 %2$d敗（勝率%3$d%%）</string>
     <string name="recap_stars">スタープレイヤー: %1$d回</string>
     <string name="recap_mvp">MVP: %1$s、%2$d勝</string>

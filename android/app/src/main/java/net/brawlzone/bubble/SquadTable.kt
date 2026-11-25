@@ -61,6 +61,7 @@ internal fun MainActivity.paintSquadTable() {
             addView(
                 Ui.row(this@paintSquadTable).apply {
                     minimumHeight = Ui.px(this@paintSquadTable, 40)
+                    setPaddingRelative(0, 0, Ui.px(this@paintSquadTable, 9), 0)
                     addView(Ui.text(this@paintSquadTable, getString(R.string.squad_week), 17f, bold = true).grow())
                     for ((i, label) in listOf(R.string.squad_wins, R.string.kd, R.string.squad_kills).withIndex()) {
                         addView(
@@ -84,6 +85,7 @@ internal fun MainActivity.paintSquadTable() {
                 addView(
                     Ui.row(this@paintSquadTable, 9).apply {
                         minimumHeight = Ui.px(this@paintSquadTable, 52)
+                        setPaddingRelative(Ui.px(this@paintSquadTable, 4), 0, Ui.px(this@paintSquadTable, 9), 0)
                         if (r.you) background = Ui.rounded(this@paintSquadTable, 0x33FFC53D, 12, 0)
                         val leads = i == 0 && (if (SquadTable.sort == SquadTable.WINS) r.wins > 0 else r.fight.games > 0)
                         addView(
@@ -177,9 +179,10 @@ private fun MainActivity.versusCard(me: SquadTable.Row, friend: SquadTable.Row):
         )
     }
     val known = me.fight.games >= Combat.MIN_GAMES && friend.fight.games >= Combat.MIN_GAMES
-    line(getString(R.string.today_elo), me.data.elo?.toDouble(), friend.data.elo?.toDouble()) { fmt.format(it.toInt()) }
+    val won = getString(R.string.stat_won).replaceFirstChar { it.titlecase(AppLang.locale(AppLang.current(this@versusCard))) }
+    line(getString(R.string.elo), me.data.elo?.toDouble(), friend.data.elo?.toDouble()) { fmt.format(it.toInt()) }
     line(getString(R.string.squad_wins), me.wins.toDouble(), friend.wins.toDouble()) { fmt.format(it.toInt()) }
-    if (me.games >= 3 && friend.games >= 3) line(getString(R.string.stat_won), me.wins.toDouble() / me.games, friend.wins.toDouble() / friend.games) { pct.format(it) }
+    if (me.games >= 3 && friend.games >= 3) line(won, me.wins.toDouble() / me.games, friend.wins.toDouble() / friend.games) { pct.format(it) }
     if (known) {
         line(getString(R.string.kd), me.fight.kd, friend.fight.kd) { Combat.ratio(it) }
         line(getString(R.string.stat_kills), me.fight.killsPerGame, friend.fight.killsPerGame) { Combat.one(it) }

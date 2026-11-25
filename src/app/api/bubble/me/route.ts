@@ -27,6 +27,7 @@ import { toApiError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
+const RANKED_MODE_KEYS = ['gemGrab', 'brawlBall', 'heist', 'bounty', 'hotZone', 'knockout'];
 const RANKED = new Set(['soloRanked', 'teamRanked']);
 
 export async function GET(request: NextRequest) {
@@ -81,9 +82,11 @@ export async function GET(request: NextRequest) {
         ...gameNumbers(e, tag),
       };
     });
-  // Each mode's name in the app's language, once rather than per game.
+  // Each mode's name in the app's language, once rather than per game. Every
+  // Ranked mode, played lately or not: a weekly quest can ask for any of them
+  // ("Win in hotZone" until 2026-11-25).
   const modes = Object.fromEntries(
-    [...new Set(games.map((g) => g.mode).filter((m): m is string => !!m))].map((m) => [m, name(modeLabel(modeMeta, m))]),
+    [...new Set([...RANKED_MODE_KEYS, ...games.map((g) => g.mode).filter((m): m is string => !!m)])].map((m) => [m, name(modeLabel(modeMeta, m))]),
   );
 
   const icon = absolute(playerIconUrl(player.icon?.id));

@@ -151,7 +151,7 @@ private fun MainActivity.gameTile(g: Tally.Battle, me: Me.Data?): View = Ui.colu
     addView(face)
     Ui.load(this@gameTile, face, me?.icons?.get(g.bid))
     addView(
-        Ui.text(this@gameTile, if (g.fought) "${g.kills}/${g.deaths}" else "–", 14.5f, if (!g.fought || g.kills == g.deaths) 0xFFEEF1FA.toInt() else if (g.kills > g.deaths) Ui.VICTORY else Ui.LOSS, bold = true, lines = 1),
+        Ui.text(this@gameTile, if (g.fought) "${g.kills}/${g.deaths}" else "–", 14.5f, if (!g.fought || g.kills == g.deaths) 0xFFEEF1FA.toInt() else if (g.kills > g.deaths) Ui.VICTORY else Ui.LOSS, bold = true, lines = 1).apply { gravity = Gravity.CENTER },
     )
     val mode = ImageView(this@gameTile).apply {
         layoutParams = LinearLayout.LayoutParams(Ui.px(this@gameTile, 18), Ui.px(this@gameTile, 18))

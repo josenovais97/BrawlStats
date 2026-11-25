@@ -144,6 +144,7 @@
     <string name="widget_rank_top">已达最高段位</string>
     <string name="widget_rank_last">最近 %1$d 场：%2$d 胜 %3$d 负 · ★%4$d</string>
     <string name="widget_elo">%1$s 分</string>
+    <string name="elo">分数</string>
     <string name="wcfg_title">小组件设置</string>
     <string name="wcfg_mode">最佳选择的模式</string>
     <string name="wcfg_all_modes">全部模式</string>

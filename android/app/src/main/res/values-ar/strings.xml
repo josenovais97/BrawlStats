@@ -144,6 +144,7 @@
     <string name="widget_rank_top">وصلت إلى أعلى رتبة</string>
     <string name="widget_rank_last">آخر %1$d: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">%1$s إيلو</string>
+    <string name="elo">إيلو</string>
     <string name="wcfg_title">إعدادات الأداة</string>
     <string name="wcfg_mode">أفضل الاختيارات لـ</string>
     <string name="wcfg_all_modes">كل الأطوار</string>

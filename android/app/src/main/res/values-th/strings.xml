@@ -144,6 +144,7 @@
     <string name="widget_rank_top">ถึงแรงก์สูงสุดแล้ว</string>
     <string name="widget_rank_last">ล่าสุด %1$d เกม: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">%1$s เอโล</string>
+    <string name="elo">เอโล</string>
     <string name="wcfg_title">ตั้งค่าวิดเจ็ต</string>
     <string name="wcfg_mode">ตัวเลือกยอดนิยมของ</string>
     <string name="wcfg_all_modes">ทุกโหมด</string>

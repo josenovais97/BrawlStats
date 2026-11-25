@@ -144,6 +144,7 @@
     <string name="widget_rank_top">최고 랭크 달성</string>
     <string name="widget_rank_last">최근 %1$d판: %2$d승 %3$d패 · ★%4$d</string>
     <string name="widget_elo">%1$s 엘로</string>
+    <string name="elo">엘로</string>
     <string name="wcfg_title">위젯 설정</string>
     <string name="wcfg_mode">최고의 픽 모드</string>
     <string name="wcfg_all_modes">모든 모드</string>

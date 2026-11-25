@@ -144,6 +144,7 @@
     <string name="widget_rank_top">Достигнут высший ранг</string>
     <string name="widget_rank_last">Последние %1$d: %2$d–%3$d · ★%4$d</string>
     <string name="widget_elo">Эло: %1$s</string>
+    <string name="elo">Эло</string>
     <string name="wcfg_title">Настройки виджета</string>
     <string name="wcfg_mode">ЛУЧШИЕ ВЫБОРЫ ДЛЯ</string>
     <string name="wcfg_all_modes">Все режимы</string>

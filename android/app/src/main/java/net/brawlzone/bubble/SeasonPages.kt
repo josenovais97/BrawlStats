@@ -279,7 +279,7 @@ private fun MainActivity.paintStats(box: LinearLayout, data: SeasonData.Data?) {
         val big = Ui.text(this, "", 58f, bold = true).apply { includeFontPadding = false }
         body.addView(big)
         Ui.countTo(big, "kd_${data.which}", mine.kd) { Combat.ratio(it) }
-        if (others != null) body.addView(Ui.text(this, getString(R.string.kd_others, Combat.ratio(others.kd)), 13.5f).apply { maxWidth = Ui.px(this@paintStats, 190) })
+        if (others != null) body.addView(Ui.text(this, getString(R.string.kd_others, Combat.ratio(others.kd)), 13.5f))
         body.addView(Ui.text(this, getString(R.string.kd_from, data.fought), 12f, 0xFFD6EFE2.toInt()))
         box.addView(frame)
 
@@ -356,7 +356,7 @@ private fun MainActivity.legend(color: Int, label: String): View = Ui.row(this, 
 
 /** A number of yours over the others' number, as two bars; green or red when they are a twentieth apart. */
 private fun MainActivity.compare(label: String, mine: Double, others: Double, low: Boolean, show: (Double) -> String): View = Ui.column(this, 5).apply {
-    val apart = Math.abs(mine - others) > Math.abs(others) * 0.05
+    val apart = Math.abs(mine - others) > Math.abs(others) * 0.05 && show(mine) != show(others)
     val good = (mine > others) != low
     val top = maxOf(mine, others, 0.0001) * 1.15
     addView(
