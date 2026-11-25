@@ -1,0 +1,13 @@
+[Unit]
+Description=The World Finals 2026 series, one Short a day
+
+[Timer]
+# Nine episodes (make.py WF_ORDER), then over. After the 15:30 quiz, before the
+# 18:10 teaser: evening in Turkey, afternoon in Brazil.
+OnCalendar=2026-11-25..30 17:00:00
+OnCalendar=2026-12-01..03 17:00:00
+Persistent=false
+Unit=brawlzone-viral-worlds.service
+
+[Install]
+WantedBy=timers.target

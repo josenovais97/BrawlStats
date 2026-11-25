@@ -38,6 +38,8 @@ kind     quiz    "Guess the brawler #N": five rounds, medium to expert, each a
                  answer, which is at brawlzone.net/daily-challenge. data is
                  {"date", "number"}; zoom-0..3 and shadow images beside it in
                  OUT, fetched from the site by the caller.
+         worlds  the World Finals 2026 series (2026-11-25): WORLDS=<episode> or the
+                 next one not out yet. data is /data/worlds2026.json.
          gwdraw  the giveaway draw, replayed (2026-11-25): every ticket running
                  past until the winning one. data is giveaway-draw.ts's VIDEO line.
 data     scripts/viral-data.ts output.
@@ -87,7 +89,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
           'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0},
-          'gwdraw': {'pace': 2}}
+          'gwdraw': {'pace': 2}, 'worlds': {'pace': 2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -1539,6 +1541,156 @@ if KIND == 'giveaway':
     }
 
 
+# ================================================================ worlds
+# The World Finals 2026 series (2026-11-25, owner: "lots of content on the
+# brawl championship that ended this weekend"). Remotion only (src/Worlds.tsx).
+# data is /data/worlds2026.json: every game of the event, read from the
+# players' battle logs (the official API: picks, the bans of each set, kills,
+# deaths, damage), all 24 series checked against the official results, beside
+# 7,700 ordinary Ranked games read the same week. The two brawlers each team
+# bans for a whole match are not in the API, so nothing here says why a brawler
+# was not played, only that it was not (owner: "i don't want assumptions, you
+# need to be certain"). Bans are of the sets whose bans were recorded, and the
+# players' numbers are of the final day, the one day proven complete.
+if KIND == 'worlds':
+    WF = data
+    WF_ORDER = ['pros', 'picks', 'never', 'best', 'draft', 'final', 'players', 'duos', 'bans']
+    EP = os.environ.get('WORLDS') or next((e for e in WF_ORDER if e not in state.get('worlds', [])), None)
+    if EP not in WF_ORDER:
+        print('every Worlds video is out'); sys.exit(5)
+    P_ = {b['n']: b for b in WF['picked']}
+    MN = {'gemGrab': 'GEM GRAB', 'brawlBall': 'BRAWL BALL', 'heist': 'HEIST', 'bounty': 'BOUNTY', 'hotZone': 'HOT ZONE', 'knockout': 'KNOCKOUT'}
+    def wb(n): return {'id': P_[n]['id'], 'n': n}
+    def rec(b): return f"{b['wins']}-{b['picks'] - b['wins']}"
+    def pc0(x): return f'{x * 100:.0f}%'
+    how, you, pro = WF['how'], WF['how']['mythic'], WF['how']['worlds']
+    less = lambda a, b: round((1 - b / a) * 100)
+    W_TAGS = '#brawlstars #worldfinals2026 #brawlstarsworldfinals #brawlstarschampionship #brawlstarsesports #brawlzone'
+    W_SRC = (f"From the official Brawl Stars API: the {WF['series']} matches and {WF['sets']} sets of the Brawl Stars World Finals 2026 "
+             f"(Tokyo, Nov 20 to 22)")
+    W_GAMES = f"{WF['gamesWithStats']} games of the Brawl Stars World Finals 2026 (Tokyo, Nov 20 to 22), from the official Brawl Stars API"
+    def meta(title, pt, es, idn, de, tr, pl, desc):
+        return {'title': title + ' #Shorts', 'titles': {'pt-BR': pt + ' #Shorts', 'es-419': es + ' #Shorts',
+                **more_titles(id=idn + ' #Shorts', de=de + ' #Shorts', tr=tr + ' #Shorts', pl=pl + ' #Shorts')},
+                'description': f'{desc}\n\nFree stats for every brawler and every rank: https://brawlzone.net{FOOTER}\n{W_TAGS}', 'worlds': EP}
+
+    if EP == 'pros':
+        tl.add(4, 'wf_intro', lines=['THE PROS DEAL', 'LESS', 'DAMAGE THAN YOU'], gold=1, chip=f"{WF['gamesWithStats']} WORLDS GAMES, {you['games']:,} MYTHIC GAMES", color='#ff3c64')
+        tl.add(5, 'wf_compare', title='DAMAGE', sub='PER MINUTE', color='#7a3cff', you={'name': 'YOU (MYTHIC)', 'v': you['dmgMin']}, pro={'name': 'THE PROS', 'v': pro['dmgMin']},
+               note=f"{less(you['dmgMin'], pro['dmgMin'])}% LESS")
+        tl.add(5, 'wf_compare', title='DEATHS', sub='PER MINUTE', color='#e0264f', you={'name': 'YOU (MYTHIC)', 'v': you['deathsMin'], 'f': '2'}, pro={'name': 'THE PROS', 'v': pro['deathsMin'], 'f': '2'},
+               note=f"{less(you['deathsMin'], pro['deathsMin'])}% FEWER DEATHS")
+        hy, hp = you['byMode']['hotZone']['deathsMin'], pro['byMode']['hotZone']['deathsMin']
+        tl.add(5, 'wf_compare', title='IN HOT ZONE', sub='DEATHS PER MINUTE', color='#ff5a28', you={'name': 'YOU (MYTHIC)', 'v': hy, 'f': '2'}, pro={'name': 'THE PROS', 'v': hp, 'f': '2'}, note='ALMOST HALF')
+        tl.add(5, 'wf_compare', title='GAMES WITHOUT DYING', color='#22b866', you={'name': 'YOU (MYTHIC)', 'v': you['deathless'] * 100, 'f': '%'}, pro={'name': 'THE PROS', 'v': pro['deathless'] * 100, 'f': '%'},
+               note=f"{pro['deathless'] / you['deathless']:.1f}X MORE OFTEN")
+        tl.add(4, 'wf_say', lines=[{'t': 'FIGHT LESS.'}, {'t': 'STAY', 'big': True}, {'t': 'ALIVE', 'big': True}], step=.6)
+        tl.add(6, 'wf_outro', big='YOUR K/D?', line1='COMMENT HOW OFTEN', line2='YOU DIE')
+        META = meta('The pros deal LESS damage than you (and win) 🏆', 'Os pros dão MENOS dano que você (e ganham) 🏆', 'Los pros hacen MENOS daño que tú (y ganan) 🏆',
+                    'Pro player kasih damage LEBIH KECIL dari kamu 🏆', 'Profis machen WENIGER Schaden als du 🏆', 'Profesyoneller senden DAHA AZ hasar veriyor 🏆', 'Zawodowcy zadają MNIEJ obrażeń niż ty 🏆',
+                    f"{W_GAMES}, next to {you['games']:,} Mythic Ranked games from the same week. Pros deal {less(you['dmgMin'], pro['dmgMin'])}% less damage a minute, and die {less(you['deathsMin'], pro['deathsMin'])}% less. "
+                    'Averaged over the six modes, so the mode mix is the same on both sides.')
+    elif EP == 'picks':
+        top = WF['picked'][:5]; r = top[0]
+        tl.add(4, 'wf_intro', lines=['MOST PICKED', 'AT WORLDS', 'AND IT LOST'], gold=1, chip=f"ALL {WF['sets']} SETS", color='#7a3cff', faces=[wb(b['n']) for b in top])
+        tl.add(8, 'wf_rows', title='MOST PICKED', sub=f"OF {WF['sets']} SETS", up=True, step=1.0,
+               rows=[{'rank': i + 1, 'b': wb(b['n']), 'name': nice(b['n']).upper(), 'sub': 'NOBODY ELSE CAME CLOSE' if False else f"PICKED IN {pc0(b['picks'] / WF['sets'])}", 'val': str(b['picks']), 'valSub': 'SETS', 'color': '#ffc72c' if i == 0 else '#cfd6ff', 'hot': i == 0} for i, b in enumerate(top)])
+        tl.add(6, 'wf_hero', title='BUT...', b=wb(r['n']), color='#ff8c28', stamp='LOST',
+               lines=[{'t': f"{r['wins']} WINS, {r['picks'] - r['wins']} LOSSES", 'c': '#ffe45a'}, {'t': f"WON ONLY {pc0(r['wins'] / r['picks'])} OF THE SETS"}])
+        tl.add(6, 'wf_rows', title='WHO WON MORE', sub='SETS WON, OF THE 5 MOST PICKED', step=.9,
+               rows=[{'b': wb(b['n']), 'name': nice(b['n']).upper(), 'sub': f"{rec(b)} IN SETS", 'val': pc0(b['wins'] / b['picks']), 'color': '#7dff9b' if b['wins'] * 2 > b['picks'] else '#ff9aa9' if b['wins'] * 2 < b['picks'] else '#ffffff'} for b in sorted(top, key=lambda b: -b['wins'] / b['picks'])])
+        tl.add(5, 'wf_hero', title='AND IN YOUR RANKED?', b=wb(r['n']), color='#3c7bff', stamp=f"{r['ladderTier']} TIER",
+               lines=[{'t': f"ONLY #{r['ladderRank']} IN PICKS"}, {'t': f"WINS {r['ladderWr'] * 100:.1f}% IN MYTHIC+", 'c': '#ff9aa9'}])
+        tl.add(6, 'wf_outro', big='WHY?', line1=f"WHY DO PROS LOVE", line2=f"{nice(r['n']).upper()}?")
+        META = meta(f"The most picked brawler at Worlds LOST 😱 {nice(r['n'])}", f"O brawler mais escolhido do Mundial PERDEU 😱", f"El brawler más elegido del Mundial PERDIÓ 😱", 'Brawler paling sering dipilih di Worlds KALAH 😱',
+                    'Der meistgespielte Brawler der Worlds hat VERLOREN 😱', "Dünya Finali'nin en çok seçilen savaşçısı KAYBETTİ 😱", 'Najczęściej wybierany brawler Worlds PRZEGRAŁ 😱',
+                    f"{W_SRC}. Most picked: " + ', '.join(f"{nice(b['n'])} ({b['picks']})" for b in top) + f". {nice(r['n'])} won {r['wins']} of {r['picks']} sets.")
+    elif EP == 'never':
+        np_ = WF['noplay']
+        tl.add(4, 'wf_intro', lines=['NOBODY PLAYED', 'YOUR MAIN', 'AT WORLDS?'], gold=1, chip=f"{WF['sets']} SETS, {len(WF['picked'])} OF {WF['roster']} BRAWLERS PLAYED", color='#e0264f', faces=[{'id': b['id'], 'n': b['n']} for b in np_[:10]])
+        tl.add(10, 'wf_grid', title='0 PICKS', sub=f"{len(np_)} BRAWLERS NOBODY PLAYED AT WORLDS", items=[{'id': b['id'], 'n': b['n']} for b in np_], note='IS YOUR MAIN HERE?')
+        bo = next(b for b in np_ if b['ladderTier'] == 'S') if any(b['ladderTier'] == 'S' for b in np_) else np_[0]
+        tl.add(6, 'wf_hero', title='THE BIGGEST SURPRISE', b={'id': bo['id'], 'n': bo['n']}, color='#22b866', stamp=f"{bo['ladderTier']} TIER",
+               lines=[{'t': f"{bo['ladderWr'] * 100:.1f}% WINS IN MYTHIC+", 'c': '#7dff9b'}, {'t': '0 PICKS AT WORLDS', 'c': '#ff9aa9'}])
+        tl.add(6, 'wf_outro', big='YOUR MAIN?', line1='WAS YOUR MAIN', line2='PLAYED AT WORLDS?')
+        META = meta(f'{len(np_)} brawlers NOBODY played at Worlds 💀 Is your main here?', f'{len(np_)} brawlers que NINGUÉM usou no Mundial 💀', f'{len(np_)} brawlers que NADIE usó en el Mundial 💀', f'{len(np_)} brawler yang TIDAK dimainkan di Worlds 💀',
+                    f'{len(np_)} Brawler, die NIEMAND bei den Worlds spielte 💀', f"Dünya Finali'nde KİMSENİN oynamadığı {len(np_)} savaşçı 💀", f'{len(np_)} brawlerów, których NIKT nie grał na Worlds 💀',
+                    f"{W_SRC}. Never played: " + ', '.join(nice(b['n']) for b in np_) + '.')
+    elif EP == 'best':
+        ok = [b for b in WF['picked'] if b['picks'] >= 9]
+        good = sorted(ok, key=lambda b: (-b['wins'] / b['picks'], -b['picks']))[:5]; bad = sorted(ok, key=lambda b: (b['wins'] / b['picks'], -b['picks']))[:3]
+        tl.add(4, 'wf_intro', lines=['THE BRAWLERS', 'THAT WON', 'WORLDS'], gold=1, chip='SETS WON, 9 PICKS OR MORE', color='#22b866')
+        tl.add(9, 'wf_rows', title='BEST AT WORLDS', sub='SETS WON AND LOST', up=True, step=1.1, color='#169a58',
+               rows=[{'rank': i + 1, 'b': wb(b['n']), 'name': nice(b['n']).upper(), 'sub': f"{b['ladderTier'] or '-'} TIER IN MYTHIC+", 'val': rec(b), 'valSub': pc0(b['wins'] / b['picks']), 'color': '#7dff9b', 'hot': i == 0} for i, b in enumerate(good)])
+        tl.add(5, 'wf_hero', title='THE KING OF WORLDS', b=wb(good[0]['n']), color='#ffc72c', lines=[{'t': f"{good[0]['wins']} SETS WON, {good[0]['picks'] - good[0]['wins']} LOST", 'c': '#ffe45a'}])
+        tl.add(6, 'wf_rows', title='THE WORST', sub='PICKED A LOT, LOST A LOT', step=1.0, color='#c8245a',
+               rows=[{'b': wb(b['n']), 'name': nice(b['n']).upper(), 'sub': f"#{b['ladderRank']} MOST PICKED IN MYTHIC+", 'val': rec(b), 'valSub': pc0(b['wins'] / b['picks']), 'color': '#ff9aa9'} for b in bad])
+        tl.add(6, 'wf_outro', big='AGREE?', line1='WHO SURPRISED YOU', line2='THE MOST?')
+        META = meta('The brawlers that WON Worlds 🏆 (and the worst)', 'Os brawlers que GANHARAM o Mundial 🏆 (e os piores)', 'Los brawlers que GANARON el Mundial 🏆 (y los peores)', 'Brawler yang MENANG di Worlds 🏆',
+                    'Die Brawler, die die Worlds GEWANNEN 🏆', "Dünya Finali'ni KAZANAN savaşçılar 🏆", 'Brawlerzy, którzy WYGRALI Worlds 🏆',
+                    f"{W_SRC}. Best: " + ', '.join(f"{nice(b['n'])} {rec(b)}" for b in good) + '. Worst: ' + ', '.join(f"{nice(b['n'])} {rec(b)}" for b in bad) + '. Brawlers with 9 picks or more.')
+    elif EP == 'bans':
+        # The bans of each set's draft only: what is banned before a match starts
+        # is not in the API, so this never says the pros do not ban someone.
+        nb = WF['setsWithBans']; lad = {int(k): v for k, v in WF['ladderBans'].items()}
+        rows_ = [{'b': {'id': b['id'], 'n': b['n']}, 'pro': b['bans'] / nb * 100, 'you': lad.get(b['id'], 0) * 100, 'bans': b['bans']} for b in WF['banned']]
+        top = rows_[:4]; gap = sorted(rows_[:14], key=lambda r: r['you'] - r['pro'])[1:5]
+        tl.add(4, 'wf_intro', lines=['MOST BANNED', 'AT WORLDS', 'SET BY SET'], gold=1, chip=f"{nb} OF {WF['sets']} SETS RECORDED", color='#c8245a')
+        tl.add(8, 'wf_bans', title='MOST BANNED', rows=top, max=75, color='#c8245a')
+        tl.add(6, 'wf_hero', title='MOST BANNED OF ALL', b=top[0]['b'], color='#ffc72c', lines=[{'t': f"BANNED IN {top[0]['bans']} OF {nb} SETS", 'c': '#ffe45a'}, {'t': f"AND IN {top[0]['you']:.0f}% OF YOUR GAMES"}])
+        tl.add(8, 'wf_bans', title='YOU LET THESE THROUGH', rows=gap, max=40, color='#b06a00')
+        tl.add(6, 'wf_outro', big='YOUR BAN?', line1='WHO DO YOU', line2='ALWAYS BAN?')
+        META = meta('The most BANNED brawlers at Worlds 🚫', 'Os brawlers mais BANIDOS do Mundial 🚫', 'Los brawlers más BANEADOS del Mundial 🚫', 'Brawler paling sering di-BAN di Worlds 🚫', 'Die meistgebannten Brawler der Worlds 🚫', "Dünya Finali'nde en çok YASAKLANAN savaşçılar 🚫", 'Najczęściej BANOWANI brawlerzy Worlds 🚫',
+                    f"{W_SRC}: the bans of each set's draft, recorded in {nb} of the sets, next to {WF['ladderBanGames']:,} Mythic to Pro Ranked games this week. Bans made before a match starts are not in these numbers.")
+    elif EP == 'draft':
+        q = [x for x in WF['quiz'] if len(x['score']) >= 1 and x['win']]
+        want = [('GF', 'heist'), ('GF', 'brawlBall'), ('LF', 'bounty'), ('UF', 'knockout')]  # the final day, proven complete
+        pickq = [next((x for x in q if x['series'] == s_ and x['mode'] == m_), None) for s_, m_ in want]; pickq = [x for x in pickq if x]
+        tl.add(4, 'wf_intro', lines=['WHO WON', 'THIS DRAFT?', 'REAL WORLDS DRAFTS'], gold=1, chip=f'{len(pickq)} DRAFTS, HOW MANY CAN YOU GET?', color='#7a3cff')
+        for i, x in enumerate(pickq):
+            ts = list(x['teams']); rnd.shuffle(ts)
+            def side(t): return {'name': t.upper(), 'trio': x['teams'][t], 'win': x['win'] == t, 'score': f"{x['score'].get(t, 0)}-{x['score'].get(ts[1 - ts.index(t)], 0)}"}
+            tl.add(8, 'wf_draft', a=side(ts[0]), b=side(ts[1]), mode=MN[x['mode']], map=x['map'], modeKey=x['mode'], n=i + 1, of=len(pickq), color=['#7a3cff', '#e0264f', '#2a6ad8', '#169a58'][i % 4])
+        tl.add(6, 'wf_outro', big='YOUR SCORE?', line1='HOW MANY DID', line2='YOU GET?')
+        META = meta('Who won this WORLDS draft? 🏆 Can you get 4/4?', 'Quem ganhou este draft do MUNDIAL? 🏆 4/4?', '¿Quién ganó este draft del MUNDIAL? 🏆 ¿4/4?', 'Siapa menang draft WORLDS ini? 🏆 4/4?', 'Wer gewann diesen WORLDS-Draft? 🏆 4/4?', "Bu DÜNYA FİNALİ draft'ını kim kazandı? 🏆 4/4?", 'Kto wygrał ten draft WORLDS? 🏆 4/4?',
+                    f"{W_SRC}. Real drafts, real results: how many did you get?")
+    elif EP == 'players':
+        ok = [p for p in WF['players'] if p['games'] >= 9]
+        kd = sorted(ok, key=lambda p: -p['kd'])[:5]; dm = sorted(ok, key=lambda p: -p['dmgMin'])[:5]; st_ = sorted(ok, key=lambda p: (-p['star'], -p['star'] / p['games']))[:5]
+        row = lambda i, p, val, sub, c: {'rank': i + 1, 'name': p['name'], 'sub': p['team'].upper(), 'val': val, 'valSub': sub, 'color': c, 'hot': i == 0}
+        tl.add(4, 'wf_intro', lines=['BEST PLAYER', 'OF THE', 'FINAL DAY'], gold=2, chip=f"WORLDS, NOV 22: {WF['finalDaySeries']} MATCHES, {WF['finalDayGames']} GAMES", color='#2a6ad8')
+        tl.add(8, 'wf_rows', title='KILLS PER DEATH', sub='FINAL DAY, EVERY GAME', up=True, step=1.0, color='#c8245a', rows=[row(i, p, f"{p['kd']:.2f}", f"{p['kills']} KILLS", '#ff9aa9') for i, p in enumerate(kd)])
+        tl.add(8, 'wf_rows', title='DAMAGE', sub='PER MINUTE', up=True, step=1.0, color='#b06a00', rows=[row(i, p, f"{p['dmgMin'] / 1000:.1f}K", f"{p['games']} GAMES", '#ffe45a') for i, p in enumerate(dm)])
+        tl.add(8, 'wf_rows', title='STAR PLAYER', sub='TIMES NAMED', up=True, step=1.0, color='#169a58', rows=[row(i, p, str(p['star']), f"IN {p['games']} GAMES", '#7dff9b') for i, p in enumerate(st_)])
+        tl.add(5, 'wf_say', lines=[{'t': 'BEST NUMBERS'}, {'t': kd[0]['name'].upper(), 'big': True}, {'t': f"OF {kd[0]['team'].upper()}"}], note='OFFICIAL MVP OF THE FINAL: ENRAGED', step=.7)
+        tl.add(6, 'wf_outro', big='YOUR MVP?', line1='WHO WAS YOUR', line2='PLAYER OF WORLDS?')
+        META = meta('Best player of the Worlds final day? 📊 The numbers', 'Melhor jogador do dia final do Mundial? 📊', '¿El mejor jugador del día final del Mundial? 📊', 'Pemain terbaik hari final Worlds? 📊', 'Bester Spieler am Finaltag der Worlds? 📊', "Dünya Finali son gününün en iyi oyuncusu? 📊", 'Najlepszy gracz finałowego dnia Worlds? 📊',
+                    f"The final day of the Brawl Stars World Finals 2026 (Tokyo, Nov 22): all {WF['finalDaySeries']} matches and {WF['finalDayGames']} games, from the official Brawl Stars API. Players with 9 games or more that day.")
+    elif EP == 'duos':
+        d = WF['duos']; best = [x for x in d if x['sets'] >= 3 and x['wins'] / x['sets'] >= .75][:4]; worst = [x for x in d if x['sets'] >= 3 and x['wins'] == 0][:3]
+        rr = lambda x, c: {'b': x['a'], 'b2': x['b'], 'name': f"{nice(x['a']['n']).upper()}", 'sub': f"+ {nice(x['b']['n']).upper()}", 'val': f"{x['wins']}-{x['sets'] - x['wins']}", 'valSub': 'SETS', 'color': c}
+        tl.add(4, 'wf_intro', lines=['BEST DUOS', 'OF WORLDS', 'AND THE CURSED ONE'], gold=1, chip=f"{WF['triosDifferent']} DIFFERENT TRIOS IN {WF['drafts']} DRAFTS", color='#169a58')
+        tl.add(8, 'wf_rows', title='THEY JUST WIN', sub='SAME TEAM, SETS WON AND LOST', step=1.2, color='#169a58', rows=[rr(x, '#7dff9b') for x in best])
+        tl.add(7, 'wf_rows', title='CURSED', sub='NEVER WON A SET TOGETHER', step=1.2, color='#c8245a', rows=[rr(x, '#ff9aa9') for x in worst])
+        tl.add(5, 'wf_say', lines=[{'t': 'PROS ALMOST'}, {'t': 'NEVER', 'big': True}, {'t': 'REPEAT A TRIO'}], note=f"{WF['triosDifferent']} DIFFERENT ONES IN {WF['drafts']} DRAFTS", step=.6)
+        tl.add(6, 'wf_outro', big='YOUR DUO?', line1='COMMENT YOUR', line2='BEST DUO')
+        META = meta('The best DUOS of Worlds 🏆 (and a cursed one)', 'As melhores DUPLAS do Mundial 🏆', 'Los mejores DÚOS del Mundial 🏆', 'DUO terbaik Worlds 🏆', 'Die besten DUOS der Worlds 🏆', "Dünya Finali'nin en iyi İKİLİLERİ 🏆", 'Najlepsze DUETY Worlds 🏆',
+                    f"{W_SRC}. Best: " + ', '.join(f"{nice(x['a']['n'])} + {nice(x['b']['n'])} {x['wins']}-{x['sets'] - x['wins']}" for x in best) + '. Never won: ' + ', '.join(f"{nice(x['a']['n'])} + {nice(x['b']['n'])} 0-{x['sets']}" for x in worst) + '.')
+    elif EP == 'final':
+        fp = {p['name']: p for p in WF['finalPlayers']}
+        navi = [p for p in WF['finalPlayers'] if p['team'] == 'NAVI']; fut = [p for p in WF['finalPlayers'] if p['team'] == 'FUT']
+        tl.add(4, 'wf_intro', lines=['THE WORLDS FINAL', 'NAVI VS FUT', 'SET BY SET'], gold=1, chip='EVERY SET, EVERY PICK', color='#b06a00')
+        tl.add(3, 'wf_say', lines=[{'t': 'NAVI STARTS'}, {'t': '1-0', 'big': True}, {'t': 'UP'}], note='FROM THE UPPER BRACKET', step=.5)
+        for i, x in enumerate(WF['final']):
+            sd = lambda t: {'name': t, 'trio': x['teams'][t], 'win': x['win'] == t, 'score': x['score'].get(t, 0)}
+            tl.add(5, 'wf_set', n=i + 1, a=sd('NAVI'), b=sd('FUT'), mode=MN[x['mode']], map=x['map'], modeKey=x['mode'], total=f"NAVI {x['after']['NAVI']} - {x['after']['FUT']} FUT", color=['#7a3cff', '#2a6ad8', '#169a58', '#c8245a', '#b06a00', '#7a3cff'][i % 6])
+        kd = lambda ps: sum(p['kills'] for p in ps) / max(1, sum(p['deaths'] for p in ps))
+        tl.add(5, 'wf_compare', title='KILLS IN THE FINAL', sub='FUT KILLED MORE AND LOST', color='#e0264f', you={'name': 'FUT', 'v': sum(p['kills'] for p in fut)}, pro={'name': 'NAVI, CHAMPIONS', 'v': sum(p['kills'] for p in navi)}, note="KILLS DON'T WIN")
+        tl.add(6, 'wf_outro', big='NAVI!', line1='DID THE BEST', line2='TEAM WIN?')
+        META = meta('The Worlds final, set by set 🏆 NAVI vs FUT', 'A final do Mundial, set por set 🏆 NAVI x FUT', 'La final del Mundial, set por set 🏆 NAVI vs FUT', 'Final Worlds, set demi set 🏆 NAVI vs FUT', 'Das Worlds-Finale, Satz für Satz 🏆 NAVI vs FUT', 'Dünya Finali, set set 🏆 NAVI - FUT', 'Finał Worlds, set po secie 🏆 NAVI vs FUT',
+                    f"{W_SRC}. NAVI beat FUT 4-3, starting one set up from the upper bracket. FUT had {sum(p['kills'] for p in fut)} kills to NAVI's {sum(p['kills'] for p in navi)}.")
+
+
 # ================================================================ the draw, replayed
 # The giveaway draw as a Short (2026-11-25, owner: "shouldnt you record the
 # drafting?"). Remotion only (src/Draw.tsx). data is what giveaway-draw.ts
@@ -2719,7 +2871,7 @@ if KIND == 'pickrow':
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
               'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo',
-              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw')
+              'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw', 'worlds')
 
 
 # The ending's reason to visit (2026-11-19, owner approved: ~30k Shorts views
@@ -2735,7 +2887,7 @@ HOOKS = [{'lead': 'FREE REWARDS EVERY DAY', 'url': 'brawlzone.net/rewards'},
 ALL_RANK_KINDS = ('everyrank', 'classrank', 'seasonclimb', 'newseason', 'modes', 'stop', 'broken',
                   'higherlower', 'hiddenop', 'wrrace', 'pickrow')
 HOOK_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb', 'newseason',
-              'modes', 'ranks', 'stop', 'broken', 'whatsnew', 'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow')
+              'modes', 'ranks', 'stop', 'broken', 'whatsnew', 'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'worlds')
 
 
 def export_plan(out):
@@ -2840,6 +2992,14 @@ def export_plan(out):
         elif k == 'w_outro' and KIND == 'whatsnew':
             o['faces'] = [save(load_face(b).resize((256, 256), Image.LANCZOS), f"b/{b['id']}-face.png")
                           for b in list(NEWEST) + [b for b, _ in BUFFIES]]
+        elif KIND == 'worlds':
+            def wconv(v, big=False):
+                if isinstance(v, dict) and 'n' in v and 'id' in v: return bz({'n': v['n'], 'id': v['id']}, full=big)
+                if isinstance(v, dict): return {kk: wconv(x, big) for kk, x in v.items()}
+                if isinstance(v, (list, tuple)): return [wconv(x, big) for x in v]
+                return v
+            o.update({kk: wconv(v, k == 'wf_hero') for kk, v in s.items() if kk not in ('kind', 'start', 'len', 'modeKey')})
+            if s.get('modeKey'): o['icon'] = mode_icon(s['modeKey'], A)
         elif KIND == 'bubblepromo':
             o.update(vo={kk: v for kk, v in s['vo'].items() if kk != 'path'}, hits=s.get('hits', []), num=s.get('num', 0))
         elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
@@ -2885,6 +3045,25 @@ def export_plan(out):
         for o in segs:
             if o.get('b'): o['useRank'] = use_rank[int(o['b']['id'])]
         plan.update(total=TOTAL, over=[{**bz(b), 'useRank': use_rank[b['id']]} for b in over[::-1]])
+    if KIND == 'worlds':
+        import sfx
+        plan['rank'] = {'label': 'WORLD FINALS 2026', 'badges': []}
+        cues = []
+        for g in tl.segments:
+            t0, k, ln = g['start'] * tl.step, g['kind'], g['len'] * tl.step
+            if t0: cues.append((max(0, t0 - .16), 'whoosh', .6))
+            if k == 'wf_intro': cues += [(t0 + i * .55 * tl.step, 'impact', .6) for i in range(3)]
+            elif k == 'wf_compare': cues += [(t0 + .5 * tl.step, 'pop', .6), (t0 + 1.5 * tl.step, 'pop', .7), (t0 + 2.5 * tl.step, 'impact', .9)]
+            elif k == 'wf_rows': cues += [(t0 + (.7 + i * g.get('step', .8)) * tl.step, 'ding' if i == len(g['rows']) - 1 else 'pop', .6) for i in range(len(g['rows']))]
+            elif k == 'wf_hero': cues += [(t0 + .5 * tl.step, 'impact', .8), (t0 + (1.4 + len(g['lines']) * .9) * tl.step, 'impact', .8 if g.get('stamp') else 0)]
+            elif k == 'wf_grid': cues += [(t0 + .6 * tl.step + i * max(1.6 / FPS, ln * .75 / len(g['items'])), 'tap', .5) for i in range(len(g['items']))] + [(t0 + ln - 1.7 * tl.step, 'buzz', .8)]
+            elif k == 'wf_bans': cues += [(t0 + (.6 + i * .95) * tl.step, 'pop', .6) for i in range(len(g['rows']))]
+            elif k == 'wf_draft':
+                rv = t0 + ln - 2.6 * tl.step
+                cues += [(rv - 3, 'tap', .7), (rv - 2, 'tap', .8), (rv - 1, 'tap', .9), (rv - 1, 'riser', .7), (rv, 'impact', 1), (rv + .1, 'chime', .7)]
+            elif k == 'wf_set': cues += [(t0 + 2.2 * tl.step, 'impact', .9), (t0 + 2.8 * tl.step, 'pop', .7)]
+            elif k == 'wf_say': cues += [(t0 + i * g.get('step', .8) * tl.step, 'impact', .7) for i in range(len(g['lines']))]
+        sfx.track([c for c in cues if len(c) < 3 or c[2]], tl.dur, f'{out}/sfx.wav')
     if KIND == 'gwdraw':
         import sfx
         pa = prize_art(700)
@@ -3041,7 +3220,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'gwdraw': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
+         'rankedrefresh': rr_scene, 'gwdraw': None, 'worlds': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
          **{k: None for k in NEW_KINDS}}[KIND]
 
 

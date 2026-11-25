@@ -1,0 +1,11 @@
+[Unit]
+Description=BrawlZone: the 17:00 World Finals 2026 Short
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+# A render, an encode, three uploads.
+TimeoutStartSec=3600
+ExecStart=/usr/local/bin/brawlzone-run viral-worlds /usr/local/bin/brawlzone-viral worlds

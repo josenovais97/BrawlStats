@@ -114,8 +114,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, ranktier, higherlower, hiddenop, wrrace, pickrow or gwdraw)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw|worlds) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, ranktier, higherlower, hiddenop, wrrace, pickrow, gwdraw or worlds)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -135,6 +135,14 @@ elif [ "$kind" = gwdraw ]; then
   [ -r "$ROOT/${GWDRAW:-gwdraw.json}" ] || die "::error::no $ROOT/${GWDRAW:-gwdraw.json}: the draw has not been saved"
   [ "$post" = 0 ] || python3 -c 'import json,sys; sys.exit(bool(json.load(open(sys.argv[1])).get("sample")))' "$ROOT/${GWDRAW:-gwdraw.json}" \
     || die "::error::that is a test draw: --no-post only"
+elif [ "$kind" = worlds ]; then
+  # The World Finals 2026 series (2026-11-25): the next episode not out yet, or
+  # WORLDS=<episode>. Its numbers are $ROOT/worlds2026.json, written once from
+  # the players' battle logs; nothing is read from the site or the database.
+  OUT="$PUBLIC/$DAY-worlds${WORLDS:+-$WORLDS}"
+  DATA_IN=/data/worlds2026.json
+  PREV=-
+  [ -r "$ROOT/worlds2026.json" ] || die "::error::no $ROOT/worlds2026.json"
 elif [ "$kind" = daily ]; then
   OUT="$PUBLIC/$DAY-daily"
   DATA_IN=/out/daily.json
@@ -159,7 +167,7 @@ TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
 extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason', 'bubblepromo',
-                        'ranktier', 'higherlower', 'hiddenop', 'wrrace')
+                        'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'worlds')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -210,7 +218,7 @@ if [ "$kind" = wrapped ]; then
     "$SITE/player/${WRAPPED_TAG#\#}/season-story/en" || die "::error::could not fetch the Season Wrapped card for that tag"
 fi
 
-if [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != gwdraw ]; then
+if [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != gwdraw ] && [ "$kind" != worlds ]; then
 
 # ---------------------------------------------------------------- data
 cd "$REPO" || die "::error::no checkout at $REPO"
@@ -408,7 +416,7 @@ if gem and cached_from('/cache/drops/gems.png') != gem:
         print(f"no gem icon: {e}")
 PY
 [ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
-fi  # not newbrawler, daily or gwdraw
+fi  # not newbrawler, daily, gwdraw or worlds
 
 # ---------------------------------------------------------------- render
 # The Remotion look (2026-11-13, owner: "the design is still the same... make
@@ -417,7 +425,7 @@ fi  # not newbrawler, daily or gwdraw
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo ranktier higherlower hiddenop wrrace pickrow gwdraw "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo ranktier higherlower hiddenop wrrace pickrow gwdraw worlds "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1
@@ -433,7 +441,7 @@ motion_ready () {
 }
 motion_draw () { # kind: 0 drawn into $OUT/silent.mp4, 3 nothing to say today, else failed
   rm -rf "$OUT/public" "$OUT/plan.json" "$OUT/silent.mp4"
-  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" -e VOICE="${VOICE:-}" -e VOICE_SPEED="${VOICE_SPEED:-}" \
+  docker run --rm --cpus=1.8 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e TRACK="$TRACK" -e WORLDS="${WORLDS:-}" -e VOICE="${VOICE:-}" -e VOICE_SPEED="${VOICE_SPEED:-}" \
     -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
     "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out --plan" \
     > "$CACHE/make-0.log" 2>&1
@@ -546,7 +554,7 @@ if [ -s "$OUT/voice.wav" ]; then
     graph="$music;[md][v]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]"
   fi
 fi
-if [ ! -s "$OUT/voice.wav" ] && [ -s "$OUT/sfx.wav" ]; then  # sounds, no voice (gwdraw)
+if [ ! -s "$OUT/voice.wav" ] && [ -s "$OUT/sfx.wav" ]; then  # sounds, no voice (gwdraw, worlds)
   audio_in=(-i sfx.wav)
   graph="[1:a]aresample=44100,volume=0.6,afade=t=in:d=0.15,afade=t=out:st=$FADE:d=1.5[m];[2:a]aresample=44100,volume=1.1[s];[m][s]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[a]"
 fi
@@ -609,5 +617,7 @@ if meta.get('used'):
 # itself (make.py fresh_or_exit).
 if meta.get('shown'):
     state.setdefault('last_shown', {})[meta['kind']] = meta['shown']
+if meta.get('worlds'):  # the World Finals episodes already out
+    state.setdefault('worlds', []).append(meta['worlds'])
 json.dump(state, open(path + '.tmp', 'w')); os.replace(path + '.tmp', path)
 PY
