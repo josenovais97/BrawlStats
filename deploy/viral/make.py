@@ -2601,28 +2601,34 @@ if KIND in ('bubblepromo', 'appfilm'):
     if KIND == 'appfilm':
         # Beats of 0.46 s; a scene's cues are its storyboard, read by index in AppFilm.tsx.
         SCRIPT = [
-            ('af_hook', 0, 'This bubble coaches you, inside Brawl Stars.', 'THIS *BUBBLE* COACHES YOU, INSIDE *BRAWL STARS*', 7,
-             [(0, 'riser'), (1.4, 'impact'), (3.2, 'whoosh')]),
-            ('af_tap', 0, 'Tap it in the draft.', 'TAP IT IN THE *DRAFT*', 5,
-             [(0.9, 'tap'), (1.3, 'whoosh')]),
-            ('af_bans', 0, 'See who gets banned on your map, at your rank.', 'SEE WHO GETS *BANNED* ON YOUR MAP, AT *YOUR RANK*', 9,
-             [(0.9, 'pop'), (1.55, 'pop'), (2.2, 'pop'), (2.85, 'pop'), (3.5, 'impact')]),
-            ('af_odds', 0, 'Add the picks, and watch your odds.', 'ADD THE PICKS, AND WATCH *YOUR ODDS*', 10,
-             [(0.8, 'pop'), (1.7, 'pop'), (2.8, 'pop'), (3.7, 'pop'), (5.6, 'impact')]),
-            ('af_counter', 0, "They lock Edgar? Here's who beats him.", "THEY LOCK *EDGAR?* HERE'S WHO *BEATS HIM*", 8,
-             [(0.3, 'impact'), (2.6, 'pop'), (3.3, 'pop'), (4.0, 'pop')]),
-            ('af_score', 0, 'After the game, the whole scoreboard. Kills, deaths and damage.', 'AFTER THE GAME, THE WHOLE *SCOREBOARD.* *KILLS,* DEATHS AND *DAMAGE*', 11,
-             [(0.4, 'chime'), (1.5, 'whoosh'), (6.2, 'ding')]),
-            ('af_season', 0, 'Your season so far, with your K D.', 'YOUR *SEASON* SO FAR, WITH YOUR *K/D*', 8,
-             [(0.2, 'whoosh'), (2.8, 'pop'), (3.8, 'pop')]),
-            ('af_pass', 0, 'Weekly quests unlock new rings.', 'WEEKLY *QUESTS* UNLOCK *NEW RINGS*', 8,
+            ('a2_hook', 0, 'One bubble. Your whole Ranked game.', 'ONE *BUBBLE.* YOUR WHOLE *RANKED* GAME', 7,
+             [(1.0, 'impact'), (4.6, 'whoosh'), (0, 'riser')]),
+            ('a2_tap', 0, 'Tap it in the draft.', 'TAP IT IN THE *DRAFT*', 5,
+             [(1.0, 'tap'), (1.4, 'whoosh')]),
+            ('a2_bans', 0, 'See who gets banned on your map, at your rank.', 'SEE WHO GETS *BANNED* ON YOUR MAP, AT *YOUR RANK*', 8,
+             [(0.5, 'pop'), (1.3, 'pop'), (2.1, 'pop'), (3.1, 'pop'), (4.2, 'impact')]),
+            ('a2_picks', 0, 'And the best picks for your draft.', 'AND THE *BEST PICKS* FOR YOUR DRAFT', 8,
+             [(1.0, 'pop'), (2.0, 'pop'), (3.4, 'impact')]),
+            ('a2_counter', 0, "They lock Edgar? Here's who beats him.", "THEY LOCK *EDGAR?* HERE'S WHO *BEATS HIM*", 7,
+             [(0.3, 'impact'), (2.4, 'pop'), (3.1, 'pop'), (3.8, 'pop')]),
+            ('a2_more', 0, 'Trios. Trophies. Or just ask.', '*TRIOS.* *TROPHIES.* OR JUST *ASK*', 7,
+             [(0.0, 'whoosh'), (1.3, 'whoosh'), (2.9, 'whoosh')]),
+            ('a2_score', 0, 'After the game, everyone\'s kills, deaths and damage.', "AFTER THE GAME, EVERYONE'S *KILLS,* DEATHS AND *DAMAGE*", 9,
+             [(0.4, 'chime'), (1.5, 'whoosh'), (6.0, 'ding')]),
+            ('a2_season', 0, 'Your season, next to others at your rank.', 'YOUR *SEASON,* NEXT TO OTHERS AT *YOUR RANK*', 10,
+             [(0.2, 'whoosh'), (3.2, 'impact'), (4.4, 'pop'), (5.6, 'pop')]),
+            ('a2_brawlers', 0, 'Which brawlers carry you. And a card to share.', 'WHICH *BRAWLERS* CARRY YOU. AND A *CARD* TO SHARE', 9,
+             [(0.2, 'whoosh'), (1.6, 'whoosh'), (5.0, 'impact')]),
+            ('a2_squad', 0, 'Beat your friends, every week.', 'BEAT YOUR *FRIENDS,* EVERY WEEK', 7,
+             [(0.2, 'whoosh'), (2.2, 'pop'), (4.0, 'chime')]),
+            ('a2_pass', 0, 'Weekly quests unlock new rings.', 'WEEKLY *QUESTS* UNLOCK *NEW RINGS*', 7,
              [(0.4, 'pop'), (1.4, 'pop'), (2.4, 'pop'), (3.4, 'pop'), (4.6, 'impact')]),
-            ('af_squad', 0, 'Duel your friends every week.', 'DUEL YOUR *FRIENDS* EVERY WEEK', 7,
-             [(0.3, 'impact'), (1.8, 'pop'), (4.2, 'chime')]),
-            ('af_alerts', 0, 'Widgets, and an alert when a free reward drops.', '*WIDGETS,* AND AN ALERT WHEN A *FREE REWARD* DROPS', 9,
-             [(0.5, 'pop'), (1.0, 'pop'), (1.5, 'pop'), (4.4, 'ding')]),
-            ('af_outro', 0, 'All free. Brawl Zone Bubble, on Google Play.', 'ALL *FREE.* *BRAWLZONE BUBBLE,* ON GOOGLE PLAY', 10,
-             [(0.2, 'impact'), (1.4, 'pop'), (2.8, 'ding')]),
+            ('a2_alerts', 0, 'Widgets, and an alert when a free reward drops.', '*WIDGETS,* AND AN ALERT WHEN A *FREE REWARD* DROPS', 9,
+             [(0.3, 'whoosh'), (3.5, 'ding'), (4.8, 'pop'), (5.7, 'pop')]),
+            ('a2_bento', 0, 'All of it free. In twenty one languages.', 'ALL OF IT *FREE.* IN *21* *LANGUAGES*', 8,
+             [(0.2, 'impact'), (2.6, 'whoosh')]),
+            ('a2_outro', 0, 'Brawl Zone Bubble, on Google Play.', '*BRAWLZONE BUBBLE,* ON GOOGLE PLAY', 8,
+             [(0.2, 'impact'), (1.4, 'pop'), (2.6, 'ding')]),
         ]
     spoken = [f"{NUMS[num] + '.' if num else ''} {said}".strip() for _, num, said, *_ in SCRIPT]
     synth(spoken)
@@ -2640,9 +2646,9 @@ if KIND in ('bubblepromo', 'appfilm'):
                                  de='Diese Bubble hilft dir im ganzen Ranked-Match 🤯 (kostenlos) #Shorts',
                                  tr='Bu balon tüm Aşamalı maçında sana yardım ediyor 🤯 (ücretsiz) #Shorts',
                                  pl='Ta bańka pomaga ci w całej grze rankingowej 🤯 (za darmo) #Shorts')},
-        'description': 'BrawlZone Bubble floats over Brawl Stars: who gets banned on your map at your rank, your draft odds, who '
-                       'beats their pick, and after the game a scoreboard with kills, deaths and damage for all six players. '
-                       'Season cards with your K/D, weekly quests, duels with friends, widgets and free reward alerts. Free, in '
+        'description': 'BrawlZone Bubble floats over Brawl Stars: who gets banned on your map at your rank, the best picks for your '
+                       'draft, who beats theirs, and after the game a scoreboard with kills, deaths and damage for all six players. '
+                       'Your season next to others at your rank, cards to share, weekly quests, friends, widgets and free reward alerts. Free, no ads, in '
                        '21 languages. Search "BrawlZone Bubble" on Google Play \U0001f447\n\n'
                        f'https://play.google.com/store/apps/details?id=net.brawlzone.bubble{FOOTER}\n'
                        '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone #app',
@@ -3241,7 +3247,7 @@ def export_plan(out):
             if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.6))
             for h, name in zip(sg['hits'], sg['sounds']):
                 cues.append((t0 + h * tl.step, name, 0.55 if name in ('tap', 'whoosh') else 0.85))
-            if sg['kind'] in ('bp_outro', 'af_outro'): cues.append((max(0, t0 - 1.0), 'riser', 0.7))
+            if sg['kind'] in ('bp_outro', 'a2_outro'): cues.append((max(0, t0 - 1.0), 'riser', 0.7))
         with wave.open(f'{out}/voice.wav', 'wb') as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(VR); w.writeframes(vo[:int(tl.dur * VR)].tobytes())
         sfx.track(cues, tl.dur, f'{out}/sfx.wav')
@@ -3266,8 +3272,9 @@ def export_plan(out):
             film={
                 'rank': AF['rank'], 'map': AF['map'], 'modeIcon': mode_icon(AF['modeKey'], A), 'shots': shots, 'card': 'c/s/season.jpg',
                 'bans': [{**one(i), 'rate': r} for i, r in AF['bans']],
-                'board': {'allies': [one(i) for i in AF['board']['allies']], 'enemies': [one(i) for i in AF['board']['enemies']], 'mine': one(AF['board']['mine']),
-                          'steps': AF['board']['steps'], 'final': AF['board']['final']},
+                'draft': {'allies': [one(i) for i in AF['draft']['allies']], 'enemies': [one(i) for i in AF['draft']['enemies']],
+                          'picks': [{**one(i, True), 'pct': p} for i, p in AF['draft']['picks']]},
+                'trio': {'faces': [one(i)['face'] for i in AF['trio']['ids']], 'pct': AF['trio']['pct']}, 'cuts': AF.get('cuts', {}), 'burst': AF.get('burst', []), 'ask': AF.get('ask'), 'app': AF.get('app', {}),
                 'counter': {'target': one(AF['counter']['target'], True), 'list': [{**one(i), 'edge': e} for i, e in AF['counter']['list']]},
                 'score': {'win': rv['result'] == 'victory', 'map': rv['mapName'], 'modeIcon': mode_icon(rv['mode'], A), 'rows': rows,
                           'bans': {side: [one(i)['face'] for i in rv['bans'][side]] for side in ('mine', 'theirs')}},
