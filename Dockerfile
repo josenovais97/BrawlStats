@@ -24,7 +24,10 @@ RUN npm i -g npm@11.6.2
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
-RUN npm ci
+# Then prove the image library loads. npm skips an optional package it could
+# not download without failing, and that install was cached and failed every
+# build after it (2026-11-25, @img/sharp-libvips-linux-arm64).
+RUN npm ci && node -e "require('sharp')"
 
 # ---- build ------------------------------------------------------------------
 # From deps rather than base + COPY of node_modules: the copy was a second
