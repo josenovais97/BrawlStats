@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Put the giveaway's winner on brawlzone.net/giveaway (2026-11-25). Only when
+# the owner says so: the winner is emailed first and chooses the name shown.
+#
+#   brawlzone-giveaway-publish "<name to show>" [--no-tag] [--video URL] [--proof FILE]
+#   brawlzone-giveaway-publish --remove
+#
+# Reads the newest proof brawlzone-giveaway-draw kept in /var/lib/brawlzone/
+# giveaway and writes /social/giveaway/result.json: tags and points in the
+# order of the draw, the round, the digest. No emails and no entry codes.
+# Run it again to add the video. --remove takes it all down.
+set -uo pipefail
+DIR=/var/lib/brawlzone/giveaway
+OUT=/var/lib/brawlzone/social/giveaway
+ENV_FILE=/home/ubuntu/brawlstats/.env.production
+die() { echo "::error::$*" >&2; exit 1; }
+
+name= tag=1 video= proof= remove=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --no-tag) tag=0 ;;
+    --video) video=${2:-}; shift ;;
+    --proof) proof=${2:-}; shift ;;
+    --remove) remove=1 ;;
+    *) name=$1 ;;
+  esac
+  shift
+done
+
+if [ "$remove" = 1 ]; then
+  rm -f "$OUT/result.json" && echo "removed"
+else
+  [ -n "$name" ] || die "usage: brawlzone-giveaway-publish \"<name to show>\" [--no-tag] [--video URL] [--proof FILE]"
+  [ -n "$proof" ] || proof=$(ls -t "$DIR"/draw-*.proof.json 2>/dev/null | head -n 1)
+  [ -s "$proof" ] || die "no proof in $DIR: the draw has not been run"
+  mkdir -p "$OUT" && chmod 755 "$OUT" || die "cannot create $OUT"
+  python3 - "$proof" "$OUT/result.json" "$name" "$tag" "$video" <<'PY' || die "the proof does not add up, nothing was published"
+import hashlib, hmac, json, os, sys
+path, out, name, tag, video = sys.argv[1:6]
+p = json.load(open(path))
+rows = [[t['playerTag'], t['entries']] for t in p['tickets']]  # in the order of the draw
+# Redo the draw from what is about to be published: it must give the same winner.
+digest = hashlib.sha256('\n'.join(f'{t}:{n}' for t, n in rows).encode()).hexdigest()
+total = sum(n for _, n in rows)
+point = int.from_bytes(hmac.new(bytes.fromhex(p['drand']['randomness']), digest.encode(), hashlib.sha256).digest()[:6], 'big') % total
+at, winner = 0, None
+for t, n in rows:
+    at += n
+    if point < at:
+        winner = t; break
+if (digest, point, total, winner) != (p['digest'], p['point'], p['total'], p['winner']):
+    sys.exit(1)
+result = {
+    'giveaway': p['giveaway'], 'closedAt': p['closesAt'],
+    'winner': {'name': name, 'tag': winner if tag == '1' else None},
+    'ticket': point + 1, 'tickets': total,
+    'round': p['drand']['round'], 'randomness': p['drand']['randomness'], 'digest': digest, 'video': video or None,
+    'howToCheck': 'digest = sha256 of the lines "tag:points" below, joined with newlines. ticket = 1 + (the first 6 bytes of '
+                  'HMAC-SHA256(key = randomness as bytes, message = digest as text), big endian) modulo tickets. Count that many '
+                  'tickets down the list. randomness is https://api.drand.sh/public/<round>, the first round published at or after closedAt.',
+    'list': rows,
+}
+json.dump(result, open(out + '.tmp', 'w'), ensure_ascii=False)
+os.chmod(out + '.tmp', 0o644); os.replace(out + '.tmp', out)
+print(f'published: {name}, ticket {point + 1} of {total}, {len(rows)} players')
+PY
+fi
+# The pages re-read it within five minutes; this makes it now.
+CRON_SECRET=$(grep -oP '^CRON_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
+curl -s -o /dev/null -w 'revalidate: HTTP %{http_code}\n' --max-time 30 -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://brawlzone.net/api/cron/revalidate-rewards || true

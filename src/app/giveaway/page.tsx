@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Countdown } from '@/components/giveaway/countdown';
+import { GiveawayEnded } from '@/components/giveaway/giveaway-ended';
 import { GiveawayPanel } from '@/components/giveaway/giveaway-panel';
-import { BRAWL_PASS_ART, DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, PRIZE_FALLBACK_ART, isOpen, notOpenYet } from '@/lib/giveaway';
+import { BRAWL_PASS_ART, DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, PRIZE_FALLBACK_ART, hasClosed, isOpen, notOpenYet } from '@/lib/giveaway';
 import { leaderboard } from '@/lib/giveaway-data';
+import { getGiveawayResult } from '@/lib/giveaway-result';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { TIKTOK_PROFILE_URL } from '@/lib/site';
@@ -24,6 +26,14 @@ const INSTAGRAM_URL = 'https://www.instagram.com/brawlzonenet/';
 
 export function generateMetadata(): Metadata {
   const t = getT(requestLocale());
+  if (hasClosed()) {
+    return {
+      alternates: { canonical: '/giveaway' },
+      title: t('Brawl Stars giveaway: the winner'),
+      description: t('Who won the Brawl Pass, the replay of the draw and the full list of tickets.'),
+      ...(GIVEAWAY_PUBLIC ? {} : { robots: { index: false, follow: false } }),
+    };
+  }
   return {
     alternates: { canonical: '/giveaway' },
     title: t('Brawl Stars giveaway: win a €10 gift card for the Brawl Pass'),
@@ -45,6 +55,21 @@ export default async function GiveawayPage() {
   const ends = new Date(GIVEAWAY.closesAt).toLocaleString(DATE_LOCALE[locale], {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
   });
+
+  const follow = (text: string) => (
+    <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">
+      <h2 className="display text-2xl">{t('The winner is revealed in a video')}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted">{text}</p>
+      <div className="mt-5 flex flex-wrap justify-center gap-3">
+        <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#ff0033] px-5 py-3 text-white [--btn-shadow:#a3001f]">YouTube</a>
+        <a href={TIKTOK_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-white px-5 py-3 text-[#10142a] [--btn-shadow:#9aa3c0]">TikTok</a>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#e1306c] px-5 py-3 text-white [--btn-shadow:#8f1c45]">Instagram</a>
+      </div>
+    </section>
+  );
+  if (hasClosed()) {
+    return <GiveawayEnded result={await getGiveawayResult()} follow={follow(t('Follow so you see it the moment it is out.'))} />;
+  }
 
   const top = await leaderboard(10);
   const ways = [
@@ -104,15 +129,7 @@ export default async function GiveawayPage() {
         <p className="text-sm text-muted">{t('Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.')}</p>
       </section>
 
-      <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">
-        <h2 className="display text-2xl">{t('The winner is revealed in a video')}</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('Follow so you see it the moment it is out, and claim your follow points on your entry page above.')}</p>
-        <div className="mt-5 flex flex-wrap justify-center gap-3">
-          <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#ff0033] px-5 py-3 text-white [--btn-shadow:#a3001f]">YouTube</a>
-          <a href={TIKTOK_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-white px-5 py-3 text-[#10142a] [--btn-shadow:#9aa3c0]">TikTok</a>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#e1306c] px-5 py-3 text-white [--btn-shadow:#8f1c45]">Instagram</a>
-        </div>
-      </section>
+      {follow(t('Follow so you see it the moment it is out, and claim your follow points on your entry page above.'))}
 
       <section className="space-y-4">
         <h2 className="display text-2xl">{t('Most points right now')}</h2>

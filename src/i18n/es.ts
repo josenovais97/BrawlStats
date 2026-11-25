@@ -5466,4 +5466,34 @@ export const ES: Record<string, string> = {
     "Hoy en la tienda: {name}",
   "Telegram channel":
     "Canal de Telegram",
+  "{name} won the Brawl Pass!":
+    "¡{name} ganó el Brawl Pass!",
+  "The giveaway has ended":
+    "El sorteo ha terminado",
+  "Ticket {ticket} of {tickets}, out of {n} players.":
+    "Boleto {ticket} de {tickets}, entre {n} jugadores.",
+  "Watch the draw":
+    "Ver el sorteo",
+  "One winner is drawn at random. We email them first, and the name goes up here when they answer.":
+    "El ganador se elige al azar. Primero le escribimos por correo, y su nombre aparece aquí cuando responda.",
+  "How it was drawn":
+    "Cómo se sorteó",
+  "Each point was a ticket, numbered in the order below. Ticket {ticket} was picked with drand round {round}, a public random number that came out after entries closed.":
+    "Cada punto era un boleto, numerado en el orden de abajo. El boleto {ticket} salió con la ronda {round} de drand, un número aleatorio público que se publicó después de cerrar las participaciones.",
+  "See the random number":
+    "Ver el número aleatorio",
+  "Download the list":
+    "Descargar la lista",
+  "All {n} players and their tickets":
+    "Los {n} jugadores y sus boletos",
+  "Free rewards every day":
+    "Recompensas gratis todos los días",
+  "See the rewards":
+    "Ver las recompensas",
+  "Brawl Stars giveaway: the winner":
+    "Sorteo de Brawl Stars: el ganador",
+  "Who won the Brawl Pass, the replay of the draw and the full list of tickets.":
+    "Quién ganó el Brawl Pass, la repetición del sorteo y la lista completa de boletos.",
+  "Follow so you see it the moment it is out.":
+    "Síguenos para verlo en cuanto salga.",
 };

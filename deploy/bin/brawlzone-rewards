@@ -217,4 +217,8 @@ CODES_SLIDE=$(python3 -c 'import json,sys; n=len(json.load(open(sys.argv[1]))); 
 # Telegram channels, when set up (2026-11-24).
 /usr/local/bin/brawlzone-telegram rewards "$OUT/rewards.json" || echo "::warning::Telegram not posted (not fatal)"
 
+# An Instagram Story (2026-11-25, owner). A unit of its own: it draws for a
+# few minutes and must outlive this job without holding up the posts below.
+sudo -n systemctl start --no-block brawlzone-ig-story@new.service || echo "::warning::the Story was not started (not fatal)"
+
 FORCE=1 exec /usr/local/bin/brawlzone-tiktok rewards "$ID"

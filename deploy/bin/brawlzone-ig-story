@@ -9,6 +9,8 @@
 #                     of it if the moving one cannot be drawn
 #   reward     08:40  today's free reward in the Supercell Store; tried again
 #                     later if it was not on the site yet
+#   new        a reward just found: started by brawlzone-rewards once the site
+#              shows it, once for each batch
 #   duel       12:30  two brawlers, which wins more
 #   evening    19:00  by weekday: a roast, hidden gems, brawlers to stop
 #                     picking, or today's puzzle
@@ -129,7 +131,7 @@ fail () {
 
 # ------------------------------------------------------------ the moving ones
 case "$slot" in
-  tiers|reward|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
+  tiers|reward|new|duel|giveaway|roast|gems|traps|guess|telegram) kinds=$slot ;;
   # What the day's is, then what to show if it has nothing to say.
   evening) case "$(date -u +%u)" in
       1|4) kinds="roast gems guess" ;;
@@ -140,9 +142,25 @@ case "$slot" in
   *) die "::error::unknown Story '$slot'" ;;
 esac
 first=${kinds%% *}
+batch= fresh='[]'
+if [ "$first" = new ]; then
+  # The newest batch on the rewards list, if it is from the last three hours.
+  mapfile -t B < <(python3 - <<'PY'
+import datetime, json
+try: items = json.load(open('/var/lib/brawlzone/social/rewards/latest.json'))['items']
+except Exception: items = []
+at = lambda i: datetime.datetime.fromisoformat(i['postedAt'].replace('Z', '+00:00'))
+newest = [i for i in items if i['postedAt'] == max(x['postedAt'] for x in items)] if items else []
+if newest and (datetime.datetime.now(datetime.timezone.utc) - at(newest[0])).total_seconds() < 3 * 3600:
+    print(newest[0]['id']); print(json.dumps([i['name'] for i in newest]))
+PY
+)
+  [ "${#B[@]}" = 2 ] || { echo "new: no reward from the last three hours"; exit 0; }
+  batch=":${B[0]}" fresh=${B[1]}
+fi
 if [ "$post" = 1 ]; then
   for k in $kinds; do
-    posted "$k" && { echo "$k: already posted today"; exit 0; }
+    posted "$k$batch" && { echo "$k: already posted today"; exit 0; }
   done
 fi
 [ -x "$MOTION_APP/node_modules/.bin/remotion" ] || fail "deploy/motion is not installed in $MOTION_APP"
@@ -179,12 +197,12 @@ if [[ " $kinds " == *" guess "* ]]; then
     curl -sf --max-time 60 -A 'BrawlZone story (https://brawlzone.net)' -o "$WORK/zoom-$i.webp" "$SITE/api/brawldle/picture?mode=zoom&step=$i&d=$DAY" || rm -f "$WORK/zoom-$i.webp"
   done
 fi
-python3 - "$WORK" "$DAY" "$snapshot" "$days" "${entrants:-0}" "$manual" <<'PY' || die "::error::could not write the Story's input"
+python3 - "$WORK" "$DAY" "$snapshot" "$days" "${entrants:-0}" "$manual" "$fresh" <<'PY' || die "::error::could not write the Story's input"
 import json, os, sys
-work, day, snap, days, entrants, manual = sys.argv[1:7]
+work, day, snap, days, entrants, manual, fresh = sys.argv[1:8]
 try: daily = json.load(open('/var/lib/brawlzone/social/rewards/daily.json'))
 except (OSError, ValueError): daily = {}
-json.dump({'day': day, 'tiers': '/work/tiers.json', 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
+json.dump({'day': day, 'new': json.loads(fresh), 'tiers': '/work/tiers.json', 'snapshot': f'/history/{snap}', 'daily': daily, 'days': int(days), 'entrants': int(entrants or 0), 'manual': manual == 'true',
            'zooms': [f'/work/zoom-{i}.webp' for i in range(3) if os.path.exists(f'{work}/zoom-{i}.webp')]}, open(f'{work}/in.json', 'w'))
 PY
 
@@ -235,4 +253,4 @@ if [ "$post" = 0 ]; then
   exit 0
 fi
 /usr/local/bin/brawlzone-instagram --story "$OUT/story.mp4" || die "::error::the Story was not published"
-remember "$kind" "$OUT/used.json"
+remember "$kind$batch" "$OUT/used.json"

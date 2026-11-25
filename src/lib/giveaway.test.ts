@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import { createHash, createHmac } from 'node:crypto';
 import { test } from 'node:test';
 
 import { entriesFor, isCode, isOpen, newCode, normaliseEmail, rank } from '@/lib/giveaway';
 import { drawWinner } from '@/lib/giveaway-draw';
+import { parseGiveawayResult } from '@/lib/giveaway-result';
 
 test('points: 1 to enter, +2 for Discord, +1 per friend with no cap', () => {
   assert.deepEqual(entriesFor(false, 0), { base: 1, discord: 0, follows: 0, referrals: 0, total: 1 });
@@ -56,4 +58,39 @@ test('the draw is deterministic, order-proof and weighted by points', () => {
     if (drawWinner(tickets, i.toString(16).padStart(64, '0')).winner.code === 'BBBBBBBB') b++;
   }
   assert.ok(b > 1700 && b < 1900, String(b));
+});
+
+test('the published list is enough to redo the draw', () => {
+  const tickets = [
+    { code: 'CCCCCCCC', playerTag: '#C', entries: 4 },
+    { code: 'AAAAAAAA', playerTag: '#A', entries: 1 },
+    { code: 'BBBBBBBB', playerTag: '#B', entries: 9 },
+  ];
+  const r = '3c'.repeat(32);
+  const drawn = drawWinner(tickets, r);
+  // What a reader has: tags and points, in the order of the draw.
+  const list = [['#A', 1], ['#B', 9], ['#C', 4]] as const;
+  const digest = createHash('sha256').update(list.map(([t, n]) => `${t}:${n}`).join('\n')).digest('hex');
+  const point = createHmac('sha256', Buffer.from(r, 'hex')).update(digest).digest().readUIntBE(0, 6) % 14;
+  let at = 0;
+  const winner = list.find(([, n]) => (at += n) > point)![0];
+  assert.deepEqual({ digest, point, winner }, { digest: drawn.digest, point: drawn.point, winner: drawn.winner.playerTag });
+});
+
+test('a result only shows when the list, the ticket and the winner agree', () => {
+  const good = {
+    giveaway: 'gw1', winner: { name: 'Someone', tag: '#B' }, ticket: 3, tickets: 14, round: 7, randomness: 'ab'.repeat(32), digest: 'cd'.repeat(32),
+    video: 'https://www.youtube.com/shorts/abc', list: [['#A', 1], ['#B', 9], ['#C', 4]],
+  };
+  const ok = parseGiveawayResult(good)!;
+  assert.equal(ok.entrants, 3);
+  assert.equal(ok.winnerRow, 1);
+  assert.deepEqual(ok.list[1], { tag: '#B', points: 9, from: 2, to: 10 });
+  assert.equal(parseGiveawayResult({ ...good, winner: { name: 'Someone', tag: null } })!.winner.tag, null, 'a winner may keep the tag off the page');
+  assert.equal(parseGiveawayResult({ ...good, video: 'javascript:alert(1)' })!.video, null);
+  assert.equal(parseGiveawayResult({ ...good, tickets: 15 }), null, 'the list must add up');
+  assert.equal(parseGiveawayResult({ ...good, ticket: 15 }), null);
+  assert.equal(parseGiveawayResult({ ...good, ticket: 11 }), null, 'the ticket is not that winner\'s');
+  assert.equal(parseGiveawayResult({ ...good, giveaway: 'gw0' }), null);
+  assert.equal(parseGiveawayResult(null), null);
 });

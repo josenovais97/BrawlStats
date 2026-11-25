@@ -24,5 +24,8 @@ export async function POST(req: NextRequest) {
   }
   revalidatePath('/rewards');
   revalidatePath('/[lang]/rewards', 'page');
-  return NextResponse.json({ ok: true, revalidated: ['/rewards', '/[lang]/rewards'] });
+  // The giveaway's result, published the same way (2026-11-25).
+  revalidatePath('/giveaway');
+  revalidatePath('/[lang]/giveaway', 'page');
+  return NextResponse.json({ ok: true, revalidated: ['/rewards', '/[lang]/rewards', '/giveaway', '/[lang]/giveaway'] });
 }

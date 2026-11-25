@@ -5467,4 +5467,34 @@ export const RU: Record<string, string> = {
     "Сегодня в магазине: {name}",
   "Telegram channel":
     "Канал в Telegram",
+  "{name} won the Brawl Pass!":
+    "{name} выигрывает Brawl Pass!",
+  "The giveaway has ended":
+    "Розыгрыш завершён",
+  "Ticket {ticket} of {tickets}, out of {n} players.":
+    "Билет {ticket} из {tickets}. Участников: {n}.",
+  "Watch the draw":
+    "Смотреть розыгрыш",
+  "One winner is drawn at random. We email them first, and the name goes up here when they answer.":
+    "Победитель выбирается случайно. Сначала мы пишем ему на почту, а имя появится здесь, когда он ответит.",
+  "How it was drawn":
+    "Как выбирали победителя",
+  "Each point was a ticket, numbered in the order below. Ticket {ticket} was picked with drand round {round}, a public random number that came out after entries closed.":
+    "Каждое очко было билетом, номера идут в порядке списка ниже. Билет {ticket} выбран по раунду drand {round}: это открытое случайное число, которое вышло после закрытия приёма заявок.",
+  "See the random number":
+    "Посмотреть случайное число",
+  "Download the list":
+    "Скачать список",
+  "All {n} players and their tickets":
+    "Все участники ({n}) и их билеты",
+  "Free rewards every day":
+    "Бесплатные награды каждый день",
+  "See the rewards":
+    "Смотреть награды",
+  "Brawl Stars giveaway: the winner":
+    "Розыгрыш Brawl Stars: победитель",
+  "Who won the Brawl Pass, the replay of the draw and the full list of tickets.":
+    "Кто выиграл Brawl Pass, запись розыгрыша и полный список билетов.",
+  "Follow so you see it the moment it is out.":
+    "Подпишись, чтобы увидеть его сразу.",
 };

@@ -3,6 +3,7 @@
     python plan.py <kind> <in.json> <state.json> <out dir>
 
 kind   reward    today's free reward in the Supercell Store
+       new       a reward that was just found, from data['new'] (names)
        duel      two brawlers, which wins more; the answer after a countdown
        roast     a roast line for a brawler's mains
        gems      three brawlers few pick that win a lot
@@ -93,6 +94,13 @@ if KIND == 'reward':
     d = data['daily']
     if d.get('day') != data['day'] or not d.get('name'): nothing("today's store reward is not known yet")
     plan.update(name=short(d['name']), art=save(reward_art(d['name']), 'c/reward.png'))
+    frames = 225
+    cues = [(0.0, 'impact', .7), (0.4, 'pop', .7), (0.66, 'chime', .8), (1.13, 'impact', .8), (1.87, 'pop', .6), (2.47, 'whoosh', .6), (3.0, 'ding', .6)]
+
+if KIND == 'new':
+    names = [n for n in data.get('new') or [] if n]
+    if not names: nothing('no new reward')
+    plan.update(name=short(names[0]), art=save(reward_art(names[0]), 'c/reward.png'), fresh=True, more=len(names) - 1)
     frames = 225
     cues = [(0.0, 'impact', .7), (0.4, 'pop', .7), (0.66, 'chime', .8), (1.13, 'impact', .8), (1.87, 'pop', .6), (2.47, 'whoosh', .6), (3.0, 'ding', .6)]
 

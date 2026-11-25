@@ -5466,4 +5466,34 @@ export const TR: Record<string, string> = {
     "Bugün mağazada: {name}",
   "Telegram channel":
     "Telegram kanalı",
+  "{name} won the Brawl Pass!":
+    "Brawl Pass'i {name} kazandı!",
+  "The giveaway has ended":
+    "Çekiliş sona erdi",
+  "Ticket {ticket} of {tickets}, out of {n} players.":
+    "{tickets} bilet ve {n} oyuncu arasından {ticket} numaralı bilet.",
+  "Watch the draw":
+    "Çekilişi izle",
+  "One winner is drawn at random. We email them first, and the name goes up here when they answer.":
+    "Kazanan rastgele seçilir. Önce ona e-posta gönderiyoruz, yanıt verince adı burada yayınlanır.",
+  "How it was drawn":
+    "Çekiliş nasıl yapıldı",
+  "Each point was a ticket, numbered in the order below. Ticket {ticket} was picked with drand round {round}, a public random number that came out after entries closed.":
+    "Her puan bir biletti ve aşağıdaki sırayla numaralandı. {ticket} numaralı bilet, katılımlar kapandıktan sonra yayınlanan herkese açık rastgele sayıyla, drand {round}. tur ile seçildi.",
+  "See the random number":
+    "Rastgele sayıyı gör",
+  "Download the list":
+    "Listeyi indir",
+  "All {n} players and their tickets":
+    "{n} oyuncu ve biletleri",
+  "Free rewards every day":
+    "Her gün ücretsiz ödüller",
+  "See the rewards":
+    "Ödülleri gör",
+  "Brawl Stars giveaway: the winner":
+    "Brawl Stars çekilişi: kazanan",
+  "Who won the Brawl Pass, the replay of the draw and the full list of tickets.":
+    "Brawl Pass'i kim kazandı, çekilişin tekrarı ve tüm biletlerin listesi.",
+  "Follow so you see it the moment it is out.":
+    "Çıkar çıkmaz görmek için takip et.",
 };

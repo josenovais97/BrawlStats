@@ -26,8 +26,8 @@ const Reward: React.FC<P> = ({plan, frame, t}) => {
   const bob = 16 * Math.sin(t * 3);
   return (
     <AbsoluteFill>
-      <Backdrop color="#2f8bff" t={t} rays={1} cy={850} />
-      <Title text="TODAY'S FREE" size={130} maxWidth={900} frame={frame} y={345} glow="#0f2a8a" />
+      <Backdrop color={plan.fresh ? '#ff4f9a' : '#2f8bff'} t={t} rays={1} cy={850} />
+      <Title text={plan.fresh ? 'NEW FREE' : "TODAY'S FREE"} size={130} maxWidth={900} frame={frame} y={345} glow="#0f2a8a" />
       <Title text="REWARD" size={210} gold frame={frame} at={12} maxWidth={900} y={520} glow="#0f2a8a" />
       <Halo x={W / 2} y={880} r={520} color="#ffe45a" a={0.85 * clamp((frame - 20) / 8)} />
       <div style={{position: 'absolute', left: W / 2, top: 880 + bob, transform: `translate(-50%,-50%) scale(${pop(frame, 20, 14, 2)}) rotate(${4 * Math.sin(t * 2.2)}deg)`}}>
@@ -36,7 +36,7 @@ const Reward: React.FC<P> = ({plan, frame, t}) => {
       <Burst f={frame - 20} x={W / 2} y={880} />
       <Flare f={frame - 20} y={880} color="#ffe45a" />
       <Title text={plan.name} size={120} maxWidth={920} frame={frame} at={34} y={1175} glow="#0f2a8a" />
-      {frame > 56 && <Chip text="FREE IN THE SUPERCELL STORE" color="#283069" size={48} x={W / 2} y={1285} scale={pop(frame, 56)} />}
+      {frame > 56 && <Chip text={plan.more ? `AND ${plan.more} MORE` : plan.fresh ? "CLAIM IT BEFORE IT'S GONE" : 'FREE IN THE SUPERCELL STORE'} color={plan.fresh ? '#3cc878' : '#283069'} size={48} x={W / 2} y={1285} scale={pop(frame, 56)} />}
       <Ask frame={frame} at={74} url="brawlzone.net/rewards" />
     </AbsoluteFill>
   );
@@ -294,7 +294,7 @@ const Tiers: React.FC<P> = ({plan, frame, t}) => {
   );
 };
 
-const KINDS: Record<string, React.FC<P>> = {reward: Reward, duel: Duel, roast: Roast, gems: List, traps: List, tiers: Tiers, guess: Guess, giveaway: Give, telegram: Telegram};
+const KINDS: Record<string, React.FC<P>> = {reward: Reward, new: Reward, duel: Duel, roast: Roast, gems: List, traps: List, tiers: Tiers, guess: Guess, giveaway: Give, telegram: Telegram};
 export const Story: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const Scene = KINDS[plan.story as string];

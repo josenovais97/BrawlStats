@@ -2727,7 +2727,9 @@ PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyra
 # A different hook each day, each with its own page, so Umami shows which one
 # brings people. Formats with a reason of their own keep theirs: the daily's
 # answer, giveaway, drops, newbrawler, roastmains, wrapped.
-HOOKS = [{'lead': 'GET YOUR ACCOUNT ROASTED', 'url': 'brawlzone.net/roast'},
+# 2026-11-25, owner: the roast ending sent about three people a day to /roast,
+# while /rewards gets 50 to 110 a day, so rewards took its place.
+HOOKS = [{'lead': 'FREE REWARDS EVERY DAY', 'url': 'brawlzone.net/rewards'},
          {'lead': 'SEE WHAT YOUR ACCOUNT IS WORTH', 'url': 'brawlzone.net/account-value'}]
 # The lists built from every rank's Ranked games, labelled so (2026-11-23).
 ALL_RANK_KINDS = ('everyrank', 'classrank', 'seasonclimb', 'newseason', 'modes', 'stop', 'broken',

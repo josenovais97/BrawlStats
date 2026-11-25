@@ -16,12 +16,18 @@ export interface Ticket {
  * Tickets are sorted by code so the list's order cannot be chosen; the HMAC
  * of the list digest under the beacon value picks a point on the line of all
  * entries, so a ticket with 5 entries is 5 times as likely as one with 1.
+ *
+ * The digest covers what gets published, tags and points in that order
+ * (2026-11-25), so anyone with the list can redo all of it: sha256 of the
+ * "tag:points" lines, HMAC-SHA256 of that under the randomness, the first six
+ * bytes modulo the number of tickets. Codes stay private: they are people's
+ * entry pages.
  */
 export function drawWinner(tickets: Ticket[], randomnessHex: string): { winner: Ticket; digest: string; point: number; total: number } {
   if (!tickets.length) throw new Error('no tickets');
   const sorted = [...tickets].sort((a, b) => a.code.localeCompare(b.code));
   const digest = createHash('sha256')
-    .update(sorted.map((t) => `${t.code}:${t.playerTag}:${t.entries}`).join('\n'))
+    .update(sorted.map((t) => `${t.playerTag}:${t.entries}`).join('\n'))
     .digest('hex');
   const total = sorted.reduce((s, t) => s + t.entries, 0);
   const mac = createHmac('sha256', Buffer.from(randomnessHex, 'hex')).update(digest).digest();
