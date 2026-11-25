@@ -90,7 +90,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}, 'newseason': {'hold': 1.2},
-          'bubblepromo': {'pace': 2}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0},
+          'bubblepromo': {'pace': 2}, 'appfilm': {'hold': 1.0}, 'higherlower': {'pace': 2}, 'pickrow': {'pace': 2}, 'wrrace': {'hold': 1.0},
           'gwdraw': {'pace': 2}, 'worlds': {'pace': 2}, 'numbers': {'pace': 2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
@@ -2436,10 +2436,18 @@ def rr_scene(s, t, bt, lt):
 # the settings demo on a made-up mid account); the native parts (bubble,
 # settings, My season, friends, widgets, alerts, break card) are drawn from
 # the app's own layouts and strings.
-if KIND == 'bubblepromo':
+# appfilm (2026-11-25, owner: "new footage on the new app... a really nice
+# video and professional"): the same voice and sounds under a new picture
+# (src/AppFilm.tsx), one Ranked game from the draft to the recap. Its footage
+# and numbers are the site's own answers, saved in $ASSETS/app-film by
+# app-film-capture.js and film.json; a one-off too.
+if KIND in ('bubblepromo', 'appfilm'):
     BP = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
     if not all(os.path.exists(f'{BP}/{f}') for f in ('v3/meta.jpg', 'v3/review.jpg', 'nunito.woff2', 'map-15000026.png')):
         print('no panel captures in', BP); sys.exit(5)
+    AFD = f"{os.environ.get('ASSETS', '.')}/app-film"
+    if KIND == 'appfilm' and not os.path.exists(f'{AFD}/film.json'):
+        print('no film data in', AFD); sys.exit(5)
     _top = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
     BP_ME = by_id.get(16000000) or _top[8]  # Shelly: the brawler everyone has
     BP_TOP = [b for b in _top if b['id'] != BP_ME['id']]
@@ -2590,6 +2598,32 @@ if KIND == 'bubblepromo':
         ('bp_outro', 0, "All free. Search Brawl Zone Bubble on Google Play.", "ALL *FREE*: SEARCH *BRAWLZONE BUBBLE*", 4,
          [(0, 'impact'), (1.2, 'pop'), (2.0, 'tap'), (3.2, 'pop')]),
     ]
+    if KIND == 'appfilm':
+        # Beats of 0.46 s; a scene's cues are its storyboard, read by index in AppFilm.tsx.
+        SCRIPT = [
+            ('af_hook', 0, 'This bubble coaches you, inside Brawl Stars.', 'THIS *BUBBLE* COACHES YOU, INSIDE *BRAWL STARS*', 7,
+             [(0, 'riser'), (1.4, 'impact'), (3.2, 'whoosh')]),
+            ('af_tap', 0, 'Tap it in the draft.', 'TAP IT IN THE *DRAFT*', 5,
+             [(0.9, 'tap'), (1.3, 'whoosh')]),
+            ('af_bans', 0, 'See who gets banned on your map, at your rank.', 'SEE WHO GETS *BANNED* ON YOUR MAP, AT *YOUR RANK*', 9,
+             [(0.9, 'pop'), (1.55, 'pop'), (2.2, 'pop'), (2.85, 'pop'), (3.5, 'impact')]),
+            ('af_odds', 0, 'Add the picks, and watch your odds.', 'ADD THE PICKS, AND WATCH *YOUR ODDS*', 10,
+             [(0.8, 'pop'), (1.7, 'pop'), (2.8, 'pop'), (3.7, 'pop'), (5.6, 'impact')]),
+            ('af_counter', 0, "They lock Edgar? Here's who beats him.", "THEY LOCK *EDGAR?* HERE'S WHO *BEATS HIM*", 8,
+             [(0.3, 'impact'), (2.6, 'pop'), (3.3, 'pop'), (4.0, 'pop')]),
+            ('af_score', 0, 'After the game, the whole scoreboard. Kills, deaths and damage.', 'AFTER THE GAME, THE WHOLE *SCOREBOARD.* *KILLS,* DEATHS AND *DAMAGE*', 11,
+             [(0.4, 'chime'), (1.5, 'whoosh'), (6.2, 'ding')]),
+            ('af_season', 0, 'Your season so far, with your K D.', 'YOUR *SEASON* SO FAR, WITH YOUR *K/D*', 8,
+             [(0.2, 'whoosh'), (2.8, 'pop'), (3.8, 'pop')]),
+            ('af_pass', 0, 'Weekly quests unlock new rings.', 'WEEKLY *QUESTS* UNLOCK *NEW RINGS*', 8,
+             [(0.4, 'pop'), (1.4, 'pop'), (2.4, 'pop'), (3.4, 'pop'), (4.6, 'impact')]),
+            ('af_squad', 0, 'Duel your friends every week.', 'DUEL YOUR *FRIENDS* EVERY WEEK', 7,
+             [(0.3, 'impact'), (1.8, 'pop'), (4.2, 'chime')]),
+            ('af_alerts', 0, 'Widgets, and an alert when a free reward drops.', '*WIDGETS,* AND AN ALERT WHEN A *FREE REWARD* DROPS', 9,
+             [(0.5, 'pop'), (1.0, 'pop'), (1.5, 'pop'), (4.4, 'ding')]),
+            ('af_outro', 0, 'All free. Brawl Zone Bubble, on Google Play.', 'ALL *FREE.* *BRAWLZONE BUBBLE,* ON GOOGLE PLAY', 10,
+             [(0.2, 'impact'), (1.4, 'pop'), (2.8, 'ding')]),
+        ]
     spoken = [f"{NUMS[num] + '.' if num else ''} {said}".strip() for _, num, said, *_ in SCRIPT]
     synth(spoken)
     for (kind, num, said, caption, least, cues), line in zip(SCRIPT, spoken):
@@ -2599,6 +2633,20 @@ if KIND == 'bubblepromo':
         tl.add(beats, kind, vo={'path': path, 'dur': round(dur, 3), 'chunks': chunks(caption, line, path, dur, lead)},
                hits=[h for h, _ in cues], sounds=[n for _, n in cues], num=num)
     META = {
+        'title': 'This bubble helps your whole Ranked game 🤯 (free app) #Shorts',
+        'titles': {'pt-BR': 'Esta bolha te ajuda na partida inteira do Ranqueado 🤯 (app grátis) #Shorts',
+                   'es-419': 'Esta burbuja te ayuda en toda tu partida de Competitivo 🤯 (app gratis) #Shorts',
+                   **more_titles(id='Gelembung ini membantumu di seluruh pertandingan Ranked 🤯 (gratis) #Shorts',
+                                 de='Diese Bubble hilft dir im ganzen Ranked-Match 🤯 (kostenlos) #Shorts',
+                                 tr='Bu balon tüm Aşamalı maçında sana yardım ediyor 🤯 (ücretsiz) #Shorts',
+                                 pl='Ta bańka pomaga ci w całej grze rankingowej 🤯 (za darmo) #Shorts')},
+        'description': 'BrawlZone Bubble floats over Brawl Stars: who gets banned on your map at your rank, your draft odds, who '
+                       'beats their pick, and after the game a scoreboard with kills, deaths and damage for all six players. '
+                       'Season cards with your K/D, weekly quests, duels with friends, widgets and free reward alerts. Free, in '
+                       '21 languages. Search "BrawlZone Bubble" on Google Play \U0001f447\n\n'
+                       f'https://play.google.com/store/apps/details?id=net.brawlzone.bubble{FOOTER}\n'
+                       '#brawlstars #brawlstarsranked #brawlstarstips #brawlzone #app',
+    } if KIND == 'appfilm' else {
         'title': 'This app coaches you INSIDE Brawl Stars 🤯 (free) #Shorts',
         'titles': {'pt-BR': 'Esse app te treina DENTRO do Brawl Stars 🤯 (grátis) #Shorts',
                    'es-419': 'Esta app te entrena DENTRO de Brawl Stars 🤯 (gratis) #Shorts',
@@ -2932,7 +2980,7 @@ if KIND == 'pickrow':
 # render paths can never disagree on content.
 PLAN_KINDS = ('quiz', 'shadowquiz', 'zoomquiz', 'skinquiz', 'iconquiz', 'everyrank', 'classrank', 'seasonclimb',
               'modes', 'ranks', 'stop', 'giveaway', 'drops', 'wrapped', 'roastmains',
-              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo',
+              'daily', 'broken', 'newbrawler', 'whatsnew', 'newseason', 'bubblepromo', 'appfilm',
               'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'pickrow', 'gwdraw', 'worlds', 'numbers')
 
 
@@ -3062,7 +3110,7 @@ def export_plan(out):
                 return v
             o.update({kk: wconv(v, k == 'wf_hero') for kk, v in s.items() if kk not in ('kind', 'start', 'len', 'modeKey')})
             if s.get('modeKey'): o['icon'] = mode_icon(s['modeKey'], A)
-        elif KIND == 'bubblepromo':
+        elif KIND in ('bubblepromo', 'appfilm'):
             o.update(vo={kk: v for kk, v in s['vo'].items() if kk != 'path'}, hits=s.get('hits', []), num=s.get('num', 0))
         elif k not in ('q_intro', 'q', 'q_outro', 'c_intro', 'c_outro'):
             o.update({kk: conv(v) for kk, v in s.items() if kk not in ('kind', 'start', 'len')})
@@ -3177,7 +3225,7 @@ def export_plan(out):
         plan.update(nb={'name': NAME, 'plain': R['name'], 'tier': R['tier'], 'rank': R['rank'], 'of': R['of'], 'battles': R['battles'],
                         'tags': [x.upper() for x in (R.get('rarity'), R.get('class')) if x], 'verdict': word, 'vcol': hexc(vcol)},
                     hero=save(HERO, 'c/hero.png'), mystery=save(MYSTERY, 'c/mystery.png'))
-    if KIND == 'bubblepromo':
+    if KIND in ('bubblepromo', 'appfilm'):
         # The voice and the sound effects as two WAVs next to the plan; the
         # job lays them with the music (the music ducks under the voice).
         import numpy as np, sfx
@@ -3193,10 +3241,40 @@ def export_plan(out):
             if sg['start'] > 0: cues.append((max(0, t0 - 0.16), 'whoosh', 0.6))
             for h, name in zip(sg['hits'], sg['sounds']):
                 cues.append((t0 + h * tl.step, name, 0.55 if name in ('tap', 'whoosh') else 0.85))
-            if sg['kind'] == 'bp_outro': cues.append((max(0, t0 - 1.0), 'riser', 0.7))
+            if sg['kind'] in ('bp_outro', 'af_outro'): cues.append((max(0, t0 - 1.0), 'riser', 0.7))
         with wave.open(f'{out}/voice.wav', 'wb') as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(VR); w.writeframes(vo[:int(tl.dur * VR)].tobytes())
         sfx.track(cues, tl.dur, f'{out}/sfx.wav')
+    if KIND == 'appfilm':
+        import shutil
+        AF = json.load(open(f'{AFD}/film.json'))
+        os.makedirs(f'{A}/c/s', exist_ok=True)
+        shots = {}
+        for f in sorted(os.listdir(AFD)):
+            if f.endswith('.jpg'):
+                shutil.copy(f'{AFD}/{f}', f'{A}/c/s/{f}'); shots[f[:-4]] = f'c/s/{f}'
+        RKA = f"{os.environ.get('ASSETS', '.')}/ranked"
+        cp = lambda src, rel: save(Image.open(src).convert('RGBA'), rel)
+        one = lambda i, full=False: bz(by_id[int(i)], full=full)
+        rv = AF['review']
+        rows = [{**one(p['id']), 'side': side, 'you': bool(p.get('you')), 'star': bool(p.get('star')),
+                 'k': p['s']['k'], 'd': p['s']['d'], 'dmg': p['s']['dmg']} for side in ('mine', 'theirs') for p in rv[side]]
+        plan.update(
+            map=cp(f'{BP}/map-15000026.png', 'c/map.png'),
+            leagues={k: cp(f'{RKA}/league-{k}.png', f'c/league-{k}.png') for k in ('mythic', 'legendary', 'masters') if os.path.exists(f'{RKA}/league-{k}.png')},
+            me=one(AF['me'], True), blue=[one(i, True) for i in AF['blue']], red=[one(i, True) for i in AF['red']],
+            film={
+                'rank': AF['rank'], 'map': AF['map'], 'modeIcon': mode_icon(AF['modeKey'], A), 'shots': shots, 'card': 'c/s/season.jpg',
+                'bans': [{**one(i), 'rate': r} for i, r in AF['bans']],
+                'board': {'allies': [one(i) for i in AF['board']['allies']], 'enemies': [one(i) for i in AF['board']['enemies']], 'mine': one(AF['board']['mine']),
+                          'steps': AF['board']['steps'], 'final': AF['board']['final']},
+                'counter': {'target': one(AF['counter']['target'], True), 'list': [{**one(i), 'edge': e} for i, e in AF['counter']['list']]},
+                'score': {'win': rv['result'] == 'victory', 'map': rv['mapName'], 'modeIcon': mode_icon(rv['mode'], A), 'rows': rows,
+                          'bans': {side: [one(i)['face'] for i in rv['bans'][side]] for side in ('mine', 'theirs')}},
+                'season': AF['season'], 'reward': AF['reward'], 'rival': one(AF['rival']), 'top': one(AF['top']),
+                'orbit': [one(i)['face'] for i in AF['orbit']],
+            })
+    if KIND == 'bubblepromo':
         BPA = f"{os.environ.get('ASSETS', '.')}/bubble-promo"
         # The panel as the app shows it, captured headless (v3/: every state
         # the video taps through, JPEG at 2.5x), copied as they are.
@@ -3283,7 +3361,7 @@ SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, '
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
-         'rankedrefresh': rr_scene, 'gwdraw': None, 'worlds': None, 'numbers': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None,
+         'rankedrefresh': rr_scene, 'gwdraw': None, 'worlds': None, 'numbers': None, 'wrapped': None, 'roastmains': None, 'newseason': None, 'bubblepromo': None, 'appfilm': None,
          **{k: None for k in NEW_KINDS}}[KIND]
 
 

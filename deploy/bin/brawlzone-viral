@@ -116,8 +116,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw|worlds|numbers) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, ranktier, higherlower, hiddenop, wrrace, pickrow, gwdraw, worlds or numbers)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh|seasonclimb|wrapped|roastmains|newseason|bubblepromo|appfilm|ranktier|higherlower|hiddenop|wrrace|pickrow|gwdraw|worlds|numbers) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew, rankedrefresh, seasonclimb, wrapped, roastmains, newseason, bubblepromo, appfilm, ranktier, higherlower, hiddenop, wrrace, pickrow, gwdraw, worlds or numbers)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -171,7 +171,7 @@ elif [ "$kind" = daily ]; then
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
      || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
      || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ] || [ "$kind" = seasonclimb ] || [ "$kind" = wrapped ] || [ "$kind" = roastmains ] \
-     || [ "$kind" = newseason ] || [ "$kind" = bubblepromo ] || [ "$kind" = ranktier ] || [ "$kind" = higherlower ] \
+     || [ "$kind" = newseason ] || [ "$kind" = bubblepromo ] || [ "$kind" = appfilm ] || [ "$kind" = ranktier ] || [ "$kind" = higherlower ] \
      || [ "$kind" = hiddenop ] || [ "$kind" = wrrace ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
@@ -187,7 +187,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason', 'bubblepromo',
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh', 'seasonclimb', 'wrapped', 'roastmains', 'newseason', 'bubblepromo', 'appfilm',
                         'ranktier', 'higherlower', 'hiddenop', 'wrrace', 'worlds', 'numbers')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
@@ -446,7 +446,7 @@ fi  # not newbrawler, daily, gwdraw, worlds or numbers
 # it does for the Pillow frames (picks, clues, timeline) and Remotion only
 # draws it. Anything failing on that side falls back to the Pillow frames, so
 # a broken render never costs a post.
-MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo ranktier higherlower hiddenop wrrace pickrow gwdraw worlds numbers "
+MOTION_KINDS=" quiz shadowquiz zoomquiz skinquiz iconquiz everyrank classrank seasonclimb modes ranks stop giveaway drops wrapped roastmains daily broken whatsnew newbrawler newseason bubblepromo appfilm ranktier higherlower hiddenop wrrace pickrow gwdraw worlds numbers "
 SHELL_BIN="$MOTION_APP/node_modules/.remotion/chrome-headless-shell/linux-arm64/chrome-headless-shell-linux-arm64/headless_shell"
 motion_ready () {
   [ -e "$ROOT/motion-on" ] || return 1

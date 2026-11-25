@@ -13,6 +13,7 @@ import {NewBrawler} from './NewBrawler';
 import {WhatsNew} from './WhatsNew';
 import {Story} from './Story';
 import {Weekly} from './Weekly';
+import {AppFilm} from './AppFilm';
 import {BubblePromo} from './BubblePromo';
 import {HiddenOp, HigherLower, PickRow, RankTier, WinRace} from './Arena';
 import {Plan, loadFonts} from './theme';
@@ -38,6 +39,7 @@ export const Root: React.FC = () => (
     <Composition id="Worlds" component={Worlds} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Daily" component={Daily} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="BubblePromo" component={BubblePromo} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
+    <Composition id="AppFilm" component={AppFilm} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="Weekly" component={Weekly} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="WhatsNew" component={WhatsNew} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
     <Composition id="NewBrawler" component={NewBrawler} width={1080} height={1920} fps={30} durationInFrames={30} defaultProps={{plan: empty}} calculateMetadata={meta} />
