@@ -235,6 +235,17 @@ const es: UiStrings = {
   "draft.chanceLabel": "de victoria",
   "review.nextTime": "La próxima vez en {map}",
   "review.yourPickHere": "{name} aquí: mapa {n} %, n.º {rank} de {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Eliminaciones",
+  'stat.deaths': "Muertes",
+  'stat.damage': "Daño",
+  'stat.healing': "Curación",
+  'review.scoreboard': "Marcador",
+  'review.bans': "Bloqueos",
+  'meta.bannedIn': "bloqueado en el {n} % de las partidas",
+  'draft.mostBanned': "Los más bloqueados aquí",
+  'draft.leftOpen': "Fuertes y poco bloqueados",
+  'meta.banRates': "Ordenados por cuántas veces se bloquean aquí. El porcentaje de victorias es cuando no se bloquean.",
 };
 
 export default es;

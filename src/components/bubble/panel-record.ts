@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
+import { NO_COMBAT, addGame, combatFromLog, type CombatTotals } from '@/lib/combat';
+import type { BSBattleLogEntry } from '@/types/brawlstars';
+
 /** The Ranked season line at the top of the panel. */
 export interface PanelSeason {
   number: number;
@@ -46,6 +49,8 @@ export interface RecentForm {
   streak: number;
   /** Wins and losses per game mode (the API's key, e.g. "gemGrab"), most played first. */
   byMode: { mode: string; wins: number; losses: number }[];
+  /** Kills, deaths and damage over the games that carry them (2026-11-25). */
+  combat: CombatTotals;
 }
 
 /*
@@ -91,7 +96,7 @@ type LogEntry = {
 
 function formOf(items: LogEntry[], tag: string): RecentForm {
   const own = `#${tag.replace(/^#/, '').toUpperCase()}`;
-  const form: RecentForm = { games: 0, wins: 0, losses: 0, stars: 0, streak: 0, byMode: [] };
+  const form: RecentForm = { games: 0, wins: 0, losses: 0, stars: 0, streak: 0, byMode: [], combat: NO_COMBAT };
   const modes = new Map<string, { mode: string; wins: number; losses: number }>();
   let streakOpen = true;
   for (const entry of items) {
@@ -102,6 +107,8 @@ function formOf(items: LogEntry[], tag: string): RecentForm {
     if (result === 'victory') form.wins += 1;
     else form.losses += 1;
     if (entry.battle?.starPlayer?.tag?.toUpperCase() === own) form.stars += 1;
+    const fought = combatFromLog(entry as unknown as BSBattleLogEntry, tag);
+    if (fought) form.combat = addGame(form.combat, fought);
     const mode = entry.event?.mode ?? entry.battle?.mode;
     if (mode) {
       const m = modes.get(mode) ?? { mode, wins: 0, losses: 0 };

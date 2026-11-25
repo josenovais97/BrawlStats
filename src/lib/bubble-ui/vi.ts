@@ -230,6 +230,17 @@ const vi: UiStrings = {
   "draft.chanceLabel": "thắng",
   "review.nextTime": "Lần sau ở {map}",
   "review.yourPickHere": "{name} ở đây: bản đồ {n}%, hạng {rank}/{count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Hạ gục",
+  'stat.deaths': "Bị hạ",
+  'stat.damage': "Sát thương",
+  'stat.healing': "Hồi máu",
+  'review.scoreboard': "Bảng điểm",
+  'review.bans': "Lượt cấm",
+  'meta.bannedIn': "bị cấm trong {n}% trận",
+  'draft.mostBanned': "Bị cấm nhiều nhất ở đây",
+  'draft.leftOpen': "Mạnh mà ít bị cấm",
+  'meta.banRates': "Xếp theo tần suất bị cấm ở đây. Tỉ lệ thắng là khi không bị cấm.",
 };
 
 export default vi;

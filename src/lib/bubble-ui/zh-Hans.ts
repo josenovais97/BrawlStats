@@ -230,6 +230,17 @@ const zhHans: UiStrings = {
   "draft.chanceLabel": "胜率",
   "review.nextTime": "下次在{map}",
   "review.yourPickHere": "{name}在这里：地图 {n}%，{count} 个中排第 {rank}",
+  'stat.kd': "K/D",
+  'stat.kills': "击杀",
+  'stat.deaths': "死亡",
+  'stat.damage': "伤害",
+  'stat.healing': "治疗",
+  'review.scoreboard': "战绩",
+  'review.bans': "禁用",
+  'meta.bannedIn': "{n}%的对局中被禁用",
+  'draft.mostBanned': "此处最常被禁用",
+  'draft.leftOpen': "强力但很少被禁",
+  'meta.banRates': "按在这里被禁用的频率排序。胜率为未被禁用时的数据。",
 };
 
 export default zhHans;

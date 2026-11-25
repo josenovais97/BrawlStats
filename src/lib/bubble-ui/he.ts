@@ -230,6 +230,17 @@ const he: UiStrings = {
   "draft.chanceLabel": "לניצחון",
   "review.nextTime": "בפעם הבאה ב-{map}",
   "review.yourPickHere": "{name} כאן: מפה {n}%, מקום {rank} מתוך {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "חיסולים",
+  'stat.deaths': "מיתות",
+  'stat.damage': "נזק",
+  'stat.healing': "ריפוי",
+  'review.scoreboard': "לוח תוצאות",
+  'review.bans': "פסילות",
+  'meta.bannedIn': "נפסל ב-{n}% מהמשחקים",
+  'draft.mostBanned': "הכי נפסלים כאן",
+  'draft.leftOpen': "חזקים שכמעט לא נפסלים",
+  'meta.banRates': "מסודר לפי כמה פעמים נפסל כאן. אחוז הניצחון הוא כשהוא לא נפסל.",
 };
 
 export default he;

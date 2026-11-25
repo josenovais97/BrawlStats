@@ -230,6 +230,17 @@ const id: UiStrings = {
   "draft.chanceLabel": "peluang menang",
   "review.nextTime": "Lain kali di {map}",
   "review.yourPickHere": "{name} di sini: peta {n}%, #{rank} dari {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Kill",
+  'stat.deaths': "Mati",
+  'stat.damage': "Damage",
+  'stat.healing': "Pemulihan",
+  'review.scoreboard': "Papan skor",
+  'review.bans': "Blokir",
+  'meta.bannedIn': "diblokir di {n}% pertandingan",
+  'draft.mostBanned': "Paling sering diblokir di sini",
+  'draft.leftOpen': "Kuat, jarang diblokir",
+  'meta.banRates': "Diurutkan dari yang paling sering diblokir di sini. Persentase menang dihitung saat ia lolos.",
 };
 
 export default id;

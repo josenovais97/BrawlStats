@@ -17,6 +17,7 @@ import { PanelHistory } from '@/components/bubble/panel-history';
 import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
 import { BarChart3, Check, ChevronDown, History, LayoutGrid, MoreVertical, Search, Shield, Sparkles, Trophy, Users, X } from 'lucide-react';
 import { PanelAsk } from '@/components/bubble/panel-ask';
+import { MIN_COMBAT_GAMES, combatRates } from '@/lib/combat';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 import { usePanelTheme } from '@/components/bubble/panel-theme';
@@ -181,6 +182,7 @@ export function PanelShell({
   const account = useBubbleAccount();
   const { t, lang, name } = usePanelI18n();
   const { record, form } = useSinceTagRecord(account.tag);
+  const combat = form && form.combat.games >= MIN_COMBAT_GAMES ? combatRates(form.combat) : null;
   // The player card opens a small drawer: rank progress and form by mode.
   const [cardOpen, setCardOpen] = useState(false);
   // The ⋯ menu (1.43): season line, History and the language.
@@ -336,6 +338,11 @@ export function PanelShell({
                   <X className="size-3 shrink-0 text-defeat" aria-hidden />
                   <span className="font-bold tabular-nums text-defeat">{form.losses}</span>
                   <span className="shrink-0 font-bold tabular-nums text-foreground">· {Math.round((form.wins / form.games) * 100)}%</span>
+                  {combat ? (
+                    <span className="shrink-0 font-bold tabular-nums text-foreground">
+                      · <span className={combat.kd >= 1 ? 'text-victory' : 'text-defeat'}>{combat.kd.toFixed(2)}</span> {t('stat.kd')}
+                    </span>
+                  ) : null}
                   {form.stars > 0 ? (
                     <span className="shrink-0 font-bold tabular-nums text-brand" title={t('record.starTitle', { n: form.stars, g: form.games })}>
                       · ★{form.stars}
@@ -429,6 +436,24 @@ export function PanelShell({
                 </span>
               ) : null}
             </div>
+          ) : null}
+          {/* Kills, deaths and damage over those games (2026-11-25). */}
+          {combat ? (
+            <ul className="flex flex-wrap gap-1">
+              {(
+                [
+                  [t('stat.kd'), combat.kd.toFixed(2)],
+                  [t('stat.kills'), combat.kills.toFixed(1)],
+                  [t('stat.deaths'), combat.deaths.toFixed(1)],
+                  [t('stat.damage'), Math.round(combat.damage).toLocaleString(lang) + '/s'],
+                ] as const
+              ).map(([label, value]) => (
+                <li key={label} className="inline-flex items-center gap-1 rounded-md bg-surface-2/70 px-1.5 py-0.5">
+                  <span className="text-muted">{label}</span>
+                  <span className="font-bold tabular-nums text-foreground">{value}</span>
+                </li>
+              ))}
+            </ul>
           ) : null}
           {form && form.byMode.length > 0 ? (
             <ul className="flex flex-wrap gap-1">

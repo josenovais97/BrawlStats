@@ -230,6 +230,17 @@ const zhHant: UiStrings = {
   "draft.chanceLabel": "勝率",
   "review.nextTime": "下次在{map}",
   "review.yourPickHere": "{name}在這裡：地圖 {n}%，{count} 個中排第 {rank}",
+  'stat.kd': "K/D",
+  'stat.kills': "擊殺",
+  'stat.deaths': "死亡",
+  'stat.damage': "傷害",
+  'stat.healing': "治療",
+  'review.scoreboard': "戰績",
+  'review.bans': "禁用",
+  'meta.bannedIn': "{n}%的對局中被禁用",
+  'draft.mostBanned': "此處最常被禁用",
+  'draft.leftOpen': "強力但很少被禁",
+  'meta.banRates': "依在這裡被禁用的頻率排序。勝率為未被禁用時的數據。",
 };
 
 export default zhHant;

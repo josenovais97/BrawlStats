@@ -230,6 +230,17 @@ const fi: UiStrings = {
   "draft.chanceLabel": "voittoon",
   "review.nextTime": "Ensi kerralla kartalla {map}",
   "review.yourPickHere": "{name} täällä: kartta {n} %, sija {rank}/{count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Tapot",
+  'stat.deaths': "Kuolemat",
+  'stat.damage': "Vahinko",
+  'stat.healing': "Parannus",
+  'review.scoreboard': "Tulostaulu",
+  'review.bans': "Estot",
+  'meta.bannedIn': "estetty {n} %:ssa peleistä",
+  'draft.mostBanned': "Täällä eniten estetyt",
+  'draft.leftOpen': "Vahvat, harvoin estetyt",
+  'meta.banRates': "Järjestetty sen mukaan, kuinka usein ne täällä estetään. Voittoprosentti on peleistä, joissa ei estetty.",
 };
 
 export default fi;

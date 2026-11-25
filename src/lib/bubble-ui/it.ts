@@ -230,6 +230,17 @@ const it: UiStrings = {
   "draft.chanceLabel": "di vittoria",
   "review.nextTime": "La prossima volta su {map}",
   "review.yourPickHere": "{name} qui: mappa {n}%, {rank}° su {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Uccisioni",
+  'stat.deaths': "Morti",
+  'stat.damage': "Danni",
+  'stat.healing': "Cure",
+  'review.scoreboard': "Tabellone",
+  'review.bans': "Ban",
+  'meta.bannedIn': "bannato nel {n}% delle partite",
+  'draft.mostBanned': "I più bannati qui",
+  'draft.leftOpen': "Forti, raramente bannati",
+  'meta.banRates': "In ordine di quante volte vengono bannati qui. La percentuale di vittorie vale quando passano.",
 };
 
 export default it;

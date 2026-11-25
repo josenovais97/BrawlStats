@@ -2,6 +2,7 @@
 
 import { ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
+import { useBans } from '@/components/bubble/bans-data';
 import { panelBracket } from '@/components/bubble/bracket-data';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useEffect, useMemo, useState } from 'react';
@@ -369,6 +370,26 @@ export function PanelDraft({
   const taken = new Set([...picked.bans, ...picked.allies, ...picked.enemies]);
 
   /*
+   * What gets banned on this map at the reader's rank (2026-11-25), and the
+   * strongest brawlers people leave open. Facts, not advice: the share of
+   * games and the map's own win rate.
+   */
+  const [banRank, setBanRank] = useState<string | null>(null);
+  useEffect(() => {
+    // Read from storage (the rank chosen on the Meta tab), so after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setBanRank(panelBracket(ownRank));
+  }, [ownRank, map]);
+  const bans = useBans(banRank);
+  const here = map ? bans?.maps[map.mapName] ?? null : null;
+  const mostBanned = (here?.bans ?? []).filter(([id, rate]) => rate >= 0.03 && !taken.has(id) && byId.has(id)).slice(0, 6);
+  const banHere = new Map(here?.bans ?? []);
+  const leftOpen =
+    here && map
+      ? map.picks.filter((p) => p.score >= 0.52 && (banHere.get(p.brawlerId) ?? 0) < 0.1 && !taken.has(p.brawlerId) && byId.has(p.brawlerId)).slice(0, 4)
+      : [];
+
+  /*
    * The map's own best brawlers, offered first.
    *
    * These are the picks and bans a draft on this map actually revolves around,
@@ -378,13 +399,15 @@ export function PanelDraft({
    */
   const likely = useMemo(() => {
     if (!map) return [];
+    // Banning: the brawlers really banned here come first.
+    if (picking === 'bans' && mostBanned.length >= 4) return mostBanned.map(([id]) => byId.get(id)).filter((b): b is LocalBrawler => b !== undefined);
     return map.picks
       .filter((p) => !taken.has(p.brawlerId))
       .slice(0, 8)
       .map((p) => byId.get(p.brawlerId))
       .filter((b): b is LocalBrawler => b !== undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, picked, byId]);
+  }, [map, picked, byId, picking, bans]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLocaleLowerCase(lang);
@@ -659,12 +682,62 @@ export function PanelDraft({
             />
           ) : null}
 
+          {/* While the bans are still open: who gets banned here, one tap each. */}
+          {picked.allies.length + picked.enemies.length === 0 && mine === null && picking !== 'bans' && picked.bans.length < LIMITS.bans && mostBanned.length > 0 ? (
+            <div className="bz-panel flex flex-wrap items-start gap-x-3 gap-y-1.5 px-2 py-1.5">
+              <BanFaces
+                title={here?.wide ? `${t('draft.mostBanned')} · ${t('bracket.all')}` : t('draft.mostBanned')}
+                rows={mostBanned.map(([id, rate]) => ({ id, value: `${Math.round(rate * 100)}%`, tone: 'text-defeat' }))}
+                byId={byId}
+                onPick={(id) => add('bans', id)}
+              />
+              {leftOpen.length > 0 ? (
+                <BanFaces
+                  title={t('draft.leftOpen')}
+                  rows={leftOpen.map((p) => ({ id: p.brawlerId, value: `${(p.score * 100).toFixed(0)}%`, tone: 'text-victory' }))}
+                  byId={byId}
+                  onPick={(id) => add('bans', id)}
+                />
+              ) : null}
+            </div>
+          ) : null}
+
           {/* Before the enemy has picked: what is hard to punish here. */}
           {picked.enemies.length === 0 && safe.length > 0 ? <SafePicks safe={safe} byId={byId} /> : null}
 
           <Suggestions picks={picks} loading={loading} byId={byId} mine={mine} onTry={(id) => setMine(mine === id ? null : id)} />
         </>
       )}
+    </div>
+  );
+}
+
+/** A row of faces to ban with one tap, each with its number under it. */
+function BanFaces({
+  title,
+  rows,
+  byId,
+  onPick,
+}: {
+  title: string;
+  rows: { id: number; value: string; tone: string }[];
+  byId: Map<number, LocalBrawler>;
+  onPick: (id: number) => void;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[9px] font-bold uppercase tracking-wide text-muted">{title}</p>
+      <div className="mt-1 flex gap-1.5">
+        {rows.map((r) => {
+          const b = byId.get(r.id);
+          return (
+            <button key={r.id} type="button" onClick={() => onPick(r.id)} title={b?.localName} className="flex flex-col items-center gap-0.5">
+              <Image src={b?.imageUrl ?? ''} alt={b?.localName ?? ''} width={30} height={30} className="size-[30px] rounded border-2 border-black/60 bg-surface-2" unoptimized />
+              <span className={`text-[10px] font-black tabular-nums leading-none ${r.tone}`}>{r.value}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -230,6 +230,17 @@ const ko: UiStrings = {
   "draft.chanceLabel": "승률",
   "review.nextTime": "다음에 {map}에서는",
   "review.yourPickHere": "여기서 {name}: 맵 {n}%, {count}명 중 {rank}위",
+  'stat.kd': "K/D",
+  'stat.kills': "킬",
+  'stat.deaths': "데스",
+  'stat.damage': "피해량",
+  'stat.healing': "회복량",
+  'review.scoreboard': "스코어보드",
+  'review.bans': "밴",
+  'meta.bannedIn': "{n}%의 게임에서 밴",
+  'draft.mostBanned': "여기서 가장 많이 밴",
+  'draft.leftOpen': "강한데 잘 안 밴됨",
+  'meta.banRates': "여기서 밴되는 빈도순이에요. 승률은 밴되지 않았을 때 기준이에요.",
 };
 
 export default ko;

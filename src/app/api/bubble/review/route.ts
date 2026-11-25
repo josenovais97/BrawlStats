@@ -4,6 +4,7 @@ import { rankedTierIconUrl } from '@/lib/brawlapi';
 import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { appNames } from '@/lib/bubble-app-l10n';
 import { rankedGames, reviewGame } from '@/lib/bubble-review';
+import { combatFromLog } from '@/lib/combat';
 import { RANK_ELO_FLOORS, rankProgress } from '@/lib/ranked-elo';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
@@ -130,6 +131,20 @@ function toGame(
             ? 'playLost'
             : 'even';
 
+  // The scoreboard (2026-11-25): the battle log carries it since November.
+  const board = (who: string) => {
+    const c = combatFromLog(entry, who);
+    return c ? { k: c.kills, d: c.deaths, dmg: c.damage, heal: c.healing } : null;
+  };
+  const players = (entry.battle.teams ?? []).flat();
+  const banned = (side: { tag: string }[]) => [
+    ...new Set(
+      side
+        .map((p) => players.find((x) => normalizeTag(x.tag) === p.tag)?.bannedBrawler?.id)
+        .filter((id): id is number => typeof id === 'number'),
+    ),
+  ];
+
   return {
     battleTime: entry.battleTime,
     mapName: entry.event?.map ?? null,
@@ -138,8 +153,10 @@ function toGame(
     eloChange,
     rank: progress?.rank ?? null,
     rankIcon: rankIndex >= 0 ? absolute(rankedTierIconUrl(rankIndex + 1)) : null,
-    mine: read.mine.map((p) => ({ id: p.id, you: p.tag === tag, star: p.tag === starTag })),
-    theirs: read.theirs.map((p) => ({ id: p.id, star: p.tag === starTag })),
+    mine: read.mine.map((p) => ({ id: p.id, you: p.tag === tag, star: p.tag === starTag, s: board(p.tag) })),
+    theirs: read.theirs.map((p) => ({ id: p.id, star: p.tag === starTag, s: board(p.tag) })),
+    // Who each side banned, once each (2026-11-25).
+    bans: { mine: banned(read.mine), theirs: banned(read.theirs) },
     winChance: review?.winChance ?? null,
     verdict,
     worst: review?.worstMatchup

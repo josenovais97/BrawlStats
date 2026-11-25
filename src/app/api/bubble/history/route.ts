@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 
 import { getBattleLog } from '@/lib/bs-api';
 import { rankedGames } from '@/lib/bubble-review';
+import { combatFromLog } from '@/lib/combat';
 import { okResponse } from '@/lib/route-helpers';
 import { normalizeTag } from '@/lib/tags';
 
@@ -39,6 +40,11 @@ export async function GET(request: NextRequest) {
       duration: typeof e.battle.duration === 'number' ? e.battle.duration : null,
       mine: side(own),
       theirs: side(other),
+      // Your kills, deaths and damage, in games since November 2026.
+      you: (() => {
+        const c = combatFromLog(e, tag);
+        return c ? { k: c.kills, d: c.deaths, dmg: c.damage } : null;
+      })(),
     };
   });
   return okResponse({ games }, 60);

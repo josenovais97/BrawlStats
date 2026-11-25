@@ -26,6 +26,7 @@ interface HistoryGame {
   duration: number | null;
   mine: Side[];
   theirs: Side[];
+  you?: { k: number; d: number; dmg: number } | null;
 }
 
 /** "20261109T151120.000Z" -> Date. */
@@ -135,6 +136,8 @@ export function PanelHistory({
     run = g.result === 'victory' ? run + 1 : 0;
     best = Math.max(best, run);
   }
+  const fought = list.map((g) => g.you).filter((x): x is NonNullable<typeof x> => Boolean(x));
+  const kd = fought.length >= 3 ? fought.reduce((n, x) => n + x.k, 0) / Math.max(1, fought.reduce((n, x) => n + x.d, 0)) : null;
   const dayKey = (d: Date) => d.toLocaleDateString('en-CA');
   const today = dayKey(new Date(now));
   const yesterday = dayKey(new Date(now - 86_400_000));
@@ -168,6 +171,11 @@ export function PanelHistory({
                 <span className="font-bold text-victory">{wins}</span>–<span className="font-bold text-defeat">{list.length - wins}</span>
               </span>
               <span className="font-bold text-foreground">{Math.round((wins / list.length) * 100)}%</span>
+              {kd !== null ? (
+                <span className="font-bold tabular-nums">
+                  <span className={kd >= 1 ? 'text-victory' : 'text-defeat'}>{kd.toFixed(2)}</span> {t('stat.kd')}
+                </span>
+              ) : null}
               {best >= 2 ? (
                 <span className="flex items-center gap-0.5 font-bold text-[#ff9b3d]">
                   <Flame className="size-3 fill-current" aria-hidden />
@@ -241,6 +249,11 @@ export function PanelHistory({
                         {art?.icon ? <Image src={art.icon} alt="" width={12} height={12} unoptimized className="size-3" /> : null}
                         <span className="truncate">{art ? name(art.label) : ''}</span>
                         {at ? <span className="shrink-0">· {at.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}</span> : null}
+                        {g.you ? (
+                          <span className="shrink-0 font-bold tabular-nums" title={`${t('stat.kills')} / ${t('stat.deaths')}`}>
+                            · <span className={g.you.k > g.you.d ? 'text-victory' : g.you.k < g.you.d ? 'text-defeat' : 'text-foreground'}>{g.you.k}</span>/{g.you.d}
+                          </span>
+                        ) : null}
                       </span>
                     </span>
                     <span className="flex shrink-0 items-center gap-0.5">

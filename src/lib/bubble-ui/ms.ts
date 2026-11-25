@@ -230,6 +230,17 @@ const ms: UiStrings = {
   "draft.chanceLabel": "peluang menang",
   "review.nextTime": "Lain kali di {map}",
   "review.yourPickHere": "{name} di sini: peta {n}%, #{rank} daripada {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Bunuh",
+  'stat.deaths': "Mati",
+  'stat.damage': "Kerosakan",
+  'stat.healing': "Pemulihan",
+  'review.scoreboard': "Papan skor",
+  'review.bans': "Larangan",
+  'meta.bannedIn': "dilarang dalam {n}% perlawanan",
+  'draft.mostBanned': "Paling kerap dilarang di sini",
+  'draft.leftOpen': "Kuat, jarang dilarang",
+  'meta.banRates': "Disusun ikut kekerapan dilarang di sini. Kadar menang ialah apabila ia terlepas.",
 };
 
 export default ms;

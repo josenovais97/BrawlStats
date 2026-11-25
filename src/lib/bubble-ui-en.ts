@@ -249,6 +249,17 @@ export const UI_EN = {
   "draft.chanceLabel": "to win",
   "review.nextTime": "Next time on {map}",
   "review.yourPickHere": "{name} here: map {n}%, #{rank} of {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Kills",
+  'stat.deaths': "Deaths",
+  'stat.damage': "Damage",
+  'stat.healing': "Healing",
+  'review.scoreboard': "Scoreboard",
+  'review.bans': "Bans",
+  'meta.bannedIn': "banned in {n}% of games",
+  'draft.mostBanned': "Most banned here",
+  'draft.leftOpen': "Strong, rarely banned",
+  'meta.banRates': "Sorted by how often it is banned here. The win rate is for when it gets through.",
 } as const;
 
 export type UiKey = keyof typeof UI_EN;

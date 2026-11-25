@@ -230,6 +230,17 @@ const de: UiStrings = {
   "draft.chanceLabel": "Siegchance",
   "review.nextTime": "Nächstes Mal auf {map}",
   "review.yourPickHere": "{name} hier: Map {n} %, Platz {rank} von {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Kills",
+  'stat.deaths': "Tode",
+  'stat.damage': "Schaden",
+  'stat.healing': "Heilung",
+  'review.scoreboard': "Scoreboard",
+  'review.bans': "Sperren",
+  'meta.bannedIn': "in {n} % der Matches gesperrt",
+  'draft.mostBanned': "Hier am meisten gesperrt",
+  'draft.leftOpen': "Stark, selten gesperrt",
+  'meta.banRates': "Sortiert danach, wie oft er hier gesperrt wird. Die Siegquote gilt, wenn er durchkommt.",
 };
 
 export default de;

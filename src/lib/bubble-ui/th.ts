@@ -230,6 +230,17 @@ const th: UiStrings = {
   "draft.chanceLabel": "โอกาสชนะ",
   "review.nextTime": "ครั้งหน้าที่ {map}",
   "review.yourPickHere": "{name} ที่นี่: แผนที่ {n}% อันดับ {rank} จาก {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "คิล",
+  'stat.deaths': "ตาย",
+  'stat.damage': "ดาเมจ",
+  'stat.healing': "ฮีล",
+  'review.scoreboard': "ตารางคะแนน",
+  'review.bans': "แบน",
+  'meta.bannedIn': "ถูกแบน {n}% ของเกม",
+  'draft.mostBanned': "โดนแบนบ่อยสุดที่นี่",
+  'draft.leftOpen': "แรงแต่ไม่ค่อยโดนแบน",
+  'meta.banRates': "เรียงตามความถี่ที่ถูกแบนที่นี่ อัตราชนะคือตอนที่ไม่ถูกแบน",
 };
 
 export default th;

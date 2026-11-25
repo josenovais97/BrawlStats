@@ -230,6 +230,17 @@ const nl: UiStrings = {
   "draft.chanceLabel": "winkans",
   "review.nextTime": "Volgende keer op {map}",
   "review.yourPickHere": "{name} hier: kaart {n}%, #{rank} van {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Kills",
+  'stat.deaths': "Deaths",
+  'stat.damage': "Schade",
+  'stat.healing': "Genezing",
+  'review.scoreboard': "Scorebord",
+  'review.bans': "Blokkades",
+  'meta.bannedIn': "geblokkeerd in {n}% van de potjes",
+  'draft.mostBanned': "Hier het vaakst geblokkeerd",
+  'draft.leftOpen': "Sterk, zelden geblokkeerd",
+  'meta.banRates': "Gesorteerd op hoe vaak hij hier geblokkeerd wordt. Het winstpercentage geldt als hij erdoor komt.",
 };
 
 export default nl;

@@ -1,5 +1,6 @@
 'use client';
 
+import { Ban } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -10,6 +11,7 @@ import {
   type BracketData,
 } from '@/components/bubble/bracket-data';
 
+import { useBans } from '@/components/bubble/bans-data';
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
 import { ModeMapChips, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
@@ -112,6 +114,9 @@ const SHOWN_PER_TIER = 8;
  */
 const SHOWN_MAP_PICKS = 10;
 
+/** A brawler banned in at least this share of games wears it on its portrait. */
+const BAN_BADGE = 0.1;
+
 type BracketLists = BracketData;
 
 
@@ -174,6 +179,14 @@ export function PanelTiers({
       .then((data) => setBracketLists((prev) => ({ ...prev, [bracket]: data })))
       .catch(() => setBracketLists((prev) => ({ ...prev, [bracket]: 'error' })));
   }, [bracket, bracketLists]);
+
+  // Who gets banned at this rank (2026-11-25).
+  const bans = useBans(bracket);
+  const banRate = useMemo(() => new Map(bans?.all ?? []), [bans]);
+  const everyone = useMemo(
+    () => new Map((modes.find((m) => m.key === null)?.entries ?? []).map((e) => [e.brawlerId, e])),
+    [modes],
+  );
 
   const chooseBracket = (slug: string | null) => {
     setBracket(slug);
@@ -390,6 +403,9 @@ export function PanelTiers({
           fieldable={fieldable}
           filtering={account.owned !== null}
           hiding={hiding}
+          bans={bans?.maps[shownMap.mapName]?.bans ?? null}
+          bansWide={bans?.maps[shownMap.mapName]?.wide ?? false}
+          everyone={everyone}
         />
       ) : entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
@@ -410,6 +426,7 @@ export function PanelTiers({
                 fieldable={fieldable}
                 hiding={hiding}
                 trend={trend}
+                banRate={banRate}
               />
             );
           })}
@@ -452,6 +469,7 @@ function TierStrip({
   fieldable,
   hiding,
   trend,
+  banRate,
 }: {
   tier: Tier;
   entries: PanelEntry[];
@@ -462,6 +480,8 @@ function TierStrip({
   /** Remove what cannot be fielded rather than dimming it. */
   hiding: boolean;
   trend: Record<number, 1 | -1>;
+  /** Share of games each is banned in at this rank. */
+  banRate: Map<number, number>;
 }) {
   const color = TIER_COLOR[tier];
   const { t, name } = usePanelI18n();
@@ -508,6 +528,7 @@ function TierStrip({
                   the meta would think the panel was broken. Someone also
                   levels brawlers between drafts, so what they cannot field
                   today is a thing they might want to see. */}
+              <span className="relative block">
               <Image
                 src={entry.imageUrl}
                 alt={name(entry.brawlerName)}
@@ -519,6 +540,17 @@ function TierStrip({
                 loading="lazy"
                 unoptimized
               />
+              {/* Banned often enough that it may not be there to pick (2026-11-25). */}
+              {(banRate.get(entry.brawlerId) ?? 0) >= BAN_BADGE ? (
+                <span
+                  className="absolute -end-1 -top-1 inline-flex items-center gap-px rounded border border-black/70 bg-defeat px-0.5 text-[8px] font-black leading-[11px] tabular-nums text-white"
+                  title={t('meta.bannedIn', { n: Math.round((banRate.get(entry.brawlerId) ?? 0) * 100) })}
+                >
+                  <Ban className="size-2" strokeWidth={3.5} aria-hidden />
+                  {Math.round((banRate.get(entry.brawlerId) ?? 0) * 100)}%
+                </span>
+              ) : null}
+              </span>
               <p className="truncate text-[9px] font-semibold leading-tight">
                 {name(entry.brawlerName)}
               </p>
@@ -582,6 +614,9 @@ function MapPicks({
   fieldable,
   filtering,
   hiding,
+  bans,
+  bansWide,
+  everyone,
 }: {
   map: PanelMap;
   /** The rank a per-rank list is for; its battle counts say both numbers. */
@@ -593,6 +628,11 @@ function MapPicks({
   filtering: boolean;
   /** Remove what cannot be fielded rather than dimming it. */
   hiding: boolean;
+  /** Share of this map's games each brawler is banned in; null when too few. */
+  bans: [number, number][] | null;
+  /** The map's bans come from more ranks than the one chosen. */
+  bansWide: boolean;
+  everyone: Map<number, PanelEntry>;
 }) {
   const [expanded, setExpanded] = useState(false);
   /*
@@ -620,7 +660,19 @@ function MapPicks({
   const source =
     tab === 'bans' || !hiding ? map.picks : map.picks.filter((p) => fieldable(p.brawlerId));
   const shown = expanded ? source : source.slice(0, SHOWN_MAP_PICKS);
-  const hidden = source.length - shown.length;
+
+  /*
+   * The bans people really make here (2026-11-25), most banned first, joined
+   * to how each does when it gets through. Before there were bans to read,
+   * this tab was the picks list again with pick rates.
+   */
+  const banRows =
+    bans && bans.length >= 5
+      ? bans
+          .filter(([id, rate]) => rate >= 0.01 && (everyone.has(id) || map.picks.some((p) => p.brawlerId === id)))
+          .map(([id, rate]) => ({ id, rate, pick: map.picks.find((p) => p.brawlerId === id) ?? null }))
+      : null;
+  const hidden = expanded ? 0 : Math.max(0, (tab === 'bans' && banRows ? banRows.length : source.length) - SHOWN_MAP_PICKS);
 
   /*
    * The best pick this account can actually take, which is the answer someone
@@ -659,7 +711,8 @@ function MapPicks({
 
     {tab === 'bans' ? (
       <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
-        {t('meta.banExplain')}
+        {t(banRows ? 'meta.banRates' : 'meta.banExplain')}
+        {banRows && bansWide ? ` · ${t('bracket.all')}` : ''}
       </p>
     ) : null}
 
@@ -675,6 +728,55 @@ function MapPicks({
         )}
       </p>
     ) : null}
+    {tab === 'bans' && banRows ? (
+      <ol className="bz-panel divide-y divide-border overflow-hidden">
+        {(expanded ? banRows : banRows.slice(0, SHOWN_MAP_PICKS)).map((row, index) => {
+          const entry = everyone.get(row.id);
+          const label = row.pick?.brawlerName ?? entry?.brawlerName ?? '';
+          const art = row.pick?.imageUrl ?? entry?.imageUrl ?? '';
+          return (
+            <li key={row.id}>
+              <button
+                type="button"
+                onClick={() => onPick({ brawlerId: row.id, brawlerName: label, metaScore: entry?.metaScore ?? null, tier: entry?.tier ?? 'S', imageUrl: art })}
+                aria-pressed={openId === row.id}
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-start"
+              >
+                <span
+                  aria-hidden
+                  className={`grid size-5 shrink-0 place-items-center rounded-full text-[10px] font-black tabular-nums ${
+                    index === 0 ? 'bg-defeat text-white' : index < 3 ? 'bg-surface-3 text-foreground' : 'text-muted'
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <Image
+                  src={art}
+                  alt=""
+                  width={30}
+                  height={30}
+                  className={`size-[30px] shrink-0 rounded-md bg-surface-2 ${openId === row.id ? 'ring-2 ring-brand' : ''}`}
+                  loading="lazy"
+                  unoptimized
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-xs font-bold leading-tight">{name(label)}</span>
+                  <span className="mt-0.5 block h-1.5 overflow-hidden rounded-full bg-black/30">
+                    <span className="block h-full rounded-full bg-defeat" style={{ width: `${Math.max(2, Math.round(row.rate * 100))}%` }} />
+                  </span>
+                </span>
+                <span className="w-24 shrink-0 text-end">
+                  <span className="block text-[11px] font-black tabular-nums leading-tight text-defeat">{(row.rate * 100).toFixed(1)}%</span>
+                  <span className="block text-[10px] tabular-nums leading-tight text-muted">
+                    {row.pick ? `${(row.pick.score * 100).toFixed(1)}% ${t('history.win').toLowerCase()}` : '–'}
+                  </span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    ) : (
     <ol className="bz-panel divide-y divide-border overflow-hidden">
       {shown.map((pick, index) => {
         const edge = pick.score - pick.overallScore;
@@ -760,6 +862,7 @@ function MapPicks({
         );
       })}
     </ol>
+    )}
 
     {hidden > 0 ? (
       <button

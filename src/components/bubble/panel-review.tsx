@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Flame, Star, X } from 'lucide-react';
+import { ArrowLeftRight, Ban, ChevronLeft, ChevronRight, Crosshair, Flame, HeartPulse, Star, X, Zap } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
@@ -21,6 +21,14 @@ import { sitePrefix } from '@/components/bubble/panel-counters';
  * battle log says nothing about how the game was played (lib/draft-autopsy).
  */
 
+/** One player's line of the scoreboard. */
+export interface BoardLine {
+  k: number;
+  d: number;
+  dmg: number;
+  heal: number;
+}
+
 export interface PostGameReview {
   battleTime: string;
   mapName: string | null;
@@ -29,8 +37,10 @@ export interface PostGameReview {
   eloChange: number | null;
   rank: string | null;
   rankIcon: string | null;
-  mine: { id: number; you: boolean; star: boolean }[];
-  theirs: { id: number; star: boolean }[];
+  mine: { id: number; you: boolean; star: boolean; s?: BoardLine | null }[];
+  theirs: { id: number; star: boolean; s?: BoardLine | null }[];
+  /** Who each side banned (2026-11-25). */
+  bans?: { mine: number[]; theirs: number[] };
   winChance: number | null;
   verdict: 'draftWon' | 'upset' | 'even' | 'draftLost' | 'playLost' | 'unknown';
   worst: { brawlerId: number; againstId: number; edge: number; battles: number } | null;
@@ -308,6 +318,8 @@ export function PanelReview({
         {rank ? <p className="mt-1.5 text-[10px] font-bold text-white/80">{rank}</p> : null}
       </div>
 
+      <Scoreboard review={review} brawlerName={brawlerName} portrait={portrait} />
+
       {/* Both teams, the draft's chance and what it means. */}
       {card(
         70,
@@ -504,6 +516,101 @@ export function PanelReview({
           {t('review.close')}
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The game's scoreboard (2026-11-25): all six players' kills, deaths, damage
+ * and healing, best kills and damage in gold, and who each side banned.
+ * Nothing for a game from before the battle log carried it.
+ */
+function Scoreboard({
+  review,
+  brawlerName,
+  portrait,
+}: {
+  review: PostGameReview;
+  brawlerName: (id: number) => string;
+  portrait: (id: number, opts?: { ring?: 'you' | 'victory' | 'defeat'; star?: boolean; dim?: boolean; size?: number }) => ReactNode;
+}) {
+  const { t, lang } = usePanelI18n();
+  const lines = [...review.mine, ...review.theirs].map((p) => p.s).filter((x): x is BoardLine => Boolean(x));
+  if (lines.length < 2) return null;
+  const topKills = Math.max(...lines.map((x) => x.k));
+  const topDamage = Math.max(1, ...lines.map((x) => x.dmg));
+  const heals = lines.some((x) => x.heal > 0);
+  const short = (n: number) => (n >= 1000 ? `${(n / 1000).toLocaleString(lang, { maximumFractionDigits: n >= 100_000 ? 0 : 1 })}k` : String(n));
+  const cols = heals ? 'grid-cols-[minmax(0,1fr)_2.6rem_3rem_3rem]' : 'grid-cols-[minmax(0,1fr)_2.6rem_3rem]';
+
+  const row = (p: { id: number; you?: boolean; star: boolean; s?: BoardLine | null }, key: string, side: 'mine' | 'theirs') => {
+    const x = p.s;
+    return (
+      <div key={key} className={`grid ${cols} items-center gap-1 rounded-md px-1 py-0.5 ${p.you ? 'bg-brand/15 ring-1 ring-inset ring-brand/40' : ''}`}>
+        <span className="flex min-w-0 items-center gap-1.5">
+          {portrait(p.id, { ring: p.you ? 'you' : undefined, star: p.star, size: 24 })}
+          <span className="min-w-0 flex-1">
+            <span className={`block truncate text-[11px] font-bold leading-tight ${p.you ? 'text-brand' : ''}`}>{brawlerName(p.id)}</span>
+            {/* The damage as a bar, against the game's highest. */}
+            <span className="mt-0.5 block h-1 overflow-hidden rounded-full bg-black/30">
+              <span
+                className={`block h-full rounded-full ${side === 'mine' ? 'bg-[#35d0ff]' : 'bg-defeat'}`}
+                style={{ width: x ? `${Math.round((x.dmg / topDamage) * 100)}%` : 0 }}
+              />
+            </span>
+          </span>
+        </span>
+        <span className="text-center text-[12px] font-black tabular-nums">
+          {x ? (
+            <>
+              <span className={x.k === topKills && x.k > 0 ? 'text-brand' : ''}>{x.k}</span>
+              <span className="font-bold text-muted">/{x.d}</span>
+            </>
+          ) : (
+            '–'
+          )}
+        </span>
+        <span className={`text-end text-[11px] font-bold tabular-nums ${x && x.dmg === topDamage ? 'text-brand' : ''}`}>{x ? short(x.dmg) : '–'}</span>
+        {heals ? <span className="text-end text-[11px] tabular-nums text-muted">{x && x.heal > 0 ? short(x.heal) : '–'}</span> : null}
+      </div>
+    );
+  };
+  const bans = (ids: number[] | undefined) =>
+    ids && ids.length > 0 ? (
+      <span className="flex items-center gap-1" title={t('review.bans')}>
+        <Ban className="size-3 text-muted" aria-label={t('review.bans')} />
+        {ids.map((id) => (
+          <span key={id}>{portrait(id, { dim: true, size: 18 })}</span>
+        ))}
+      </span>
+    ) : null;
+
+  return (
+    <div className="bz-panel bz-review-in px-2 py-2" style={{ animationDelay: '50ms' }}>
+      <div className={`grid ${cols} items-center gap-1 px-1 text-[10px] font-bold uppercase tracking-wider text-muted`}>
+        <span>{t('review.scoreboard')}</span>
+        <span className="flex items-center justify-center gap-0.5" title={`${t('stat.kills')} / ${t('stat.deaths')}`}>
+          <Crosshair className="size-3" aria-label={`${t('stat.kills')} / ${t('stat.deaths')}`} />
+          <span className="normal-case tracking-normal">{t('stat.kd')}</span>
+        </span>
+        <span className="flex justify-end" title={t('stat.damage')}>
+          <Zap className="size-3" aria-label={t('stat.damage')} />
+        </span>
+        {heals ? (
+          <span className="flex justify-end" title={t('stat.healing')}>
+            <HeartPulse className="size-3" aria-label={t('stat.healing')} />
+          </span>
+        ) : null}
+      </div>
+      <div className="mt-1 space-y-0.5">{review.mine.map((p) => row(p, `m${p.id}`, 'mine'))}</div>
+      <div className="my-1 flex items-center gap-2 px-1">
+        {bans(review.bans?.mine)}
+        <span className="h-px flex-1 bg-border" />
+        <span className="display text-[10px] text-muted">VS</span>
+        <span className="h-px flex-1 bg-border" />
+        {bans(review.bans?.theirs)}
+      </div>
+      <div className="space-y-0.5">{review.theirs.map((p) => row(p, `t${p.id}`, 'theirs'))}</div>
     </div>
   );
 }

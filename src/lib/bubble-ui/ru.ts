@@ -230,6 +230,17 @@ const ru: UiStrings = {
   "draft.chanceLabel": "на победу",
   "review.nextTime": "В следующий раз на карте {map}",
   "review.yourPickHere": "{name} здесь: карта {n}%, {rank}-е место из {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Убийства",
+  'stat.deaths': "Смерти",
+  'stat.damage': "Урон",
+  'stat.healing': "Лечение",
+  'review.scoreboard': "Таблица боя",
+  'review.bans': "Запреты",
+  'meta.bannedIn': "запрещён в {n}% боёв",
+  'draft.mostBanned': "Чаще всего запрещают здесь",
+  'draft.leftOpen': "Сильные, редко запрещают",
+  'meta.banRates': "По тому, как часто их здесь запрещают. Процент побед — когда их не запретили.",
 };
 
 export default ru;

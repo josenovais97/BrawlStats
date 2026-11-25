@@ -230,6 +230,17 @@ const tr: UiStrings = {
   "draft.chanceLabel": "kazanma şansı",
   "review.nextTime": "Bir dahaki sefere {map} haritasında",
   "review.yourPickHere": "{name} burada: harita %{n}, {count} içinde {rank}.",
+  'stat.kd': "K/D",
+  'stat.kills': "Öldürme",
+  'stat.deaths': "Ölüm",
+  'stat.damage': "Hasar",
+  'stat.healing': "İyileştirme",
+  'review.scoreboard': "Skor tablosu",
+  'review.bans': "Yasaklar",
+  'meta.bannedIn': "maçların %{n} kadarında yasaklı",
+  'draft.mostBanned': "Burada en çok yasaklananlar",
+  'draft.leftOpen': "Güçlü, nadiren yasaklanan",
+  'meta.banRates': "Burada ne sıklıkla yasaklandığına göre sıralı. Kazanma oranı yasaklanmadığı maçlardan.",
 };
 
 export default tr;

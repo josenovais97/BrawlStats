@@ -230,6 +230,17 @@ const ja: UiStrings = {
   "draft.chanceLabel": "勝率",
   "review.nextTime": "次に{map}なら",
   "review.yourPickHere": "ここでの{name}: マップ{n}%、{count}体中{rank}位",
+  'stat.kd': "K/D",
+  'stat.kills': "キル",
+  'stat.deaths': "デス",
+  'stat.damage': "ダメージ",
+  'stat.healing': "回復",
+  'review.scoreboard': "スコアボード",
+  'review.bans': "使用禁止",
+  'meta.bannedIn': "{n}%の試合で使用禁止",
+  'draft.mostBanned': "ここで最も禁止されるキャラ",
+  'draft.leftOpen': "強いのに禁止されにくい",
+  'meta.banRates': "ここで禁止される頻度順。勝率は禁止されなかった試合のもの。",
 };
 
 export default ja;

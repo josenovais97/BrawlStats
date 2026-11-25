@@ -230,6 +230,17 @@ const pl: UiStrings = {
   "draft.chanceLabel": "na wygraną",
   "review.nextTime": "Następnym razem na {map}",
   "review.yourPickHere": "{name} tutaj: mapa {n}%, #{rank} z {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "Zabójstwa",
+  'stat.deaths': "Śmierci",
+  'stat.damage': "Obrażenia",
+  'stat.healing': "Leczenie",
+  'review.scoreboard': "Tablica wyników",
+  'review.bans': "Blokady",
+  'meta.bannedIn': "blokowany w {n}% gier",
+  'draft.mostBanned': "Najczęściej blokowani tutaj",
+  'draft.leftOpen': "Silni, rzadko blokowani",
+  'meta.banRates': "Według tego, jak często są tu blokowani. Procent wygranych liczy się, gdy przejdą.",
 };
 
 export default pl;

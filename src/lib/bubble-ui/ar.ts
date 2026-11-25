@@ -230,6 +230,17 @@ const ar: UiStrings = {
   "draft.chanceLabel": "للفوز",
   "review.nextTime": "في المرة القادمة على {map}",
   "review.yourPickHere": "{name} هنا: الخريطة {n}%، المركز {rank} من {count}",
+  'stat.kd': "K/D",
+  'stat.kills': "القتل",
+  'stat.deaths': "الموت",
+  'stat.damage': "الضرر",
+  'stat.healing': "العلاج",
+  'review.scoreboard': "لوحة النتائج",
+  'review.bans': "المحظورون",
+  'meta.bannedIn': "محظور في {n}% من المباريات",
+  'draft.mostBanned': "الأكثر حظرًا هنا",
+  'draft.leftOpen': "قوي ونادرًا ما يُحظر",
+  'meta.banRates': "مرتبة حسب عدد مرات الحظر هنا. نسبة الفوز تُحسب عندما لا يُحظر.",
 };
 
 export default ar;
