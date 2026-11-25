@@ -80,12 +80,20 @@ jobs:
         run: |
           APK=$(ls app/build/outputs/apk/play/qa/*.apk | head -1)
           cp "$APK" bubble-test.apk
-          gh release delete bubble-test --cleanup-tag --yes || true
-          gh release delete bubble-test-log --cleanup-tag --yes || true
-          gh release create bubble-test bubble-test.apk \
-            --target "$GITHUB_SHA" --prerelease \
-            --title "Bubble test build ($(git rev-parse --short HEAD))" \
-            --notes "Test build of BrawlZone Bubble from $GITHUB_SHA. Installs as a separate app called Bubble Test. Not a release."
+          # Three tries: on 2026-11-25 a good build was lost to one failed call here.
+          for try in 1 2 3; do
+            gh release delete bubble-test --cleanup-tag --yes || true
+            gh release delete bubble-test-log --cleanup-tag --yes || true
+            sleep 5
+            if gh release create bubble-test bubble-test.apk \
+              --target "$GITHUB_SHA" --prerelease \
+              --title "Bubble test build ($(git rev-parse --short HEAD))" \
+              --notes "Test build of BrawlZone Bubble from $GITHUB_SHA. Installs as a separate app called Bubble Test. Not a release."; then
+              exit 0
+            fi
+            sleep 20
+          done
+          exit 1
 
       - name: Publish the build log
         if: failure()
