@@ -284,7 +284,8 @@ export async function GET(request: NextRequest) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          width: combat ? 286 : 420,
+          // Three in a row: 3 x 284 and two 22 gaps fit the 900.
+          width: combat ? 284 : 420,
           height: combat ? 150 : 168,
           padding: '0 18px',
           borderRadius: 32,
