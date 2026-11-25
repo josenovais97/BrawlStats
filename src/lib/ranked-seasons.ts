@@ -400,6 +400,20 @@ export function liveSeasonNumber(state: Pick<SeasonState, 'current' | 'latest'> 
   return state.latest ? state.latest.number + 1 : null;
 }
 
+/**
+ * The season being played today with its dates, by the same rule: the listed
+ * one, or the next number starting where the newest listed one ended (its
+ * trial brawlers are then not known yet).
+ */
+export function runningSeason(
+  state: Pick<SeasonState, 'current' | 'latest'> | null,
+): Pick<ResolvedSeason, 'number' | 'startsOn' | 'endsOn' | 'brawlers'> | null {
+  if (!state) return null;
+  if (state.current) return state.current;
+  if (!state.latest?.endsOn) return null;
+  return { number: state.latest.number + 1, startsOn: state.latest.endsOn, endsOn: nextBoundary(state.latest.endsOn), brawlers: [] };
+}
+
 /** `liveSeasonNumber` from the cached wiki read, or null when that fails. */
 export async function getLiveSeasonNumber(): Promise<number | null> {
   return liveSeasonNumber(await getSeasonState().catch(() => null));

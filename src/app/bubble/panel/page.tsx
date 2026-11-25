@@ -25,7 +25,7 @@ import {
   type TeamComp,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
-import { getSeasonState } from '@/lib/ranked-seasons';
+import { getSeasonState, runningSeason } from '@/lib/ranked-seasons';
 import { panelTrend } from '@/lib/meta-changes';
 import { rotationKey, rotationMaps } from '@/lib/ranked-rotation';
 
@@ -165,6 +165,7 @@ export default async function BubblePanelPage() {
     getSeasonState().catch(() => null),
     getRankedRecentMaps().catch(() => []),
   ]);
+  const running = runningSeason(season);
   const rotation = rotationMaps({ recent, pool: season?.mapPool ?? [] });
   if (rotation.size > 0) {
     for (const mode of modeKeys) {
@@ -301,11 +302,11 @@ export default async function BubblePanelPage() {
             eloRates={eloRates}
             trend={trend}
             season={
-              season?.current
+              running
                 ? {
-                    number: season.current.number,
-                    endsOn: season.current.endsOn,
-                    trial: season.current.brawlers.map((b) => ({ name: b.name, imageUrl: brawlerIconUrl(b.id) })),
+                    number: running.number,
+                    endsOn: running.endsOn,
+                    trial: running.brawlers.map((b) => ({ name: b.name, imageUrl: brawlerIconUrl(b.id) })),
                   }
                 : null
             }

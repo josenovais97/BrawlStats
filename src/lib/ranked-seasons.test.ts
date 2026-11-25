@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { liveSeasonNumber, parseMapPool, parseSeasons, type ResolvedSeason } from '@/lib/ranked-seasons';
+import { liveSeasonNumber, parseMapPool, parseSeasons, runningSeason, type ResolvedSeason } from '@/lib/ranked-seasons';
 
 /* The wiki's Ranked page as of 2026-10-15, trimmed: the one-line-per-row
  * layout, a footnote on a date, a mode cell wrapped onto its own line, and a
@@ -86,4 +86,12 @@ test('the live season is the current one, or the next number while the wiki lags
   assert.equal(liveSeasonNumber({ current: null, latest: season(50) }), 51);
   assert.equal(liveSeasonNumber({ current: null, latest: null }), null);
   assert.equal(liveSeasonNumber(null), null);
+});
+
+test('the running season has dates while the wiki lags', () => {
+  const fifty = { number: 50, startsOn: '2026-10-15', endsOn: '2026-11-19', brawlers: [] } as unknown as ResolvedSeason;
+  assert.equal(runningSeason({ current: fifty, latest: fifty }), fifty);
+  assert.deepEqual(runningSeason({ current: null, latest: fifty }), { number: 51, startsOn: '2026-11-19', endsOn: '2026-12-17', brawlers: [] });
+  assert.equal(runningSeason({ current: null, latest: { ...fifty, endsOn: null } }), null);
+  assert.equal(runningSeason(null), null);
 });

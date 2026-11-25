@@ -3,7 +3,7 @@ import { ImageResponse } from 'next/og';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { isIntlLocale, rankLabel, type Locale } from '@/lib/i18n';
 import { bracketBySlug } from '@/lib/rank-brackets';
-import { getSeasonState } from '@/lib/ranked-seasons';
+import { getSeasonState, liveSeasonNumber } from '@/lib/ranked-seasons';
 import { BG, BODY, BRAND, DIM, DISPLAY, FG, SLIDE_SIZE, loadIcon, slideFonts } from '@/lib/slide-chrome';
 import { getBracketRoster, getScoredRoster, type ScoredBrawler } from '@/lib/stats';
 import { TIER_COLOR } from '@/lib/tiers';
@@ -77,7 +77,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ran
       byTier.flatMap((row) => row.shown).map(async (b) => [b.brawlerId, await loadIcon(brawlerIconUrl(b.brawlerId), ICON)] as const),
     ),
   );
-  const seasonNo = season?.current?.number;
+  const seasonNo = liveSeasonNumber(season);
   // The rank's own list only: with too few games for it, the picture falls
   // back to every rank and the rank's arrows would be about another list.
   const arrows: Record<number, 1 | -1> = bracket && !roster ? {} : trend;

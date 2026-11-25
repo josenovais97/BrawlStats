@@ -4,7 +4,7 @@ import { brawlerIconUrl, getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { appNames } from '@/lib/bubble-app-l10n';
 import { getDailyGift, getFreeRewards } from '@/lib/free-rewards';
-import { getSeasonState } from '@/lib/ranked-seasons';
+import { getSeasonState, runningSeason } from '@/lib/ranked-seasons';
 import { okResponse } from '@/lib/route-helpers';
 import { SITE_URL } from '@/lib/site';
 import { dailyAlertOn } from '@/lib/store-daily';
@@ -68,7 +68,9 @@ export async function GET(request: NextRequest) {
       }));
 
   const pick = [...today.values()].sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))[0];
-  const current = season?.current ?? null;
+  // Not `season.current`: null while the wiki lags, and the app then stays on
+  // the season that ended (2026-11-25, six days into Season 51).
+  const current = runningSeason(season);
 
   return okResponse(
     {
