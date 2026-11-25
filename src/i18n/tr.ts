@@ -5496,4 +5496,74 @@ export const TR: Record<string, string> = {
     "Brawl Pass'i kim kazandı, çekilişin tekrarı ve tüm biletlerin listesi.",
   "Follow so you see it the moment it is out.":
     "Çıkar çıkmaz görmek için takip et.",
+  "Choose a rank":
+    "Bir rütbe seç",
+  "Mythic and up":
+    "Gizemli ve üstü",
+  "Most banned brawlers and Ranked stats ({v})":
+    "En çok yasaklanan savaşçılar ve Aşamalı istatistikleri ({v})",
+  "The most banned brawlers in Brawl Stars Ranked by rank and by map, and who kills, dies, heals and deals damage the most. From real games, updated every 2 hours.":
+    "Brawl Stars Aşamalı'da rütbeye ve haritaya göre en çok yasaklanan savaşçılar; en çok öldüren, ölen, iyileştiren ve hasar veren kim. Gerçek maçlardan, 2 saatte bir güncellenir.",
+  "Ranked stats":
+    "Aşamalı istatistikleri",
+  "Ranked Stats":
+    "Aşamalı istatistikleri",
+  "Who gets banned, who kills the most, who dies the most and who deals the most damage, by rank.":
+    "Rütbeye göre kim yasaklanıyor, kim en çok öldürüyor, kim en çok ölüyor ve kim en çok hasar veriyor.",
+  "Ban tier list":
+    "Yasak tier listesi",
+  "How often each brawler gets banned in a game.":
+    "Her savaşçının bir maçta ne sıklıkla yasaklandığı.",
+  "Not enough games here yet.":
+    "Burada henüz yeterli maç yok.",
+  "Nobody":
+    "Hiç kimse",
+  "From {n} games.":
+    "{n} maçtan.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "Harf, savaşçının yasaklandığı maç oranıdır: S %40'tan, A %20'den, B %10'dan, C %5'ten başlar.",
+  "Kills, deaths and damage":
+    "Öldürme, ölüm ve hasar",
+  "What each brawler does in a game, on average.":
+    "Her savaşçının bir maçtaki ortalaması.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Öldürme",
+  "Deaths":
+    "Ölüm",
+  "Damage":
+    "Hasar",
+  "Healing":
+    "İyileştirme",
+  "Never died":
+    "Hiç ölmeden",
+  "Most banned":
+    "En çok yasaklanan",
+  "Best K/D":
+    "En iyi K/D",
+  "Dies the least":
+    "En az ölen",
+  "Most damage":
+    "En çok hasar",
+  "Most star players":
+    "En çok yıldız oyuncu",
+  "Highest first":
+    "Önce en yüksek",
+  "Lowest first":
+    "Önce en düşük",
+  "Show all {n}":
+    "Tümünü göster ({n})",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "{n} maçtan az oynayan savaşçılar listede yok. Hasar ve iyileştirme, tüm maçın saniyesi başınadır.",
+  "{n} a game":
+    "maç başına {n}",
+  "{n} a second":
+    "saniyede {n}",
+  "{n}% of games":
+    "maçların %{n}",
+  "Bans, kills and damage by rank":
+    "Rütbeye göre yasaklar, öldürme ve hasar",
+  "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
+    "Her haritada en çok yasaklanan savaşçılar ve en çok öldüren, ölen ve hasar veren kim.",
 };

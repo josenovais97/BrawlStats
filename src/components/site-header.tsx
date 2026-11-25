@@ -84,6 +84,8 @@ const MORE: NavItem[] = [
   { href: '/roast', label: 'Roast My Account', icon: WinStreakIcon },
   { href: '/bubble', label: 'Android App', icon: BubbleAppIcon },
   { href: '/daily', label: 'Daily', icon: ClockIcon },
+  // Bans, kills and damage by rank (2026-11-25): data nobody else keeps.
+  { href: '/ranked/stats', label: 'Ranked Stats', icon: RankedIcon },
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
   { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
   // A star power is the strength a brawler has that its base kit does not

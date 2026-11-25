@@ -602,4 +602,66 @@ export const CLIENT_FR: Record<string, string> = {
     "Récupérer",
   "Telegram channel":
     "Chaîne Telegram",
+  "Choose a rank":
+    "Choisis un rang",
+  "Ban tier list":
+    "Tier list des bans",
+  "How often each brawler gets banned in a game.":
+    "À quelle fréquence chaque brawler est banni dans un combat.",
+  "Not enough games here yet.":
+    "Pas encore assez de combats ici.",
+  "Nobody":
+    "Personne",
+  "From {n} games.":
+    "Sur {n} combats.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "La lettre est la part des combats où le brawler est banni : S dès 40 %, A dès 20 %, B dès 10 %, C dès 5 %.",
+  "Kills, deaths and damage":
+    "Éliminations, morts et dégâts",
+  "What each brawler does in a game, on average.":
+    "Ce que fait chaque brawler dans un combat, en moyenne.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Éliminations",
+  "Deaths":
+    "Morts",
+  "Damage":
+    "Dégâts",
+  "Healing":
+    "Soins",
+  "Never died":
+    "Sans mourir",
+  "Most banned":
+    "Le plus banni",
+  "Best K/D":
+    "Meilleur K/D",
+  "Dies the least":
+    "Meurt le moins",
+  "Most damage":
+    "Le plus de dégâts",
+  "Most star players":
+    "Le plus souvent joueur star",
+  "Highest first":
+    "Du plus au moins",
+  "Lowest first":
+    "Du moins au plus",
+  "Show all {n}":
+    "Tout afficher ({n})",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "Les brawlers avec moins de {n} combats sont exclus. Dégâts et soins sont par seconde du combat entier.",
+  "{n} a game":
+    "{n} par combat",
+  "{n} a second":
+    "{n} par seconde",
+  "{n}% of games":
+    "{n} % des combats",
+  "All maps":
+    "Toutes les cartes",
+  "Map":
+    "Carte",
+  "Show less":
+    "Réduire",
+  "Ranked Stats":
+    "Stats Classé",
 };

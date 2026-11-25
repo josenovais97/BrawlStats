@@ -305,6 +305,13 @@ export default async function RankedPage() {
             <Fact>{t('{rated} of {length} maps with a pick', { rated: rated, length: onBoard.length })}</Fact>
           ) : null}
         </ul>
+        <Link href={lp('/ranked/stats')} prefetch={false} className="reward-tile mt-4 flex max-w-2xl items-center gap-4 p-4">
+          <RankedIcon className="size-9 shrink-0" />
+          <span className="min-w-0">
+            <span className="display block text-lg text-white">{t('Bans, kills and damage by rank')}</span>
+            <span className="block text-sm text-white/75">{t('The most banned brawlers on every map, and who kills, dies and deals damage the most.')}</span>
+          </span>
+        </Link>
         </div>
         {/* The top three at each rank (2026-11-11), filling the empty half. */}
         <RankedHeroRanks brawlerMeta={brawlerMeta} />

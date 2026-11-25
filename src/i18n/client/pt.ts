@@ -1074,4 +1074,66 @@ export const CLIENT_PT: Record<string, string> = {
     "Resgatar",
   "Telegram channel":
     "Canal do Telegram",
+  "Choose a rank":
+    "Escolha um rank",
+  "Ban tier list":
+    "Tier list de bans",
+  "How often each brawler gets banned in a game.":
+    "Com que frequência cada brawler é banido em uma partida.",
+  "Not enough games here yet.":
+    "Ainda não há partidas suficientes aqui.",
+  "Nobody":
+    "Ninguém",
+  "From {n} games.":
+    "De {n} partidas.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "A letra é a parte das partidas em que o brawler é banido: S a partir de 40%, A de 20%, B de 10%, C de 5%.",
+  "Kills, deaths and damage":
+    "Abates, mortes e dano",
+  "What each brawler does in a game, on average.":
+    "O que cada brawler faz em uma partida, em média.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Abates",
+  "Deaths":
+    "Mortes",
+  "Damage":
+    "Dano",
+  "Healing":
+    "Cura",
+  "Never died":
+    "Sem morrer",
+  "Most banned":
+    "Mais banido",
+  "Best K/D":
+    "Melhor K/D",
+  "Dies the least":
+    "Morre menos",
+  "Most damage":
+    "Mais dano",
+  "Most star players":
+    "Mais vezes craque",
+  "Highest first":
+    "Do maior para o menor",
+  "Lowest first":
+    "Do menor para o maior",
+  "Show all {n}":
+    "Mostrar todos os {n}",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "Brawlers com menos de {n} partidas ficam de fora. O dano e a cura são por segundo da partida inteira.",
+  "{n} a game":
+    "{n} por partida",
+  "{n} a second":
+    "{n} por segundo",
+  "{n}% of games":
+    "{n}% das partidas",
+  "All maps":
+    "Todos os mapas",
+  "Map":
+    "Mapa",
+  "Show less":
+    "Mostrar menos",
+  "Ranked Stats":
+    "Estatísticas do Ranqueado",
 };

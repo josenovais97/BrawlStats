@@ -602,4 +602,66 @@ export const CLIENT_TR: Record<string, string> = {
     "Al",
   "Telegram channel":
     "Telegram kanalı",
+  "Choose a rank":
+    "Bir rütbe seç",
+  "Ban tier list":
+    "Yasak tier listesi",
+  "How often each brawler gets banned in a game.":
+    "Her savaşçının bir maçta ne sıklıkla yasaklandığı.",
+  "Not enough games here yet.":
+    "Burada henüz yeterli maç yok.",
+  "Nobody":
+    "Hiç kimse",
+  "From {n} games.":
+    "{n} maçtan.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "Harf, savaşçının yasaklandığı maç oranıdır: S %40'tan, A %20'den, B %10'dan, C %5'ten başlar.",
+  "Kills, deaths and damage":
+    "Öldürme, ölüm ve hasar",
+  "What each brawler does in a game, on average.":
+    "Her savaşçının bir maçtaki ortalaması.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Öldürme",
+  "Deaths":
+    "Ölüm",
+  "Damage":
+    "Hasar",
+  "Healing":
+    "İyileştirme",
+  "Never died":
+    "Hiç ölmeden",
+  "Most banned":
+    "En çok yasaklanan",
+  "Best K/D":
+    "En iyi K/D",
+  "Dies the least":
+    "En az ölen",
+  "Most damage":
+    "En çok hasar",
+  "Most star players":
+    "En çok yıldız oyuncu",
+  "Highest first":
+    "Önce en yüksek",
+  "Lowest first":
+    "Önce en düşük",
+  "Show all {n}":
+    "Tümünü göster ({n})",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "{n} maçtan az oynayan savaşçılar listede yok. Hasar ve iyileştirme, tüm maçın saniyesi başınadır.",
+  "{n} a game":
+    "maç başına {n}",
+  "{n} a second":
+    "saniyede {n}",
+  "{n}% of games":
+    "maçların %{n}",
+  "All maps":
+    "Tüm haritalar",
+  "Map":
+    "Harita",
+  "Show less":
+    "Daha az göster",
+  "Ranked Stats":
+    "Aşamalı istatistikleri",
 };

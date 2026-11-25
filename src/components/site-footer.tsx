@@ -70,6 +70,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
       { href: '/brawlers', label: 'Brawlers' },
       { href: '/tier-list/ranked', label: 'Tier List' },
       { href: '/ranked', label: 'Ranked Maps' },
+      { href: '/ranked/stats', label: 'Ranked Stats' },
       { href: '/maps', label: 'Maps' },
       { href: '/leaderboard', label: 'Leaderboard' },
     ],

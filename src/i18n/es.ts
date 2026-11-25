@@ -5496,4 +5496,74 @@ export const ES: Record<string, string> = {
     "Quién ganó el Brawl Pass, la repetición del sorteo y la lista completa de boletos.",
   "Follow so you see it the moment it is out.":
     "Síguenos para verlo en cuanto salga.",
+  "Choose a rank":
+    "Elige un rango",
+  "Mythic and up":
+    "Mítico o más",
+  "Most banned brawlers and Ranked stats ({v})":
+    "Los brawlers más baneados y estadísticas de Competitivo ({v})",
+  "The most banned brawlers in Brawl Stars Ranked by rank and by map, and who kills, dies, heals and deals damage the most. From real games, updated every 2 hours.":
+    "Los brawlers más baneados en el Competitivo de Brawl Stars por rango y por mapa, y quién mata, muere, cura y hace más daño. De partidas reales, actualizado cada 2 horas.",
+  "Ranked stats":
+    "Estadísticas de Competitivo",
+  "Ranked Stats":
+    "Estadísticas de Competitivo",
+  "Who gets banned, who kills the most, who dies the most and who deals the most damage, by rank.":
+    "Quién es baneado, quién mata más, quién muere más y quién hace más daño, por rango.",
+  "Ban tier list":
+    "Tier list de baneos",
+  "How often each brawler gets banned in a game.":
+    "Con qué frecuencia se banea a cada brawler en una partida.",
+  "Not enough games here yet.":
+    "Aún no hay suficientes partidas aquí.",
+  "Nobody":
+    "Nadie",
+  "From {n} games.":
+    "De {n} partidas.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "La letra es la parte de partidas en que se banea al brawler: S desde 40%, A desde 20%, B desde 10%, C desde 5%.",
+  "Kills, deaths and damage":
+    "Eliminaciones, muertes y daño",
+  "What each brawler does in a game, on average.":
+    "Lo que hace cada brawler en una partida, de media.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Eliminaciones",
+  "Deaths":
+    "Muertes",
+  "Damage":
+    "Daño",
+  "Healing":
+    "Curación",
+  "Never died":
+    "Sin morir",
+  "Most banned":
+    "Más baneado",
+  "Best K/D":
+    "Mejor K/D",
+  "Dies the least":
+    "Muere menos",
+  "Most damage":
+    "Más daño",
+  "Most star players":
+    "Más veces estelar",
+  "Highest first":
+    "De más a menos",
+  "Lowest first":
+    "De menos a más",
+  "Show all {n}":
+    "Mostrar los {n}",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "Se omiten los brawlers con menos de {n} partidas. El daño y la curación son por segundo de toda la partida.",
+  "{n} a game":
+    "{n} por partida",
+  "{n} a second":
+    "{n} por segundo",
+  "{n}% of games":
+    "{n}% de las partidas",
+  "Bans, kills and damage by rank":
+    "Baneos, eliminaciones y daño por rango",
+  "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
+    "Los brawlers más baneados en cada mapa, y quién mata, muere y hace más daño.",
 };

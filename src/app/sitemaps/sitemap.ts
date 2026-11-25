@@ -153,6 +153,7 @@ async function core(add: Add, dataDay: Date | null) {
   }
 
   add('/ranked', 'daily', 0.8);
+  add('/ranked/stats', 'daily', 0.8);
   add('/daily', 'daily', 0.9);
   add('/meta', 'daily', 0.8);
   add('/hidden-meta', 'daily', 0.8);

@@ -602,4 +602,66 @@ export const CLIENT_RU: Record<string, string> = {
     "Забрать",
   "Telegram channel":
     "Канал в Telegram",
+  "Choose a rank":
+    "Выбери ранг",
+  "Ban tier list":
+    "Тир-лист банов",
+  "How often each brawler gets banned in a game.":
+    "Как часто каждого бойца банят в бою.",
+  "Not enough games here yet.":
+    "Здесь пока недостаточно боёв.",
+  "Nobody":
+    "Никого",
+  "From {n} games.":
+    "Боёв: {n}.",
+  "The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.":
+    "Буква показывает долю боёв, где бойца банят: S от 40%, A от 20%, B от 10%, C от 5%.",
+  "Kills, deaths and damage":
+    "Убийства, смерти и урон",
+  "What each brawler does in a game, on average.":
+    "Что каждый боец делает за бой в среднем.",
+  "K/D":
+    "K/D",
+  "Kills":
+    "Убийства",
+  "Deaths":
+    "Смерти",
+  "Damage":
+    "Урон",
+  "Healing":
+    "Лечение",
+  "Never died":
+    "Без смертей",
+  "Most banned":
+    "Чаще всех банят",
+  "Best K/D":
+    "Лучшее K/D",
+  "Dies the least":
+    "Реже всех умирает",
+  "Most damage":
+    "Больше всех урона",
+  "Most star players":
+    "Чаще всех звёздный игрок",
+  "Highest first":
+    "Сначала больше",
+  "Lowest first":
+    "Сначала меньше",
+  "Show all {n}":
+    "Показать всех ({n})",
+  "Brawlers with fewer than {n} games are left out. Damage and healing are per second of the whole game.":
+    "Бойцов, у которых меньше боёв, чем {n}, здесь нет. Урон и лечение считаются за секунду всего боя.",
+  "{n} a game":
+    "{n} за бой",
+  "{n} a second":
+    "{n} в секунду",
+  "{n}% of games":
+    "{n}% боёв",
+  "All maps":
+    "Все карты",
+  "Map":
+    "Карта",
+  "Show less":
+    "Свернуть",
+  "Ranked Stats":
+    "Статистика ранговых боёв",
 };
