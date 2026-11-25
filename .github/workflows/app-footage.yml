@@ -1,0 +1,83 @@
+# Runs the Bubble test APK (the `bubble-test` release) on an Android emulator,
+# walks through it and publishes the screens as the `app-footage` release.
+# Two uses: footage for the videos, and a first crash check of a build.
+# Lives on the app-footage branch, so it never starts a site deploy.
+name: App footage
+
+on:
+  push:
+    branches: [app-footage]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: app-footage
+  cancel-in-progress: true
+
+jobs:
+  shoot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
+      - name: Emulator
+        run: |
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK" ] || [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDK="$HOME/android-sdk"
+            mkdir -p "$SDK/cmdline-tools"
+            curl -fsSL -o /tmp/cmdline.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+            unzip -q /tmp/cmdline.zip -d "$SDK/cmdline-tools"
+            mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
+          fi
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK"
+          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$SDK/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-34" "system-images;android-34;google_apis;x86_64" > /dev/null
+          echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -f -n phone -k "system-images;android-34;google_apis;x86_64" -d pixel_7
+          cat >> "$HOME/.android/avd/phone.avd/config.ini" <<CFG
+          hw.ramSize=4096
+          hw.cpu.ncore=4
+          hw.keyboard=yes
+          disk.dataPartition.size=4G
+          CFG
+          nohup "$SDK/emulator/emulator" -avd phone -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -cores 4 -memory 4096 > emulator.log 2>&1 &
+          timeout 400 "$SDK/platform-tools/adb" wait-for-device
+          for i in $(seq 1 120); do
+            [ "$("$SDK/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
+            sleep 4
+          done
+          "$SDK/platform-tools/adb" shell getprop ro.build.version.release
+
+      - name: Shoot
+        run: |
+          export PATH="$ANDROID_HOME/platform-tools:$PATH"
+          curl -fsSL -o bubble-test.apk "https://github.com/$GITHUB_REPOSITORY/releases/download/bubble-test/bubble-test.apk"
+          mkdir -p out
+          python3 deploy/app-footage/shoot.py 2>&1 | tee out/log.txt
+
+      - name: Publish
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out
+          cp emulator.log out/ 2>/dev/null || true
+          (cd out && zip -qr ../footage.zip .)
+          for try in 1 2 3; do
+            gh release delete app-footage --cleanup-tag --yes || true
+            sleep 4
+            gh release create app-footage footage.zip --target main --prerelease --title "App footage" --notes "Screens of the Bubble test build, for the videos." && exit 0
+            sleep 15
+          done
+          exit 1
