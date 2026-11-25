@@ -72,7 +72,8 @@ export async function BrawlerCombat({ name, data, modeMeta }: { name: string; da
         aside={<Link href={localePath(locale, '/ranked/stats')} className="text-sm font-semibold text-brand hover:underline">{t('Ranked stats')}</Link>}
       />
       <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        {METRICS.map((m) => {
+        {/* Healing only for the quarter that heals most: "87th of 87" says nothing. */}
+        {METRICS.filter((m) => m !== 'healing' || (places.healing ?? Infinity) <= of / 4).map((m) => {
           const Icon = ICONS[m];
           return (
             <li key={m} className="rounded-2xl border-2 border-ink bg-surface-2/70 px-4 py-3">
