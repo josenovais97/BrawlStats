@@ -793,8 +793,8 @@ class MainActivity : AppCompatActivity() {
                     .setPositiveButton(R.string.invite_add) { _, _ ->
                         Thread {
                             val result = Invite.accept(app, code, from)
-                            runOnUiThread {
-                                if (isFinishing || isDestroyed) return@runOnUiThread
+                            runOnUiThread told@{
+                                if (isFinishing || isDestroyed) return@told
                                 val message = when (result) {
                                     Friends.AddResult.ADDED, Friends.AddResult.ALREADY -> getString(R.string.invite_added, name)
                                     Friends.AddResult.FULL -> getString(R.string.friends_full)

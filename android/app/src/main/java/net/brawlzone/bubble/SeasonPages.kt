@@ -32,6 +32,9 @@ internal object SeasonPages {
     var which = NOW
     var sort = 0
     var showAll = false
+
+    /** The last look found no answer: the open page offers another instead of waiting on. */
+    var failed = false
 }
 
 private fun MainActivity.percent(n: Double): String = NumberFormat.getPercentInstance(AppLang.locale(AppLang.current(this))).format(n)
@@ -45,12 +48,14 @@ internal fun MainActivity.refreshSeasonData(force: Boolean = false, done: () -> 
         return
     }
     val app = applicationContext
+    SeasonPages.failed = false
     Thread {
-        SeasonData.fetch(app, which)
+        val got = SeasonData.fetch(app, which) != null
         // The last season's number is on the running one's answer: the switch needs both.
         if (which == SeasonPages.LAST && SeasonData.last(app, SeasonPages.NOW) == null) SeasonData.fetch(app, SeasonPages.NOW)
         runOnUiThread {
             if (isFinishing || isDestroyed) return@runOnUiThread
+            if (which == SeasonPages.which) SeasonPages.failed = !got
             paintSeasonPages()
             paintHomeFight()
             done()
@@ -80,6 +85,7 @@ internal fun MainActivity.openSeason(which: String) {
     if (which == SeasonPages.which) return
     SeasonPages.which = which
     SeasonPages.showAll = false
+    SeasonPages.failed = false
     paintSeasonPages()
     refreshSeasonData()
 }
@@ -178,12 +184,32 @@ private fun MainActivity.seasonCardBusy(button: TextView, busy: Boolean, number:
     findViewById<View>(R.id.share_progress).visibility = if (busy) View.VISIBLE else View.GONE
 }
 
+/** Placeholders while the answer is on its way; a card to tap when none came. */
+private fun MainActivity.waiting(box: LinearLayout, heights: List<Int>) {
+    if (!SeasonPages.failed) {
+        box.addView(Ui.skeleton(this, heights))
+        return
+    }
+    box.addView(
+        Ui.card(this).apply {
+            addView(Ui.text(this@waiting, getString(R.string.panel_retry), 15f).apply { gravity = Gravity.CENTER })
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                SeasonPages.failed = false
+                paintSeasonPages()
+                refreshSeasonData(force = true)
+            }
+        },
+    )
+}
+
 // ------------------------------------------------------------------- last season
 
 private fun MainActivity.paintLastRank(box: LinearLayout, data: SeasonData.Data?, number: Int?) {
     box.removeAllViews()
     if (data == null) {
-        box.addView(Ui.skeleton(this, listOf(150, 80, 56)))
+        waiting(box, listOf(150, 80, 56))
         return
     }
     val versus = Versus.last(this)?.last?.takeIf { it.number == (data.number ?: number) }
@@ -234,7 +260,7 @@ private fun MainActivity.paintLastRank(box: LinearLayout, data: SeasonData.Data?
 private fun MainActivity.paintStats(box: LinearLayout, data: SeasonData.Data?) {
     box.removeAllViews()
     if (data == null) {
-        box.addView(Ui.skeleton(this, listOf(150, 220, 180)))
+        waiting(box, listOf(150, 220, 180))
         return
     }
     val mine = data.mine
@@ -389,7 +415,7 @@ internal fun MainActivity.coachRow(icon: String?, line: String, good: Boolean): 
 private fun MainActivity.paintBrawlers(box: LinearLayout, data: SeasonData.Data?) {
     box.removeAllViews()
     if (data == null) {
-        box.addView(Ui.skeleton(this, listOf(44, 170, 64, 64, 64, 64)))
+        waiting(box, listOf(44, 170, 64, 64, 64, 64))
         return
     }
     if (data.brawlers.isEmpty()) {
