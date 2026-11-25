@@ -1,7 +1,7 @@
-# Runs the Bubble test APK (the `bubble-test` release) on an Android emulator,
-# walks through it and publishes the screens as the `app-footage` release.
-# Two uses: footage for the videos, and a first crash check of a build.
-# Lives on the app-footage branch, so it never starts a site deploy.
+# Runs the Bubble test APK (the `bubble-test` release) on an Android emulator
+# for screens, clips and a crash check. The walk itself is deploy/app-footage/
+# shoot.py. This version only clears the pictures of the last walk: the
+# workflow that shoots is in this branch's history.
 name: App footage
 
 on:
@@ -11,75 +11,13 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: app-footage
-  cancel-in-progress: true
-
 jobs:
-  shoot:
+  clear:
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
-
-      - name: KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          ls -l /dev/kvm
-
-      - name: Emulator
-        run: |
-          mkdir -p out
-          set -o pipefail
-          {
-            set -x
-            SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
-            if [ -z "$SDK" ] || [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
-              SDK="$HOME/android-sdk"
-              mkdir -p "$SDK/cmdline-tools"
-              curl -fsSL -o /tmp/cmdline.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-              unzip -q /tmp/cmdline.zip -d "$SDK/cmdline-tools"
-              mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
-            fi
-            export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK" ANDROID_USER_HOME="$HOME/.android" ANDROID_AVD_HOME="$HOME/.android/avd"
-            mkdir -p "$ANDROID_AVD_HOME"
-            for v in ANDROID_HOME ANDROID_SDK_ROOT ANDROID_USER_HOME ANDROID_AVD_HOME; do echo "$v=${!v}" >> "$GITHUB_ENV"; done
-            (yes || true) | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-            "$SDK/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-34" "system-images;android-34;google_apis;x86_64" | tail -3
-            echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -f -n phone -k "system-images;android-34;google_apis;x86_64" -d pixel_7
-            ls -la "$ANDROID_AVD_HOME"
-            printf 'hw.ramSize=4096\nhw.cpu.ncore=4\nhw.keyboard=yes\n' >> "$ANDROID_AVD_HOME/phone.avd/config.ini"
-            nohup "$SDK/emulator/emulator" -avd phone -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -cores 4 -memory 4096 > out/emulator.log 2>&1 &
-            timeout 500 "$SDK/platform-tools/adb" wait-for-device
-            for i in $(seq 1 120); do
-              [ "$("$SDK/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
-              sleep 4
-            done
-            "$SDK/platform-tools/adb" shell getprop ro.build.version.release
-            echo booted
-          } > out/setup.log 2>&1 || { tail -40 out/setup.log; exit 1; }
-
-      - name: Shoot
-        run: |
-          export PATH="$ANDROID_HOME/platform-tools:$PATH"
-          curl -fsSL -o bubble-test.apk "https://github.com/$GITHUB_REPOSITORY/releases/download/bubble-test/bubble-test.apk"
-          mkdir -p out
-          python3 -u deploy/app-footage/shoot.py 2>&1 | tee out/log.txt
-
-      - name: Publish
-        if: always()
+      - name: Delete the published pictures
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p out
-          date > out/when.txt
-          (cd out && zip -qr ../footage.zip .)
-          for try in 1 2 3; do
-            gh release delete app-footage --cleanup-tag --yes || true
-            sleep 4
-            gh release create app-footage footage.zip --target main --prerelease --title "App footage" --notes "Screens of the Bubble test build, for the videos." && exit 0
-            sleep 15
-          done
-          exit 1
+          GH_REPO: ${{ github.repository }}
+        run: gh release delete app-footage --cleanup-tag --yes
