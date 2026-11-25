@@ -1,6 +1,6 @@
 import { ChevronRight, Download, Flame, Snowflake } from 'lucide-react';
 import Image from 'next/image';
-import { cache, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { CrownIcon, RankedIcon } from '@/components/game-icons';
@@ -11,48 +11,27 @@ import { SeasonHours } from '@/components/player/season/season-hours';
 import { ShareButton } from '@/components/player/share-button';
 import { ShareImageButton } from '@/components/share-image-button';
 import { rankedTierIconUrl } from '@/lib/brawlapi';
-import { getBattleLog } from '@/lib/bs-api';
 import { formatNumber, formatPercentWhole } from '@/lib/format';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { DATE_LOCALE, localePath } from '@/lib/i18n';
 import { gameWords } from '@/lib/i18n-game';
+import { MIN_COMBAT_GAMES, combatRates, type PlayerCombat } from '@/lib/combat';
+import { PlayerCombatPanel } from '@/components/player/season/player-combat';
 import {
   bestBrawler,
   bestKeyed,
   dayBefore,
-  gamesFromLog,
-  seasonView,
   todayUtc,
   winRate,
   type BrawlerRecord,
 } from '@/lib/ranked-season';
-import { getSeasonState } from '@/lib/ranked-seasons';
 import { brawlerPath } from '@/lib/slugs';
-import { getPlayerRankedSeason, mapNameKey } from '@/lib/stats';
+import { getPlayerSeasonStats, mapNameKey } from '@/lib/stats';
+import { seasonFor, seasonPair } from '@/lib/player-season-data';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayer } from '@/types/brawlstars';
-
-/**
- * The season's reads and the view built from them, once per request: the
- * Ranked tab and the Overview teaser both ask.
- */
-export const seasonFor = cache(async (tag: string, playerTag: string) => {
-  const state = await getSeasonState().catch(() => null);
-  const season = state?.current ?? state?.latest ?? null;
-  const from = season?.startsOn ?? null;
-  const to = season?.endsOn ?? null;
-  const data = from && to ? await getPlayerRankedSeason(tag, from, to) : null;
-  const log = await getBattleLog(tag)
-    .then((r) => r.items)
-    .catch(() => []);
-  const fromMs = from ? Date.parse(`${from}T00:00:00Z`) : 0;
-  const toMs = to ? Date.parse(`${to}T00:00:00Z`) : Infinity;
-  const logGames = gamesFromLog(log, playerTag).filter((g) => g.time >= fromMs && g.time < toMs);
-  const view = seasonView(data?.rows ?? [], data?.games ?? [], logGames);
-  return { state, season, from, to, data, view };
-});
 
 /**
  * A card on the Overview tab pointing at the Ranked tab, so the season is
@@ -67,11 +46,11 @@ export async function SeasonTeaser({
   tag: string;
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const { state, season, view } = await seasonFor(tag, player.tag);
+  const { season, view, live, daysLeft: days } = await seasonFor(tag, player.tag);
   if (view.games === 0) return null;
   const t = getT(requestLocale());
   const top = view.brawlers[0];
-  const days = state?.current ? state.daysUntilNext : null;
+  const combat = combatRates(view.combat.totals);
   return (
     <a
       href="#ranked"
@@ -94,7 +73,7 @@ export async function SeasonTeaser({
         </p>
         <p className="display text-game-stroke mt-1 text-3xl leading-none sm:text-4xl">
           {season?.number ? t('SEASON {n}', { n: season.number }) : t('MY SEASON')}{' '}
-          <span className="text-brand">{t('WRAPPED')}</span>
+          <span className="text-brand">{live ? t('SO FAR') : t('WRAPPED')}</span>
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -106,6 +85,12 @@ export async function SeasonTeaser({
           <p className="text-xs text-muted">{t('Win rate')}</p>
           <p className="display text-2xl leading-none text-brand tabular-nums">{formatPercentWhole(view.wins / view.games)}</p>
         </div>
+        {combat && view.combat.totals.games >= MIN_COMBAT_GAMES ? (
+          <div>
+            <p className="text-xs text-muted">{t('K/D')}</p>
+            <p className="display text-2xl leading-none tabular-nums">{combat.kd.toFixed(2)}</p>
+          </div>
+        ) : null}
         {top ? (
           <div className="flex items-center gap-2">
             <BrawlerFace id={top.brawlerId} meta={brawlerMeta} size={40} />
@@ -155,13 +140,15 @@ export async function PlayerSeason({
   const fmtDay = (day: string) =>
     new Date(`${day}T00:00:00Z`).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
-  const { state, season, from, to, data, view } = await seasonFor(tag, player.tag);
-  const { hasSeason, brawlers, days, games, wins, recent, detail, detailDays } = view;
+  const { which, season, from, to, live, daysLeft, data, view } = await seasonFor(tag, player.tag);
+  const { hasSeason, brawlers, days, games, wins, recent, detail, detailDays, combat } = view;
 
   const hasRank = Boolean(player.rankedElo || player.highestAllTimeRankedElo);
   const seasonNo = season?.number ?? null;
-  const live = Boolean(state?.current);
   const last = to ? dayBefore(to) : null;
+  // The season before, beside the running one: its totals and its own card.
+  const before = which === 'now' ? (await seasonPair()).last : null;
+  const beforeStats = before ? await getPlayerSeasonStats(tag, before.from, before.to) : null;
 
   if (games === 0 && !hasRank) {
     return (
@@ -221,9 +208,9 @@ export async function PlayerSeason({
             <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
               <RankedIcon className="size-4" />
               {seasonNo ? t('Ranked · Season {n}', { n: seasonNo }) : t('Ranked')}
-              {live && state?.daysUntilNext !== null && state?.daysUntilNext !== undefined ? (
+              {live && daysLeft !== null ? (
                 <span className="rounded-full border-2 border-ink bg-brand px-2.5 py-0.5 text-xs text-brand-ink">
-                  {state.daysUntilNext <= 1 ? t('Ends tomorrow') : t('Ends in {n} days', { n: state.daysUntilNext })}
+                  {daysLeft <= 1 ? t('Ends tomorrow') : t('Ends in {n} days', { n: daysLeft })}
                 </span>
               ) : seasonNo ? (
                 <span className="rounded-full border-2 border-ink bg-surface-3 px-2.5 py-0.5 text-xs">{t('Season over')}</span>
@@ -232,19 +219,34 @@ export async function PlayerSeason({
             <h2 className="display text-game-stroke mt-3 text-5xl leading-[0.95] sm:text-6xl">
               {seasonNo ? t('SEASON {n}', { n: seasonNo }) : t('MY SEASON')}
               <br />
-              <span className="text-brand">{t('WRAPPED')}</span>
+              <span className="text-brand">{live ? t('SO FAR') : t('WRAPPED')}</span>
             </h2>
             {subtitle ? <p className="mt-3 max-w-xl text-sm text-muted">{subtitle}</p> : null}
             {!hasSeason && games > 0 ? <p className="mt-1 max-w-xl text-sm text-muted">{t('Season totals show up here within a few hours.')}</p> : null}
-            {/* The season as a phone story, branded, for sharing (2026-11-12). */}
-            {games >= 5 ? (
-              <ShareImageButton
-                src={`/player/${encodeURIComponent(tag)}/season-story`}
-                fileName={`brawlzone-season-${tag}.png`}
-                kind="season"
-                label={t('Share my season')}
-                className="mt-4"
-              />
+            {/* The season as a phone story, branded, for sharing (2026-11-12); the
+                last one's card beside it since 2026-11-25. */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {games >= 5 ? (
+                <ShareImageButton
+                  src={`/player/${encodeURIComponent(tag)}/season-story${which === 'last' ? '/last' : ''}`}
+                  fileName={`brawlzone-season-${seasonNo ?? ''}-${tag}.png`}
+                  kind="season"
+                  label={seasonNo ? t('Share Season {n}', { n: seasonNo }) : t('Share my season')}
+                />
+              ) : null}
+              {before && beforeStats && beforeStats.games >= 5 ? (
+                <ShareImageButton
+                  src={`/player/${encodeURIComponent(tag)}/season-story/last`}
+                  fileName={`brawlzone-season-${before.number}-${tag}.png`}
+                  kind="season-last"
+                  label={t('Share Season {n}', { n: before.number })}
+                />
+              ) : null}
+            </div>
+            {before && beforeStats && beforeStats.games > 0 ? (
+              <p className="mt-3 text-sm text-muted">
+                {t('Season {n}: {games} games, {rate} won', { n: before.number, games: formatNumber(beforeStats.games), rate: formatPercentWhole(beforeStats.wins / beforeStats.games) })}
+              </p>
             ) : null}
           </div>
 
@@ -327,6 +329,8 @@ export async function PlayerSeason({
         ) : null}
       </section>
 
+      <PlayerCombatPanel player={player} combat={combat} />
+
       {/* -------------------------------------------------------- top 10 */}
       {top.length > 0 ? (
         <section className="card p-5 sm:p-6">
@@ -356,13 +360,14 @@ export async function PlayerSeason({
                 <p className={`display text-3xl leading-none sm:text-4xl ${rateTone(winRate(b))}`}>{formatPercentWhole(winRate(b))}</p>
                 <p className="mt-1 text-xs font-bold tabular-nums">{`${b.wins}–${b.games - b.wins}`}</p>
                 <p className="text-[11px] text-muted sm:text-xs">{t('{games} games', { games: b.games })}</p>
+                {kdOf(combat, b.brawlerId) ? <p className="text-[11px] font-bold tabular-nums text-accent sm:text-xs">{t('K/D')} {kdOf(combat, b.brawlerId)}</p> : null}
               </li>
             ))}
           </ol>
 
           <ol className="mt-4 divide-y divide-border/60" start={4}>
             {top.slice(3).map((b, i) => (
-              <BrawlerRow key={b.brawlerId} rank={i + 4} row={b} max={mostGames} meta={brawlerMeta} average={averageRate.get(b.brawlerId)} lp={lp} />
+              <BrawlerRow key={b.brawlerId} rank={i + 4} row={b} max={mostGames} meta={brawlerMeta} average={averageRate.get(b.brawlerId)} kd={kdOf(combat, b.brawlerId)} lp={lp} />
             ))}
           </ol>
 
@@ -384,7 +389,7 @@ export async function PlayerSeason({
               </summary>
               <ol className="mt-2 divide-y divide-border/60">
                 {rest.map((b, i) => (
-                  <BrawlerRow key={b.brawlerId} rank={i + 11} row={b} max={mostGames} meta={brawlerMeta} average={averageRate.get(b.brawlerId)} lp={lp} />
+                  <BrawlerRow key={b.brawlerId} rank={i + 11} row={b} max={mostGames} meta={brawlerMeta} average={averageRate.get(b.brawlerId)} kd={kdOf(combat, b.brawlerId)} lp={lp} />
                 ))}
               </ol>
             </details>
@@ -565,7 +570,7 @@ export async function PlayerSeason({
         <div className="flex shrink-0 flex-wrap gap-2">
           {hasSeason ? (
             <a
-              href={`/api/bubble/card?kind=season&tag=${encodeURIComponent(tag)}&lang=${locale}`}
+              href={`/api/bubble/card?kind=season${which === 'last' ? '&which=last' : ''}&tag=${encodeURIComponent(tag)}&lang=${locale}`}
               target="_blank"
               rel="nofollow noopener"
               className="btn-game inline-flex items-center gap-2 bg-brand px-4 py-2 text-sm text-brand-ink hover:bg-brand-strong"
@@ -599,6 +604,13 @@ function diffLabel(diff: number, t: T): string {
   return t('{n} pts vs average', { n: `${n > 0 ? '+' : n < 0 ? '−' : '±'}${Math.abs(n)}` });
 }
 
+/** Kills per death with one brawler, from three games up. */
+function kdOf(combat: PlayerCombat, brawlerId: number): string | null {
+  const b = combat.byBrawler.get(brawlerId);
+  const rates = b && b.games >= 3 ? combatRates(b) : null;
+  return rates ? rates.kd.toFixed(2) : null;
+}
+
 /** Daily readings plus today's live elo, while the season is running. */
 function eloPoints(readings: { day: string; elo: number }[], now: number | null, live: boolean) {
   const today = todayUtc();
@@ -624,6 +636,7 @@ function BrawlerRow({
   max,
   meta,
   average,
+  kd,
   lp,
 }: {
   rank: number;
@@ -631,6 +644,8 @@ function BrawlerRow({
   max: number;
   meta: Map<number, BABrawler>;
   average: number | undefined;
+  /** Kills per death with the brawler, once there are games to say. */
+  kd: string | null;
   lp: (path: string) => string;
 }) {
   const t = getT(requestLocale());
@@ -650,6 +665,7 @@ function BrawlerRow({
               {diffLabel(diff, t)}
             </span>
           ) : null}
+          {kd ? <span className="shrink-0 text-[11px] font-bold tabular-nums text-accent">{t('K/D')} {kd}</span> : null}
         </div>
         <div className="mt-1 flex items-center gap-2">
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-3">

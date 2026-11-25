@@ -105,9 +105,10 @@ export function TierDrawer({
               </p>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className={`mt-4 grid gap-2 ${entry.banRate !== null ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
             <Stat label={t('Win rate')} value={pct(entry.winRate, locale)} />
             <Stat label={t('Pick rate')} value={pct(entry.pickRate, locale)} />
+            {entry.banRate !== null ? <Stat label={t('Ban rate')} value={pct(entry.banRate, locale)} /> : null}
             <Stat label={t('Battles')} value={entry.games.toLocaleString(NUMBER_LOCALE[locale])} />
           </div>
         </div>

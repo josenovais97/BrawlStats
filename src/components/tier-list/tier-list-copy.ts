@@ -69,6 +69,8 @@ export interface TierCopy {
   winTitle: string;
   pickLetter: string;
   pickTitle: string;
+  banLetter: string;
+  banTitle: string;
   emptyTitle: (configured: boolean) => string;
   emptyBody: (configured: boolean, window: string) => string;
   browse: string;
@@ -165,6 +167,8 @@ const en: TierCopy = {
   winTitle: 'Adjusted win rate',
   pickLetter: 'P',
   pickTitle: 'Pick rate',
+  banLetter: 'B',
+  banTitle: 'Ban rate',
   emptyTitle: (c) => (c ? 'No aggregated data yet' : 'Database not configured'),
   emptyBody: (c, w) =>
     c ? `Not enough battles sampled in the ${w} yet. Try a longer window, or check back shortly.` : 'Rankings are not available right now.',
@@ -264,6 +268,8 @@ const es: TierCopy = {
   winTitle: 'Tasa de victorias ajustada',
   pickLetter: 'U',
   pickTitle: 'Tasa de uso',
+  banLetter: 'B',
+  banTitle: 'Tasa de baneo',
   emptyTitle: (c) => (c ? 'Todavía no hay datos' : 'Base de datos no configurada'),
   emptyBody: (c, w) =>
     c ? `Todavía no hay suficientes partidas en ${w}. Prueba una ventana más larga o vuelve en un rato.` : 'La clasificación no está disponible ahora mismo.',
@@ -363,6 +369,8 @@ const pt: TierCopy = {
   winTitle: 'Taxa de vitória ajustada',
   pickLetter: 'E',
   pickTitle: 'Taxa de escolha',
+  banLetter: 'B',
+  banTitle: 'Taxa de ban',
   emptyTitle: (c) => (c ? 'Ainda não há dados' : 'Banco de dados não configurado'),
   emptyBody: (c, w) =>
     c ? `Ainda não há partidas suficientes em ${w}. Tente uma janela maior ou volte daqui a pouco.` : 'O ranking não está disponível agora.',
@@ -461,6 +469,8 @@ const tr: TierCopy = {
   winTitle: 'Düzeltilmiş kazanma oranı',
   pickLetter: 'S',
   pickTitle: 'Seçilme oranı',
+  banLetter: 'Y',
+  banTitle: 'Yasaklanma oranı',
   emptyTitle: (c) => (c ? 'Henüz toplanmış veri yok' : 'Veritabanı yapılandırılmadı'),
   emptyBody: (c, w) =>
     c ? `${w} döneminde henüz yeterli maç incelenmedi. Daha uzun bir dönem dene ya da biraz sonra tekrar bak.` : 'Sıralamalar şu anda kullanılamıyor.',
@@ -558,6 +568,8 @@ const de: TierCopy = {
   winTitle: 'Bereinigte Siegquote',
   pickLetter: 'P',
   pickTitle: 'Pickrate',
+  banLetter: 'B',
+  banTitle: 'Bannrate',
   emptyTitle: (c) => (c ? 'Noch keine aggregierten Daten' : 'Datenbank nicht eingerichtet'),
   emptyBody: (c, w) =>
     c ? `Im Zeitraum ${w} wurden noch nicht genug Matches erfasst. Probier einen längeren Zeitraum oder schau gleich wieder vorbei.` : 'Ranglisten sind gerade nicht verfügbar.',
@@ -655,6 +667,8 @@ const ru: TierCopy = {
   winTitle: 'Скорректированный процент побед',
   pickLetter: 'В',
   pickTitle: 'Частота выбора',
+  banLetter: 'Б',
+  banTitle: 'Частота банов',
   emptyTitle: (c) => (c ? 'Пока нет сводных данных' : 'База данных не настроена'),
   emptyBody: (c, w) =>
     c ? `За ${w} собрано недостаточно боёв. Попробуй период подлиннее или загляни чуть позже.` : 'Рейтинги сейчас недоступны.',
@@ -752,6 +766,8 @@ const fr: TierCopy = {
   winTitle: 'Taux de victoire ajusté',
   pickLetter: 'S',
   pickTitle: 'Taux de sélection',
+  banLetter: 'B',
+  banTitle: 'Taux de ban',
   emptyTitle: (c) => (c ? 'Pas encore de données agrégées' : 'Base de données non configurée'),
   emptyBody: (c, w) =>
     c ? `Pas encore assez de combats collectés sur ${w}. Essaie une période plus longue ou reviens un peu plus tard.` : 'Les classements sont indisponibles pour le moment.',

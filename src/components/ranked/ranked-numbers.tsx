@@ -92,7 +92,10 @@ export function RankedNumbers({ first, labels }: { first: RankNumbers; labels: N
               : t('{n}% of games', { n: ((m === 'star' ? r.star : r.deathless) * 100).toFixed(1) });
 
   const mapBans = map ? data.maps.find((m) => `${m.mode}|${m.map}` === map) ?? null : null;
-  const bans: BanList = map ? mapBans?.bans ?? [] : data.bans;
+  // An answer cached before the modes were added has none.
+  const modeBans = banMode ? data.modes?.[banMode] ?? null : null;
+  const bans: BanList = map ? mapBans?.bans ?? [] : banMode ? modeBans?.bans ?? [] : data.bans;
+  const banGames = map ? mapBans?.battles ?? 0 : banMode ? modeBans?.battles ?? 0 : data.battles;
   const tiers = banTiers(bans);
   const rows = useMemo(() => rankBy(data.stats[mode] ?? [], metric, order), [data, mode, metric, order]);
   const shown = all ? rows : rows.slice(0, SHOWN);
@@ -172,7 +175,7 @@ export function RankedNumbers({ first, labels }: { first: RankNumbers; labels: N
             <Chips label={t('Map')}>
               <button type="button" aria-pressed={!banMode} onClick={() => { setBanMode(null); setMap(null); }} className={cls(!banMode)}>{t('All maps')}</button>
               {NUMBER_MODES.filter((m) => data.maps.some((x) => x.mode === m)).map((m) => (
-                <button key={m} type="button" aria-pressed={banMode === m} onClick={() => { setBanMode(m); const f = data.maps.find((x) => x.mode === m); setMap(f ? `${f.mode}|${f.map}` : null); }} className={cls(banMode === m)}>
+                <button key={m} type="button" aria-pressed={banMode === m} onClick={() => { setBanMode(m); setMap(null); }} className={cls(banMode === m)}>
                   <Icon src={labels.modes[m]?.icon} />
                   {labels.modes[m]?.label ?? m}
                 </button>
@@ -180,6 +183,7 @@ export function RankedNumbers({ first, labels }: { first: RankNumbers; labels: N
             </Chips>
             {banMode ? (
               <Chips label={labels.modes[banMode]?.label ?? banMode}>
+                <button type="button" aria-pressed={!map} onClick={() => setMap(null)} className={cls(!map)}>{t('All maps')}</button>
                 {data.maps.filter((x) => x.mode === banMode).map((x) => {
                   const key = `${x.mode}|${x.map}`;
                   return (
@@ -214,7 +218,7 @@ export function RankedNumbers({ first, labels }: { first: RankNumbers; labels: N
               </div>
             )}
             <p className="text-xs text-muted">
-              {t('From {n} games.', { n: (map ? mapBans?.battles ?? 0 : data.battles).toLocaleString('en-US') })}{' '}
+              {t('From {n} games.', { n: banGames.toLocaleString('en-US') })}{' '}
               {t('The letter is the share of games a brawler is banned in: S from 40%, A from 20%, B from 10%, C from 5%.')}
             </p>
           </section>

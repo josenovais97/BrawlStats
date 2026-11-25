@@ -5567,4 +5567,34 @@ export const FR: Record<string, string> = {
     "Bans, éliminations et dégâts par rang",
   "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
     "Les brawlers les plus bannis sur chaque carte, et qui tue, meurt et inflige le plus.",
+  "SO FAR":
+    "POUR L'INSTANT",
+  "Share Season {n}":
+    "Partager la saison {n}",
+  "Season {n}: {games} games, {rate} won":
+    "Saison {n} : {games} combats, {rate} gagnés",
+  "Kills a game":
+    "Éliminations par combat",
+  "Deaths a game":
+    "Morts par combat",
+  "Damage a second":
+    "Dégâts par seconde",
+  "Healing a second":
+    "Soins par seconde",
+  "Ban rate":
+    "Taux de ban",
+  "#{n} most banned":
+    "#{n} des plus bannis",
+  "{k} kills, {d} deaths":
+    "{k} éliminations, {d} morts",
+  "{name} in {n} Ranked games this week.":
+    "{name} sur {n} parties Classé cette semaine.",
+  "From {n} Ranked games":
+    "Sur {n} parties Classé",
+  "Others: {n}":
+    "Les autres : {n}",
+  "Others: the same brawlers in {rank} games.":
+    "Les autres : les mêmes brawlers en parties {rank}.",
+  "Kills and bans":
+    "Éliminations et bans",
 };

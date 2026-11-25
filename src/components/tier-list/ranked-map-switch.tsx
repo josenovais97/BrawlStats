@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { type ReactNode, useSyncExternalStore } from 'react';
 
-import { fmtDecimal, fmtNumber, localePath, type Locale } from '@/lib/i18n';
+import { fmtDecimal, fmtNumber, fmtPercent, localePath, type Locale } from '@/lib/i18n';
 import { brawlerPath } from '@/lib/slugs';
 
 /** The switch's words. Map and rank names arrive already translated. */
@@ -17,6 +17,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} at ${rank} · ${all} all ranks`,
     here: (n: string) => `${n} battles here`,
     usual: 'vs usual',
+    banned: (rate: string) => `banned in ${rate}`,
     noteRank: (rank: string) =>
       `Every rank's results on this map, adjusted to how each brawler does in ${rank} lobbies, then pulled toward the ${rank} battles played here. Brawlers under 20 ${rank} battles here are left out.`,
     note: "Adjusted win rate on this map over the last three weeks, shrunk toward each brawler's overall Ranked form where the sample is thin. Brawlers under 150 decided battles here are left out.",
@@ -30,6 +31,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} en ${rank} · ${all} en total`,
     here: (n: string) => `${n} partidas aquí`,
     usual: 'vs lo normal',
+    banned: (rate: string) => `baneado en ${rate}`,
     noteRank: (rank: string) =>
       `Los resultados de todos los rangos en este mapa, ajustados a cómo rinde cada brawler en ${rank} y acercados a las partidas de ${rank} jugadas aquí. Se omiten los brawlers con menos de 20 partidas de ${rank} aquí.`,
     note: 'Tasa de victorias ajustada en este mapa en las últimas tres semanas, acercada al nivel general de cada brawler en Competitivo cuando hay pocas partidas. Se omiten los brawlers con menos de 150 partidas decididas aquí.',
@@ -43,6 +45,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} no ${rank} · ${all} no total`,
     here: (n: string) => `${n} partidas aqui`,
     usual: 'vs o normal',
+    banned: (rate: string) => `banido em ${rate}`,
     noteRank: (rank: string) =>
       `Os resultados de todos os ranks neste mapa, ajustados a como cada brawler se sai no ${rank} e aproximados das partidas do ${rank} jogadas aqui. Brawlers com menos de 20 partidas do ${rank} aqui ficam de fora.`,
     note: 'Taxa de vitória ajustada neste mapa nas últimas três semanas, aproximada do nível geral de cada brawler no Ranqueado quando há poucas partidas. Brawlers com menos de 150 partidas decididas aqui ficam de fora.',
@@ -56,6 +59,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${rank} rütbesinde ${n} · tüm rütbelerde ${all}`,
     here: (n: string) => `burada ${n} maç`,
     usual: 'normale göre',
+    banned: (rate: string) => `${rate} yasaklanma`,
     noteRank: (rank: string) =>
       `Bu haritadaki tüm rütbelerin sonuçları, her savaşçının ${rank} lobilerindeki performansına göre düzeltilir ve burada oynanan ${rank} maçlarına yaklaştırılır. Burada 20'den az ${rank} maçı olan savaşçılar dahil edilmez.`,
     note: "Son üç haftada bu haritadaki düzeltilmiş kazanma oranı; örneklem azsa her savaşçının genel Aşamalı formuna yaklaştırılır. Burada 150'den az sonuçlanmış maçı olan savaşçılar dahil edilmez.",
@@ -69,6 +73,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} in ${rank} · ${all} insgesamt`,
     here: (n: string) => `${n} Matches hier`,
     usual: 'ggü. normal',
+    banned: (rate: string) => `in ${rate} gebannt`,
     noteRank: (rank: string) =>
       `Die Ergebnisse aller Ränge auf dieser Map, angepasst daran, wie jeder Brawler in ${rank} abschneidet, und an die hier gespielten ${rank}-Matches angenähert. Brawler mit weniger als 20 ${rank}-Matches hier werden weggelassen.`,
     note: 'Bereinigte Siegquote auf dieser Map in den letzten drei Wochen, bei wenigen Matches an die allgemeine Ranked-Form jedes Brawlers angenähert. Brawler mit weniger als 150 entschiedenen Matches hier werden weggelassen.',
@@ -82,6 +87,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} на ранге ${rank} · ${all} всего`,
     here: (n: string) => `боёв здесь: ${n}`,
     usual: 'к обычной форме',
+    banned: (rate: string) => `бан в ${rate}`,
     noteRank: (rank: string) =>
       `Результаты всех рангов на этой карте с поправкой на то, как каждый боец играет на ранге ${rank}, и с опорой на бои ранга ${rank}, сыгранные здесь. Бойцы, у которых здесь меньше 20 боёв ранга ${rank}, не показаны.`,
     note: 'Скорректированный процент побед на этой карте за последние три недели; при малом числе боёв опирается на общую ранговую форму бойца. Бойцы, у которых здесь меньше 150 решённых боёв, не показаны.',
@@ -95,6 +101,7 @@ const WORDS = {
     atRank: (n: string, rank: string, all: string) => `${n} en ${rank} · ${all} au total`,
     here: (n: string) => `${n} combats ici`,
     usual: 'vs habituel',
+    banned: (rate: string) => `banni dans ${rate}`,
     noteRank: (rank: string) =>
       `Les résultats de tous les rangs sur cette carte, ajustés selon les performances de chaque brawler en ${rank} et rapprochés des combats ${rank} joués ici. Les brawlers avec moins de 20 combats ${rank} ici ne sont pas affichés.`,
     note: "Taux de victoire ajusté sur cette carte ces trois dernières semaines, rapproché de la forme générale en Classé de chaque brawler quand il y a peu de combats. Les brawlers avec moins de 150 combats décisifs ici ne sont pas affichés.",
@@ -115,6 +122,8 @@ export interface MapPickRow {
   battles: number;
   /** On a rank page: decided battles on this map at every rank. */
   allBattles?: number;
+  /** Share of this map's games it is banned in, when there are enough. */
+  banRate?: number;
 }
 
 export interface MapRows {
@@ -273,6 +282,7 @@ function MapPicks({ map, locale }: { map: MapRows; locale: Locale }) {
                   {map.rankLabel && pick.allBattles !== undefined
                     ? w.atRank(n(pick.battles), map.rankLabel, n(pick.allBattles))
                     : w.here(n(pick.battles))}
+                  {pick.banRate !== undefined ? ` · ${w.banned(fmtPercent(pick.banRate, locale))}` : ''}
                 </span>
               </span>
               <span className="shrink-0 text-right">

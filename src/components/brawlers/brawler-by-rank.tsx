@@ -6,6 +6,8 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { formatPercent } from '@/lib/format';
 import { localePath, rankLabel } from '@/lib/i18n';
 import { RANK_BRACKETS, bracketIconUrl, type RankBracket } from '@/lib/rank-brackets';
+import { MIN_BAN_BATTLES, type RankKey } from '@/lib/ranked-numbers';
+import { getRankNumbers } from '@/lib/ranked-numbers-data';
 import { getStoredBracketRoster, type ScoredBrawler } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { TIER_COLOR } from '@/lib/tiers';
@@ -16,6 +18,9 @@ export interface RankCell {
   entry: ScoredBrawler | null;
   position: number | null;
   of: number;
+  /** Share of this rank's games it is banned in, and its kills per death there. */
+  ban: number | null;
+  kd: number | null;
 }
 
 /** Place in a list by meta score, 1 = best, or null when not in it. */
@@ -37,7 +42,13 @@ export async function byRankCells(brawlerId: number): Promise<RankCell[] | null>
   for (const bracket of RANK_BRACKETS) {
     const roster = await getStoredBracketRoster(bracket.id).catch(() => null);
     if (!roster) continue;
-    cells.push({ bracket, ...placeIn(roster.scored, brawlerId) });
+    const numbers = await getRankNumbers(bracket.slug as RankKey).catch(() => null);
+    cells.push({
+      bracket,
+      ...placeIn(roster.scored, brawlerId),
+      ban: numbers && numbers.battles >= MIN_BAN_BATTLES ? (numbers.bans.find(([id]) => id === brawlerId)?.[1] ?? 0) : null,
+      kd: numbers?.stats.all?.find((r) => r.id === brawlerId)?.kd ?? null,
+    });
   }
   return cells.filter((c) => c.position !== null && c.of > 0).length >= 2 ? cells : null;
 }
@@ -119,6 +130,18 @@ export function BrawlerByRank({ cells, name }: { cells: RankCell[] | null; name:
                         {t('Pick rate')}
                         <span className="block text-sm font-bold tabular-nums text-accent">{formatPercent(c.entry.usageRate)}</span>
                       </span>
+                      {c.ban !== null ? (
+                        <span>
+                          {t('Ban rate')}
+                          <span className={`block text-sm font-bold tabular-nums ${c.ban >= 0.2 ? 'text-defeat' : 'text-foreground'}`}>{formatPercent(c.ban)}</span>
+                        </span>
+                      ) : null}
+                      {c.kd !== null ? (
+                        <span>
+                          {t('K/D')}
+                          <span className={`block text-sm font-bold tabular-nums ${c.kd >= 1 ? 'text-victory' : 'text-foreground'}`}>{c.kd.toFixed(2)}</span>
+                        </span>
+                      ) : null}
                     </span>
                   </>
                 ) : (

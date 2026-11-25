@@ -14,6 +14,7 @@ import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
 import { computeBattleInsights, type PlayerAssociation } from '@/lib/battle-insights';
+import { MIN_COMBAT_GAMES, combatRates } from '@/lib/combat';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
 import { playerLinkRel } from '@/lib/link-rel';
@@ -47,6 +48,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
   const insights = computeBattleInsights(entries, playerTag);
   const topBrawlers = insights.brawlers.slice(0, 6);
   const perDay = insights.battles / insights.daysCovered;
+  const combat = insights.combat.games >= MIN_COMBAT_GAMES ? combatRates(insights.combat) : null;
 
   return (
     <Panel
@@ -109,6 +111,21 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                 {insights.starPlayerCount}
               </p>
             </div>
+            {combat
+              ? (
+                  [
+                    [t('K/D'), combat.kd.toFixed(2), combat.kd >= 1 ? 'text-victory' : 'text-defeat'],
+                    [t('Damage a second'), formatNumber(Math.round(combat.damage)), ''],
+                    [t('Kills a game'), combat.kills.toFixed(2), ''],
+                    [t('Deaths a game'), combat.deaths.toFixed(2), ''],
+                  ] as const
+                ).map(([label, value, tone]) => (
+                  <div key={label}>
+                    <p className="label-game text-xs text-muted">{label}</p>
+                    <p className={`text-lg font-bold tabular-nums ${tone}`}>{value}</p>
+                  </div>
+                ))
+              : null}
           </div>
         </div>
 
@@ -143,6 +160,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                         {brawler.winRate !== null
                           ? t(' · {winRate} win', { winRate: formatPercent(brawler.winRate) })
                           : ''}
+                        {brawler.combat.games >= 3 ? ` · ${t('K/D')} ${(combatRates(brawler.combat)?.kd ?? 0).toFixed(2)}` : ''}
                       </p>
                     </div>
                     {/* Ranked games move no trophies, so a Ranked-only

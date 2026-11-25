@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { brawlerIconUrl, modeLabel, playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import type { BattleInsights } from '@/lib/battle-insights';
+import { MIN_COMBAT_GAMES, combatRates } from '@/lib/combat';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayer } from '@/types/brawlstars';
 import { getT } from '@/lib/t';
@@ -34,6 +35,7 @@ export function WrappedCard({
   const topBrawler = insights.brawlers[0] ?? null;
   const topMode = insights.modes[0] ?? null;
   const up = insights.trophyChange >= 0;
+  const combat = insights.combat.games >= MIN_COMBAT_GAMES ? combatRates(insights.combat) : null;
 
   return (
     <article className="card card-glow relative mx-auto w-full max-w-md overflow-hidden">
@@ -92,6 +94,17 @@ export function WrappedCard({
             value={formatNumber(insights.starPlayerCount)}
             hint={insights.starPlayerCount === 1 ? t('time') : t('times', { n: insights.starPlayerCount })}
           />
+          {combat ? (
+            <>
+              <Stat
+                label={t('K/D')}
+                value={combat.kd.toFixed(2)}
+                hint={t('{k} kills, {d} deaths', { k: insights.combat.kills, d: insights.combat.deaths })}
+                tone={combat.kd >= 1 ? 'good' : 'bad'}
+              />
+              <Stat label={t('Damage a second')} value={formatNumber(Math.round(combat.damage))} hint={t('From {n} games.', { n: insights.combat.games })} />
+            </>
+          ) : null}
         </div>
 
         {topBrawler ? (

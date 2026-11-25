@@ -5,10 +5,12 @@
  */
 
 export const RANK_KEYS = ['mythic-plus', 'diamond', 'mythic', 'legendary', 'masters'] as const;
-export type RankKey = (typeof RANK_KEYS)[number];
+/** The ones a reader chooses, and every rank together for the all-ranks lists. */
+export type RankKey = (typeof RANK_KEYS)[number] | 'all';
 
 /** Which `rank_bracket`s each choice reads (lib/rank-brackets). */
 export const RANK_BRACKET_IDS: Record<RankKey, number[]> = {
+  all: [0, 1, 2, 3, 4],
   'mythic-plus': [2, 3, 4],
   diamond: [1],
   mythic: [2],
@@ -16,7 +18,7 @@ export const RANK_BRACKET_IDS: Record<RankKey, number[]> = {
   masters: [4],
 };
 
-export function isRankKey(value: string | null | undefined): value is RankKey {
+export function isRankKey(value: string | null | undefined): value is (typeof RANK_KEYS)[number] {
   return (RANK_KEYS as readonly string[]).includes(value ?? '');
 }
 
@@ -110,6 +112,8 @@ export interface RankNumbers {
   battles: number;
   bans: BanList;
   maps: MapBans[];
+  /** Each mode's bans, all its maps together. */
+  modes: Record<string, { battles: number; bans: BanList }>;
   /** 'all' and each mode. */
   stats: Record<string, BrawlerNumbers[]>;
 }
@@ -146,3 +150,7 @@ export function rankBy(rows: BrawlerNumbers[], metric: Metric, order: 'high' | '
   const sign = order === 'high' ? -1 : 1;
   return rows.filter((r) => r.games >= minGames).sort((a, b) => sign * (a[metric] - b[metric]) || b.games - a.games);
 }
+
+/** Below this many battles a ban rate is not shown beside a brawler, or on a map. */
+export const MIN_BAN_BATTLES = 500;
+export const MIN_MAP_BAN_BATTLES = 150;

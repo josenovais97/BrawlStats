@@ -28,12 +28,14 @@ export interface TierToolEntry {
   score: number | null;
   winRate: number | null;
   pickRate: number | null;
+  /** Share of Ranked games it is banned in; null where there are too few. */
+  banRate: number | null;
   games: number;
 }
 
 type View = 'grid' | 'table';
 type Scope = 'all' | 'owned' | 'power11';
-type SortKey = 'score' | 'winRate' | 'pickRate' | 'games' | 'name';
+type SortKey = 'score' | 'winRate' | 'pickRate' | 'banRate' | 'games' | 'name';
 
 function percent(value: number | null, locale: Locale): string {
   if (value === null) return '–';
@@ -112,6 +114,8 @@ export function TierTools({
         return list.sort(by((e) => e.winRate));
       case 'pickRate':
         return list.sort(by((e) => e.pickRate));
+      case 'banRate':
+        return list.sort(by((e) => e.banRate));
       case 'games':
         return list.sort(by((e) => e.games));
       case 'name':
@@ -121,6 +125,8 @@ export function TierTools({
     }
   }, [visible, sort]);
   const rank = useMemo(() => new Map([...entries].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)).map((e, i) => [e.id, i + 1])), [entries]);
+
+  const banned = entries.some((e) => e.banRate !== null);
 
   const byId = useMemo(() => new Map(entries.map((e) => [e.id, e])), [entries]);
   const close = useCallback(() => setOpenId(null), []);
@@ -288,6 +294,7 @@ export function TierTools({
                 <SortHead label={t('Score')} on={sort === 'score'} onClick={() => setSort('score')} right />
                 <SortHead label={t('Win rate')} on={sort === 'winRate'} onClick={() => setSort('winRate')} right />
                 <SortHead label={t('Pick rate')} on={sort === 'pickRate'} onClick={() => setSort('pickRate')} right />
+                {banned ? <SortHead label={t('Ban rate')} on={sort === 'banRate'} onClick={() => setSort('banRate')} right /> : null}
                 <SortHead label={t('Battles')} on={sort === 'games'} onClick={() => setSort('games')} right wide />
               </tr>
             </thead>
@@ -320,6 +327,7 @@ export function TierTools({
                   </td>
                   <td className="px-2 py-1.5 text-right font-semibold tabular-nums">{percent(e.winRate, locale)}</td>
                   <td className="px-2 py-1.5 text-right tabular-nums">{percent(e.pickRate, locale)}</td>
+                  {banned ? <td className="px-2 py-1.5 text-right tabular-nums">{percent(e.banRate, locale)}</td> : null}
                   <td className="hidden px-3 py-1.5 text-right tabular-nums text-muted sm:table-cell">{e.games.toLocaleString(NUMBER_LOCALE[locale])}</td>
                 </tr>
               ))}

@@ -2,6 +2,7 @@ import 'server-only';
 
 import { isListedMode } from '@/lib/battle-mode';
 import { mergeBracketRows } from '@/lib/bracket-merge';
+import { combatFromStored, type CombatDay } from '@/lib/combat';
 import { solveEloRate, type EloRate } from '@/lib/ranked-elo';
 import { dayBefore, dayRange, type RankedGame } from '@/lib/ranked-season';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
@@ -5897,6 +5898,8 @@ export interface PlayerRankedSeasonData {
   games: RankedGame[];
   /** Daily elo readings from profile views this season. */
   elo: { day: string; elo: number }[];
+  /** Kills, deaths and damage per day and brawler, since 2026-11-25. */
+  combat: CombatDay[];
   /** Whether the account is in the sampling pool. */
   sampled: boolean;
 }
@@ -5923,6 +5926,8 @@ export async function getPlayerRankedSeason(tag: string, from: string, to: strin
     `;
     // Raw rows are kept about two weeks; never earlier than the season.
     const since = new Date(Math.max(Date.parse(`${from}T00:00:00Z`), Date.now() - 20 * 86_400_000));
+    // ...nor later: a season that is over must not take the next one's games.
+    const until = new Date(`${to}T00:00:00Z`);
     // The battle_type list is written out, not passed in: Postgres only uses
     // a partial index when it can see the query asks for the same rows.
     const raw = await prisma.$queryRaw<{
@@ -5933,12 +5938,14 @@ export async function getPlayerRankedSeason(tag: string, from: string, to: strin
       map_name: string | null;
       ally_brawler_ids: number[];
       enemy_brawler_ids: number[];
+      lineup_stats: number[] | null;
     }[]>`
-      SELECT battle_time, brawler_id, result, mode, map_name, ally_brawler_ids, enemy_brawler_ids
+      SELECT battle_time, brawler_id, result, mode, map_name, ally_brawler_ids, enemy_brawler_ids, lineup_stats
       FROM battle_team_samples
       WHERE player_tag = ${tag}
         AND battle_type IN ('soloRanked', 'teamRanked')
         AND battle_time >= ${since}
+        AND battle_time < ${until}
         AND result IN ('victory', 'defeat')
       ORDER BY battle_time DESC
       LIMIT 2000
@@ -5949,6 +5956,11 @@ export async function getPlayerRankedSeason(tag: string, from: string, to: strin
       WHERE player_tag = ${tag} AND recorded_on >= ${from}::date AND ranked_elo IS NOT NULL
       ORDER BY recorded_on
     `;
+    const combat = await prisma.$queryRaw<{ day: string; brawler_id: number; games: number; kills: number; deaths: number; deathless: number; stars: number; damage: number; healing: number; seconds: number }[]>`
+      SELECT day::text AS day, brawler_id, games, kills, deaths, deathless, stars, damage, healing, seconds
+      FROM player_ranked_combat_daily
+      WHERE day = ANY(${days}::date[]) AND player_tag = ${tag}
+    `.catch(() => []);
     const member = await prisma.sampledPlayer.findUnique({ where: { tag }, select: { tag: true } });
 
     const seen = daily.filter((r) => Number(r.battles) > 0).map((r) => r.day).sort();
@@ -5965,8 +5977,21 @@ export async function getPlayerRankedSeason(tag: string, from: string, to: strin
         map: r.map_name,
         allies: r.ally_brawler_ids ?? [],
         enemies: r.enemy_brawler_ids ?? [],
+        combat: combatFromStored(r.brawler_id, r.lineup_stats),
       })),
       elo: elo.map((r) => ({ day: r.day, elo: Number(r.elo) })),
+      combat: combat.map((r) => ({
+        day: r.day,
+        brawlerId: r.brawler_id,
+        games: Number(r.games),
+        kills: Number(r.kills),
+        deaths: Number(r.deaths),
+        deathless: Number(r.deathless),
+        stars: Number(r.stars),
+        damage: Number(r.damage),
+        healing: Number(r.healing),
+        seconds: Number(r.seconds),
+      })),
       sampled: member !== null,
     };
   } catch (error) {

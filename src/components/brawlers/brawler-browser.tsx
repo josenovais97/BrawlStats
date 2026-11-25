@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Ban, ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useId, useMemo, useState, type CSSProperties } from 'react';
@@ -43,6 +43,8 @@ export interface BrawlerCardData {
   /** Ranked win rate (mode-adjusted) and pick rate this week (2026-11-11). */
   winRate?: number | null;
   pickRate?: number | null;
+  /** Share of Ranked games it is banned in, every rank (2026-11-25). */
+  banRate?: number | null;
   /** Meta score change over 7 days, and the tier a week ago. */
   delta?: number | null;
   tierBefore?: Tier | null;
@@ -92,6 +94,11 @@ const SORTS = {
     label: 'Most picked',
     compare: (a: BrawlerCardData, b: BrawlerCardData) =>
       (b.pickRate ?? -1) - (a.pickRate ?? -1) || a.id - b.id,
+  },
+  banRate: {
+    label: 'Most banned',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
+      (b.banRate ?? -1) - (a.banRate ?? -1) || a.id - b.id,
   },
   rising: {
     label: 'Rising',
@@ -511,6 +518,16 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
                 {brawler.tierBefore && brawler.tier && brawler.tierBefore !== brawler.tier ? ` ${brawler.tierBefore}→${brawler.tier}` : ''}
               </span>
             ) : null}
+          </span>
+        ) : null}
+        {typeof brawler.banRate === 'number' ? (
+          <span
+            className="mt-1 flex items-center justify-center gap-1 rounded-md bg-black/30 px-1.5 py-0.5 text-xs font-bold tabular-nums text-white/90"
+            title={tx('Ban rate')}
+          >
+            <Ban aria-hidden className="size-3 shrink-0" />
+            <span className="sr-only">{tx('Ban rate')}</span>
+            <span className={brawler.banRate >= 0.2 ? 'text-defeat' : undefined}>{pct(brawler.banRate)}</span>
           </span>
         ) : null}
       </span>

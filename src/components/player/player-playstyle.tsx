@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { TrophyIcon } from '@/components/game-icons';
 import { activityFor } from '@/components/player/player-activity';
-import { seasonFor } from '@/components/player/player-season';
+import { seasonFor } from '@/lib/player-season-data';
 import { trophyGamesFor } from '@/components/player/player-trophies';
 import { brawlerName, rateTone } from '@/components/player/season/shared';
 import { brawlerIconUrl, realBrawlerClass } from '@/lib/brawlapi';

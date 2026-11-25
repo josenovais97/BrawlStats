@@ -664,4 +664,8 @@ export const CLIENT_TR: Record<string, string> = {
     "Daha az göster",
   "Ranked Stats":
     "Aşamalı istatistikleri",
+  "Ban rate":
+    "Yasaklanma oranı",
+  "{k} kills, {d} deaths":
+    "{k} öldürme, {d} ölüm",
 };

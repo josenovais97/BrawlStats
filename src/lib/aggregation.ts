@@ -1416,7 +1416,7 @@ async function rollUpRankedExtras(competitive: string[]): Promise<number> {
         FROM seen
         ORDER BY battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text), lobby_rank NULLS LAST
       )`;
-    const [, bans, , stats] = await prisma.$transaction([
+    const [, bans, , stats, , combat] = await prisma.$transaction([
       prisma.$executeRaw`DELETE FROM ranked_ban_daily WHERE day = ${day}`,
       prisma.$executeRaw`
         INSERT INTO ranked_ban_daily (day, mode, map_name, rank_bracket, brawler_id, battles)
@@ -1445,6 +1445,28 @@ async function rollUpRankedExtras(competitive: string[]): Promise<number> {
         WHERE cardinality(b.lineup_stats) = ${STATS_HEAD + 6 * STATS_PER_PLAYER}::int
         GROUP BY 1, 2, 3, 4
       `,
+      // The sampled player's own line: one row per player and battle already,
+      // so nothing to de-duplicate. Their team comes first, and no team has
+      // the same brawler twice.
+      prisma.$executeRaw`DELETE FROM player_ranked_combat_daily WHERE day = ${day}`,
+      prisma.$executeRaw`
+        INSERT INTO player_ranked_combat_daily
+          (day, player_tag, brawler_id, games, kills, deaths, deathless, stars, damage, healing, seconds)
+        SELECT ${day}::date, t.player_tag, t.brawler_id, COUNT(*),
+               SUM(t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 2]),
+               SUM(t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 3]),
+               COUNT(*) FILTER (WHERE t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 3] = 0),
+               COUNT(*) FILTER (WHERE t.lineup_stats[2] = p.i),
+               SUM(t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 4]),
+               SUM(t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 5]),
+               SUM(t.lineup_stats[1])
+        FROM battle_team_samples t, generate_series(0, 2) AS p(i)
+        WHERE t.battle_time >= ${day}::date AND t.battle_time < ${day}::date + 1
+          AND t.battle_type = ANY(${competitive}::text[])
+          AND cardinality(t.lineup_stats) = ${STATS_HEAD + 6 * STATS_PER_PLAYER}::int
+          AND t.lineup_stats[${STATS_HEAD}::int + ${STATS_PER_PLAYER}::int * p.i + 1] = t.brawler_id - ${BRAWLER_ID_BASE}::int
+        GROUP BY 1, 2, 3
+      `,
     ]);
     await prisma.$executeRaw`
       INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
@@ -1452,7 +1474,7 @@ async function rollUpRankedExtras(competitive: string[]): Promise<number> {
       ON CONFLICT (day, source)
       DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
     `;
-    rows += bans + stats;
+    rows += bans + stats + combat;
   }
   return rows;
 }
@@ -1584,6 +1606,7 @@ export async function pruneOldSamples(): Promise<number> {
     // Bans and combat numbers, on the lineups' window.
     await prisma.$executeRaw`DELETE FROM ranked_ban_daily WHERE day < ${pairingCutoff}`;
     await prisma.$executeRaw`DELETE FROM ranked_stat_daily WHERE day < ${pairingCutoff}`;
+    await prisma.$executeRaw`DELETE FROM player_ranked_combat_daily WHERE day < ${pairingCutoff}`;
 
     return (
       battles +

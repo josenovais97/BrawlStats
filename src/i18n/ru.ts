@@ -5567,4 +5567,34 @@ export const RU: Record<string, string> = {
     "Баны, убийства и урон по рангам",
   "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
     "Кого чаще банят на каждой карте, и кто больше убивает, умирает и наносит урон.",
+  "SO FAR":
+    "НА СЕГОДНЯ",
+  "Share Season {n}":
+    "Поделиться сезоном {n}",
+  "Season {n}: {games} games, {rate} won":
+    "Сезон {n}: боёв {games}, побед {rate}",
+  "Kills a game":
+    "Убийств за бой",
+  "Deaths a game":
+    "Смертей за бой",
+  "Damage a second":
+    "Урон в секунду",
+  "Healing a second":
+    "Лечение в секунду",
+  "Ban rate":
+    "Частота банов",
+  "#{n} most banned":
+    "#{n} по банам",
+  "{k} kills, {d} deaths":
+    "Убийств: {k}, смертей: {d}",
+  "{name} in {n} Ranked games this week.":
+    "{name}, ранговых боёв за неделю: {n}.",
+  "From {n} Ranked games":
+    "Ранговых боёв: {n}",
+  "Others: {n}":
+    "Другие: {n}",
+  "Others: the same brawlers in {rank} games.":
+    "Другие: те же бойцы в боях ранга «{rank}».",
+  "Kills and bans":
+    "Убийства и баны",
 };

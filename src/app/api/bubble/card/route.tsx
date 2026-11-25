@@ -6,10 +6,12 @@ import { brawlerIconUrl, playerIconUrl, rankedTierIconUrl } from '@/lib/brawlapi
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { appNames, localRank } from '@/lib/bubble-app-l10n';
+import { MIN_COMBAT_GAMES, combatRates } from '@/lib/combat';
 import { isIntlLocale, type Locale } from '@/lib/i18n';
 import { RANK_ELO_FLOORS, rankProgress, winsToNext } from '@/lib/ranked-elo';
-import { getSeasonState } from '@/lib/ranked-seasons';
+import { getSeasonPair } from '@/lib/ranked-seasons';
 import { BG, BODY, BRAND, DIM, DISPLAY, FG, loadIcon, loadLogo, slideFonts } from '@/lib/slide-chrome';
+import { getPlayerCombat } from '@/lib/player-combat';
 import { getPlayerSeasonStats, getRankedEloRates } from '@/lib/stats';
 import { translate } from '@/lib/t';
 import { normalizeTag } from '@/lib/tags';
@@ -57,14 +59,18 @@ export async function GET(request: NextRequest) {
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
   const kind = q.get('kind') === 'season' ? 'season' : q.get('kind') === 'versus' ? 'versus' : 'rank';
 
-  const [fonts, player, name, rates, season, logo] = await Promise.all([
+  const [fonts, player, name, rates, pair, logo] = await Promise.all([
     slideFonts(),
     getPlayer(tag).catch(() => null),
     appNames(lang),
     getRankedEloRates().catch(() => ({})),
-    getSeasonState().catch(() => null),
+    getSeasonPair().catch(() => ({ now: null, last: null })),
     loadLogo(96),
   ]);
+  // The running season, or the one before it with which=last (the site's
+  // Ranked tab); the app names its own season in n, from and to.
+  const span = q.get('which') === 'last' ? pair.last : pair.now;
+  const running = !q.get('n') || int(q.get('n')) === pair.now?.number ? q.get('which') !== 'last' : false;
   if (!player) return new Response('not found', { status: 404 });
 
   const progress = rankProgress(player.rankedElo ?? null);
@@ -72,7 +78,7 @@ export async function GET(request: NextRequest) {
     rank ? RANK_ELO_FLOORS.findIndex(([n]) => n === rank.toUpperCase()) : -1;
   const rankIndex = indexOf(progress?.rank);
   const icon = await loadIcon(playerIconUrl(player.icon?.id), 150);
-  const seasonNo = int(q.get('n')) ?? season?.current?.number ?? null;
+  const seasonNo = int(q.get('n')) ?? span?.number ?? null;
 
   const header = (
     <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
@@ -215,9 +221,13 @@ export async function GET(request: NextRequest) {
       </div>
     );
   } else {
-    const from = q.get('from') ?? season?.current?.startsOn ?? null;
-    const to = q.get('to') ?? season?.current?.endsOn ?? null;
-    const db = from && to && DATE.test(from) && DATE.test(to) ? await getPlayerSeasonStats(tag, from, to) : null;
+    const from = q.get('from') ?? span?.from ?? null;
+    const to = q.get('to') ?? span?.to ?? null;
+    const dated = from && to && DATE.test(from) && DATE.test(to) ? { from, to } : null;
+    const db = dated ? await getPlayerSeasonStats(tag, dated.from, dated.to) : null;
+    // Kills and deaths (2026-11-25), for players the sampler follows.
+    const fought = dated ? await getPlayerCombat(tag, dated.from, dated.to) : null;
+    const combat = fought && fought.games >= MIN_COMBAT_GAMES ? combatRates(fought) : null;
     const appGames = int(q.get('g'));
     const appWins = int(q.get('w'));
     const useDb = db !== null && db.games >= (appGames ?? 0);
@@ -268,16 +278,16 @@ export async function GET(request: NextRequest) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 420,
-          height: 168,
+          width: combat ? 286 : 420,
+          height: combat ? 150 : 168,
           padding: '0 18px',
           borderRadius: 32,
           background: 'rgba(255,255,255,0.07)',
           border: '3px solid rgba(255,255,255,0.12)',
         }}
       >
-        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 80, color: FG, lineHeight: 1.05 }}>{value}</div>
-        <div style={{ display: 'flex', fontSize: 30, color: DIM, textAlign: 'center', justifyContent: 'center' }}>{label}</div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: combat ? 64 : 80, color: FG, lineHeight: 1.05 }}>{value}</div>
+        <div style={{ display: 'flex', fontSize: combat ? 26 : 30, color: DIM, textAlign: 'center', justifyContent: 'center' }}>{label}</div>
       </div>
     );
     const winsText = (n: number) => t(n === 1 ? '{n} win' : '{n} wins', { n: n.toLocaleString(locale) });
@@ -289,7 +299,7 @@ export async function GET(request: NextRequest) {
         <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: BRAND, lineHeight: 1 }}>
           {seasonNo ? t('SEASON {n}', { n: seasonNo }) : t('MY SEASON')}
         </div>
-        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: FG, lineHeight: 1 }}>{t('WRAPPED')}</div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: FG, lineHeight: 1 }}>{running ? t('SO FAR') : t('WRAPPED')}</div>
 
         {/* Who, and the best rank of the season, in one row. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 8 }}>
@@ -316,6 +326,9 @@ export async function GET(request: NextRequest) {
               ? tile(player.rankedElo.toLocaleString(locale), 'Elo')
               : null}
           {streak !== null && streak > 0 ? tile(String(streak), t('Longest win streak')) : null}
+          {combat ? tile(combat.kd.toFixed(2), t('K/D')) : null}
+          {combat ? tile(combat.deaths.toFixed(2), t('Deaths a game')) : null}
+          {combat && (streak === null || streak <= 0) ? tile(Math.round(combat.damage).toLocaleString(locale), t('Damage a second')) : null}
         </div>
 
         {/* The season's top three brawlers, spelled out: wins, losses, win rate. */}

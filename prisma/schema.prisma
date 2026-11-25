@@ -590,6 +590,25 @@ model RankedStatDaily {
   @@map("ranked_stat_daily")
 }
 
+/// A player's Ranked combat numbers per day and brawler (2026-11-25), for the
+/// profile and the Season Wrapped card. Kept like `player_battle_daily`.
+model PlayerRankedCombatDaily {
+  day       DateTime @db.Date
+  playerTag String   @map("player_tag")
+  brawlerId Int      @map("brawler_id")
+  games     Int      @db.SmallInt
+  kills     Int
+  deaths    Int
+  deathless Int      @db.SmallInt
+  stars     Int      @db.SmallInt
+  damage    Int
+  healing   Int
+  seconds   Int
+
+  @@id([day, playerTag, brawlerId])
+  @@map("player_ranked_combat_daily")
+}
+
 /// Ranked matchups per rank bracket (1-4): how a brawler does against
 /// ("enemy") or alongside ("ally") another, in that bracket's lobbies. Built
 /// with `brawler_pair_daily` from the same de-duplicated lineups. What the

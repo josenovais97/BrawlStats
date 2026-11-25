@@ -10,6 +10,7 @@ import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerByRank, byRankCells } from '@/components/brawlers/brawler-by-rank';
+import { BrawlerCombat, brawlerCombatOf } from '@/components/brawlers/brawler-combat';
 import { BrawlerHeroStats } from '@/components/brawlers/brawler-hero-stats';
 import { BrawlerLiveMaps, livePicksFor } from '@/components/brawlers/brawler-live-maps';
 import { liveSlots } from '@/lib/live-slots';
@@ -21,6 +22,7 @@ import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { ErrorState } from '@/components/ui/error-state';
+import { getRankNumbers } from '@/lib/ranked-numbers-data';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import {
@@ -609,9 +611,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const live = liveSlots(await getEventRotation(revalidate).catch(() => []));
   const livePicks = livePicksFor(live, splits.maps, activeMaps);
   const rankCells = await byRankCells(brawlerId);
+  const combat = brawlerCombatOf(brawlerId, await getRankNumbers('all').catch(() => null));
   const jumps = [
     { id: 'build', label: t('Build') },
     ...(livePicks.length > 0 ? [{ id: 'play-now', label: t('Play now') }] : []),
+    ...(combat?.row ? [{ id: 'numbers', label: t('Kills and bans') }] : []),
     ...(rankCells ? [{ id: 'by-rank', label: t('By rank') }] : []),
     ...(splits.modes.length > 0 || splits.maps.length > 0 ? [{ id: 'maps', label: t('Best maps') }] : []),
     ...(pairings ? [{ id: 'matchups', label: t('Matchups') }] : []),
@@ -979,6 +983,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           winRate={normalizedWinRate}
           pickRate={stat?.usageRate ?? null}
           pickPlace={pickPlace}
+          combat={combat}
           metaPlace={metaPlace}
           metaTotal={metaRated.length}
           mover={mover}
@@ -1011,6 +1016,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
       {/* Where to play it now, and how it holds up rank by rank (2026-11-11). */}
       <BrawlerLiveMaps name={name} picks={livePicks} modeMeta={modeMeta} />
+      <BrawlerCombat name={name} data={combat} modeMeta={modeMeta} />
       <BrawlerByRank cells={rankCells} name={name} />
 
       {/* The answer the page title promises, before the biography and the stat

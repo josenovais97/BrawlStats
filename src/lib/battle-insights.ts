@@ -1,4 +1,5 @@
 import { battleModeOf } from '@/lib/battle-mode';
+import { NO_COMBAT, addGame, combatFromLog, type CombatTotals } from '@/lib/combat';
 import { parseApiDate } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
@@ -20,6 +21,8 @@ export interface BrawlerUsage {
   decided: number;
   winRate: number | null;
   trophyChange: number;
+  /** Kills, deaths and damage of the games that carry them. */
+  combat: CombatTotals;
 }
 
 export interface PlayerAssociation {
@@ -52,6 +55,8 @@ export interface BattleInsights {
   starPlayerCount: number;
   /** Showdown-style placements, averaged. */
   averageRank: number | null;
+  /** Kills, deaths and damage over the battles that carry them (3v3). */
+  combat: CombatTotals;
 
   brawlers: BrawlerUsage[];
   modes: ModeUsage[];
@@ -98,6 +103,7 @@ export function computeBattleInsights(
   let rankCount = 0;
   let battlesLast24h = 0;
   let lastBattleAt: string | null = null;
+  let combat = NO_COMBAT;
 
   const dayKeys = new Set<string>();
   const brawlers = new Map<number, BrawlerUsage>();
@@ -120,6 +126,9 @@ export function computeBattleInsights(
     if (isWin) wins += 1;
     if (isLoss) losses += 1;
     if (isDraw) draws += 1;
+
+    const fought = entry.battle.teams ? combatFromLog(entry, playerTag) : null;
+    if (fought) combat = addGame(combat, fought);
 
     const delta = entry.battle.trophyChange ?? self?.brawler?.trophyChange ?? 0;
     trophyChange += delta;
@@ -152,11 +161,13 @@ export function computeBattleInsights(
         decided: 0,
         winRate: null,
         trophyChange: 0,
+        combat: NO_COMBAT,
       };
       current.battles += 1;
       current.wins += isWin ? 1 : 0;
       current.decided += decided;
       current.trophyChange += delta;
+      if (fought) current.combat = addGame(current.combat, fought);
       brawlers.set(brawler.id, current);
     }
 
@@ -217,6 +228,7 @@ export function computeBattleInsights(
     trophyChange,
     starPlayerCount,
     averageRank: rankCount > 0 ? rankSum / rankCount : null,
+    combat,
 
     brawlers: finish([...brawlers.values()]).sort(
       (a, b) => b.battles - a.battles || b.trophyChange - a.trophyChange,

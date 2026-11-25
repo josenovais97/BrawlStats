@@ -1,11 +1,12 @@
 'use client';
 
-import { ChevronDown, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { Ban, ChevronDown, Crosshair, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { CrownIcon, TrophyIcon } from '@/components/game-icons';
+import { NO_COMBAT, addGame, combatRates, type GameCombat } from '@/lib/combat';
 import { formatNumber } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
@@ -23,6 +24,11 @@ export interface BattleParticipant {
   iconUrl: string | null;
   isStar: boolean;
   isSelf: boolean;
+  /** Kills, deaths and damage; team modes since November 2026. */
+  combat: GameCombat | null;
+  /** Who this player banned, in Ranked. */
+  bannedName: string | null;
+  bannedIcon: string | null;
 }
 
 export interface BattleEntry {
@@ -53,6 +59,8 @@ export interface BattleEntry {
   /** The brawler's rarity colour. */
   tint: string | null;
   isStarPlayer: boolean;
+  /** This player's own kills, deaths and damage. */
+  combat: GameCombat | null;
   teams: BattleParticipant[][];
   isTeamMode: boolean;
 }
@@ -258,6 +266,7 @@ function Session({ entries }: { entries: BattleEntry[] }) {
               tone={s.trophies > 0 ? 'text-victory' : s.trophies < 0 ? 'text-defeat' : undefined}
             />
           ) : null}
+          {s.combat ? <Stat label={tx('K/D')} value={s.combat.kd.toFixed(2)} tone={s.combat.kd >= 1 ? 'text-victory' : 'text-defeat'} /> : null}
           <Stat label={tx('Star player')} value={`×${s.stars}`} tone={s.stars ? 'text-brand' : undefined} />
         </dl>
       </div>
@@ -301,6 +310,7 @@ function summarise(entries: BattleEntry[]) {
   let draws = 0;
   let stars = 0;
   let trophies: number | null = null;
+  const combat = entries.reduce((sum, e) => (e.combat ? addGame(sum, e.combat) : sum), NO_COMBAT);
   const modes = new Map<string, Tally>();
   const brawlers = new Map<string, Tally>();
 
@@ -339,6 +349,7 @@ function summarise(entries: BattleEntry[]) {
     decided: wins + losses,
     stars,
     trophies,
+    combat: combatRates(combat),
     modes: [...modes.values()].sort(order),
     brawlers: [...brawlers.values()].sort(order),
   };
@@ -519,6 +530,7 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
                 <CrownIcon className="size-3.5" />{tx('Star player')}</span>
             ) : null}
+            {entry.combat ? <KillsDeaths combat={entry.combat} /> : null}
           </div>
           <p className="mt-0.5 truncate text-xs text-muted">
             {entry.map} · {entry.type} · {entry.relative}
@@ -624,6 +636,27 @@ function Faces({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMode
   );
 }
 
+/** "5/2": kills and deaths, green when there are more kills. */
+function KillsDeaths({ combat, bare = false }: { combat: GameCombat; bare?: boolean }) {
+  const tx = useT();
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-bold tabular-nums ${bare ? '' : 'rounded-full bg-surface-3/80 px-2 py-0.5'}`}
+      title={tx('{k} kills, {d} deaths', { k: combat.kills, d: combat.deaths })}
+    >
+      <Crosshair aria-hidden className="size-3 text-muted" />
+      <span className={combat.kills > combat.deaths ? 'text-victory' : combat.kills < combat.deaths ? 'text-defeat' : ''}>{combat.kills}</span>
+      <span className="text-muted">/</span>
+      <span>{combat.deaths}</span>
+    </span>
+  );
+}
+
+/** "38.2k" from 38 214. */
+function thousands(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(n >= 100_000 ? 0 : 1)}k` : String(n);
+}
+
 function TrophyDelta({ value }: { value: number | null }) {
   if (typeof value !== 'number' || value === 0) {
     return <Minus aria-hidden className="size-4 shrink-0 text-muted/50" />;
@@ -660,7 +693,10 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
         {teams.map((team, teamIndex) => (
           <div key={teamIndex}>
             {isTeamMode && teams.length > 1 ? (
-              <p className="eyebrow mb-2">{tx('Team')}{' '}{teamIndex + 1}</p>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="eyebrow">{tx('Team')}{' '}{teamIndex + 1}</p>
+                <TeamBans team={team} />
+              </div>
             ) : null}
             <ul className="space-y-1">
               {team.map((participant) => (
@@ -706,7 +742,14 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
                       </span>
                     </span>
 
-                    {participant.brawlerTrophies !== null ? (
+                    {participant.combat ? (
+                      <span className="flex shrink-0 flex-col items-end gap-0.5">
+                        <KillsDeaths combat={participant.combat} bare />
+                        <span className="text-xs tabular-nums text-muted" title={tx('Damage')}>
+                          {thousands(participant.combat.damage)} {tx('Damage').toLowerCase()}
+                        </span>
+                      </span>
+                    ) : participant.brawlerTrophies !== null ? (
                       <span className="flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums text-muted">
                         <TrophyIcon className="size-3" />
                         {formatNumber(participant.brawlerTrophies)}
@@ -720,6 +763,32 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
         ))}
       </div>
     </div>
+  );
+}
+
+/** Who a team banned, in Ranked: each brawler once. */
+function TeamBans({ team }: { team: BattleParticipant[] }) {
+  const tx = useT();
+  const bans = team.filter((p, i) => p.bannedName && team.findIndex((q) => q.bannedName === p.bannedName) === i);
+  if (bans.length === 0) return null;
+  return (
+    <span className="flex items-center gap-1 text-xs text-muted">
+      <Ban aria-hidden className="size-3.5" />
+      {tx('Bans')}
+      {bans.map((p) => (
+        <Image
+          key={p.bannedName}
+          src={p.bannedIcon!}
+          alt={p.bannedName!.toLowerCase()}
+          title={p.bannedName!}
+          width={24}
+          height={24}
+          className="size-6 rounded-md bg-surface-2 grayscale"
+          loading="lazy"
+          unoptimized
+        />
+      ))}
+    </span>
   );
 }
 

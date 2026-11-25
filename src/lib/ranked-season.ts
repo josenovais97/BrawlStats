@@ -12,6 +12,7 @@
  */
 
 import { battleModeOf } from '@/lib/battle-mode';
+import { combatFromLog, playerCombat, type CombatDay, type GameCombat, type PlayerCombat } from '@/lib/combat';
 import type { BSBattleLogEntry } from '@/types/brawlstars';
 
 export const RANKED_TYPES = new Set(['soloRanked', 'teamRanked']);
@@ -26,6 +27,8 @@ export interface RankedGame {
   map: string | null;
   allies: number[];
   enemies: number[];
+  /** Kills, deaths and damage, for games since 2026-11-25. */
+  combat?: GameCombat | null;
 }
 
 export interface SeasonDay {
@@ -83,6 +86,7 @@ export function gamesFromLog(entries: BSBattleLogEntry[], playerTag: string): Ra
         .flat()
         .map((p) => p.brawler?.id)
         .filter((id): id is number => typeof id === 'number'),
+      combat: combatFromLog(entry, playerTag),
     });
   }
   return out;
@@ -95,7 +99,10 @@ export function gamesFromLog(entries: BSBattleLogEntry[], playerTag: string): Ra
 export function mergeGames(stored: RankedGame[], log: RankedGame[]): RankedGame[] {
   const seen = new Set(stored.map((g) => Math.round(g.time / 1000)));
   const extra = log.filter((g) => !seen.has(Math.round(g.time / 1000)));
-  return [...stored, ...extra].sort((a, b) => b.time - a.time);
+  // A game stored before its numbers were kept takes them from the log.
+  const numbers = new Map(log.filter((g) => g.combat).map((g) => [Math.round(g.time / 1000), g.combat]));
+  const known = stored.map((g) => (g.combat ? g : { ...g, combat: numbers.get(Math.round(g.time / 1000)) ?? null }));
+  return [...known, ...extra].sort((a, b) => b.time - a.time);
 }
 
 /** Season totals per brawler with the log's unsampled games added on. */
@@ -282,6 +289,8 @@ export interface SeasonView {
   detail: GameBreakdown;
   /** Whole days the single games reach back. */
   detailDays: number;
+  /** Kills, deaths and damage of the season's games that carry them. */
+  combat: PlayerCombat;
 }
 
 /**
@@ -294,6 +303,7 @@ export function seasonView(
   stored: RankedGame[],
   logGames: RankedGame[],
   now: number = Date.now(),
+  combatDays: CombatDay[] = [],
 ): SeasonView {
   const hasSeason = rows.length > 0;
   const storedSeconds = new Set(stored.map((g) => Math.round(g.time / 1000)));
@@ -327,6 +337,7 @@ export function seasonView(
     recent,
     detail,
     detailDays: detail.since ? Math.max(1, Math.ceil((now - detail.since) / 86_400_000)) : 0,
+    combat: playerCombat(recent, combatDays),
   };
 }
 

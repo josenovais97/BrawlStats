@@ -5566,4 +5566,34 @@ export const PT: Record<string, string> = {
     "Bans, abates e dano por rank",
   "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
     "Os brawlers mais banidos em cada mapa, e quem mata, morre e causa mais dano.",
+  "SO FAR":
+    "ATÉ AGORA",
+  "Share Season {n}":
+    "Compartilhar temporada {n}",
+  "Season {n}: {games} games, {rate} won":
+    "Temporada {n}: {games} partidas, {rate} vencidas",
+  "Kills a game":
+    "Abates por partida",
+  "Deaths a game":
+    "Mortes por partida",
+  "Damage a second":
+    "Dano por segundo",
+  "Healing a second":
+    "Cura por segundo",
+  "Ban rate":
+    "Taxa de ban",
+  "#{n} most banned":
+    "#{n} mais banido",
+  "{k} kills, {d} deaths":
+    "{k} abates, {d} mortes",
+  "{name} in {n} Ranked games this week.":
+    "{name} em {n} partidas do Ranqueado esta semana.",
+  "From {n} Ranked games":
+    "De {n} partidas do Ranqueado",
+  "Others: {n}":
+    "Outros: {n}",
+  "Others: the same brawlers in {rank} games.":
+    "Outros: os mesmos brawlers em partidas de {rank}.",
+  "Kills and bans":
+    "Abates e bans",
 };

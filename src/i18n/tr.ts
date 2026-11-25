@@ -5566,4 +5566,34 @@ export const TR: Record<string, string> = {
     "Rütbeye göre yasaklar, öldürme ve hasar",
   "The most banned brawlers on every map, and who kills, dies and deals damage the most.":
     "Her haritada en çok yasaklanan savaşçılar ve en çok öldüren, ölen ve hasar veren kim.",
+  "SO FAR":
+    "ŞU ANA KADAR",
+  "Share Season {n}":
+    "{n}. sezonu paylaş",
+  "Season {n}: {games} games, {rate} won":
+    "{n}. sezon: {games} maç, {rate} kazanma",
+  "Kills a game":
+    "Maç başına öldürme",
+  "Deaths a game":
+    "Maç başına ölüm",
+  "Damage a second":
+    "Saniyede hasar",
+  "Healing a second":
+    "Saniyede iyileştirme",
+  "Ban rate":
+    "Yasaklanma oranı",
+  "#{n} most banned":
+    "En çok yasaklanan #{n}",
+  "{k} kills, {d} deaths":
+    "{k} öldürme, {d} ölüm",
+  "{name} in {n} Ranked games this week.":
+    "{name}, bu hafta {n} Aşamalı maçta.",
+  "From {n} Ranked games":
+    "{n} Aşamalı maçtan",
+  "Others: {n}":
+    "Diğerleri: {n}",
+  "Others: the same brawlers in {rank} games.":
+    "Diğerleri: {rank} maçlarında aynı savaşçılar.",
+  "Kills and bans":
+    "Öldürme ve yasaklar",
 };

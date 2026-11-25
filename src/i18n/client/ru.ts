@@ -664,4 +664,8 @@ export const CLIENT_RU: Record<string, string> = {
     "Свернуть",
   "Ranked Stats":
     "Статистика ранговых боёв",
+  "Ban rate":
+    "Частота банов",
+  "{k} kills, {d} deaths":
+    "Убийств: {k}, смертей: {d}",
 };

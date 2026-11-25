@@ -6,6 +6,7 @@ import {
 } from '@/components/player/battle-log-view';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { brawlerArt } from '@/lib/brawler-art';
+import { combatFromLog } from '@/lib/combat';
 import { getBattleLog } from '@/lib/bs-api';
 import { getActiveMaps } from '@/lib/game-maps';
 import { mapNameKey } from '@/lib/stats';
@@ -116,6 +117,7 @@ function toViewEntry(
 
   const lineup = battle.teams ?? (battle.players ? [battle.players] : []);
   const starTag = battle.starPlayer?.tag?.toUpperCase();
+  const ranked = battle.type === 'soloRanked' || battle.type === 'teamRanked';
 
   const teams: BattleParticipant[][] = lineup.map((team) =>
     team.map((participant): BattleParticipant => {
@@ -125,7 +127,13 @@ function toViewEntry(
         name: participant.name,
         brawlerName: brawler?.name ?? null,
         brawlerPower: brawler?.power ?? null,
-        brawlerTrophies: brawler?.trophies ?? null,
+        // In Ranked this number is the player's rank, not trophies.
+        brawlerTrophies: ranked ? null : (brawler?.trophies ?? null),
+        combat: battle.teams ? combatFromLog(entry, participant.tag) : null,
+        bannedName: participant.bannedBrawler?.name ?? null,
+        bannedIcon: participant.bannedBrawler
+          ? (brawlerMeta.get(participant.bannedBrawler.id)?.imageUrl ?? brawlerIconUrl(participant.bannedBrawler.id))
+          : null,
         iconUrl: brawler
           ? (brawlerMeta.get(brawler.id)?.imageUrl ?? brawlerIconUrl(brawler.id))
           : null,
@@ -155,6 +163,7 @@ function toViewEntry(
       ? (brawlerMeta.get(myBrawler.id)?.imageUrl ?? brawlerIconUrl(myBrawler.id))
       : null,
     isStarPlayer: starTag === self,
+    combat: battle.teams ? combatFromLog(entry, playerTag) : null,
     teams,
     isTeamMode: Boolean(battle.teams),
   };

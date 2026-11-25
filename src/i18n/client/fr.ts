@@ -664,4 +664,8 @@ export const CLIENT_FR: Record<string, string> = {
     "Réduire",
   "Ranked Stats":
     "Stats Classé",
+  "Ban rate":
+    "Taux de ban",
+  "{k} kills, {d} deaths":
+    "{k} éliminations, {d} morts",
 };

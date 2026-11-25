@@ -28,6 +28,8 @@ import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { PendingArea, TierNav } from '@/components/tier-list/tier-nav';
 import type { RankBracket } from '@/lib/rank-brackets';
 import { TierTools } from '@/components/tier-list/tier-tools';
+import { MIN_MAP_BAN_BATTLES, type RankKey } from '@/lib/ranked-numbers';
+import { getBanRates, getRankNumbers } from '@/lib/ranked-numbers-data';
 import { TierPodium } from '@/components/tier-list/tier-podium';
 import { ShareImageButton } from '@/components/share-image-button';
 import { getT } from '@/lib/t';
@@ -188,6 +190,13 @@ export async function TierListView({
       : Promise.resolve([]),
   ]);
 
+  // The map's bans at this rank, for the map chips' lists.
+  const mapBans = new Map(
+    (format === 'ranked' && mode ? (await getRankNumbers(bracket ? (bracket.slug as RankKey) : 'all').catch(() => null))?.maps ?? [] : [])
+      .filter((m) => m.mode === mode && m.battles >= MIN_MAP_BAN_BATTLES)
+      .map((m) => [m.map, new Map(m.bans)] as const),
+  );
+
   const maps: MapRows[] = mapPicks
     .filter((map) => map.mode === mode)
     .sort((a, b) => a.mapName.localeCompare(b.mapName))
@@ -204,6 +213,7 @@ export async function TierListView({
         overallScore: pick.overallScore,
         battles: pick.decidedSampleSize,
         allBattles: pick.allRanksSampleSize,
+        banRate: mapBans.get(map.mapName)?.get(pick.brawlerId),
       })),
       rankLabel: bracket ? rankLabel(bracket, locale) : undefined,
     }));
@@ -234,6 +244,11 @@ export async function TierListView({
    * best pick in each Ranked mode for the "at a glance" strip.
    */
   const overallRanked = format === 'ranked' && !mode && !bracket;
+
+  // How often each is banned, at this rank and in this mode (2026-11-25).
+  const banRates =
+    format === 'ranked' ? await getBanRates(bracket ? (bracket.slug as RankKey) : 'all', mode).catch(() => null) : null;
+  const banRateOf = (id: number) => (banRates ? banRates.get(id) ?? 0 : null);
   const trends = overallRanked ? await getRankedTrends(14).catch(() => ({}) as Record<number, [string, number][]>) : {};
   const bestByMode = overallRanked ? await getBestPicksByMode(1).catch(() => new Map<string, ModeBestPicks>()) : new Map<string, ModeBestPicks>();
 
@@ -528,6 +543,7 @@ export async function TierListView({
               score: e.metaScore ?? null,
               winRate: e.normalizedWinRate ?? null,
               pickRate: e.usageRate ?? null,
+              banRate: banRateOf(e.brawlerId),
               games: e.decidedSampleSize ?? 0,
             }))}
           >
@@ -547,6 +563,7 @@ export async function TierListView({
                   copy={t}
                   locale={locale}
                   trends={trends}
+                  banRates={banRates}
                 />
               );
             })}
@@ -658,6 +675,7 @@ function TierRow({
   copy,
   locale,
   trends,
+  banRates,
 }: {
   tier: Tier;
   entries: TierListEntry[];
@@ -666,6 +684,8 @@ function TierRow({
   copy: TierCopy;
   locale: Locale;
   trends: Record<number, [string, number][]>;
+  /** Share of games each is banned in; null where there are too few. */
+  banRates: Map<number, number> | null;
 }) {
   const color = TIER_COLOR[tier];
 
@@ -770,6 +790,16 @@ function TierRow({
                   <span className="text-right font-semibold text-foreground">
                     {fmtPercent(entry.usageRate, locale)}
                   </span>
+                  {banRates ? (
+                    <>
+                      <span className="text-muted" title={copy.banTitle}>
+                        {copy.banLetter}
+                      </span>
+                      <span className={`text-right font-semibold ${(banRates.get(entry.brawlerId) ?? 0) >= 0.2 ? 'text-defeat' : 'text-foreground'}`}>
+                        {fmtPercent(banRates.get(entry.brawlerId) ?? 0, locale)}
+                      </span>
+                    </>
+                  ) : null}
                 </p>
                 <Sparkline points={trends[entry.brawlerId]} />
                 {/* Only when it actually moved. A badge on every chip saying

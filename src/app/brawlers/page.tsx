@@ -9,6 +9,7 @@ import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { BrawlersPulse } from '@/components/brawlers/brawlers-pulse';
+import { getBanRates } from '@/lib/ranked-numbers-data';
 import { getMetaIndex, getMetaMovers, type ScoredBrawler } from '@/lib/stats';
 import type { MetaMover } from '@/types/stats';
 import { getT } from '@/lib/t';
@@ -64,6 +65,7 @@ export default async function BrawlersPage() {
   const meta: Map<number, ScoredBrawler> = await getMetaIndex('ranked', 7).catch(() => new Map());
   const movers = await getMetaMovers(7).catch(() => [] as MetaMover[]);
   const moverBy = new Map(movers.map((m) => [m.brawlerId, m]));
+  const banRates = await getBanRates('all').catch(() => null);
   const images = new Map(catalog.all.map((b) => [b.id, { name: b.name, image: b.imageUrl || null }]));
 
   /*
@@ -143,6 +145,8 @@ export default async function BrawlersPage() {
             metaScore: meta.get(b.id)?.metaScore ?? null,
             winRate: meta.get(b.id)?.normalizedWinRate ?? null,
             pickRate: meta.get(b.id)?.usageRate ?? null,
+            // Only brawlers in this week's Ranked list: a withdrawn one has no bans to show.
+            banRate: banRates && meta.has(b.id) ? banRates.get(b.id) ?? 0 : null,
             delta: moverBy.get(b.id)?.metaScoreDelta ?? null,
             tierBefore: moverBy.get(b.id)?.tierBefore ?? null,
           })),

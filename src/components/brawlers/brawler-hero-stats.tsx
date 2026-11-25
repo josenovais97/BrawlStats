@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { BrawlerCombatData } from '@/components/brawlers/brawler-combat';
 import { isListedMode } from '@/lib/battle-mode';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatPercent } from '@/lib/format';
@@ -24,6 +25,7 @@ export async function BrawlerHeroStats({
   winRate,
   pickRate,
   pickPlace,
+  combat,
   metaPlace,
   metaTotal,
   mover,
@@ -36,6 +38,8 @@ export async function BrawlerHeroStats({
   winRate: number | null;
   pickRate: number | null;
   pickPlace: number;
+  /** Bans and kills this week (2026-11-25). */
+  combat: BrawlerCombatData | null;
   metaPlace: number;
   metaTotal: number;
   mover: MetaMover | null;
@@ -65,6 +69,22 @@ export async function BrawlerHeroStats({
       value: formatPercent(pickRate),
       sub: pickPlace > 0 ? t('#{n} most picked this week', { n: pickPlace }) : t('Last 7 days'),
       tone: 'text-accent',
+    });
+  }
+  if (combat?.ban) {
+    tiles.push({
+      label: t('Ban rate'),
+      value: formatPercent(combat.ban.rate),
+      sub: combat.ban.place > 0 ? t('#{n} most banned', { n: combat.ban.place }) : t('Last 7 days'),
+      tone: combat.ban.rate >= 0.2 ? 'text-defeat' : 'text-foreground',
+    });
+  }
+  if (combat?.row) {
+    tiles.push({
+      label: t('K/D'),
+      value: combat.row.kd.toFixed(2),
+      sub: `#${combat.places.kd} ${t('of {n}', { n: combat.of })}`,
+      tone: combat.row.kd >= 1 ? 'text-victory' : 'text-foreground',
     });
   }
   if (metaPlace > 0) {
@@ -98,7 +118,7 @@ export async function BrawlerHeroStats({
   return (
     <div className="relative space-y-3 border-t border-border/70 p-4 sm:px-6">
       {tiles.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+        <div className={`grid grid-cols-2 gap-2.5 ${tiles.length > 4 ? 'sm:grid-cols-3' : ''} ${tiles.length > 5 ? 'lg:grid-cols-6' : tiles.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
           {tiles.map((tile) => (
             <div key={tile.label} className="rounded-2xl border-2 border-ink bg-surface-2/70 px-4 py-3">
               <p className="label-game text-xs text-muted">{tile.label}</p>
