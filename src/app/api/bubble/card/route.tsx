@@ -12,7 +12,7 @@ import { RANK_ELO_FLOORS, rankProgress, winsToNext } from '@/lib/ranked-elo';
 import { getSeasonPair } from '@/lib/ranked-seasons';
 import { BG, BODY, BRAND, DIM, DISPLAY, FG, loadIcon, loadLogo, slideFonts } from '@/lib/slide-chrome';
 import { getPlayerCombat } from '@/lib/player-combat';
-import { getPlayerSeasonStats, getRankedEloRates } from '@/lib/stats';
+import { getPlayerPeakElo, getPlayerSeasonStats, getRankedEloRates } from '@/lib/stats';
 import { translate } from '@/lib/t';
 import { normalizeTag } from '@/lib/tags';
 import type { BABrawler } from '@/types/brawlapi';
@@ -266,7 +266,12 @@ export async function GET(request: NextRequest) {
       top.map((r) => (r.id !== null ? loadIcon(art.get(r.id)?.imageUrl ?? brawlerIconUrl(r.id), 200) : Promise.resolve(null))),
     );
 
-    const peakIndex = Math.max(indexOf(player.highestSeasonRankedRankName ?? null), int(q.get('peak')) ?? -1, rankIndex);
+    // The game's "highest this season" and today's rank are the running season's:
+    // a season that is over has only what we read during it, or the app's own.
+    const readPeak = !running && dated ? await getPlayerPeakElo(tag, dated.from, dated.to) : null;
+    const peakIndex = running
+      ? Math.max(indexOf(player.highestSeasonRankedRankName ?? null), int(q.get('peak')) ?? -1, rankIndex)
+      : Math.max(readPeak !== null ? indexOf(rankProgress(readPeak)?.rank) : -1, int(q.get('peak')) ?? -1);
     const peakName = peakIndex >= 0 ? localRank(rankProgress(RANK_ELO_FLOORS[peakIndex][1])?.rank, name) : null;
     const peakBadge = peakIndex >= 0 ? await loadIcon(rankedTierIconUrl(peakIndex + 1) ?? '', 200) : null;
     const gain = int(q.get('gain'));
@@ -322,10 +327,12 @@ export async function GET(request: NextRequest) {
           {/* Elo gained is only known when the app counted from the season's start; otherwise today's elo. */}
           {gain !== null
             ? tile(`${gain > 0 ? '+' : gain < 0 ? '−' : '±'}${Math.abs(gain).toLocaleString(locale)}`, t('Elo this season'))
-            : player.rankedElo
+            : running && player.rankedElo
               ? tile(player.rankedElo.toLocaleString(locale), 'Elo')
               : null}
           {streak !== null && streak > 0 ? tile(String(streak), t('Longest win streak')) : null}
+          {!running && gain === null && games > 0 ? tile(wins.toLocaleString(locale), t('Wins')) : null}
+          {!running && gain === null && games > 0 ? tile((games - wins).toLocaleString(locale), t('Losses')) : null}
           {combat ? tile(combat.kd.toFixed(2), t('K/D')) : null}
           {combat ? tile(combat.deaths.toFixed(2), t('Deaths a game')) : null}
           {combat && (streak === null || streak <= 0) ? tile(Math.round(combat.damage).toLocaleString(locale), t('Damage a second')) : null}
