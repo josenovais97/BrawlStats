@@ -66,7 +66,6 @@ internal fun MainActivity.wireSettingsPages() {
 }
 
 internal fun MainActivity.openSettingsGroup(group: Int) {
-    if (group >= 0) Stats.event(this, "app_settings", mapOf("group" to SettingsPages.NAMES[group]))
     SettingsPages.open = group
     paintSettingsPages()
     findViewById<ScrollView>(R.id.scroll_settings).smoothScrollTo(0, 0)
@@ -168,7 +167,6 @@ internal fun MainActivity.wireRefresh() {
         Tabs.PAGES.map { findViewById<ScrollView>(it) }.firstOrNull { it.visibility == View.VISIBLE }?.canScrollVertically(-1) ?: false
     }
     pull.setOnRefreshListener {
-        Stats.event(this, "app_pull")
         pullRefresh { pull.isRefreshing = false }
     }
     val density = resources.displayMetrics.density

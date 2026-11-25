@@ -62,7 +62,6 @@ internal fun MainActivity.openSeasonPage(page: Int) {
     if (page !in SeasonPages.RANK..SeasonPages.BRAWLERS || page == SeasonPages.page) return
     val right = page > SeasonPages.page
     SeasonPages.page = page
-    Stats.event(this, "app_season_page", mapOf("page" to listOf("rank", "stats", "brawlers")[page]))
     paintSeasonPages()
     // The new page comes from the side it lives on.
     val shown = when (page) {
@@ -81,7 +80,6 @@ internal fun MainActivity.openSeason(which: String) {
     if (which == SeasonPages.which) return
     SeasonPages.which = which
     SeasonPages.showAll = false
-    Stats.event(this, "app_season_which", mapOf("which" to which))
     paintSeasonPages()
     refreshSeasonData()
 }

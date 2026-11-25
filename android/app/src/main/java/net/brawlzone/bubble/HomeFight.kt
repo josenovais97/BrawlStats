@@ -170,7 +170,6 @@ private fun MainActivity.openReview(g: Tally.Battle) {
         Toast.makeText(this, R.string.status_perm, Toast.LENGTH_SHORT).show()
         return
     }
-    Stats.event(this, "app_home_game")
     val app = applicationContext
     Thread {
         val game = runCatching {

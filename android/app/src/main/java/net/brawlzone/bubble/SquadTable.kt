@@ -111,7 +111,6 @@ internal fun MainActivity.paintSquadTable() {
                             isFocusable = true
                             setOnClickListener {
                                 SquadTable.against = r.data.tag
-                                Stats.event(this@paintSquadTable, "app_squad_versus")
                                 paintSquadTable()
                             }
                         }
@@ -206,7 +205,6 @@ private fun MainActivity.shareVersus(card: View) {
         }.getOrNull()
         runOnUiThread {
             if (file == null || isFinishing || isDestroyed) return@runOnUiThread
-            Stats.event(this, "app_squad_share")
             Share.sendFile(this, file, "duel", getString(R.string.share_text))
         }
     }.start()
