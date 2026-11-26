@@ -31,7 +31,9 @@
 # gave up for doing worst. By weekday, since 2026-10-29 with the data
 # formats the daily quiz moved out of 15:30:
 #
-#   Mon drops  Tue higherlower  Wed ranktier  Thu whatsnew  Fri hiddenop (giveaway to Nov 30)  Sat modes  Sun everyrank
+#   Mon drops  Tue higherlower  Wed ranktier  Thu whatsnew  Fri hiddenop (giveaway to Nov 30)  Sat ranktier  Sun everyrank
+#   (2026-11-26, owner: more of the one-rank tier list, the week's best Short on both networks:
+#   Wednesday and Saturday, Masters+, Legendary and Mythic in turn; numbers keeps Thursday)
 #   (2026-11-23: higher or lower, the one-rank tier list and the most underrated brawler took the
 #   weak stop, ranks and broken slots; Mondays without drops are the two-week win-rate race)
 #   The third Thursday, when a Ranked season starts (lib/ranked-seasons), is seasonclimb instead of whatsnew.
@@ -102,15 +104,17 @@ if [ "$kind" = extra ]; then
        done ;;
     2) kind=higherlower ;;
     3) kind=ranktier ;;
-    # Thursday and Saturday (2026-11-25): bans, kills, deaths and damage in
-    # Ranked, in turn, in place of whatsnew and modes.
+    # Thursday (2026-11-25): bans, kills, deaths and damage in Ranked, in
+    # turn, in place of whatsnew.
     4) if [ "$(date -u +%-d)" -ge 15 ] && [ "$(date -u +%-d)" -le 21 ]; then kind=seasonclimb; else kind=numbers; fi ;;
     # The Friday after a reset (the third Thursday), from December: the new
     # season's top ten so far (newseason, 2026-11-19); else broken.
     5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway
        elif [ "$(date -u +%-d)" -ge 16 ] && [ "$(date -u +%-d)" -le 22 ]; then kind=newseason
        else kind=hiddenop; fi ;;
-    6) kind=numbers ;;
+    # Saturday (2026-11-26): the one-rank tier list again, the next rank in
+    # its rotation (make.py BRACKET_SHOW), in place of the second numbers.
+    6) kind=ranktier ;;
     7) kind=everyrank ;;
     *) kind=classrank ;;
   esac
