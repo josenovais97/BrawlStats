@@ -5597,4 +5597,16 @@ export const FR: Record<string, string> = {
     "Les autres : les mêmes brawlers en parties {rank}.",
   "Kills and bans":
     "Éliminations et bans",
+  "Your K/D, kills and damage: on Home, in Season, in Squad and on the rank widget.":
+    "Ton K/D, tes éliminations et tes dégâts : dans Accueil, Saison, Équipe et le widget de rang.",
+  "Season: this one and the last, with your stats next to others at your rank and your brawlers by K/D or wins.":
+    "Saison : l'actuelle et la dernière, avec tes stats à côté de celles des autres à ton rang et tes brawlers par K/D ou victoires.",
+  "A card to share for each season.":
+    "Une carte à partager pour chaque saison.",
+  "Squad: the week by wins, K/D or kills, and a duel card with any friend.":
+    "Équipe : la semaine par victoires, K/D ou éliminations, et une carte de duel.",
+  "Home: your last five games, Coach and your next quests.":
+    "Accueil : tes cinq derniers matchs, Coach et tes prochaines quêtes.",
+  "Shorter Settings, and pull down to refresh.":
+    "Réglages plus courts, et tire vers le bas pour actualiser.",
 };

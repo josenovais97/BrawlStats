@@ -5597,4 +5597,16 @@ export const RU: Record<string, string> = {
     "Другие: те же бойцы в боях ранга «{rank}».",
   "Kills and bans":
     "Убийства и баны",
+  "Your K/D, kills and damage: on Home, in Season, in Squad and on the rank widget.":
+    "Твой K/D, убийства и урон: на Главной, в Сезоне, в Отряде и в виджете ранга.",
+  "Season: this one and the last, with your stats next to others at your rank and your brawlers by K/D or wins.":
+    "Сезон: этот и прошлый. Твоя статистика рядом с другими на твоём ранге и бойцы по K/D или победам.",
+  "A card to share for each season.":
+    "Карточка каждого сезона, чтобы поделиться.",
+  "Squad: the week by wins, K/D or kills, and a duel card with any friend.":
+    "Отряд: неделя по победам, K/D или убийствам и карточка дуэли с любым другом.",
+  "Home: your last five games, Coach and your next quests.":
+    "Главная: пять последних боёв, Тренер и ближайшие задания.",
+  "Shorter Settings, and pull down to refresh.":
+    "Короче Настройки, и потяни вниз, чтобы обновить.",
 };

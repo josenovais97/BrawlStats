@@ -5596,4 +5596,16 @@ export const TR: Record<string, string> = {
     "Diğerleri: {rank} maçlarında aynı savaşçılar.",
   "Kills and bans":
     "Öldürme ve yasaklar",
+  "Your K/D, kills and damage: on Home, in Season, in Squad and on the rank widget.":
+    "K/D, öldürme ve hasarın: Ana sayfa, Sezon, Ekip ve rütbe widget'ında.",
+  "Season: this one and the last, with your stats next to others at your rank and your brawlers by K/D or wins.":
+    "Sezon: bu sezon ve geçen sezon; istatistiklerin rütbendeki diğerlerinin yanında, savaşçıların K/D'ye veya galibiyete göre.",
+  "A card to share for each season.":
+    "Her sezon için paylaşılacak bir kart.",
+  "Squad: the week by wins, K/D or kills, and a duel card with any friend.":
+    "Ekip: haftanın galibiyet, K/D veya öldürme sıralaması ve her arkadaşınla düello kartı.",
+  "Home: your last five games, Coach and your next quests.":
+    "Ana sayfa: son beş maçın, Koç ve sıradaki görevlerin.",
+  "Shorter Settings, and pull down to refresh.":
+    "Daha kısa Ayarlar; yenilemek için aşağı çek.",
 };

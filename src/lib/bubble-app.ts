@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.44',
+  version: '1.45',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 57,
+  versionCode: 58,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.44.apk',
+  path: '/downloads/brawlzone-bubble-1.45.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,11 +62,11 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 4037735,
-  sha256: 'e6821cdbd7591701b76cb7a8759dbcd382603dd87b4765a4d5bd7a6a5e9c29a7',
+  size: 4189192,
+  sha256: 'd1b7bc4dbaffa4df8a2e4a1e9aff74abd2c8938373bff82269003b3fc639d4de',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-11-24',
+  released: '2026-11-26',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -95,6 +95,19 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.45',
+    versionCode: 58,
+    date: '2026-11-26',
+    changes: [
+      "Your K/D, kills and damage: on Home, in Season, in Squad and on the rank widget.",
+      "Season: this one and the last, with your stats next to others at your rank and your brawlers by K/D or wins.",
+      "A card to share for each season.",
+      "Squad: the week by wins, K/D or kills, and a duel card with any friend.",
+      "Home: your last five games, Coach and your next quests.",
+      "Shorter Settings, and pull down to refresh.",
+    ],
+  },
   {
     version: '1.44',
     versionCode: 57,
