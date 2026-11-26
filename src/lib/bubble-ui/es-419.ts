@@ -13,7 +13,7 @@ const es419: UiStrings = {
   'meta.vsUsual': '{n} vs lo habitual',
   'comps.vsAvg': '{n} vs promedio',
   'playTest.body': 'La misma app, actualizada por Google Play, y nos ayudas a lanzarla. Play la instala encima de esta y conserva tu tag.',
-  'update.fallback': 'Si no pasa nada, abre {url} en tu navegador. El archivo lleva su número de versión, así puedes revisar qué instalas.',
+  'update.fromPlay': "Ahora las actualizaciones llegan por Google Play. Play la instala encima de esta y conserva tu tag.",
   'bracket.title': 'Tu rango',
   'bracket.all': 'Todos los rangos',
   'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',

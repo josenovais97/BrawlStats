@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   Check,
-  Download,
   Hand,
   Layers,
   ListOrdered,
@@ -19,10 +18,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DemoVideo } from "@/components/bubble/demo-video";
-import { DownloadButton } from "@/components/bubble/download-button";
 import { GooglePlayBadge } from "@/components/store-badges";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_LIVE, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
+import { BUBBLE_CHANGELOG, PLAY_TEST } from "@/lib/bubble-app";
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -123,27 +121,16 @@ const ACCOUNT = [
 const STEPS = [
   {
     n: 1,
-    title: "Download and open the file",
-    body: "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.",
+    title: "Install it from Google Play",
+    body: "Tap the Google Play button at the top of this page, or search for BrawlZone Bubble in the Play Store.",
   },
   {
     n: 2,
-    title: "Allow installing from your browser",
-    body: 'Android asks once per app that installs other apps. "Allow from this source" appears the first time; after that it remembers.',
-  },
-  {
-    n: 3,
     title: "Open BrawlZone and tap Start bubble",
     body: 'The first tap sends you to Android\'s "Display over other apps" screen, because no app is allowed to grant itself that permission.',
   },
   {
-    n: 4,
-    title: "If the toggle is greyed out",
-    body: 'Android blocks this permission for apps installed outside a store. Go to Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, choose "Allow restricted settings", then try again. This catches almost everyone, and Android never explains it.',
-    warn: true,
-  },
-  {
-    n: 5,
+    n: 3,
     title: "Switch it on and go back",
     body: "The bubble appears straight away and stays on top of whatever you open next, including the game.",
   },
@@ -199,87 +186,10 @@ export default function BubblePage() {
               <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick, so the bubble brings the answer to you: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.')}</p>
             </div>
 
-            {/*
-              Google Play first while its closed test is recruiting: every new
-              install that goes through Play is a tester, and Play keeps the
-              app updated. The APK stays, smaller, for phones without Google
-              Play and for anyone who will not join a group.
-            */}
-            {PLAY_LIVE ? (
-              <div className="space-y-3">
-                <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="inline-block transition-transform hover:-translate-y-0.5">
-                  <GooglePlayBadge className="h-16 w-auto" />
-                </a>
-                <p className="text-sm text-muted">
-                  {t('No Google Play on your phone?')}{' '}
-                  <DownloadButton from="hero" className="font-semibold text-foreground underline underline-offset-2">
-                    {t('Download the APK')}
-                  </DownloadButton>{' '}
-                  {t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}
-                </p>
-              </div>
-            ) : PLAY_TEST.open ? (
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-4">
-                  <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
-                    <GooglePlayBadge className="h-14 w-auto" />
-                  </Link>
-                  <Link
-                    href={lp('/bubble/test')}
-                    data-umami-event="playtest_entry"
-                    data-umami-event-from="bubble"
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
-                  >
-                    {t('Join the test')}
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </div>
-                <p className="text-sm text-muted">
-                  {t('No Google Play on your phone?')}{' '}
-                  <DownloadButton from="hero" className="font-semibold text-foreground underline underline-offset-2">
-                    {t('Download the APK')}
-                  </DownloadButton>{' '}
-                  {t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-                <DownloadButton
-                  from="hero"
-                  className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
-                >
-                  <Download className="size-5" />{t('Download for Android')}</DownloadButton>
-                <p className="text-sm text-muted">{t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}</p>
-              </div>
-            )}
-
-            {/* The store listing, for readers who will not sideload. Same
-                build, same key; see `storeUrl`. */}
-            {/* Hidden during the Google Play test: a third route pulls people
-                away from the one that makes them testers. */}
-            {BUBBLE_APP.storeUrl && !PLAY_TEST.open && !PLAY_LIVE ? (
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <a
-                  href={lp(BUBBLE_APP.storeUrl)}
-                  rel="noopener"
-                  className="inline-flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-2.5 transition-[transform,border-color] hover:-translate-y-0.5 hover:border-brand/50"
-                >
-                  <Image
-                    src={BUBBLE_APP.storeIcon}
-                    alt=""
-                    width={74}
-                    height={74}
-                    className="size-8"
-                    unoptimized
-                  />
-                  <span className="flex flex-col leading-tight">
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('Get it on')}</span>
-                    <span className="font-bold">{BUBBLE_APP.storeName}</span>
-                  </span>
-                </a>
-                <p className="text-sm text-muted">{t('Prefer a store? The same signed file, so either one updates the other.')}</p>
-              </div>
-            ) : null}
+            {/* Google Play is the only place to get the app since 2026-11-26. */}
+            <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="inline-block transition-transform hover:-translate-y-0.5">
+              <GooglePlayBadge className="h-16 w-auto" />
+            </a>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {TRUST.map((item) => (
@@ -295,12 +205,8 @@ export default function BubblePage() {
           </div>
 
           {/*
-            For the reader on a desktop, where the download button hands them an
-            APK their computer cannot install.
-
-            Points at this page rather than the file: someone arriving on a phone
-            needs the install steps — the restricted-settings one in particular —
-            and a QR that starts a download gives them the file with none of that.
+            For the reader on a desktop, where the app cannot be installed.
+            Points at this page, with its Play button and setup steps.
             Hidden below `lg`, because scanning a code with the phone displaying
             it is not a thing anyone can do.
           */}
@@ -494,22 +400,18 @@ export default function BubblePage() {
         </div>
       </section>
 
-      {/* Install. Step four is the one that stops people. */}
+      {/* Install: from Google Play, then the one permission. */}
       <section className="space-y-5">
         <SectionHeading
           title={t('Installing it')}
-          subtitle={t('Five steps, and the fourth is where Android gets in your way.')}
+          subtitle={t('Three steps, about a minute.')}
         />
 
         <ol className="card divide-y divide-border overflow-hidden">
           {STEPS.map((step) => (
             <li key={step.n} className="flex gap-4 p-5">
               <span
-                className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-black tabular-nums ${
-                  step.warn
-                    ? "bg-brand text-brand-ink"
-                    : "bg-surface-2 text-muted"
-                }`}
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-sm font-black tabular-nums text-muted"
               >
                 {step.n}
               </span>
@@ -523,39 +425,7 @@ export default function BubblePage() {
           ))}
         </ol>
 
-        {/* While the Google Play closed test is recruiting (PLAY_TEST). */}
-        {PLAY_TEST.open ? (
-          <Link
-            href={lp('/bubble/test')}
-            className="card card-interactive flex items-center justify-between gap-4 border-victory/40 p-5"
-          >
-            <span>
-              <span className="block font-bold text-victory">{t('Coming to Google Play')}</span>
-              <span className="mt-1 block text-sm text-muted">{t('Join the test and install it from the Play Store instead: three taps.')}</span>
-            </span>
-            <ArrowRight className="size-5 shrink-0 text-victory" />
-          </Link>
-        ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="card p-5">
-            <h3 className="text-sm font-bold">{t('About Play Protect')}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">{t('Google Play Protect warns about any app installed outside the Play Store. That warning is about where a file came from, not about what is in it.')}</p>
-          </div>
-
-          {/* A checksum is only worth printing if it is right, so it is generated
-              from the committed file and asserted against it in the test run. */}
-          <details className="card p-5">
-            <summary className="cursor-pointer text-sm font-bold">{t('Verify the download')}</summary>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{t('Confirm the file you got is the file published here. On a desktop:')}{" "}
-              <code className="rounded bg-surface-2 px-1.5 py-0.5 text-xs">{t('sha256sum brawlzone-bubble.apk')}</code>
-            </p>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">{t('SHA-256')}</p>
-            <code className="mt-1 block overflow-x-auto rounded-lg bg-surface-2 p-3 text-xs">
-              {BUBBLE_APP.sha256}
-            </code>
-          </details>
-        </div>
       </section>
 
 
@@ -682,26 +552,11 @@ export default function BubblePage() {
 
       <section className="card card-glow p-6 text-center sm:p-10">
         <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('Get it on your phone')}</h2>
-        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.', { v: bubbleAppSize() })}</p>
+        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.')}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          {PLAY_LIVE ? (
-            <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble-cta" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
-              <GooglePlayBadge className="h-[3.25rem] w-auto" />
-            </a>
-          ) : PLAY_TEST.open ? (
-            <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
-              <GooglePlayBadge className="h-[3.25rem] w-auto" />
-            </Link>
-          ) : null}
-          <DownloadButton
-            from="cta"
-            className={
-              PLAY_TEST.open || PLAY_LIVE
-                ? "inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"
-                : "inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
-            }
-          >
-            <Download className="size-5" />{PLAY_TEST.open || PLAY_LIVE ? t('Download the APK') : t('Download for Android')}</DownloadButton>
+          <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble-cta" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+            <GooglePlayBadge className="h-[3.25rem] w-auto" />
+          </a>
           <Link
             href={lp('/tier-list/ranked')}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"

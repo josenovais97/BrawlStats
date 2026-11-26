@@ -1,78 +1,25 @@
 /**
- * The Android app's release facts, in one place.
+ * The Android app's latest release, in one place.
  *
- * The download page, the checksum it publishes and the structured data all
- * have to agree, and the one thing worse than no checksum is a stale one: it
- * fails verification on a good file and teaches the reader to skip the step.
- * So the numbers live here and every consumer reads them.
+ * Google Play is the only place to get the app since 2026-11-26 (owner: "stop
+ * offering the apk"; about 4 people used the site build against ~60 on Play).
+ * The site no longer serves an APK: `/downloads/*` redirects to the Play
+ * listing (next.config.ts), and the panel tells an older site build that its
+ * updates now come from Play, which installs over it (same signing key).
  *
- * Update all four together when a new APK is copied into `public/downloads/`.
- * `scripts/check-apk-release.ts` fails the test run if `size` or `sha256` stop
- * matching the file actually committed.
+ * Bump `version`, `versionCode` and `released` when a release reaches Play:
+ * the panel's update line, the changelog and the Discord announcement read
+ * them.
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
   version: '1.45',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
   versionCode: 58,
-  /**
-   * Served from this origin rather than a third party, so the download and the
-   * site people already trust come from the same place.
-   *
-   * **The version is in the filename, and that is not cosmetic.** This used to
-   * be one versionless path that each release overwrote, cached for a day. A
-   * day is a long time when six releases ship in one: a phone that had fetched
-   * the APK kept serving itself the copy it already had, so every update
-   * installed the previous build. Fixes were reported as not working because
-   * the binary carrying them never arrived — through four releases, while the
-   * page around it updated instantly and said the new version was installed.
-   *
-   * A new release is now a new URL, which no cache can answer with the wrong
-   * bytes. Bump this with `version` and `versionCode`; the test below fails if
-   * the file at this path is not the one whose checksum is published.
-   */
-  path: '/downloads/brawlzone-bubble-1.45.apk',
-
-  /**
-   * The old versionless address, kept for links and QR codes already in the
-   * world. Redirected to `path` and never cached — see `next.config.ts`.
-   */
-  legacyPath: '/downloads/brawlzone-bubble.apk',
-  /**
-   * Where the same build is listed on a store, or null while it is not.
-   *
-   * A store page is a second door to the same APK, not a different build: the
-   * listing is updated by uploading the file at `path`, signed with the same
-   * key, so an install from either side updates from either side. It exists
-   * for the people a sideload page loses — the ones who will not enable
-   * "unknown sources" for a site they found ten minutes ago — and because a
-   * listing on a domain search engines already trust is a link to this one.
-   *
-   * Null renders nothing. The page must never point at a listing that is not
-   * up yet; a dead store link on a download page reads as a dead app.
-   */
-  storeUrl: "https://apkpure.com/p/net.brawlzone.bubble" as string | null,
-  /** The store's name, as the link says it. */
-  storeName: "APKPure",
-  /**
-   * The store's own mark, saved from its site rather than redrawn, so the
-   * badge reads as that store at a glance. Served from public/. Cropped from
-   * the transparent wordmark, not the app icon, whose white square shows on
-   * the dark theme.
-   */
-  storeIcon: "/brand/stores/apkpure.png",
-  /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 4189192,
-  sha256: 'd1b7bc4dbaffa4df8a2e4a1e9aff74abd2c8938373bff82269003b3fc639d4de',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-11-26',
 } as const;
-
-/** "2.5 MB", for a reader deciding whether to tap on mobile data. */
-export function bubbleAppSize(): string {
-  return `${(BUBBLE_APP.size / 1024 / 1024).toFixed(1)} MB`;
-}
 
 /** One shipped version and what changed in it. */
 export interface BubbleRelease {
@@ -522,8 +469,8 @@ export function releasesSince(versionCode: number): BubbleRelease[] {
  * The one switch for launch day: true ends the closed test everywhere
  * (`PLAY_TEST.open` follows it), points every Google Play badge straight at
  * the listing, turns the home page's tester card into a launch card,
- * redirects /bubble/test to /bubble, and keeps the APK as the fallback for
- * phones without Play.
+ * redirects /bubble/test to /bubble. Since 2026-11-26 it is the only way to
+ * get the app.
  */
 export const PLAY_LIVE = true;
 

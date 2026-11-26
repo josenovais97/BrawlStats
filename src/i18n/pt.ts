@@ -5608,4 +5608,13 @@ export const PT: Record<string, string> = {
     "Início: suas últimas cinco partidas, Treinador e próximas missões.",
   "Shorter Settings, and pull down to refresh.":
     "Ajustes mais curtos, e puxe para atualizar.",
+  // /bubble without the APK (2026-11-26): Google Play only.
+  "Install it from Google Play":
+    "Instale pelo Google Play",
+  "Tap the Google Play button at the top of this page, or search for BrawlZone Bubble in the Play Store.":
+    "Toque no botão do Google Play no topo desta página ou procure BrawlZone Bubble na Play Store.",
+  "Three steps, about a minute.":
+    "Três passos, cerca de um minuto.",
+  "Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Grátis, sem conta. Tudo o que ela mostra também está no site. O app só te poupa de trocar de app no meio do draft.",
 };

@@ -5608,4 +5608,13 @@ export const TR: Record<string, string> = {
     "Ana sayfa: son beş maçın, Koç ve sıradaki görevlerin.",
   "Shorter Settings, and pull down to refresh.":
     "Daha kısa Ayarlar; yenilemek için aşağı çek.",
+  // /bubble without the APK (2026-11-26): Google Play only.
+  "Install it from Google Play":
+    "Google Play'den yükle",
+  "Tap the Google Play button at the top of this page, or search for BrawlZone Bubble in the Play Store.":
+    "Bu sayfanın üstündeki Google Play düğmesine dokun ya da Play Store'da BrawlZone Bubble'ı ara.",
+  "Three steps, about a minute.":
+    "Üç adım, yaklaşık bir dakika.",
+  "Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Ücretsiz, hesap yok. İçindeki her şey sitede de var. Uygulama yalnızca draft ortasında uygulama değiştirmeni önler.",
 };

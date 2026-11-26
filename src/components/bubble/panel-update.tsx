@@ -1,8 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { type MouseEvent, useSyncExternalStore } from "react";
 
-import { DownloadButton } from "@/components/bubble/download-button";
 import { usePanelI18n } from "@/components/bubble/panel-i18n";
 import { type BubbleRelease } from "@/lib/bubble-app";
 
@@ -29,15 +28,18 @@ import { type BubbleRelease } from "@/lib/bubble-app";
 export function PanelUpdate({
   latestVersion,
   latestVersionCode,
+  storeUrl,
   changes,
 }: {
   latestVersion: string;
   latestVersionCode: number;
+  /** The Play listing: the only place updates come from since 2026-11-26. */
+  storeUrl: string;
   /** Everything newer than the oldest install we might be talking to. */
   changes: BubbleRelease[];
 }) {
   const hash = useSyncExternalStore(subscribe, snapshot, () => null);
-  const { t, tx } = usePanelI18n();
+  const { t } = usePanelI18n();
 
   // Null on the server and on the first paint; nothing is drawn until the
   // client can actually answer the question.
@@ -115,32 +117,25 @@ export function PanelUpdate({
             </span>
           ) : null}
         </p>
-        {/* Straight to the file; the address below is the fallback. */}
-        <DownloadButton
-          from="panel"
+        {/*
+          Straight to Google Play (2026-11-26: the site stopped serving the
+          APK). Play installs over a site build, since both are signed with the
+          same key, and the app keeps its tag and settings.
+        */}
+        <a
+          href={storeUrl}
+          rel="noopener"
+          data-umami-event="play_store"
+          data-umami-event-from="panel-update"
+          onClick={(event) => openOutside(event, storeUrl)}
           className="shrink-0 rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold text-brand-ink"
         >
-          {t("update.download")}
-        </DownloadButton>
+          {t("playTest.cta")}
+        </a>
       </div>
 
-      {/*
-        The address stays, under the button rather than instead of it.
-        
-        The button has failed on a real phone more than once and each failure
-        was silent, so the reader needs a route that cannot fail even when the
-        one above does. The filename carries the version, which is how you can
-        tell a fresh download from a cached one before installing it — the thing
-        that would have caught a day of stale updates.
-      */}
       <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
-        {tx("update.fallback", {
-          url: (
-            <span className="font-semibold text-foreground">
-              brawlzone.net/bubble
-            </span>
-          ),
-        })}
+        {t("update.fromPlay")}
       </p>
 
       {lines.length > 0 ? (
@@ -161,6 +156,25 @@ export function PanelUpdate({
       ) : null}
     </section>
   );
+}
+
+/**
+ * In the app, ask the app to open the link. Builds since 1.14 expose
+ * `BrawlZoneApp.openExternal`, which hands the URL to Android (so a Play link
+ * opens the Play Store); older builds fall through to a plain navigation,
+ * which every build since 1.5 routes out to the browser.
+ */
+function openOutside(event: MouseEvent<HTMLAnchorElement>, url: string) {
+  type Bridge = { openExternal?: (u: string) => void };
+  const w = window as unknown as { BrawlZoneApp?: Bridge; BrawlZoneScan?: Bridge };
+  const bridge = w.BrawlZoneApp ?? w.BrawlZoneScan;
+  if (typeof bridge?.openExternal !== "function") return;
+  try {
+    bridge.openExternal(url);
+    event.preventDefault();
+  } catch {
+    // Leave the navigation to happen normally.
+  }
 }
 
 /** The `v` in `#v=14`, or null when the app did not say. */

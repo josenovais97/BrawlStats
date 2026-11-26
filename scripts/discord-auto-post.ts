@@ -24,7 +24,7 @@
  */
 import { fullBodyArt } from '@/lib/brawler-art';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
+import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST } from '@/lib/bubble-app';
 import { getEventRotation, getOfficialBrawlers } from '@/lib/bs-api';
 import { formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
@@ -174,10 +174,7 @@ async function bubbleRelease(g: Guild): Promise<string> {
           footer: { text: `Android · free · ${release?.date ?? ''}`.trim() },
         },
       ],
-      components: buttons(
-        ['Download', `${SITE}/bubble`],
-        ...(BUBBLE_APP.storeUrl ? [[`Also on ${BUBBLE_APP.storeName ?? 'the store'}`, BUBBLE_APP.storeUrl] as [string, string]] : []),
-      ),
+      components: buttons(['Get it on Google Play', PLAY_TEST.listingUrl]),
     },
     g.roles.get('App updates'),
   );

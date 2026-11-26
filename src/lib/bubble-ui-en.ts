@@ -193,8 +193,7 @@ export const UI_EN = {
   'support.cta': "Buy me a coffee",
   'support.later': "Not now",
   'update.youHave': '— you have {version}',
-  'update.download': 'Download',
-  'update.fallback': 'If nothing happens, open {url} in your browser. The file is named for its version, so you can check what you are installing.',
+  'update.fromPlay': "Updates now come from Google Play. Play installs over this app and keeps your tag.",
 
   'bracket.title': 'Your rank',
   'bracket.all': 'All ranks',

@@ -5609,4 +5609,13 @@ export const RU: Record<string, string> = {
     "Главная: пять последних боёв, Тренер и ближайшие задания.",
   "Shorter Settings, and pull down to refresh.":
     "Короче Настройки, и потяни вниз, чтобы обновить.",
+  // /bubble without the APK (2026-11-26): Google Play only.
+  "Install it from Google Play":
+    "Установи из Google Play",
+  "Tap the Google Play button at the top of this page, or search for BrawlZone Bubble in the Play Store.":
+    "Нажми кнопку Google Play вверху этой страницы или найди BrawlZone Bubble в Play Маркете.",
+  "Three steps, about a minute.":
+    "Три шага, около минуты.",
+  "Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Бесплатно, без аккаунта. Всё это есть и на сайте. Приложение лишь избавляет от переключения посреди драфта.",
 };

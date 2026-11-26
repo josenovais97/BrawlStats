@@ -1,11 +1,10 @@
-import { Check, Download } from "lucide-react";
+import { Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { DownloadButton } from "@/components/bubble/download-button";
 import { HomeSection } from "@/components/home/home-section";
 import { GooglePlayBadge } from "@/components/store-badges";
-import { BUBBLE_APP, PLAY_LIVE, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
+import { PLAY_TEST } from "@/lib/bubble-app";
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -92,37 +91,19 @@ export function HomeBubble() {
             )}
           </ul>
 
-          {/* On Google Play since 2026-11-06: the badge leads, the APK stays
-              for phones without Play, as on /bubble. */}
-          {PLAY_LIVE ? (
-            <div className="space-y-2 pt-1">
-              <a
-                href={PLAY_TEST.listingUrl}
-                rel="noopener"
-                data-umami-event="play_store"
-                data-umami-event-from="home-bubble"
-                aria-label={t('Get it on Google Play')}
-                className="inline-block transition-transform hover:-translate-y-0.5"
-              >
-                <GooglePlayBadge className="h-14 w-auto" />
-              </a>
-              <p className="text-xs text-muted">
-                {t('No Google Play on your phone?')}{' '}
-                <DownloadButton from="home" className="font-semibold text-foreground underline underline-offset-2">
-                  {t('Download the APK')}
-                </DownloadButton>
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-              <DownloadButton
-                from="home"
-                className="btn-game inline-flex items-center gap-2.5 bg-brand hover:bg-brand-strong px-5 py-3 text-brand-ink"
-              >
-                <Download className="size-4" />{t('Download for Android')}</DownloadButton>
-              <p className="text-xs text-muted">{t('{v} · Android {minAndroid}+', { v: bubbleAppSize(), minAndroid: BUBBLE_APP.minAndroid })}</p>
-            </div>
-          )}
+          {/* Google Play is the only place to get the app since 2026-11-26. */}
+          <div className="pt-1">
+            <a
+              href={PLAY_TEST.listingUrl}
+              rel="noopener"
+              data-umami-event="play_store"
+              data-umami-event-from="home-bubble"
+              aria-label={t('Get it on Google Play')}
+              className="inline-block transition-transform hover:-translate-y-0.5"
+            >
+              <GooglePlayBadge className="h-14 w-auto" />
+            </a>
+          </div>
         </div>
       </div>
     </HomeSection>

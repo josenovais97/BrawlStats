@@ -54,10 +54,11 @@ checkout configures cleanly.
    upgrades on the code, not the name, so the code is the one that must move.
 2. Add an entry to `BUBBLE_CHANGELOG` in `src/lib/bubble-app.ts`. The panel
    shows an out-of-date install only what it has not got, using `versionCode`.
-3. `./gradlew assembleRelease`, copy the APK to
-   `public/downloads/brawlzone-bubble.apk`.
-4. Update `BUBBLE_APP` — version, versionCode, size, sha256.
-   `src/lib/bubble-app.test.ts` fails until the checksum matches the committed
-   file, which is the reminder that would otherwise not exist: a stale checksum
-   fails verification on a good download and teaches the one careful reader to
-   skip the step.
+3. `./gradlew bundlePlayRelease` and upload the bundle in Play Console.
+   Google Play is the only place to get the app since 2026-11-26: the site
+   no longer serves an APK (`/downloads/*` redirects to the Play listing), so
+   there is no site build to copy.
+4. Once the release is live on Play, update `BUBBLE_APP` in
+   `src/lib/bubble-app.ts` (version, versionCode, released). The panel tells an
+   older site build that its update is on Google Play, and Discord announces
+   the release from the changelog entry.

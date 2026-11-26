@@ -283,6 +283,7 @@ export default async function BubblePanelPage() {
         <PanelUpdate
           latestVersion={BUBBLE_APP.version}
           latestVersionCode={BUBBLE_APP.versionCode}
+          storeUrl={PLAY_TEST.listingUrl}
           changes={BUBBLE_CHANGELOG}
         />
         {/* The Google Play closed test, while it is recruiting (PLAY_TEST). */}
