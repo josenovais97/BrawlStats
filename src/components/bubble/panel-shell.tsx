@@ -527,8 +527,11 @@ export function PanelShell({
       </div>
 
       {/* Five tabs with icons (1.43): the icon reads faster than the word, and
-          short words stop "Team comp" being cut to "Teamco…". */}
-      <div role="tablist" aria-label="Panel view" className="mb-2 flex gap-1 px-1">
+          short words stop "Team comp" being cut to "Teamco…". In a narrow
+          panel (2026-11-26) the icons go and the words stay: at 360 px, the
+          panel with the phone upright, every language was cut ("Me…",
+          "Coun…"), and Russian in Nunito Black already below ~440 px. */}
+      <div role="tablist" aria-label="Panel view" className="@container mb-2 flex gap-1 px-1">
         {(
           [
             ['meta', t('tab.meta'), BarChart3],
@@ -544,11 +547,11 @@ export function PanelShell({
             role="tab"
             aria-selected={tab === key}
             onClick={() => choose(key)}
-            className={`inline-flex min-w-0 flex-auto items-center justify-center gap-1 px-1.5 py-1.5 text-[12px] leading-tight ${
+            className={`inline-flex min-w-0 flex-auto items-center justify-center gap-1 px-1.5 py-1.5 text-[12px] leading-tight @max-[27.5rem]:px-1 ${
               tab === key ? 'bz-chip-on' : 'bz-chip'
             }`}
           >
-            <Icon className="size-3.5 shrink-0" strokeWidth={2.6} aria-hidden />
+            <Icon className="size-3.5 shrink-0 @max-[27.5rem]:hidden" strokeWidth={2.6} aria-hidden />
             <span className="truncate">{label}</span>
           </button>
         ))}
