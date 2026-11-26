@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 import { draftChanceFor } from '@/lib/bubble-review';
+import { bracketBySlug } from '@/lib/rank-brackets';
 import { okResponse } from '@/lib/route-helpers';
 
 /**
@@ -8,8 +9,10 @@ import { okResponse } from '@/lib/route-helpers';
  *
  * GET ?map=<name>&mine=1,2,3&theirs=4,5,6 → { chance, mapped }, the draft's
  * chance to win on that map from the same reading as the post-game review.
- * `mine` is the reader's team (teammates plus the pick being tried). Answers
- * are the same for everyone, so they are cached by URL at the edge.
+ * `mine` is the reader's team (teammates plus the pick being tried). `rank`
+ * (a bracket slug, optional, 2026-11-26) reads that rank's games, as the
+ * draft suggestions do. Answers are the same for everyone, so they are cached
+ * by URL at the edge.
  */
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +31,7 @@ export async function GET(request: NextRequest) {
   if (!map || map.length > 60 || !mine || !theirs) {
     return Response.json({ error: 'bad request' }, { status: 400 });
   }
-  const read = await draftChanceFor(map, mine, theirs).catch(() => null);
+  const bracket = bracketBySlug(q.get('rank'))?.id;
+  const read = await draftChanceFor(map, mine, theirs, bracket).catch(() => null);
   return okResponse({ chance: read?.chance ?? null, mapped: read?.mapped ?? 0 }, 600);
 }

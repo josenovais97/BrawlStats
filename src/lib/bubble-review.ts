@@ -2,7 +2,10 @@ import 'server-only';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { draftAutopsy, draftChance, type DraftAutopsy } from '@/lib/draft-autopsy';
+import { bracketForTier, lobbyTier } from '@/lib/rank-brackets';
 import {
+  getBracketMapPicks,
+  getBracketRoster,
   getBrawlerPairings,
   getCounterScores,
   getLadderMapForm,
@@ -72,41 +75,28 @@ export async function reviewGame(
   if (myIds.length === 0 || theirIds.length === 0) return null;
 
   const mapName = entry.event?.map ?? '';
-  const [rankedMaps, form, pairs, shapes, catalogue, counters, countered, meta] = await Promise.all([
-    // Per map, the same read (and cache) as the draft helper's.
-    getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, { mapName }).catch(() => []),
-    getLadderMapForm().catch(() => new Map<string, MapForm[]>()),
+  /*
+   * Read at the rank the game was played at (2026-11-26): in a Ranked game
+   * each brawler's `trophies` is its player's rank tier, and the lobby's rank
+   * is their median, as the sampler files it (lib/aggregation).
+   */
+  const players = (entry.battle.teams ?? []).flat();
+  const bracket = bracketForTier(lobbyTier(players.map((p) => p.brawler?.trophies), players.length))?.id;
+  const [inputs, pairs, shapes, catalogue] = await Promise.all([
+    draftInputs(mapName, myIds, theirIds, bracket),
     Promise.all(myIds.map(async (id) => [id, await getBrawlerPairings(id).catch(() => null)] as const)),
     getRoleCompositions().catch(() => null),
     getBrawlerCatalog().catch(() => null),
-    getCounterScores(theirIds).catch(() => new Map<number, CounterScore>()),
-    getCounterScores(myIds).catch(() => new Map<number, CounterScore>()),
-    getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
   ]);
-
-  /*
-   * A Ranked game is read against Ranked results on its map (the lists the
-   * Meta tab shows), where the profile card uses trophy games. Trophy form
-   * fills in for a map Ranked has too little on.
-   */
-  const rankedMap = rankedMaps.find((m) => m.mapName === mapName);
-  const mapRows: MapForm[] =
-    rankedMap && rankedMap.picks.length >= 6
-      ? rankedMap.picks.map((p) => ({ brawlerId: p.brawlerId, battles: p.decidedSampleSize, winRate: p.winRate, adjusted: p.score }))
-      : (form.get(mapName) ?? []);
 
   const review = draftAutopsy({
     entry,
     tag: me ?? tag,
-    mapForm: new Map<number, MapForm>(mapRows.map((row) => [row.brawlerId, row])),
+    mapForm: inputs.mapForm,
     pairings: new Map(pairs.filter((p): p is [number, NonNullable<(typeof p)[1]>] => p[1] !== null)),
-    counters,
-    countered,
-    overall: new Map(
-      [...meta.values()]
-        .filter((e) => e.normalizedWinRate !== null)
-        .map((e) => [e.brawlerId, e.normalizedWinRate!] as const),
-    ),
+    counters: inputs.counters,
+    countered: inputs.countered,
+    overall: inputs.overall,
     roles: new Map((catalogue?.all ?? []).map((b) => [b.id, b.className])),
     shapes,
     roster,
@@ -124,30 +114,53 @@ export async function draftChanceFor(
   mapName: string,
   myIds: number[],
   theirIds: number[],
+  bracket?: number,
 ): Promise<{ chance: number; mapped: number } | null> {
   if (myIds.length === 0 || theirIds.length === 0) return null;
-  const [rankedMaps, form, counters, countered, meta] = await Promise.all([
+  const inputs = await draftInputs(mapName, myIds, theirIds, bracket);
+  return draftChance({ myIds, theirIds, ...inputs });
+}
+
+/**
+ * What a draft is read against: the map's Ranked picks, each brawler's
+ * overall Ranked form and the matchups both ways.
+ *
+ * With `bracket`, at that rank (2026-11-26): the draft board's chance and the
+ * review used every rank's games, so a Masters player was read partly against
+ * Bronze lobbies while the draft suggestions beside it already answered for
+ * their rank. Anything too thin at the rank keeps its every-rank answer, as in
+ * the suggestions: the map when it has fewer than six picks there, a brawler's
+ * form or matchup when the rank has too few of its games.
+ *
+ * A Ranked game is read against Ranked results on its map (the lists the Meta
+ * tab shows), where the profile card uses trophy games. Trophy form fills in
+ * for a map Ranked has too little on.
+ */
+async function draftInputs(mapName: string, myIds: number[], theirIds: number[], bracket?: number) {
+  const [rankedMaps, rankMaps, form, counters, countered, meta, rankRoster] = await Promise.all([
+    // Per map, the same read (and cache) as the draft helper's.
     getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, { mapName }).catch(() => []),
+    bracket ? getBracketMapPicks(bracket, 60).catch(() => []) : Promise.resolve([]),
     getLadderMapForm().catch(() => new Map<string, MapForm[]>()),
-    getCounterScores(theirIds).catch(() => new Map<number, CounterScore>()),
-    getCounterScores(myIds).catch(() => new Map<number, CounterScore>()),
+    getCounterScores(theirIds, 21, bracket).catch(() => new Map<number, CounterScore>()),
+    getCounterScores(myIds, 21, bracket).catch(() => new Map<number, CounterScore>()),
     getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
+    bracket ? getBracketRoster(bracket).catch(() => null) : Promise.resolve(null),
   ]);
-  const rankedMap = rankedMaps.find((m) => m.mapName === mapName);
-  const mapRows: MapForm[] =
-    rankedMap && rankedMap.picks.length >= 6
-      ? rankedMap.picks.map((p) => ({ brawlerId: p.brawlerId, battles: p.decidedSampleSize, winRate: p.winRate, adjusted: p.score }))
-      : (form.get(mapName) ?? []);
-  return draftChance({
-    myIds,
-    theirIds,
+  const enough = (m: { mapName: string; picks: unknown[] }) => m.mapName === mapName && m.picks.length >= 6;
+  const rankedMap = rankMaps.find(enough) ?? rankedMaps.find(enough);
+  const mapRows: MapForm[] = rankedMap
+    ? rankedMap.picks.map((p) => ({ brawlerId: p.brawlerId, battles: p.decidedSampleSize, winRate: p.winRate, adjusted: p.score }))
+    : (form.get(mapName) ?? []);
+
+  const overall = new Map<number, number>();
+  for (const e of [...meta.values(), ...(rankRoster?.scored ?? [])]) {
+    if (e.normalizedWinRate !== null) overall.set(e.brawlerId, e.normalizedWinRate);
+  }
+  return {
     mapForm: new Map<number, MapForm>(mapRows.map((row) => [row.brawlerId, row])),
-    overall: new Map(
-      [...meta.values()]
-        .filter((e) => e.normalizedWinRate !== null)
-        .map((e) => [e.brawlerId, e.normalizedWinRate!] as const),
-    ),
+    overall,
     counters,
     countered,
-  });
+  };
 }

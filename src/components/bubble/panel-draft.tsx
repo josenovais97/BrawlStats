@@ -245,6 +245,9 @@ export function PanelDraft({
       return;
     }
     const params = new URLSearchParams({ map: map.mapName, mine: team.join(','), theirs: picked.enemies.join(',') });
+    // At the same rank as the suggestions (2026-11-26), not every rank's games.
+    const rank = panelBracket(ownRank);
+    if (rank) params.set('rank', rank);
     const controller = new AbortController();
     const timer = setTimeout(() => {
       fetch(`/api/bubble/chance?${params}`, { signal: controller.signal })
@@ -263,7 +266,7 @@ export function PanelDraft({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [map, picked, mine]);
+  }, [map, picked, mine, ownRank]);
 
   /*
    * Scoring, debounced.
