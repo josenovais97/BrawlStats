@@ -27,18 +27,18 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
   title: 'Privacy Policy',
   description:
-    'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.',
+    'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and the app\'s one banner can be removed for good.',
 };
 
 const NOTHING = [
   'No account, because there is nothing to sign in to.',
   'No cookies of our own. The website\'s ads may set some, and in Europe only after you agree.',
-  'No trackers beyond Google\'s ad service on the website, and none at all in the Android app.',
+  'No trackers beyond Google\'s ad services: AdSense on the website, and AdMob for the banner in the Google Play app.',
   'No email address, name, phone number or payment details — none are ever asked for.',
 ];
 
 /** Bump when the policy text changes; shown at the bottom of the page. */
-const UPDATED = '2026-11-20T00:00:00Z';
+const UPDATED = '2026-11-27T00:00:00Z';
 
 export default function PrivacyPage() {
   const t = getT(requestLocale());
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('Advertising')}
-          subtitle={t('On the website only. The Android app shows no ads.')}
+          subtitle={t('On the website, and one banner in the Google Play app.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">
@@ -156,8 +156,10 @@ export default function PrivacyPage() {
                   rel="noopener noreferrer"
                   className="font-semibold text-foreground underline underline-offset-2"
                 >{t('Google\'s own policy')}</a>
-                {t('. The BrawlZone Bubble app and its panel show no ads.')}
+                .
               </p>
+              {/* 1.46 (2026-11-27): one AdMob banner in the Google Play app. */}
+              <p>{t('Since version 1.46, the Google Play version of the BrawlZone Bubble app shows one banner on its own screens, served by Google AdMob. The bubble, its panel and the widgets show no ads. AdMob collects the device\'s IP address (for an approximate location), the Android advertising ID, how the ad is seen and tapped, and diagnostic data, to show and measure ads and to prevent fraud. In the EEA, the UK and Switzerland the app asks first, through Google\'s consent message, and its Settings have a link to change the answer. The advertising ID can be reset or deleted in Android\'s settings. Bubble Supporter, a one-time purchase, removes the banner for good.')}</p>
               <p>{t('Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors\' YouTube or Google accounts. YouTube\'s use of data is covered by the')}{' '}
                 <a
                   href="https://www.youtube.com/t/terms"
@@ -238,7 +240,7 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('The Android app')}
-          subtitle={t('No account, no ads, and it cannot see your screen.')}
+          subtitle={t('No account, and it cannot see your screen.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">
@@ -260,12 +262,10 @@ export default function PrivacyPage() {
                 <Link
                   href={lp('/bubble/panel')}
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('a page on this site')}</Link>{t(', so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.')}</p>
-              <p>{t('Installed from Google Play, the app is covered by Google\'s own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the')}{' '}
-                <Link
-                  href={lp('/bubble')}
-                  className="font-semibold text-foreground underline underline-offset-2"
-                >{t('download page')}</Link>{t(', it comes with a SHA-256 checksum so you can verify the file is the one we published.')}</p>
+                >{t('a page on this site')}</Link>{t(', so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). Apart from Google AdMob for the banner (see Advertising), the app contains no advertising or analytics SDK and shares nothing with third parties.')}</p>
+              <p>{t('Installed from Google Play, the app is covered by Google\'s own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports.')}</p>
+              {/* 1.46 (2026-11-27): Bubble Supporter, the one-time purchase. */}
+              <p>{t('Bubble Supporter is a one-time purchase through Google Play. Google handles the payment, and we never see card or payment details. Whether you bought it is kept on your phone and checked with Google Play; nothing about the purchase is sent to brawlzone.net.')}</p>
             </div>
           </div>
         </div>

@@ -5617,4 +5617,19 @@ export const TR: Record<string, string> = {
     "Üç adım, yaklaşık bir dakika.",
   "Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
     "Ücretsiz, hesap yok. İçindeki her şey sitede de var. Uygulama yalnızca draft ortasında uygulama değiştirmeni önler.",
+  // Privacy policy for the 1.46 app (2026-11-27): the AdMob banner and Bubble Supporter.
+  "No trackers beyond Google's ad services: AdSense on the website, and AdMob for the banner in the Google Play app.":
+    "Google'ın reklam hizmetleri dışında izleyici yok: sitede AdSense, Google Play uygulamasındaki banner için AdMob.",
+  "On the website, and one banner in the Google Play app.":
+    "Sitede ve Google Play uygulamasında tek bir banner olarak.",
+  "Since version 1.46, the Google Play version of the BrawlZone Bubble app shows one banner on its own screens, served by Google AdMob. The bubble, its panel and the widgets show no ads. AdMob collects the device's IP address (for an approximate location), the Android advertising ID, how the ad is seen and tapped, and diagnostic data, to show and measure ads and to prevent fraud. In the EEA, the UK and Switzerland the app asks first, through Google's consent message, and its Settings have a link to change the answer. The advertising ID can be reset or deleted in Android's settings. Bubble Supporter, a one-time purchase, removes the banner for good.":
+    "1.46 sürümünden beri BrawlZone Bubble uygulamasının Google Play sürümü kendi ekranlarında Google AdMob tarafından sunulan tek bir banner gösterir. Baloncuk, paneli ve widget'lar reklam göstermez. AdMob, reklamları göstermek, ölçmek ve dolandırıcılığı önlemek için cihazın IP adresini (yaklaşık konum için), Android reklam kimliğini, reklamın nasıl görüldüğünü ve dokunulduğunu ve tanılama verilerini toplar. AEA, Birleşik Krallık ve İsviçre'de uygulama önce Google'ın onay mesajıyla sorar ve Ayarlar'da cevabı değiştirmek için bir bağlantı vardır. Reklam kimliği Android ayarlarından sıfırlanabilir veya silinebilir. Tek seferlik bir satın alma olan Bubble Destekçisi, banner'ı sonsuza dek kaldırır.",
+  "No account, and it cannot see your screen.":
+    "Hesap yok ve ekranını göremez.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). Apart from Google AdMob for the banner (see Advertising), the app contains no advertising or analytics SDK and shares nothing with third parties.":
+    "; yani açmak burada anonim bir sayfa görüntüleme sayılır, başka bir şey değil. Tüm trafik şifrelidir (HTTPS). Banner için Google AdMob dışında (bkz. Reklamlar) uygulamada hiçbir reklam veya istatistik SDK'sı yoktur ve üçüncü taraflarla hiçbir şey paylaşmaz.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports.":
+    "Google Play'den yüklendiğinde uygulama, Google'ın Play Store gizlilik politikası kapsamındadır ve Google bize yükleme sayıları ve çökme raporları gibi toplu istatistikler verir.",
+  "Bubble Supporter is a one-time purchase through Google Play. Google handles the payment, and we never see card or payment details. Whether you bought it is kept on your phone and checked with Google Play; nothing about the purchase is sent to brawlzone.net.":
+    "Bubble Destekçisi, Google Play üzerinden tek seferlik bir satın almadır. Ödemeyi Google yönetir; kart veya ödeme bilgilerini asla görmeyiz. Satın alıp almadığın telefonunda tutulur ve Google Play ile kontrol edilir; satın almayla ilgili hiçbir şey brawlzone.net'e gönderilmez.",
 };

@@ -5618,4 +5618,19 @@ export const RU: Record<string, string> = {
     "Три шага, около минуты.",
   "Free, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
     "Бесплатно, без аккаунта. Всё это есть и на сайте. Приложение лишь избавляет от переключения посреди драфта.",
+  // Privacy policy for the 1.46 app (2026-11-27): the AdMob banner and Bubble Supporter.
+  "No trackers beyond Google's ad services: AdSense on the website, and AdMob for the banner in the Google Play app.":
+    "Никаких трекеров, кроме рекламных сервисов Google: AdSense на сайте и AdMob для баннера в приложении из Google Play.",
+  "On the website, and one banner in the Google Play app.":
+    "На сайте и один баннер в приложении из Google Play.",
+  "Since version 1.46, the Google Play version of the BrawlZone Bubble app shows one banner on its own screens, served by Google AdMob. The bubble, its panel and the widgets show no ads. AdMob collects the device's IP address (for an approximate location), the Android advertising ID, how the ad is seen and tapped, and diagnostic data, to show and measure ads and to prevent fraud. In the EEA, the UK and Switzerland the app asks first, through Google's consent message, and its Settings have a link to change the answer. The advertising ID can be reset or deleted in Android's settings. Bubble Supporter, a one-time purchase, removes the banner for good.":
+    "Начиная с версии 1.46, версия приложения BrawlZone Bubble из Google Play показывает один баннер на своих экранах, его выдаёт Google AdMob. В пузыре, его панели и виджетах рекламы нет. AdMob собирает IP-адрес устройства (для примерного местоположения), рекламный идентификатор Android, данные о том, как рекламу видят и нажимают, и диагностические данные, чтобы показывать и измерять рекламу и предотвращать мошенничество. В ЕЭЗ, Великобритании и Швейцарии приложение сначала спрашивает согласие через сообщение Google, а в его Настройках есть ссылка, чтобы изменить ответ. Рекламный идентификатор можно сбросить или удалить в настройках Android. Спонсор Bubble — разовая покупка — навсегда убирает баннер.",
+  "No account, and it cannot see your screen.":
+    "Без аккаунта, и он не видит твой экран.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). Apart from Google AdMob for the banner (see Advertising), the app contains no advertising or analytics SDK and shares nothing with third parties.":
+    ", поэтому её открытие считается здесь анонимным просмотром страницы, и ничем больше. Весь трафик зашифрован (HTTPS). Кроме Google AdMob для баннера (см. «Реклама»), в приложении нет ни одного рекламного или аналитического SDK, и оно ничего не передаёт третьим лицам.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports.":
+    "При установке из Google Play на приложение распространяется политика конфиденциальности Google для Play Store, а Google даёт нам общую статистику, например число установок и отчёты о сбоях.",
+  "Bubble Supporter is a one-time purchase through Google Play. Google handles the payment, and we never see card or payment details. Whether you bought it is kept on your phone and checked with Google Play; nothing about the purchase is sent to brawlzone.net.":
+    "Спонсор Bubble — разовая покупка через Google Play. Платёж обрабатывает Google, и мы никогда не видим данные карты или платежа. Факт покупки хранится на твоём телефоне и проверяется через Google Play; ничего о покупке не отправляется на brawlzone.net.",
 };
