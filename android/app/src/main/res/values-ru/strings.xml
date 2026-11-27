@@ -601,4 +601,7 @@
     <string name="ads_pending">Платёж обрабатывается. Реклама исчезнет, как только он пройдёт.</string>
     <string name="ads_unavailable">Google Play не отвечает. Попробуй ещё раз чуть позже.</string>
     <string name="ads_privacy">Настройки конфиденциальности рекламы</string>
+    <string name="ads_offer_body">Заплати %1$s один раз — и реклама исчезнет навсегда. Без подписки.</string>
+    <string name="ads_offer_body_noprice">Заплати один раз — и реклама исчезнет навсегда. Без подписки.</string>
+    <string name="ads_offer_buy">Убрать рекламу</string>
 </resources>

@@ -601,4 +601,7 @@
     <string name="ads_pending">Pagamento pendente. Os anúncios somem assim que ele for aprovado.</string>
     <string name="ads_unavailable">O Google Play não está respondendo. Tente de novo daqui a pouco.</string>
     <string name="ads_privacy">Opções de privacidade dos anúncios</string>
+    <string name="ads_offer_body">Pague %1$s uma vez e os anúncios somem para sempre. Sem assinatura.</string>
+    <string name="ads_offer_body_noprice">Pague uma vez e os anúncios somem para sempre. Sem assinatura.</string>
+    <string name="ads_offer_buy">Remover anúncios</string>
 </resources>

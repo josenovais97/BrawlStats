@@ -601,4 +601,7 @@
     <string name="ads_pending">Pembayaran belum selesai. Iklan hilang sebaik sahaja ia berjaya.</string>
     <string name="ads_unavailable">Google Play tidak menjawab. Cuba lagi sebentar nanti.</string>
     <string name="ads_privacy">Pilihan privasi iklan</string>
+    <string name="ads_offer_body">Bayar %1$s sekali dan iklan hilang selama-lamanya. Bukan langganan.</string>
+    <string name="ads_offer_body_noprice">Bayar sekali dan iklan hilang selama-lamanya. Bukan langganan.</string>
+    <string name="ads_offer_buy">Buang iklan</string>
 </resources>

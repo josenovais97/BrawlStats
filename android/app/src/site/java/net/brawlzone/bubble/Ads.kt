@@ -17,6 +17,9 @@ object Ads {
     fun price(): String? = null
 
     @Suppress("UNUSED_PARAMETER")
+    fun adDays(context: Context): Int = 0
+
+    @Suppress("UNUSED_PARAMETER")
     fun start(activity: Activity, adSlot: FrameLayout, onChange: () -> Unit) = Unit
 
     fun resume() = Unit

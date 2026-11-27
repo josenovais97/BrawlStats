@@ -601,4 +601,7 @@
     <string name="ads_pending">Płatność w toku. Reklamy znikną, gdy tylko przejdzie.</string>
     <string name="ads_unavailable">Google Play nie odpowiada. Spróbuj ponownie za chwilę.</string>
     <string name="ads_privacy">Wybory prywatności reklam</string>
+    <string name="ads_offer_body">Zapłać raz %1$s, a reklamy znikną na zawsze. Bez subskrypcji.</string>
+    <string name="ads_offer_body_noprice">Zapłać raz, a reklamy znikną na zawsze. Bez subskrypcji.</string>
+    <string name="ads_offer_buy">Usuń reklamy</string>
 </resources>

@@ -601,4 +601,7 @@
     <string name="ads_pending">付款處理中。付款完成後廣告就會消失。</string>
     <string name="ads_unavailable">Google Play 沒有回應，請稍後再試。</string>
     <string name="ads_privacy">廣告隱私選項</string>
+    <string name="ads_offer_body">一次付 %1$s，廣告永久消失。不是訂閱。</string>
+    <string name="ads_offer_body_noprice">付一次，廣告永久消失。不是訂閱。</string>
+    <string name="ads_offer_buy">移除廣告</string>
 </resources>

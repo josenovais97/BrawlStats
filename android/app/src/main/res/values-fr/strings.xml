@@ -601,4 +601,7 @@
     <string name="ads_pending">Paiement en attente. Les pubs disparaissent dès qu’il est validé.</string>
     <string name="ads_unavailable">Google Play ne répond pas. Réessaie dans un instant.</string>
     <string name="ads_privacy">Choix de confidentialité des pubs</string>
+    <string name="ads_offer_body">Paie %1$s une fois et les pubs disparaissent pour toujours. Sans abonnement.</string>
+    <string name="ads_offer_body_noprice">Paie une fois et les pubs disparaissent pour toujours. Sans abonnement.</string>
+    <string name="ads_offer_buy">Retirer les pubs</string>
 </resources>

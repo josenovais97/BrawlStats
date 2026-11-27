@@ -601,4 +601,7 @@
     <string name="ads_pending">결제 대기 중이에요. 결제가 끝나면 바로 광고가 사라져요.</string>
     <string name="ads_unavailable">Google Play가 응답하지 않아요. 잠시 후 다시 시도해 주세요.</string>
     <string name="ads_privacy">광고 개인정보 선택</string>
+    <string name="ads_offer_body">%1$s 한 번만 결제하면 광고가 영원히 사라져요. 구독 아님.</string>
+    <string name="ads_offer_body_noprice">한 번만 결제하면 광고가 영원히 사라져요. 구독 아님.</string>
+    <string name="ads_offer_buy">광고 제거</string>
 </resources>

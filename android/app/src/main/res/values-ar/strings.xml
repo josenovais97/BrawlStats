@@ -601,4 +601,7 @@
     <string name="ads_pending">الدفع قيد الانتظار. ستختفي الإعلانات فور اكتماله.</string>
     <string name="ads_unavailable">لا يستجيب Google Play. حاول مرة أخرى بعد قليل.</string>
     <string name="ads_privacy">خيارات خصوصية الإعلانات</string>
+    <string name="ads_offer_body">ادفع %1$s مرة واحدة وتختفي الإعلانات للأبد. بلا اشتراك.</string>
+    <string name="ads_offer_body_noprice">ادفع مرة واحدة وتختفي الإعلانات للأبد. بلا اشتراك.</string>
+    <string name="ads_offer_buy">إزالة الإعلانات</string>
 </resources>

@@ -601,4 +601,7 @@
     <string name="ads_pending">Ödeme bekliyor. Ödeme tamamlanınca reklamlar kalkar.</string>
     <string name="ads_unavailable">Google Play yanıt vermiyor. Birazdan tekrar dene.</string>
     <string name="ads_privacy">Reklam gizlilik seçenekleri</string>
+    <string name="ads_offer_body">%1$s bir kez öde, reklamlar sonsuza dek gitsin. Abonelik yok.</string>
+    <string name="ads_offer_body_noprice">Bir kez öde, reklamlar sonsuza dek gitsin. Abonelik yok.</string>
+    <string name="ads_offer_buy">Reklamları kaldır</string>
 </resources>

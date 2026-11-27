@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- What a counting number last showed (Ui.countTo, 1.45). -->
+    <item name="count_key" type="id" />
+    <item name="count_value" type="id" />
+</resources>

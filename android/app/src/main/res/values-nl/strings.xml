@@ -601,4 +601,7 @@
     <string name="ads_pending">Betaling in behandeling. De advertenties verdwijnen zodra die rond is.</string>
     <string name="ads_unavailable">Google Play reageert niet. Probeer het zo opnieuw.</string>
     <string name="ads_privacy">Privacykeuzes voor advertenties</string>
+    <string name="ads_offer_body">Betaal één keer %1$s en de advertenties zijn voorgoed weg. Geen abonnement.</string>
+    <string name="ads_offer_body_noprice">Betaal één keer en de advertenties zijn voorgoed weg. Geen abonnement.</string>
+    <string name="ads_offer_buy">Advertenties weg</string>
 </resources>

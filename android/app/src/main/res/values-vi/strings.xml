@@ -601,4 +601,7 @@
     <string name="ads_pending">Thanh toán đang chờ xử lý. Quảng cáo sẽ biến mất ngay khi thanh toán xong.</string>
     <string name="ads_unavailable">Google Play không phản hồi. Hãy thử lại sau giây lát.</string>
     <string name="ads_privacy">Lựa chọn quyền riêng tư cho quảng cáo</string>
+    <string name="ads_offer_body">Trả %1$s một lần là quảng cáo biến mất vĩnh viễn. Không phải gói đăng ký.</string>
+    <string name="ads_offer_body_noprice">Trả một lần là quảng cáo biến mất vĩnh viễn. Không phải gói đăng ký.</string>
+    <string name="ads_offer_buy">Xóa quảng cáo</string>
 </resources>

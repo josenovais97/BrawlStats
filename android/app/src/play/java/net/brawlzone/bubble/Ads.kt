@@ -59,6 +59,8 @@ object Ads {
 
     private const val PREFS = "brawlzone-ads"
     private const val KEY_REMOVED = "removed"
+    private const val KEY_AD_DAYS = "ad_days"
+    private const val KEY_AD_DAY = "ad_day"
 
     private val main = Handler(Looper.getMainLooper())
     private var screen: WeakReference<Activity>? = null
@@ -76,6 +78,16 @@ object Ads {
 
     /** Bought, as far as this phone knows. */
     fun removed(context: Context): Boolean = prefs(context).getBoolean(KEY_REMOVED, false)
+
+    /** How many different days a banner has been on screen (Home offers the removal from 3). */
+    fun adDays(context: Context): Int = prefs(context).getInt(KEY_AD_DAYS, 0)
+
+    private fun adShown(context: Context) {
+        val today = System.currentTimeMillis() / 86_400_000L
+        val p = prefs(context)
+        if (p.getLong(KEY_AD_DAY, -1L) == today) return
+        p.edit().putLong(KEY_AD_DAY, today).putInt(KEY_AD_DAYS, p.getInt(KEY_AD_DAYS, 0) + 1).apply()
+    }
 
     /** The price in the player's own currency, once Play has said it. */
     fun price(): String? = product?.oneTimePurchaseOfferDetails?.formattedPrice
@@ -177,7 +189,10 @@ object Ads {
             // The slot stays closed until an ad has arrived, so a failed load leaves no empty strip.
             view.setAdListener(object : AdListener() {
                 override fun onAdLoaded() {
-                    if (slot === holder && !removed(activity)) holder.visibility = View.VISIBLE
+                    if (slot === holder && !removed(activity)) {
+                        holder.visibility = View.VISIBLE
+                        adShown(activity)
+                    }
                 }
             })
             holder.removeAllViews()

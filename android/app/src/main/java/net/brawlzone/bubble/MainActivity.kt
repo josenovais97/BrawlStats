@@ -165,7 +165,10 @@ class MainActivity : AppCompatActivity() {
         }
         offerTile()
         // 1.46: the banner and "Remove ads forever" (Play build; nothing in the site build).
-        Ads.start(this, findViewById(R.id.ad_slot)) { if (tab == Tabs.SETTINGS) paintSettingsPages() }
+        Ads.start(this, findViewById(R.id.ad_slot)) {
+            paintAdsOffer()
+            if (tab == Tabs.SETTINGS) paintSettingsPages()
+        }
     }
 
     /**

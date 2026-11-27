@@ -608,4 +608,7 @@
     <string name="ads_pending">Payment pending. The ads go as soon as it goes through.</string>
     <string name="ads_unavailable">Google Play isn’t answering. Try again in a moment.</string>
     <string name="ads_privacy">Ad privacy choices</string>
+    <string name="ads_offer_body">Pay %1$s once and the ads are gone for good. No subscription.</string>
+    <string name="ads_offer_body_noprice">Pay once and the ads are gone for good. No subscription.</string>
+    <string name="ads_offer_buy">Remove ads</string>
 </resources>

@@ -601,4 +601,7 @@
     <string name="ads_pending">Pago pendiente. Los anuncios desaparecen en cuanto se complete.</string>
     <string name="ads_unavailable">Google Play no responde. Inténtalo de nuevo en un momento.</string>
     <string name="ads_privacy">Opciones de privacidad de anuncios</string>
+    <string name="ads_offer_body">Paga %1$s una vez y los anuncios desaparecen para siempre. Sin suscripción.</string>
+    <string name="ads_offer_body_noprice">Paga una vez y los anuncios desaparecen para siempre. Sin suscripción.</string>
+    <string name="ads_offer_buy">Quitar anuncios</string>
 </resources>

@@ -66,6 +66,7 @@ internal object Tabs {
         else -> null
     }
     const val KEY_PIN_DONE = "pin_done"
+    const val KEY_ADS_OFFER_UNTIL = "ads_offer_until"
 }
 
 /** Shows one page and lights its tab. */
@@ -97,6 +98,7 @@ internal fun MainActivity.paintHome() {
     paintLastGame(me, tag)
     paintHomeRank(me, tag)
     paintPin()
+    paintAdsOffer()
 }
 
 private fun MainActivity.colored(text: String, color: Int): CharSequence =
@@ -329,6 +331,30 @@ private fun MainActivity.paintPin() {
         card.visibility = View.GONE
         Stats.event(this, "app_pin", mapOf("ok" to true))
     }
+}
+
+/**
+ * "Remove ads forever" on Home (1.46, Play build): once the banner has shown
+ * on three different days, so a first visit is not greeted by a sales card.
+ * "Not now" puts it away for two weeks; buying puts it away for good.
+ */
+internal fun MainActivity.paintAdsOffer() {
+    val card = findViewById<View>(R.id.ads_offer) ?: return
+    val prefs = getSharedPreferences(Tabs.PREFS, android.content.Context.MODE_PRIVATE)
+    // The test build offers it from the first day, so it can be looked at straight away.
+    val days = if (BuildConfig.BUILD_TYPE == "qa") 1 else 3
+    val show = Ads.SOLD && !Ads.removed(this) && Ads.adDays(this) >= days &&
+        System.currentTimeMillis() >= prefs.getLong(Tabs.KEY_ADS_OFFER_UNTIL, 0L)
+    card.visibility = if (show) View.VISIBLE else View.GONE
+    if (!show) return
+    val price = Ads.price()
+    findViewById<TextView>(R.id.ads_offer_body).text =
+        if (price != null) getString(R.string.ads_offer_body, price) else getString(R.string.ads_offer_body_noprice)
+    findViewById<View>(R.id.ads_offer_later).setOnClickListener {
+        prefs.edit().putLong(Tabs.KEY_ADS_OFFER_UNTIL, System.currentTimeMillis() + 14L * 24 * 60 * 60 * 1000).apply()
+        card.visibility = View.GONE
+    }
+    findViewById<View>(R.id.ads_offer_buy).setOnClickListener { Ads.buy(this) }
 }
 
 // ------------------------------------------------------------------ Season

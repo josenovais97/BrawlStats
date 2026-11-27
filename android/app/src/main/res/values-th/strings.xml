@@ -601,4 +601,7 @@
     <string name="ads_pending">การชำระเงินรอดำเนินการ โฆษณาจะหายไปทันทีที่ชำระเสร็จ</string>
     <string name="ads_unavailable">Google Play ไม่ตอบสนอง ลองอีกครั้งในอีกสักครู่</string>
     <string name="ads_privacy">ตัวเลือกความเป็นส่วนตัวของโฆษณา</string>
+    <string name="ads_offer_body">จ่าย %1$s ครั้งเดียว โฆษณาหายไปตลอดกาล ไม่ใช่การสมัครสมาชิก</string>
+    <string name="ads_offer_body_noprice">จ่ายครั้งเดียว โฆษณาหายไปตลอดกาล ไม่ใช่การสมัครสมาชิก</string>
+    <string name="ads_offer_buy">ลบโฆษณา</string>
 </resources>

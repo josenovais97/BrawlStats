@@ -601,4 +601,7 @@
     <string name="ads_pending">Pagamento in sospeso. La pubblicità sparisce appena va a buon fine.</string>
     <string name="ads_unavailable">Google Play non risponde. Riprova tra un attimo.</string>
     <string name="ads_privacy">Scelte sulla privacy degli annunci</string>
+    <string name="ads_offer_body">Paga %1$s una volta e la pubblicità sparisce per sempre. Nessun abbonamento.</string>
+    <string name="ads_offer_body_noprice">Paga una volta e la pubblicità sparisce per sempre. Nessun abbonamento.</string>
+    <string name="ads_offer_buy">Rimuovi pubblicità</string>
 </resources>

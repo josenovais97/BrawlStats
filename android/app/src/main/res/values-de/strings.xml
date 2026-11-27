@@ -601,4 +601,7 @@
     <string name="ads_pending">Zahlung ausstehend. Die Werbung verschwindet, sobald sie durch ist.</string>
     <string name="ads_unavailable">Google Play antwortet nicht. Versuch es gleich noch mal.</string>
     <string name="ads_privacy">Datenschutzoptionen für Werbung</string>
+    <string name="ads_offer_body">Zahl einmal %1$s und die Werbung ist für immer weg. Kein Abo.</string>
+    <string name="ads_offer_body_noprice">Einmal zahlen und die Werbung ist für immer weg. Kein Abo.</string>
+    <string name="ads_offer_buy">Werbung weg</string>
 </resources>

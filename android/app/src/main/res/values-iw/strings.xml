@@ -601,4 +601,7 @@
     <string name="ads_pending">התשלום ממתין. הפרסומות ייעלמו ברגע שהוא יעבור.</string>
     <string name="ads_unavailable">Google Play לא עונה. נסו שוב בעוד רגע.</string>
     <string name="ads_privacy">אפשרויות פרטיות לפרסומות</string>
+    <string name="ads_offer_body">משלמים %1$s פעם אחת והפרסומות נעלמות לתמיד. בלי מנוי.</string>
+    <string name="ads_offer_body_noprice">משלמים פעם אחת והפרסומות נעלמות לתמיד. בלי מנוי.</string>
+    <string name="ads_offer_buy">הסרת פרסומות</string>
 </resources>
