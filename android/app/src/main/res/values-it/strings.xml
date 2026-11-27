@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (tu)</string>
     <string name="friends_week">Questa settimana %1$d–%2$d</string>
     <string name="friends_not_found">Nessun giocatore con questo ID.</string>
-    <string name="friends_full">Puoi aggiungere fino a 5 amici.</string>
+    <string name="friends_full">Puoi aggiungere fino a %1$d amici.</string>
     <string name="friends_already">È già nella tua lista.</string>
     <string name="friends_failed">Ricerca non riuscita. Riprova.</string>
     <string name="rate_title">Aiuta altri giocatori a trovare Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Diventa Sostenitore di Bubble</string>
-    <string name="ads_remove_price">%1$s una volta · Niente pubblicità, anello Sostenitore, 2 temi</string>
-    <string name="ads_remove_once">Un solo pagamento · Niente pubblicità, anello Sostenitore, 2 temi</string>
+    <string name="ads_remove_price">%1$s una volta · Niente pubblicità, anello Sostenitore, 2 temi, 2× XP del Pass, 15 amici</string>
+    <string name="ads_remove_once">Un solo pagamento · Niente pubblicità, anello Sostenitore, 2 temi, 2× XP del Pass, 15 amici</string>
     <string name="ads_removed_title">Sei un Sostenitore di Bubble</string>
     <string name="ads_removed_sub">Grazie per il tuo supporto a BrawlZone!</string>
     <string name="ads_restore">Ripristina acquisto</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Sostenitori</string>
     <string name="theme_obsidian">Ossidiana</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Paga %1$s una volta: niente pubblicità per sempre, l’anello Sostenitore e 2 temi esclusivi. Nessun abbonamento.</string>
-    <string name="ads_offer_body_noprice">Paga una volta: niente pubblicità per sempre, l’anello Sostenitore e 2 temi esclusivi. Nessun abbonamento.</string>
+    <string name="ads_offer_body">Paga %1$s una volta: niente pubblicità per sempre, l’anello Sostenitore, 2 temi esclusivi, XP doppi nel Bubble Pass e posto per 15 amici. Nessun abbonamento.</string>
+    <string name="ads_offer_body_noprice">Paga una volta: niente pubblicità per sempre, l’anello Sostenitore, 2 temi esclusivi, XP doppi nel Bubble Pass e posto per 15 amici. Nessun abbonamento.</string>
     <string name="ads_offer_buy">Lo voglio</string>
 </resources>

@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (jij)</string>
     <string name="friends_week">Deze week %1$d–%2$d</string>
     <string name="friends_not_found">Geen speler met die tag.</string>
-    <string name="friends_full">Je kunt tot 5 vrienden toevoegen.</string>
+    <string name="friends_full">Je kunt tot %1$d vrienden toevoegen.</string>
     <string name="friends_already">Staat al in je lijst.</string>
     <string name="friends_failed">Opzoeken mislukt. Probeer het opnieuw.</string>
     <string name="rate_title">Help andere spelers Bubble te vinden</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Word Bubble Supporter</string>
-    <string name="ads_remove_price">%1$s eenmalig · Geen advertenties, Supporter-ring, 2 thema’s</string>
-    <string name="ads_remove_once">Eenmalig betalen · Geen advertenties, Supporter-ring, 2 thema’s</string>
+    <string name="ads_remove_price">%1$s eenmalig · Geen advertenties, Supporter-ring, 2 thema’s, 2× Pass-XP, 15 vrienden</string>
+    <string name="ads_remove_once">Eenmalig betalen · Geen advertenties, Supporter-ring, 2 thema’s, 2× Pass-XP, 15 vrienden</string>
     <string name="ads_removed_title">Je bent Bubble Supporter</string>
     <string name="ads_removed_sub">Bedankt dat je BrawlZone steunt!</string>
     <string name="ads_restore">Aankoop herstellen</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Supporters</string>
     <string name="theme_obsidian">Obsidiaan</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Betaal één keer %1$s: nooit meer advertenties, de Supporter-ring en 2 exclusieve thema’s. Geen abonnement.</string>
-    <string name="ads_offer_body_noprice">Betaal één keer: nooit meer advertenties, de Supporter-ring en 2 exclusieve thema’s. Geen abonnement.</string>
+    <string name="ads_offer_body">Betaal één keer %1$s: nooit meer advertenties, de Supporter-ring, 2 exclusieve thema’s, dubbele Bubble Pass-XP en plek voor 15 vrienden. Geen abonnement.</string>
+    <string name="ads_offer_body_noprice">Betaal één keer: nooit meer advertenties, de Supporter-ring, 2 exclusieve thema’s, dubbele Bubble Pass-XP en plek voor 15 vrienden. Geen abonnement.</string>
     <string name="ads_offer_buy">Nemen</string>
 </resources>

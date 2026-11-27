@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (나)</string>
     <string name="friends_week">이번 주 %1$d–%2$d</string>
     <string name="friends_not_found">그 태그의 플레이어가 없어요.</string>
-    <string name="friends_full">친구는 최대 5명까지 추가할 수 있어요.</string>
+    <string name="friends_full">친구는 최대 %1$d명까지 추가할 수 있어요.</string>
     <string name="friends_already">이미 목록에 있어요.</string>
     <string name="friends_failed">찾지 못했어요. 다시 시도해 주세요.</string>
     <string name="rate_title">다른 플레이어도 Bubble을 찾을 수 있게 도와주세요</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Bubble 서포터 되기</string>
-    <string name="ads_remove_price">%1$s 한 번 · 광고 없음, 서포터 링, 테마 2종</string>
-    <string name="ads_remove_once">한 번 결제 · 광고 없음, 서포터 링, 테마 2종</string>
+    <string name="ads_remove_price">%1$s 한 번 · 광고 없음, 서포터 링, 테마 2종, 패스 XP 2배, 친구 15명</string>
+    <string name="ads_remove_once">한 번 결제 · 광고 없음, 서포터 링, 테마 2종, 패스 XP 2배, 친구 15명</string>
     <string name="ads_removed_title">Bubble 서포터예요</string>
     <string name="ads_removed_sub">BrawlZone을 응원해 줘서 고마워요!</string>
     <string name="ads_restore">구매 복원</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">서포터 전용</string>
     <string name="theme_obsidian">흑요석</string>
     <string name="theme_holo">홀로</string>
-    <string name="ads_offer_body">%1$s 한 번만 결제하면 광고가 영원히 사라지고, 서포터 링과 전용 테마 2종도 받아요. 구독 아님.</string>
-    <string name="ads_offer_body_noprice">한 번만 결제하면 광고가 영원히 사라지고, 서포터 링과 전용 테마 2종도 받아요. 구독 아님.</string>
+    <string name="ads_offer_body">%1$s 한 번만 결제하면 광고가 영원히 사라지고, 서포터 링, 전용 테마 2종, Bubble Pass XP 2배, 친구 15명까지 받아요. 구독 아님.</string>
+    <string name="ads_offer_body_noprice">한 번만 결제하면 광고가 영원히 사라지고, 서포터 링, 전용 테마 2종, Bubble Pass XP 2배, 친구 15명까지 받아요. 구독 아님.</string>
     <string name="ads_offer_buy">받기</string>
 </resources>

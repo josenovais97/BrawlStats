@@ -197,7 +197,7 @@
     <string name="friends_you">%1$s (you)</string>
     <string name="friends_week">This week %1$d–%2$d</string>
     <string name="friends_not_found">No player with that tag.</string>
-    <string name="friends_full">You can add up to 5 friends.</string>
+    <string name="friends_full">You can add up to %1$d friends.</string>
     <string name="friends_already">Already on your list.</string>
     <string name="friends_failed">Couldn\'t look that up. Try again.</string>
     <string name="rate_title">Help other players find Bubble</string>
@@ -598,8 +598,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Become a Bubble Supporter</string>
-    <string name="ads_remove_price">%1$s once · No ads, Supporter ring, 2 themes</string>
-    <string name="ads_remove_once">Paid once · No ads, Supporter ring, 2 themes</string>
+    <string name="ads_remove_price">%1$s once · No ads, Supporter ring, 2 themes, 2× Pass XP, 15 friends</string>
+    <string name="ads_remove_once">Paid once · No ads, Supporter ring, 2 themes, 2× Pass XP, 15 friends</string>
     <string name="ads_removed_title">You’re a Bubble Supporter</string>
     <string name="ads_removed_sub">Thanks for supporting BrawlZone!</string>
     <string name="ads_restore">Restore purchase</string>
@@ -613,7 +613,7 @@
     <string name="ring_supporters_only">Supporters</string>
     <string name="theme_obsidian">Obsidian</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Pay %1$s once: no ads forever, the Supporter ring and 2 exclusive themes. No subscription.</string>
-    <string name="ads_offer_body_noprice">Pay once: no ads forever, the Supporter ring and 2 exclusive themes. No subscription.</string>
+    <string name="ads_offer_body">Pay %1$s once: no ads forever, the Supporter ring, 2 exclusive themes, double Bubble Pass XP and room for 15 friends. No subscription.</string>
+    <string name="ads_offer_body_noprice">Pay once: no ads forever, the Supporter ring, 2 exclusive themes, double Bubble Pass XP and room for 15 friends. No subscription.</string>
     <string name="ads_offer_buy">Get it</string>
 </resources>

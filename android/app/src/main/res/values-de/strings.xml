@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (du)</string>
     <string name="friends_week">Diese Woche %1$d–%2$d</string>
     <string name="friends_not_found">Kein Spieler mit dieser ID.</string>
-    <string name="friends_full">Du kannst bis zu 5 Freunde hinzufügen.</string>
+    <string name="friends_full">Du kannst bis zu %1$d Freunde hinzufügen.</string>
     <string name="friends_already">Schon auf deiner Liste.</string>
     <string name="friends_failed">Suche fehlgeschlagen. Versuch es noch mal.</string>
     <string name="rate_title">Hilf anderen Spielern, Bubble zu finden</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Werde Bubble-Unterstützer</string>
-    <string name="ads_remove_price">%1$s einmalig · Keine Werbung, Unterstützer-Ring, 2 Designs</string>
-    <string name="ads_remove_once">Einmal zahlen · Keine Werbung, Unterstützer-Ring, 2 Designs</string>
+    <string name="ads_remove_price">%1$s einmalig · Keine Werbung, Unterstützer-Ring, 2 Designs, 2× Pass-XP, 15 Freunde</string>
+    <string name="ads_remove_once">Einmal zahlen · Keine Werbung, Unterstützer-Ring, 2 Designs, 2× Pass-XP, 15 Freunde</string>
     <string name="ads_removed_title">Du bist Bubble-Unterstützer</string>
     <string name="ads_removed_sub">Danke, dass du BrawlZone unterstützt!</string>
     <string name="ads_restore">Kauf wiederherstellen</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Unterstützer</string>
     <string name="theme_obsidian">Obsidian</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Zahl einmal %1$s: für immer keine Werbung, dazu der Unterstützer-Ring und 2 exklusive Designs. Kein Abo.</string>
-    <string name="ads_offer_body_noprice">Einmal zahlen: für immer keine Werbung, dazu der Unterstützer-Ring und 2 exklusive Designs. Kein Abo.</string>
+    <string name="ads_offer_body">Zahl einmal %1$s: für immer keine Werbung, dazu der Unterstützer-Ring, 2 exklusive Designs, doppelte Bubble-Pass-XP und Platz für 15 Freunde. Kein Abo.</string>
+    <string name="ads_offer_body_noprice">Einmal zahlen: für immer keine Werbung, dazu der Unterstützer-Ring, 2 exklusive Designs, doppelte Bubble-Pass-XP und Platz für 15 Freunde. Kein Abo.</string>
     <string name="ads_offer_buy">Holen</string>
 </resources>

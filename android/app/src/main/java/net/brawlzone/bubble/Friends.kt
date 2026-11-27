@@ -16,6 +16,11 @@ object Friends {
 
     const val MAX = 5
 
+    /** Bubble Supporter (1.46): room for the whole club. */
+    const val MAX_SUPPORTER = 15
+
+    fun max(context: Context): Int = if (Supporter.active(context)) MAX_SUPPORTER else MAX
+
     data class Row(val data: Me.Data, val you: Boolean, val weekWins: Int, val weekLosses: Int)
 
     private const val PREFS = "brawlzone-friends"
@@ -41,7 +46,7 @@ object Friends {
         if (!Account.isValid(tag)) return AddResult.NOT_FOUND
         val list = tags(context)
         if (tag in list || tag == Account.tag(context)) return AddResult.ALREADY
-        if (list.size >= MAX) return AddResult.FULL
+        if (list.size >= max(context)) return AddResult.FULL
         val body = try {
             Http.text(Me.url(context, tag))
         } catch (e: java.io.FileNotFoundException) {

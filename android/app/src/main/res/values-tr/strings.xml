@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (sen)</string>
     <string name="friends_week">Bu hafta %1$d–%2$d</string>
     <string name="friends_not_found">Bu etikete sahip oyuncu yok.</string>
-    <string name="friends_full">En fazla 5 arkadaş ekleyebilirsin.</string>
+    <string name="friends_full">En fazla %1$d arkadaş ekleyebilirsin.</string>
     <string name="friends_already">Zaten listende.</string>
     <string name="friends_failed">Aranamadı. Tekrar dene.</string>
     <string name="rate_title">Diğer oyuncuların Bubble\'ı bulmasına yardım et</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Bubble Destekçisi ol</string>
-    <string name="ads_remove_price">%1$s tek sefer · Reklamsız, Destekçi halkası, 2 tema</string>
-    <string name="ads_remove_once">Tek ödeme · Reklamsız, Destekçi halkası, 2 tema</string>
+    <string name="ads_remove_price">%1$s tek sefer · Reklamsız, Destekçi halkası, 2 tema, 2× Pass XP’si, 15 arkadaş</string>
+    <string name="ads_remove_once">Tek ödeme · Reklamsız, Destekçi halkası, 2 tema, 2× Pass XP’si, 15 arkadaş</string>
     <string name="ads_removed_title">Bubble Destekçisisin</string>
     <string name="ads_removed_sub">BrawlZone’u desteklediğin için teşekkürler!</string>
     <string name="ads_restore">Satın alımı geri yükle</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Destekçilere</string>
     <string name="theme_obsidian">Obsidyen</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">%1$s bir kez öde: sonsuza dek reklamsız, Destekçi halkası ve 2 özel tema. Abonelik yok.</string>
-    <string name="ads_offer_body_noprice">Bir kez öde: sonsuza dek reklamsız, Destekçi halkası ve 2 özel tema. Abonelik yok.</string>
+    <string name="ads_offer_body">%1$s bir kez öde: sonsuza dek reklamsız, Destekçi halkası, 2 özel tema, Bubble Pass’te çift XP ve 15 arkadaşlık yer. Abonelik yok.</string>
+    <string name="ads_offer_body_noprice">Bir kez öde: sonsuza dek reklamsız, Destekçi halkası, 2 özel tema, Bubble Pass’te çift XP ve 15 arkadaşlık yer. Abonelik yok.</string>
     <string name="ads_offer_buy">Al</string>
 </resources>

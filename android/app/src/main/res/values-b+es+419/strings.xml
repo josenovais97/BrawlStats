@@ -18,7 +18,7 @@
     <string name="friends_body">Agrega hasta 5 amigos para ver quién sube más rápido. Te avisaremos cuando alguno suba de rango.</string>
     <string name="friends_add">+ Agregar un amigo</string>
     <string name="friends_add_button">Agregar</string>
-    <string name="friends_full">Puedes agregar hasta 5 amigos.</string>
+    <string name="friends_full">Puedes agregar hasta %1$d amigos.</string>
     <string name="widget_friends_none">Agrega amigos en la app para ver aquí tu clasificación.</string>
 
     <!-- 1.43: tabs, Play, Today, Last game, insights, teammates, notification settings, widgets -->

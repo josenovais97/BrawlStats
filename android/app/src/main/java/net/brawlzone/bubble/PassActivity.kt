@@ -99,7 +99,9 @@ class PassActivity : AppCompatActivity() {
         }
         findViewById<TextView>(R.id.pass_xp).text =
             if (week.tier >= Pass.TIERS) getString(R.string.pass_max)
-            else getString(R.string.pass_xp, week.xpInTier, Pass.XP_PER_TIER, week.tier + 1)
+            else getString(R.string.pass_xp, week.xpInTier, Pass.XP_PER_TIER, week.tier + 1) +
+                // Bubble Supporter (1.46): the doubled XP says so.
+                if (Supporter.active(this)) "  ·  ⭐ 2× XP" else ""
         findViewById<TextView>(R.id.pass_resets).text = getString(R.string.pass_resets, Pass.resetsOn(this, week))
         val streak = findViewById<TextView>(R.id.pass_streak)
         streak.visibility = if (week.streak > 0) View.VISIBLE else View.GONE

@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s（あなた）</string>
     <string name="friends_week">今週 %1$d–%2$d</string>
     <string name="friends_not_found">そのタグのプレイヤーはいません。</string>
-    <string name="friends_full">フレンドは5人まで追加できます。</string>
+    <string name="friends_full">フレンドは%1$d人まで追加できます。</string>
     <string name="friends_already">すでにリストにいます。</string>
     <string name="friends_failed">検索できませんでした。もう一度お試しください。</string>
     <string name="rate_title">ほかのプレイヤーにBubbleを知ってもらおう</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Bubble サポーターになろう</string>
-    <string name="ads_remove_price">%1$s（買い切り）・広告なし、サポーターリング、テーマ2種</string>
-    <string name="ads_remove_once">買い切り・広告なし、サポーターリング、テーマ2種</string>
+    <string name="ads_remove_price">%1$s（買い切り）・広告なし、サポーターリング、テーマ2種、パスXP2倍、フレンド15人</string>
+    <string name="ads_remove_once">買い切り・広告なし、サポーターリング、テーマ2種、パスXP2倍、フレンド15人</string>
     <string name="ads_removed_title">あなたは Bubble サポーターです</string>
     <string name="ads_removed_sub">BrawlZone を応援してくれてありがとう！</string>
     <string name="ads_restore">購入を復元</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">サポーター限定</string>
     <string name="theme_obsidian">オブシディアン</string>
     <string name="theme_holo">ホロ</string>
-    <string name="ads_offer_body">%1$s を一度払うだけ：広告がずっと消え、サポーターリングと限定テーマ2種も。サブスクではありません。</string>
-    <string name="ads_offer_body_noprice">一度払うだけ：広告がずっと消え、サポーターリングと限定テーマ2種も。サブスクではありません。</string>
+    <string name="ads_offer_body">%1$s を一度払うだけ：広告がずっと消え、サポーターリング、限定テーマ2種、Bubble Pass のXP2倍、フレンド15人まで。サブスクではありません。</string>
+    <string name="ads_offer_body_noprice">一度払うだけ：広告がずっと消え、サポーターリング、限定テーマ2種、Bubble Pass のXP2倍、フレンド15人まで。サブスクではありません。</string>
     <string name="ads_offer_buy">手に入れる</string>
 </resources>

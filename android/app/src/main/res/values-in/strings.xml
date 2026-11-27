@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (kamu)</string>
     <string name="friends_week">Minggu ini %1$d–%2$d</string>
     <string name="friends_not_found">Tidak ada pemain dengan tag itu.</string>
-    <string name="friends_full">Kamu bisa menambahkan hingga 5 teman.</string>
+    <string name="friends_full">Kamu bisa menambahkan hingga %1$d teman.</string>
     <string name="friends_already">Sudah ada di daftarmu.</string>
     <string name="friends_failed">Gagal mencari. Coba lagi.</string>
     <string name="rate_title">Bantu pemain lain menemukan Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Jadi Pendukung Bubble</string>
-    <string name="ads_remove_price">%1$s sekali · Tanpa iklan, cincin Pendukung, 2 tema</string>
-    <string name="ads_remove_once">Sekali bayar · Tanpa iklan, cincin Pendukung, 2 tema</string>
+    <string name="ads_remove_price">%1$s sekali · Tanpa iklan, cincin Pendukung, 2 tema, XP Pass 2×, 15 teman</string>
+    <string name="ads_remove_once">Sekali bayar · Tanpa iklan, cincin Pendukung, 2 tema, XP Pass 2×, 15 teman</string>
     <string name="ads_removed_title">Kamu Pendukung Bubble</string>
     <string name="ads_removed_sub">Terima kasih sudah mendukung BrawlZone!</string>
     <string name="ads_restore">Pulihkan pembelian</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Pendukung</string>
     <string name="theme_obsidian">Obsidian</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Bayar %1$s sekali: tanpa iklan selamanya, cincin Pendukung, dan 2 tema eksklusif. Bukan langganan.</string>
-    <string name="ads_offer_body_noprice">Bayar sekali: tanpa iklan selamanya, cincin Pendukung, dan 2 tema eksklusif. Bukan langganan.</string>
+    <string name="ads_offer_body">Bayar %1$s sekali: tanpa iklan selamanya, cincin Pendukung, 2 tema eksklusif, XP Bubble Pass 2×, dan tempat untuk 15 teman. Bukan langganan.</string>
+    <string name="ads_offer_body_noprice">Bayar sekali: tanpa iklan selamanya, cincin Pendukung, 2 tema eksklusif, XP Bubble Pass 2×, dan tempat untuk 15 teman. Bukan langganan.</string>
     <string name="ads_offer_buy">Dapatkan</string>
 </resources>

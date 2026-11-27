@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (أنت)</string>
     <string name="friends_week">هذا الأسبوع %1$d–%2$d</string>
     <string name="friends_not_found">لا يوجد لاعب بهذا الوسم.</string>
-    <string name="friends_full">يمكنك إضافة حتى 5 أصدقاء.</string>
+    <string name="friends_full">يمكنك إضافة حتى %1$d أصدقاء.</string>
     <string name="friends_already">موجود في قائمتك بالفعل.</string>
     <string name="friends_failed">تعذّر البحث. حاول مرة أخرى.</string>
     <string name="rate_title">ساعد لاعبين آخرين على اكتشاف Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">كن داعمًا لـ Bubble</string>
-    <string name="ads_remove_price">%1$s مرة واحدة · بلا إعلانات، حلقة الداعم، مظهران</string>
-    <string name="ads_remove_once">دفعة واحدة · بلا إعلانات، حلقة الداعم، مظهران</string>
+    <string name="ads_remove_price">%1$s مرة واحدة · بلا إعلانات، حلقة الداعم، مظهران، ‏2× XP للـ Pass، ‏15 صديقًا</string>
+    <string name="ads_remove_once">دفعة واحدة · بلا إعلانات، حلقة الداعم، مظهران، ‏2× XP للـ Pass، ‏15 صديقًا</string>
     <string name="ads_removed_title">أنت داعم لـ Bubble</string>
     <string name="ads_removed_sub">شكرًا لدعمك BrawlZone!</string>
     <string name="ads_restore">استعادة الشراء</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">للداعمين</string>
     <string name="theme_obsidian">سبج</string>
     <string name="theme_holo">هولو</string>
-    <string name="ads_offer_body">ادفع %1$s مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان. بلا اشتراك.</string>
-    <string name="ads_offer_body_noprice">ادفع مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان. بلا اشتراك.</string>
+    <string name="ads_offer_body">ادفع %1$s مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان وضعف XP في Bubble Pass ومكان لـ 15 صديقًا. بلا اشتراك.</string>
+    <string name="ads_offer_body_noprice">ادفع مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان وضعف XP في Bubble Pass ومكان لـ 15 صديقًا. بلا اشتراك.</string>
     <string name="ads_offer_buy">احصل عليه</string>
 </resources>

@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (sinä)</string>
     <string name="friends_week">Tällä viikolla %1$d–%2$d</string>
     <string name="friends_not_found">Tällä tunnuksella ei löydy pelaajaa.</string>
-    <string name="friends_full">Voit lisätä enintään 5 kaveria.</string>
+    <string name="friends_full">Voit lisätä enintään %1$d kaveria.</string>
     <string name="friends_already">On jo listallasi.</string>
     <string name="friends_failed">Haku epäonnistui. Yritä uudelleen.</string>
     <string name="rate_title">Auta muita pelaajia löytämään Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Ryhdy Bubble-tukijaksi</string>
-    <string name="ads_remove_price">%1$s kerran · Ei mainoksia, tukijan rengas, 2 teemaa</string>
-    <string name="ads_remove_once">Kertamaksu · Ei mainoksia, tukijan rengas, 2 teemaa</string>
+    <string name="ads_remove_price">%1$s kerran · Ei mainoksia, tukijan rengas, 2 teemaa, 2× Pass-XP, 15 kaveria</string>
+    <string name="ads_remove_once">Kertamaksu · Ei mainoksia, tukijan rengas, 2 teemaa, 2× Pass-XP, 15 kaveria</string>
     <string name="ads_removed_title">Olet Bubble-tukija</string>
     <string name="ads_removed_sub">Kiitos, että tuet BrawlZonea!</string>
     <string name="ads_restore">Palauta osto</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Tukijoille</string>
     <string name="theme_obsidian">Obsidiaani</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Maksa %1$s kerran: ei mainoksia koskaan, tukijan rengas ja 2 eksklusiivista teemaa. Ei tilausta.</string>
-    <string name="ads_offer_body_noprice">Maksa kerran: ei mainoksia koskaan, tukijan rengas ja 2 eksklusiivista teemaa. Ei tilausta.</string>
+    <string name="ads_offer_body">Maksa %1$s kerran: ei mainoksia koskaan, tukijan rengas, 2 eksklusiivista teemaa, tupla-XP Bubble Passiin ja tilaa 15 kaverille. Ei tilausta.</string>
+    <string name="ads_offer_body_noprice">Maksa kerran: ei mainoksia koskaan, tukijan rengas, 2 eksklusiivista teemaa, tupla-XP Bubble Passiin ja tilaa 15 kaverille. Ei tilausta.</string>
     <string name="ads_offer_buy">Hanki</string>
 </resources>

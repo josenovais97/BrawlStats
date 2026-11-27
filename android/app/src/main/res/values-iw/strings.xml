@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (אתם)</string>
     <string name="friends_week">השבוע %1$d–%2$d</string>
     <string name="friends_not_found">אין שחקן עם התג הזה.</string>
-    <string name="friends_full">אפשר להוסיף עד 5 חברים.</string>
+    <string name="friends_full">אפשר להוסיף עד %1$d חברים.</string>
     <string name="friends_already">כבר ברשימה שלכם.</string>
     <string name="friends_failed">החיפוש נכשל. נסו שוב.</string>
     <string name="rate_title">עזרו לשחקנים אחרים למצוא את Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">הצטרפו לתומכי Bubble</string>
-    <string name="ads_remove_price">%1$s פעם אחת · בלי פרסומות, טבעת תומכים, 2 ערכות נושא</string>
-    <string name="ads_remove_once">תשלום חד־פעמי · בלי פרסומות, טבעת תומכים, 2 ערכות נושא</string>
+    <string name="ads_remove_price">%1$s פעם אחת · בלי פרסומות, טבעת תומכים, 2 ערכות נושא, ‏XP כפול בפס, 15 חברים</string>
+    <string name="ads_remove_once">תשלום חד־פעמי · בלי פרסומות, טבעת תומכים, 2 ערכות נושא, ‏XP כפול בפס, 15 חברים</string>
     <string name="ads_removed_title">אתם תומכי Bubble</string>
     <string name="ads_removed_sub">תודה שאתם תומכים ב-BrawlZone!</string>
     <string name="ads_restore">שחזור רכישה</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">לתומכים</string>
     <string name="theme_obsidian">אובסידיאן</string>
     <string name="theme_holo">הולו</string>
-    <string name="ads_offer_body">משלמים %1$s פעם אחת: בלי פרסומות לתמיד, טבעת התומכים ו־2 ערכות נושא בלעדיות. בלי מנוי.</string>
-    <string name="ads_offer_body_noprice">משלמים פעם אחת: בלי פרסומות לתמיד, טבעת התומכים ו־2 ערכות נושא בלעדיות. בלי מנוי.</string>
+    <string name="ads_offer_body">משלמים %1$s פעם אחת: בלי פרסומות לתמיד, טבעת התומכים, 2 ערכות נושא בלעדיות, XP כפול ב־Bubble Pass ומקום ל־15 חברים. בלי מנוי.</string>
+    <string name="ads_offer_body_noprice">משלמים פעם אחת: בלי פרסומות לתמיד, טבעת התומכים, 2 ערכות נושא בלעדיות, XP כפול ב־Bubble Pass ומקום ל־15 חברים. בלי מנוי.</string>
     <string name="ads_offer_buy">קבלו</string>
 </resources>

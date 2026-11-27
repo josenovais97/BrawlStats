@@ -720,8 +720,8 @@ class MainActivity : AppCompatActivity() {
         val field = findViewById<EditText>(R.id.friends_field)
         val go = findViewById<TextView>(R.id.friends_go)
         add.setOnClickListener {
-            if (Friends.tags(this).size >= Friends.MAX) {
-                android.widget.Toast.makeText(this, R.string.friends_full, android.widget.Toast.LENGTH_SHORT).show()
+            if (Friends.tags(this).size >= Friends.max(this)) {
+                android.widget.Toast.makeText(this, getString(R.string.friends_full, Friends.max(this)), android.widget.Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             editor.visibility = View.VISIBLE
@@ -748,10 +748,10 @@ class MainActivity : AppCompatActivity() {
                     go.text = getString(R.string.friends_add_button)
                     val message = when (result) {
                         Friends.AddResult.ADDED -> null
-                        Friends.AddResult.NOT_FOUND -> R.string.friends_not_found
-                        Friends.AddResult.FULL -> R.string.friends_full
-                        Friends.AddResult.ALREADY -> R.string.friends_already
-                        Friends.AddResult.FAILED -> R.string.friends_failed
+                        Friends.AddResult.NOT_FOUND -> getString(R.string.friends_not_found)
+                        Friends.AddResult.FULL -> getString(R.string.friends_full, Friends.max(this))
+                        Friends.AddResult.ALREADY -> getString(R.string.friends_already)
+                        Friends.AddResult.FAILED -> getString(R.string.friends_failed)
                     }
                     if (message != null) {
                         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
@@ -823,7 +823,7 @@ class MainActivity : AppCompatActivity() {
                                 if (isFinishing || isDestroyed) return@told
                                 val message = when (result) {
                                     Friends.AddResult.ADDED, Friends.AddResult.ALREADY -> getString(R.string.invite_added, name)
-                                    Friends.AddResult.FULL -> getString(R.string.friends_full)
+                                    Friends.AddResult.FULL -> getString(R.string.friends_full, Friends.max(this))
                                     else -> getString(R.string.friends_failed)
                                 }
                                 android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
@@ -952,12 +952,12 @@ class MainActivity : AppCompatActivity() {
         if (!hasFriends) findViewById<TextView>(R.id.friends_body).setText(R.string.squad_body)
         findViewById<View>(R.id.friends_remove_hint).visibility = if (hasFriends) View.VISIBLE else View.GONE
         findViewById<View>(R.id.friends_add).visibility =
-            if (Friends.tags(this).size >= Friends.MAX) View.GONE
+            if (Friends.tags(this).size >= Friends.max(this)) View.GONE
             else if (findViewById<View>(R.id.friends_editor).visibility == View.VISIBLE) View.GONE
             else View.VISIBLE
         // 1.42: invite while there is room; the weekly duel once there are friends.
         findViewById<View>(R.id.friends_invite).visibility =
-            if (Friends.tags(this).size >= Friends.MAX) View.GONE else View.VISIBLE
+            if (Friends.tags(this).size >= Friends.max(this)) View.GONE else View.VISIBLE
         val duel = findViewById<TextView>(R.id.friends_duel)
         val week = if (hasFriends) Duel.thisWeek(this) else emptyList()
         duel.visibility = if (hasFriends) View.VISIBLE else View.GONE

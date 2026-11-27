@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (ты)</string>
     <string name="friends_week">На этой неделе %1$d–%2$d</string>
     <string name="friends_not_found">Игрока с таким тегом нет.</string>
-    <string name="friends_full">Можно добавить до 5 друзей.</string>
+    <string name="friends_full">Можно добавить до %1$d друзей.</string>
     <string name="friends_already">Уже в твоём списке.</string>
     <string name="friends_failed">Не удалось найти. Попробуй ещё раз.</string>
     <string name="rate_title">Помоги другим игрокам найти Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Стань спонсором Bubble</string>
-    <string name="ads_remove_price">%1$s один раз · Без рекламы, кольцо спонсора, 2 темы</string>
-    <string name="ads_remove_once">Один платёж · Без рекламы, кольцо спонсора, 2 темы</string>
+    <string name="ads_remove_price">%1$s один раз · Без рекламы, кольцо спонсора, 2 темы, 2× опыт пропуска, 15 друзей</string>
+    <string name="ads_remove_once">Один платёж · Без рекламы, кольцо спонсора, 2 темы, 2× опыт пропуска, 15 друзей</string>
     <string name="ads_removed_title">Ты спонсор Bubble</string>
     <string name="ads_removed_sub">Спасибо, что поддерживаешь BrawlZone!</string>
     <string name="ads_restore">Восстановить покупку</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Для спонсоров</string>
     <string name="theme_obsidian">Обсидиан</string>
     <string name="theme_holo">Голо</string>
-    <string name="ads_offer_body">Заплати %1$s один раз: никакой рекламы навсегда, кольцо спонсора и 2 эксклюзивные темы. Без подписки.</string>
-    <string name="ads_offer_body_noprice">Заплати один раз: никакой рекламы навсегда, кольцо спонсора и 2 эксклюзивные темы. Без подписки.</string>
+    <string name="ads_offer_body">Заплати %1$s один раз: никакой рекламы навсегда, кольцо спонсора, 2 эксклюзивные темы, двойной опыт в Bubble Pass и место для 15 друзей. Без подписки.</string>
+    <string name="ads_offer_body_noprice">Заплати один раз: никакой рекламы навсегда, кольцо спонсора, 2 эксклюзивные темы, двойной опыт в Bubble Pass и место для 15 друзей. Без подписки.</string>
     <string name="ads_offer_buy">Хочу</string>
 </resources>

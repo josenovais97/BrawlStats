@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (você)</string>
     <string name="friends_week">Esta semana %1$d–%2$d</string>
     <string name="friends_not_found">Nenhum jogador com essa tag.</string>
-    <string name="friends_full">Você pode adicionar até 5 amigos.</string>
+    <string name="friends_full">Você pode adicionar até %1$d amigos.</string>
     <string name="friends_already">Já está na sua lista.</string>
     <string name="friends_failed">Não deu para buscar. Tente de novo.</string>
     <string name="rate_title">Ajude outros jogadores a encontrar o Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Seja Apoiador do Bubble</string>
-    <string name="ads_remove_price">%1$s uma vez · Sem anúncios, anel de Apoiador, 2 temas</string>
-    <string name="ads_remove_once">Pagamento único · Sem anúncios, anel de Apoiador, 2 temas</string>
+    <string name="ads_remove_price">%1$s uma vez · Sem anúncios, anel de Apoiador, 2 temas, 2× XP no Pass, 15 amigos</string>
+    <string name="ads_remove_once">Pagamento único · Sem anúncios, anel de Apoiador, 2 temas, 2× XP no Pass, 15 amigos</string>
     <string name="ads_removed_title">Você é Apoiador do Bubble</string>
     <string name="ads_removed_sub">Obrigado por apoiar o BrawlZone!</string>
     <string name="ads_restore">Restaurar compra</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Apoiadores</string>
     <string name="theme_obsidian">Obsidiana</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Pague %1$s uma vez: sem anúncios para sempre, o anel de Apoiador e 2 temas exclusivos. Sem assinatura.</string>
-    <string name="ads_offer_body_noprice">Pague uma vez: sem anúncios para sempre, o anel de Apoiador e 2 temas exclusivos. Sem assinatura.</string>
+    <string name="ads_offer_body">Pague %1$s uma vez: sem anúncios para sempre, o anel de Apoiador, 2 temas exclusivos, XP em dobro no Bubble Pass e espaço para 15 amigos. Sem assinatura.</string>
+    <string name="ads_offer_body_noprice">Pague uma vez: sem anúncios para sempre, o anel de Apoiador, 2 temas exclusivos, XP em dobro no Bubble Pass e espaço para 15 amigos. Sem assinatura.</string>
     <string name="ads_offer_buy">Quero</string>
 </resources>

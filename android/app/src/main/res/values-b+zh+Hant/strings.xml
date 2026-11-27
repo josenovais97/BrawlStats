@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s（你）</string>
     <string name="friends_week">本週 %1$d–%2$d</string>
     <string name="friends_not_found">沒有使用該標籤的玩家。</string>
-    <string name="friends_full">最多可新增 5 位好友。</string>
+    <string name="friends_full">最多可新增 %1$d 位好友。</string>
     <string name="friends_already">已在你的清單中。</string>
     <string name="friends_failed">查詢失敗，請重試。</string>
     <string name="rate_title">幫助其他玩家發現 Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">成為 Bubble 支持者</string>
-    <string name="ads_remove_price">%1$s 一次 · 無廣告、支持者光環、2 款主題</string>
-    <string name="ads_remove_once">一次付清 · 無廣告、支持者光環、2 款主題</string>
+    <string name="ads_remove_price">%1$s 一次 · 無廣告、支持者光環、2 款主題、2 倍通行證經驗、15 位好友</string>
+    <string name="ads_remove_once">一次付清 · 無廣告、支持者光環、2 款主題、2 倍通行證經驗、15 位好友</string>
     <string name="ads_removed_title">你是 Bubble 支持者</string>
     <string name="ads_removed_sub">感謝支持 BrawlZone！</string>
     <string name="ads_restore">恢復購買</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">支持者專屬</string>
     <string name="theme_obsidian">黑曜石</string>
     <string name="theme_holo">幻彩</string>
-    <string name="ads_offer_body">一次付 %1$s：永久無廣告，外加支持者光環和 2 款專屬主題。不是訂閱。</string>
-    <string name="ads_offer_body_noprice">付一次：永久無廣告，外加支持者光環和 2 款專屬主題。不是訂閱。</string>
+    <string name="ads_offer_body">一次付 %1$s：永久無廣告，外加支持者光環、2 款專屬主題、Bubble Pass 雙倍經驗和 15 個好友位。不是訂閱。</string>
+    <string name="ads_offer_body_noprice">付一次：永久無廣告，外加支持者光環、2 款專屬主題、Bubble Pass 雙倍經驗和 15 個好友位。不是訂閱。</string>
     <string name="ads_offer_buy">立即取得</string>
 </resources>

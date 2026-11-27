@@ -193,8 +193,10 @@ object Pass {
         // The week's games, read once for all seven quests (this runs on the main thread).
         val since = start.toInstant().toEpochMilli()
         val games = Tally.battles(context, tag).filter { it.at >= since }.sortedBy { it.at }
+        // Bubble Supporter (1.46): every quest is worth double.
+        val boost = if (Supporter.active(context)) 2 else 1
         val quests = picked.map { (kind, mode) ->
-            Quest(kind, progress(context, tag, start, games, kind, mode), mode, (Math.round(kind.xp * factor / 25.0) * 25).toInt())
+            Quest(kind, progress(context, tag, start, games, kind, mode), mode, (Math.round(kind.xp * factor / 25.0) * 25).toInt() * boost)
         }
         val xp = quests.filter { it.done }.sumOf { it.xp }
         val tier = (xp / XP_PER_TIER).coerceAtMost(TIERS)

@@ -191,7 +191,7 @@
     <string name="friends_you">%1$s (toi)</string>
     <string name="friends_week">Cette semaine %1$d–%2$d</string>
     <string name="friends_not_found">Aucun joueur avec cet identifiant.</string>
-    <string name="friends_full">Tu peux ajouter jusqu\'à 5 amis.</string>
+    <string name="friends_full">Tu peux ajouter jusqu\'à %1$d amis.</string>
     <string name="friends_already">Déjà dans ta liste.</string>
     <string name="friends_failed">Recherche impossible. Réessaie.</string>
     <string name="rate_title">Aide d\'autres joueurs à trouver Bubble</string>
@@ -591,8 +591,8 @@
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
     <string name="ads_remove_title">Deviens Soutien de Bubble</string>
-    <string name="ads_remove_price">%1$s une fois · Sans pubs, anneau Soutien, 2 thèmes</string>
-    <string name="ads_remove_once">Un seul paiement · Sans pubs, anneau Soutien, 2 thèmes</string>
+    <string name="ads_remove_price">%1$s une fois · Sans pubs, anneau Soutien, 2 thèmes, 2× XP du Pass, 15 amis</string>
+    <string name="ads_remove_once">Un seul paiement · Sans pubs, anneau Soutien, 2 thèmes, 2× XP du Pass, 15 amis</string>
     <string name="ads_removed_title">Tu es Soutien de Bubble</string>
     <string name="ads_removed_sub">Merci de soutenir BrawlZone !</string>
     <string name="ads_restore">Restaurer l’achat</string>
@@ -606,7 +606,7 @@
     <string name="ring_supporters_only">Soutiens</string>
     <string name="theme_obsidian">Obsidienne</string>
     <string name="theme_holo">Holo</string>
-    <string name="ads_offer_body">Paie %1$s une fois : plus jamais de pubs, l’anneau Soutien et 2 thèmes exclusifs. Sans abonnement.</string>
-    <string name="ads_offer_body_noprice">Paie une fois : plus jamais de pubs, l’anneau Soutien et 2 thèmes exclusifs. Sans abonnement.</string>
+    <string name="ads_offer_body">Paie %1$s une fois : plus jamais de pubs, l’anneau Soutien, 2 thèmes exclusifs, le double d’XP dans le Bubble Pass et de la place pour 15 amis. Sans abonnement.</string>
+    <string name="ads_offer_body_noprice">Paie une fois : plus jamais de pubs, l’anneau Soutien, 2 thèmes exclusifs, le double d’XP dans le Bubble Pass et de la place pour 15 amis. Sans abonnement.</string>
     <string name="ads_offer_buy">Je le veux</string>
 </resources>

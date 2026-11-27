@@ -433,7 +433,7 @@ internal fun MainActivity.paintSquad() {
     findViewById<View>(R.id.squad_empty_head).visibility = if (tag.isNotEmpty() && !hasFriends) View.VISIBLE else View.GONE
     paintSquadTable()
     paintMates()
-    if (tag.isNotEmpty() && Teammates.isStale(this) && Friends.tags(this).size < Friends.MAX) {
+    if (tag.isNotEmpty() && Teammates.isStale(this) && Friends.tags(this).size < Friends.max(this)) {
         val app = applicationContext
         Thread {
             Teammates.fetch(app)
@@ -445,7 +445,7 @@ internal fun MainActivity.paintSquad() {
 private fun MainActivity.paintMates() {
     val caption = findViewById<View>(R.id.mates_caption)
     val card = findViewById<View>(R.id.mates_card)
-    val mates = if (Account.tag(this).isEmpty() || Friends.tags(this).size >= Friends.MAX) emptyList() else Teammates.last(this)
+    val mates = if (Account.tag(this).isEmpty() || Friends.tags(this).size >= Friends.max(this)) emptyList() else Teammates.last(this)
     if (mates.isEmpty()) {
         caption.visibility = View.GONE
         card.visibility = View.GONE
@@ -503,10 +503,10 @@ private fun MainActivity.paintMates() {
                     if (isFinishing || isDestroyed) return@runOnUiThread
                     val message = when (result) {
                         Friends.AddResult.ADDED -> null
-                        Friends.AddResult.NOT_FOUND -> R.string.friends_not_found
-                        Friends.AddResult.FULL -> R.string.friends_full
-                        Friends.AddResult.ALREADY -> R.string.friends_already
-                        Friends.AddResult.FAILED -> R.string.friends_failed
+                        Friends.AddResult.NOT_FOUND -> getString(R.string.friends_not_found)
+                        Friends.AddResult.FULL -> getString(R.string.friends_full, Friends.max(this))
+                        Friends.AddResult.ALREADY -> getString(R.string.friends_already)
+                        Friends.AddResult.FAILED -> getString(R.string.friends_failed)
                     }
                     if (message != null) {
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
