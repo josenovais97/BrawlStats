@@ -63,7 +63,7 @@
     <string name="how_1">Avaa paneeli napauttamalla kuplaa; napauta uudelleen taittaaksesi sen pois.</string>
     <string name="how_2">Vedä kupla minne haluat — se asettuu lähimpään reunaan.</string>
     <string name="how_3">Sulje vetämällä se alareunan ✕:n päälle, käytä ilmoituksen Pysäytä-painiketta tai Pika-asetusten BrawlZone-ruutua — ruutu myös käynnistää sen, suoraan pelistä.</string>
-    <string name="footer_note">Luvut mitattu otantana kerätyistä rankatuista taisteluista, samoista kuin brawlzone.netissä. Ilmainen, ei tiliä, ei mainoksia.</string>
+    <string name="footer_note">Luvut mitattu otantana kerätyistä rankatuista taisteluista, samoista kuin brawlzone.netissä. Ilmainen, ei tiliä.</string>
     <string name="disclaimer">BrawlZone on fanien tekemä sovellus. Se ei ole Supercellin kumppani, eikä Supercell ole tukenut, sponsoroinut tai erikseen hyväksynyt sitä, eikä Supercell ole siitä vastuussa.</string>
     <string name="notification_channel">Kupla</string>
     <string name="notification_title">BrawlZone-kupla</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">voitettu</string>
     <string name="you">Sinä</string>
     <string name="you_others">Sinä ja muut</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Poista mainokset pysyvästi</string>
+    <string name="ads_remove_price">%1$s, kertamaksu</string>
+    <string name="ads_remove_once">Kertamaksu, ei tilausta</string>
+    <string name="ads_removed_title">Ei mainoksia, pysyvästi</string>
+    <string name="ads_removed_sub">Kiitos, että tuet BrawlZonea!</string>
+    <string name="ads_restore">Palauta osto</string>
+    <string name="ads_restore_none">Tällä Google-tilillä ei löytynyt ostoa.</string>
+    <string name="ads_restored">Osto palautettu. Ei enää mainoksia.</string>
+    <string name="ads_pending">Maksu odottaa. Mainokset poistuvat heti, kun se menee läpi.</string>
+    <string name="ads_unavailable">Google Play ei vastaa. Yritä hetken päästä uudelleen.</string>
+    <string name="ads_privacy">Mainosten tietosuojavalinnat</string>
 </resources>

@@ -36,8 +36,8 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 58
-    versionName = "1.45"
+    versionCode = 59
+    versionName = "1.46"
 
     // The launcher name. The test build (qa, below) overrides it so it can sit
     // next to the real app on the same phone without looking identical.
@@ -52,6 +52,15 @@ android {
      * without shipping one of them first.
      */
     buildConfigField("String", "PANEL_ORIGIN", "\"https://brawlzone.net\"")
+
+    /*
+     * AdMob (1.46, Play build only). Google's own sample IDs everywhere but a
+     * release, so a debug or test build can never show, or be clicked on, a
+     * real ad: AdMob counts that against the account. The release block below
+     * sets the real ones; neither is a secret, both ship in the app.
+     */
+    manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+    buildConfigField("String", "BANNER_UNIT", "\"ca-app-pub-3940256099942544/9214589741\"")
   }
 
   /*
@@ -121,6 +130,9 @@ android {
        */
       isMinifyEnabled = false
       if (hasSigning) signingConfig = signingConfigs.getByName("release")
+      // The real AdMob app and its one banner (1.46).
+      manifestPlaceholders["admobAppId"] = "ca-app-pub-9381565116085110~9819416082"
+      buildConfigField("String", "BANNER_UNIT", "\"ca-app-pub-9381565116085110/8599889090\"")
     }
     /*
      * "Bubble Test" (1.40): a release build under its own package and name,
@@ -136,6 +148,9 @@ android {
       signingConfig = signingConfigs.getByName("qa")
       manifestPlaceholders["appLabel"] = "Bubble Test"
       matchingFallbacks += listOf("release")
+      // Back to Google's sample ad IDs: a test build never shows a real ad.
+      manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+      buildConfigField("String", "BANNER_UNIT", "\"ca-app-pub-3940256099942544/9214589741\"")
     }
   }
   /*
@@ -174,4 +189,12 @@ dependencies {
   "playImplementation"("com.google.android.play:app-update:2.1.0")
   // Friend invites (1.42): a code in the Play install referrer, read once on first open.
   "playImplementation"("com.android.installreferrer:installreferrer:2.2")
+  /*
+   * Ads and "Remove ads forever" (1.46), Play build only: the AdMob banner,
+   * Google's consent message for it (UMP) and Play Billing for the one-time
+   * purchase. The ads SDK needs Kotlin 2.x (it brings kotlin-stdlib 2.1).
+   */
+  "playImplementation"("com.google.android.gms:play-services-ads:25.5.0")
+  "playImplementation"("com.google.android.ump:user-messaging-platform:4.0.0")
+  "playImplementation"("com.android.billingclient:billing:8.3.0")
 }

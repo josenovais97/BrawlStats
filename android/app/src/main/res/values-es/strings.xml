@@ -63,7 +63,7 @@
     <string name="how_1">Toca la burbuja para abrir el panel; tócala otra vez para plegarlo.</string>
     <string name="how_2">Arrastra la burbuja a donde quieras — se apoya en el borde más cercano.</string>
     <string name="how_3">Arrástrala a la ✕ de abajo para cerrarla, usa Detener en la notificación o el icono de BrawlZone en Ajustes rápidos — ese icono también la inicia, desde el juego.</string>
-    <string name="footer_note">Datos medidos en combates de Competitivo muestreados, los mismos que muestra brawlzone.net. Gratis, sin cuenta, sin anuncios.</string>
+    <string name="footer_note">Datos medidos en combates de Competitivo muestreados, los mismos que muestra brawlzone.net. Gratis, sin cuenta.</string>
     <string name="disclaimer">BrawlZone es una app hecha por fans. No está afiliada, respaldada, patrocinada ni aprobada específicamente por Supercell, y Supercell no es responsable de ella.</string>
     <string name="notification_channel">Burbuja</string>
     <string name="notification_title">Burbuja de BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">ganadas</string>
     <string name="you">Tú</string>
     <string name="you_others">Tú y los demás</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Quitar anuncios para siempre</string>
+    <string name="ads_remove_price">%1$s, un solo pago</string>
+    <string name="ads_remove_once">Un solo pago, sin suscripción</string>
+    <string name="ads_removed_title">Sin anuncios, para siempre</string>
+    <string name="ads_removed_sub">¡Gracias por apoyar BrawlZone!</string>
+    <string name="ads_restore">Restaurar compra</string>
+    <string name="ads_restore_none">No hay ninguna compra en esta cuenta de Google.</string>
+    <string name="ads_restored">Compra restaurada. Se acabaron los anuncios.</string>
+    <string name="ads_pending">Pago pendiente. Los anuncios desaparecen en cuanto se complete.</string>
+    <string name="ads_unavailable">Google Play no responde. Inténtalo de nuevo en un momento.</string>
+    <string name="ads_privacy">Opciones de privacidad de anuncios</string>
 </resources>

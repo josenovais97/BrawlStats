@@ -164,6 +164,8 @@ class MainActivity : AppCompatActivity() {
             findViewById<View>(R.id.stop).postDelayed({ if (!isDestroyed) paintStatus() }, 300)
         }
         offerTile()
+        // 1.46: the banner and "Remove ads forever" (Play build; nothing in the site build).
+        Ads.start(this, findViewById(R.id.ad_slot)) { if (tab == Tabs.SETTINGS) paintSettingsPages() }
     }
 
     /**
@@ -186,12 +188,14 @@ class MainActivity : AppCompatActivity() {
         // bar steps aside and the open page scrolls the field into view.
         val pages = Tabs.PAGES.map { findViewById<android.widget.ScrollView>(it) }
         val nav = findViewById<View>(R.id.bottom_nav)
+        val adFrame = findViewById<View>(R.id.ad_frame)
         for (page in pages) page.clipToPadding = false
         val gap = (16 * resources.displayMetrics.density).toInt()
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { _, insets ->
             val bars = insets.getInsets(Type.systemBars() or Type.displayCutout())
             val ime = insets.getInsets(Type.ime()).bottom
             nav.visibility = if (ime > 0) View.GONE else View.VISIBLE
+            adFrame.visibility = nav.visibility
             nav.setPadding(bars.left, 0, bars.right, bars.bottom)
             for (page in pages) page.setPadding(bars.left, bars.top, bars.right, if (ime > 0) ime else 0)
             if (ime > 0) {
@@ -309,8 +313,14 @@ class MainActivity : AppCompatActivity() {
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
+    override fun onPause() {
+        Ads.pause()
+        super.onPause()
+    }
+
     override fun onDestroy() {
         Store.release()
+        Ads.release()
         super.onDestroy()
     }
 
@@ -391,6 +401,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<View>(R.id.update_card)?.visibility = View.VISIBLE
         }
         Store.maybeAskForReview(this)
+        Ads.resume()
         refreshStanding()
         askInvite()
         val granted = paintStatus()
@@ -622,7 +633,13 @@ class MainActivity : AppCompatActivity() {
         val graph = findViewById<ImageView>(R.id.season_graph)
         val points = EloLog.points(this, me.tag, Alerts.last(this)?.season?.number)
         val window = EloGraph.window(this, me.tag)
-        if (points.size >= 2 && window != null) {
+        /*
+         * 1.46: only once the readings span two days. A first day's readings sit
+         * hours apart on a season-wide axis, so the line was a dot at the left
+         * edge of an empty box.
+         */
+        val spansDays = points.size >= 2 && points.last().first - points.first().first >= 2 * 86_400_000L
+        if (spansDays && window != null) {
             graph.visibility = View.VISIBLE
             graph.post {
                 EloGraph.bitmap(this, graph.width, graph.height, points, window.first, window.second)?.let { graph.setImageBitmap(it) }

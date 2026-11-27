@@ -69,7 +69,7 @@
     <string name="how_1">Tap the bubble to open the panel; tap it again to fold it away.</string>
     <string name="how_2">Drag the bubble anywhere — it rests against the nearest edge.</string>
     <string name="how_3">Drag it onto the ✕ at the bottom to close it, use Stop in the notification, or the BrawlZone tile in Quick Settings — that tile also starts it, from inside the game.</string>
-    <string name="footer_note">Numbers measured from sampled Ranked battles, the same ones brawlzone.net shows. Free, no account, no ads.</string>
+    <string name="footer_note">Numbers measured from sampled Ranked battles, the same ones brawlzone.net shows. Free, no account.</string>
     <string name="disclaimer">BrawlZone is a fan-made app. It is not affiliated with, endorsed, sponsored or specifically approved by Supercell, and Supercell is not responsible for it.</string>
     <string name="notification_channel">Bubble</string>
     <string name="notification_title">BrawlZone bubble</string>
@@ -595,4 +595,17 @@
     <string name="stat_won">won</string>
     <string name="you">You</string>
     <string name="you_others">You and others</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Remove ads forever</string>
+    <string name="ads_remove_price">%1$s, paid once</string>
+    <string name="ads_remove_once">Paid once, no subscription</string>
+    <string name="ads_removed_title">No ads, forever</string>
+    <string name="ads_removed_sub">Thanks for supporting BrawlZone!</string>
+    <string name="ads_restore">Restore purchase</string>
+    <string name="ads_restore_none">No purchase found on this Google account.</string>
+    <string name="ads_restored">Purchase restored. No more ads.</string>
+    <string name="ads_pending">Payment pending. The ads go as soon as it goes through.</string>
+    <string name="ads_unavailable">Google Play isn’t answering. Try again in a moment.</string>
+    <string name="ads_privacy">Ad privacy choices</string>
 </resources>

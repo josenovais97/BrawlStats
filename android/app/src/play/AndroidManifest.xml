@@ -10,4 +10,14 @@
     <uses-permission
         android:name="android.permission.REQUEST_INSTALL_PACKAGES"
         tools:node="remove" />
+
+    <!--
+      AdMob (1.46): the ads SDK refuses to start without its app ID. The value
+      is Google's sample app everywhere but a release (app/build.gradle.kts).
+    -->
+    <application>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+    </application>
 </manifest>

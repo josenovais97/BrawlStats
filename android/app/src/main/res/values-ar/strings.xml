@@ -63,7 +63,7 @@
     <string name="how_1">المس الفقاعة لفتح اللوحة، والمسها مرة أخرى لطيّها.</string>
     <string name="how_2">اسحب الفقاعة إلى أي مكان — تستقر عند أقرب حافة.</string>
     <string name="how_3">اسحبها إلى ✕ في الأسفل لإغلاقها، أو استخدم إيقاف في الإشعار، أو مربع BrawlZone في الإعدادات السريعة — هذا المربع يشغّلها أيضًا من داخل اللعبة.</string>
-    <string name="footer_note">أرقام مقاسة من عينة من معارك المصنف، نفسها التي يعرضها brawlzone.net. مجاني، بلا حساب، بلا إعلانات.</string>
+    <string name="footer_note">أرقام مقاسة من عينة من معارك المصنف، نفسها التي يعرضها brawlzone.net. مجاني، بلا حساب.</string>
     <string name="disclaimer">BrawlZone تطبيق من صنع المعجبين. وهو غير تابع لـ Supercell ولا تؤيده أو ترعاه أو توافق عليه تحديدًا، وSupercell ليست مسؤولة عنه.</string>
     <string name="notification_channel">الفقاعة</string>
     <string name="notification_title">فقاعة BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">فوز</string>
     <string name="you">أنت</string>
     <string name="you_others">أنت والآخرون</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">إزالة الإعلانات للأبد</string>
+    <string name="ads_remove_price">%1$s، تُدفع مرة واحدة</string>
+    <string name="ads_remove_once">دفعة واحدة، بلا اشتراك</string>
+    <string name="ads_removed_title">بلا إعلانات، للأبد</string>
+    <string name="ads_removed_sub">شكرًا لدعمك BrawlZone!</string>
+    <string name="ads_restore">استعادة الشراء</string>
+    <string name="ads_restore_none">لا يوجد شراء على حساب Google هذا.</string>
+    <string name="ads_restored">تمت استعادة الشراء. لا مزيد من الإعلانات.</string>
+    <string name="ads_pending">الدفع قيد الانتظار. ستختفي الإعلانات فور اكتماله.</string>
+    <string name="ads_unavailable">لا يستجيب Google Play. حاول مرة أخرى بعد قليل.</string>
+    <string name="ads_privacy">خيارات خصوصية الإعلانات</string>
 </resources>

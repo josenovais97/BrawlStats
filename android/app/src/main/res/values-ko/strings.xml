@@ -63,7 +63,7 @@
     <string name="how_1">버블을 탭하면 패널이 열리고, 다시 탭하면 접혀요.</string>
     <string name="how_2">버블을 원하는 곳으로 드래그하세요 — 가장 가까운 가장자리에 붙어요.</string>
     <string name="how_3">아래의 ✕로 드래그하면 닫히고, 알림의 중지나 빠른 설정의 BrawlZone 타일도 쓸 수 있어요 — 이 타일로 게임 안에서 시작할 수도 있어요.</string>
-    <string name="footer_note">수치는 샘플링한 경쟁전 전투에서 측정했으며, brawlzone.net과 같아요. 무료, 계정 불필요, 광고 없음.</string>
+    <string name="footer_note">수치는 샘플링한 경쟁전 전투에서 측정했으며, brawlzone.net과 같아요. 무료, 계정 불필요.</string>
     <string name="disclaimer">BrawlZone은 팬이 만든 앱입니다. Supercell과 제휴하거나 Supercell의 보증, 후원 또는 특별 승인을 받지 않았으며, Supercell은 이 앱에 대해 책임지지 않습니다.</string>
     <string name="notification_channel">버블</string>
     <string name="notification_title">BrawlZone 버블</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">승률</string>
     <string name="you">나</string>
     <string name="you_others">나와 다른 사람</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">광고 영구 제거</string>
+    <string name="ads_remove_price">%1$s, 한 번만 결제</string>
+    <string name="ads_remove_once">한 번 결제, 구독 아님</string>
+    <string name="ads_removed_title">광고 없음, 영원히</string>
+    <string name="ads_removed_sub">BrawlZone을 응원해 줘서 고마워요!</string>
+    <string name="ads_restore">구매 복원</string>
+    <string name="ads_restore_none">이 Google 계정에서 구매 내역을 찾지 못했어요.</string>
+    <string name="ads_restored">구매가 복원됐어요. 이제 광고가 없어요.</string>
+    <string name="ads_pending">결제 대기 중이에요. 결제가 끝나면 바로 광고가 사라져요.</string>
+    <string name="ads_unavailable">Google Play가 응답하지 않아요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="ads_privacy">광고 개인정보 선택</string>
 </resources>

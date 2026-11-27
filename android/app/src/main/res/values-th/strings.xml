@@ -63,7 +63,7 @@
     <string name="how_1">แตะบับเบิลเพื่อเปิดแผง แตะอีกครั้งเพื่อพับเก็บ</string>
     <string name="how_2">ลากบับเบิลไปที่ไหนก็ได้ — มันจะชิดขอบที่ใกล้ที่สุด</string>
     <string name="how_3">ลากไปที่ ✕ ด้านล่างเพื่อปิด ใช้ปุ่มหยุดในการแจ้งเตือน หรือไทล์ BrawlZone ในการตั้งค่าด่วน — ไทล์นี้เปิดบับเบิลได้จากในเกมด้วย</string>
-    <string name="footer_note">ตัวเลขวัดจากการต่อสู้จัดอันดับที่สุ่มเก็บ ชุดเดียวกับที่ brawlzone.net แสดง ฟรี ไม่ต้องมีบัญชี ไม่มีโฆษณา</string>
+    <string name="footer_note">ตัวเลขวัดจากการต่อสู้จัดอันดับที่สุ่มเก็บ ชุดเดียวกับที่ brawlzone.net แสดง ฟรี ไม่ต้องมีบัญชี</string>
     <string name="disclaimer">BrawlZone เป็นแอปที่แฟนๆ สร้างขึ้น ไม่มีส่วนเกี่ยวข้อง ไม่ได้รับการรับรอง การสนับสนุน หรือการอนุมัติเป็นการเฉพาะจาก Supercell และ Supercell ไม่รับผิดชอบต่อแอปนี้</string>
     <string name="notification_channel">บับเบิล</string>
     <string name="notification_title">บับเบิล BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">ชนะ</string>
     <string name="you">คุณ</string>
     <string name="you_others">คุณกับคนอื่น</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">ลบโฆษณาถาวร</string>
+    <string name="ads_remove_price">%1$s จ่ายครั้งเดียว</string>
+    <string name="ads_remove_once">จ่ายครั้งเดียว ไม่ใช่การสมัครสมาชิก</string>
+    <string name="ads_removed_title">ไม่มีโฆษณา ตลอดไป</string>
+    <string name="ads_removed_sub">ขอบคุณที่สนับสนุน BrawlZone!</string>
+    <string name="ads_restore">กู้คืนการซื้อ</string>
+    <string name="ads_restore_none">ไม่พบการซื้อในบัญชี Google นี้</string>
+    <string name="ads_restored">กู้คืนการซื้อแล้ว ไม่มีโฆษณาอีกต่อไป</string>
+    <string name="ads_pending">การชำระเงินรอดำเนินการ โฆษณาจะหายไปทันทีที่ชำระเสร็จ</string>
+    <string name="ads_unavailable">Google Play ไม่ตอบสนอง ลองอีกครั้งในอีกสักครู่</string>
+    <string name="ads_privacy">ตัวเลือกความเป็นส่วนตัวของโฆษณา</string>
 </resources>

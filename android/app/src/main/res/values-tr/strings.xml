@@ -63,7 +63,7 @@
     <string name="how_1">Paneli açmak için baloncuğa dokun; kapatmak için tekrar dokun.</string>
     <string name="how_2">Baloncuğu istediğin yere sürükle — en yakın kenara yaslanır.</string>
     <string name="how_3">Kapatmak için alttaki ✕ üzerine sürükle, bildirimdeki Durdur’u ya da Hızlı Ayarlar’daki BrawlZone kutucuğunu kullan — o kutucuk oyunun içinden de başlatır.</string>
-    <string name="footer_note">Rakamlar, brawlzone.net’te gösterilenlerle aynı örneklenmiş aşamalı savaşlardan ölçülür. Ücretsiz, hesapsız, reklamsız.</string>
+    <string name="footer_note">Rakamlar, brawlzone.net’te gösterilenlerle aynı örneklenmiş aşamalı savaşlardan ölçülür. Ücretsiz, hesapsız.</string>
     <string name="disclaimer">BrawlZone hayranlar tarafından yapılmış bir uygulamadır. Supercell ile bağlantılı değildir; Supercell tarafından desteklenmez, sponsorluk almaz veya özel olarak onaylanmaz ve Supercell bundan sorumlu değildir.</string>
     <string name="notification_channel">Baloncuk</string>
     <string name="notification_title">BrawlZone baloncuğu</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">kazanılan</string>
     <string name="you">Sen</string>
     <string name="you_others">Sen ve diğerleri</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Reklamları sonsuza dek kaldır</string>
+    <string name="ads_remove_price">%1$s, tek seferlik</string>
+    <string name="ads_remove_once">Tek ödeme, abonelik yok</string>
+    <string name="ads_removed_title">Reklam yok, sonsuza dek</string>
+    <string name="ads_removed_sub">BrawlZone’u desteklediğin için teşekkürler!</string>
+    <string name="ads_restore">Satın alımı geri yükle</string>
+    <string name="ads_restore_none">Bu Google hesabında satın alım bulunamadı.</string>
+    <string name="ads_restored">Satın alım geri yüklendi. Artık reklam yok.</string>
+    <string name="ads_pending">Ödeme bekliyor. Ödeme tamamlanınca reklamlar kalkar.</string>
+    <string name="ads_unavailable">Google Play yanıt vermiyor. Birazdan tekrar dene.</string>
+    <string name="ads_privacy">Reklam gizlilik seçenekleri</string>
 </resources>

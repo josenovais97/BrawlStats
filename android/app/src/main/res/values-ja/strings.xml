@@ -63,7 +63,7 @@
     <string name="how_1">バブルをタップしてパネルを開き、もう一度タップでたたみます。</string>
     <string name="how_2">バブルは好きな場所にドラッグできます — 一番近い端に寄ります。</string>
     <string name="how_3">下の ✕ にドラッグすると閉じます。通知の「停止」やクイック設定の BrawlZone タイルも使えます — タイルならゲーム中にも起動できます。</string>
-    <string name="footer_note">数値は抽出したガチバトルの対戦から算出しており、brawlzone.net と同じです。無料・アカウント不要・広告なし。</string>
+    <string name="footer_note">数値は抽出したガチバトルの対戦から算出しており、brawlzone.net と同じです。無料・アカウント不要。</string>
     <string name="disclaimer">BrawlZone はファンが作ったアプリです。Supercell とは提携しておらず、Supercell による承認・後援・スポンサー・特別な許可を受けたものではなく、Supercell はこのアプリに責任を負いません。</string>
     <string name="notification_channel">バブル</string>
     <string name="notification_title">BrawlZone バブル</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">勝率</string>
     <string name="you">あなた</string>
     <string name="you_others">あなたと他の人</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">広告を永久に削除</string>
+    <string name="ads_remove_price">%1$s（買い切り）</string>
+    <string name="ads_remove_once">買い切り、サブスクではありません</string>
+    <string name="ads_removed_title">広告なし、ずっと</string>
+    <string name="ads_removed_sub">BrawlZone を応援してくれてありがとう！</string>
+    <string name="ads_restore">購入を復元</string>
+    <string name="ads_restore_none">この Google アカウントに購入は見つかりませんでした。</string>
+    <string name="ads_restored">購入を復元しました。もう広告は出ません。</string>
+    <string name="ads_pending">支払いを処理中です。完了しだい広告は消えます。</string>
+    <string name="ads_unavailable">Google Play が応答しません。少ししてからもう一度お試しください。</string>
+    <string name="ads_privacy">広告のプライバシー設定</string>
 </resources>

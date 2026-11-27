@@ -63,7 +63,7 @@
     <string name="how_1">Tippe auf die Bubble, um das Panel zu öffnen; nochmal tippen klappt es zu.</string>
     <string name="how_2">Zieh die Bubble, wohin du willst — sie legt sich an den nächsten Rand.</string>
     <string name="how_3">Zieh sie auf das ✕ unten, um sie zu schließen, nutze Stopp in der Benachrichtigung oder die BrawlZone-Kachel in den Schnelleinstellungen — die Kachel startet sie auch, direkt im Spiel.</string>
-    <string name="footer_note">Zahlen aus gesampelten Ranglisten-Kämpfen, dieselben wie auf brawlzone.net. Kostenlos, ohne Konto, ohne Werbung.</string>
+    <string name="footer_note">Zahlen aus gesampelten Ranglisten-Kämpfen, dieselben wie auf brawlzone.net. Kostenlos, ohne Konto.</string>
     <string name="disclaimer">BrawlZone ist eine Fan-App. Sie ist nicht mit Supercell verbunden und wird von Supercell weder unterstützt, gesponsert noch ausdrücklich genehmigt, und Supercell ist nicht für sie verantwortlich.</string>
     <string name="notification_channel">Bubble</string>
     <string name="notification_title">BrawlZone-Bubble</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">gewonnen</string>
     <string name="you">Du</string>
     <string name="you_others">Du und andere</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Werbung für immer entfernen</string>
+    <string name="ads_remove_price">%1$s, einmalig</string>
+    <string name="ads_remove_once">Einmal zahlen, kein Abo</string>
+    <string name="ads_removed_title">Keine Werbung, für immer</string>
+    <string name="ads_removed_sub">Danke, dass du BrawlZone unterstützt!</string>
+    <string name="ads_restore">Kauf wiederherstellen</string>
+    <string name="ads_restore_none">Auf diesem Google-Konto wurde kein Kauf gefunden.</string>
+    <string name="ads_restored">Kauf wiederhergestellt. Keine Werbung mehr.</string>
+    <string name="ads_pending">Zahlung ausstehend. Die Werbung verschwindet, sobald sie durch ist.</string>
+    <string name="ads_unavailable">Google Play antwortet nicht. Versuch es gleich noch mal.</string>
+    <string name="ads_privacy">Datenschutzoptionen für Werbung</string>
 </resources>

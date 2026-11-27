@@ -63,7 +63,7 @@
     <string name="how_1">הקישו על הבועה כדי לפתוח את הלוח; הקישו שוב כדי לקפל אותו.</string>
     <string name="how_2">גררו את הבועה לכל מקום — היא נצמדת לקצה הקרוב.</string>
     <string name="how_3">גררו אותה אל ה-✕ למטה כדי לסגור, השתמשו בעצירה שבהתראה, או באריח BrawlZone בהגדרות המהירות — האריח גם מפעיל אותה מתוך המשחק.</string>
-    <string name="footer_note">המספרים נמדדים מקרבות מדורגים שנדגמו, אותם קרבות שמוצגים ב-brawlzone.net. חינם, בלי חשבון, בלי פרסומות.</string>
+    <string name="footer_note">המספרים נמדדים מקרבות מדורגים שנדגמו, אותם קרבות שמוצגים ב-brawlzone.net. חינם, בלי חשבון.</string>
     <string name="disclaimer">BrawlZone היא אפליקציה שנוצרה על ידי מעריצים. היא אינה קשורה ל-Supercell, אינה נתמכת, ממומנת או מאושרת במיוחד על ידה, ו-Supercell אינה אחראית לה.</string>
     <string name="notification_channel">בועה</string>
     <string name="notification_title">הבועה של BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">ניצחון</string>
     <string name="you">אתם</string>
     <string name="you_others">אתם ואחרים</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">הסרת פרסומות לתמיד</string>
+    <string name="ads_remove_price">%1$s, תשלום חד־פעמי</string>
+    <string name="ads_remove_once">תשלום חד־פעמי, בלי מנוי</string>
+    <string name="ads_removed_title">בלי פרסומות, לתמיד</string>
+    <string name="ads_removed_sub">תודה שאתם תומכים ב-BrawlZone!</string>
+    <string name="ads_restore">שחזור רכישה</string>
+    <string name="ads_restore_none">לא נמצאה רכישה בחשבון Google הזה.</string>
+    <string name="ads_restored">הרכישה שוחזרה. אין יותר פרסומות.</string>
+    <string name="ads_pending">התשלום ממתין. הפרסומות ייעלמו ברגע שהוא יעבור.</string>
+    <string name="ads_unavailable">Google Play לא עונה. נסו שוב בעוד רגע.</string>
+    <string name="ads_privacy">אפשרויות פרטיות לפרסומות</string>
 </resources>

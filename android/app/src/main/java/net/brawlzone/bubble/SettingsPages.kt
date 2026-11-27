@@ -112,7 +112,66 @@ internal fun MainActivity.paintSettingsPages() {
             }
         },
     )
+    if (Ads.SOLD) menu.addView(adsCard())
     gameType(menu)
+}
+
+/**
+ * "Remove ads forever" under the menu (1.46, Play build): the price and a
+ * restore, or a thank-you once bought; and the way back to the EU consent
+ * message, which Google asks for wherever that message was shown.
+ */
+private fun MainActivity.adsCard(): View = Ui.card(this, 0).apply {
+    setPadding(0, 0, 0, 0)
+    (layoutParams as LinearLayout.LayoutParams).topMargin = Ui.px(this@adsCard, 12)
+    val rows = mutableListOf<View>()
+    if (Ads.removed(this@adsCard)) {
+        rows += plainRow("✨", getString(R.string.ads_removed_title), getString(R.string.ads_removed_sub), null)
+    } else {
+        val price = Ads.price()
+        rows += plainRow(
+            "🚫",
+            getString(R.string.ads_remove_title),
+            if (price != null) getString(R.string.ads_remove_price, price) else getString(R.string.ads_remove_once),
+        ) { Ads.buy(this@adsCard) }
+        rows += plainRow("↺", getString(R.string.ads_restore), "") { Ads.restore(this@adsCard) }
+    }
+    if (Ads.privacyChoicesNeeded(this@adsCard)) {
+        rows += plainRow("🛡️", getString(R.string.ads_privacy), "") { Ads.showPrivacyChoices(this@adsCard) }
+    }
+    for ((i, row) in rows.withIndex()) {
+        if (i > 0) addView(View(this@adsCard).apply {
+            setBackgroundColor(getColor(R.color.surface_3))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.px(this@adsCard, 1))
+        })
+        addView(row)
+    }
+}
+
+/** A row like the menu's own, for things that are not a group. */
+private fun MainActivity.plainRow(icon: String, title: String, sub: String, onTap: (() -> Unit)?): View = Ui.row(this, 14).apply {
+    minimumHeight = Ui.px(this@plainRow, 60)
+    val p = Ui.px(this@plainRow, 16)
+    setPadding(p, Ui.px(this@plainRow, 8), p, Ui.px(this@plainRow, 8))
+    if (onTap != null) {
+        isClickable = true
+        isFocusable = true
+        setOnClickListener { onTap() }
+    }
+    addView(
+        Ui.text(this@plainRow, icon, 18f).apply {
+            gravity = android.view.Gravity.CENTER
+            background = Ui.rounded(this@plainRow, getColor(R.color.surface_3), 13, 0)
+            layoutParams = LinearLayout.LayoutParams(Ui.px(this@plainRow, 42), Ui.px(this@plainRow, 42))
+        },
+    )
+    addView(
+        Ui.column(this@plainRow, 1).apply {
+            addView(Ui.text(this@plainRow, title, 15f, bold = true, lines = 2))
+            if (sub.isNotEmpty()) addView(Ui.text(this@plainRow, sub, 12.5f, Ui.MUTED, lines = 2))
+        }.grow(),
+    )
+    if (onTap != null) addView(Ui.text(this@plainRow, "›", 22f, getColor(R.color.muted), bold = true))
 }
 
 private fun MainActivity.groupTitle(i: Int): String = getString(

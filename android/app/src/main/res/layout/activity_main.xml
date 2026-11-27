@@ -3591,6 +3591,23 @@
     </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!--
+      1.46: the one banner (Play build only, see Ads). The outer frame steps
+      aside with the keyboard like the bar below it; the inner slot opens only
+      once an ad has arrived, and never for someone who removed the ads.
+    -->
+    <FrameLayout
+        android:id="@+id/ad_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/ad_slot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </FrameLayout>
+
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"

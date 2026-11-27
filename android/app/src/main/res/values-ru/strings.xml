@@ -63,7 +63,7 @@
     <string name="how_1">Нажми на пузырь, чтобы открыть панель; нажми ещё раз, чтобы свернуть.</string>
     <string name="how_2">Перетащи пузырь куда угодно — он прижмётся к ближайшему краю.</string>
     <string name="how_3">Перетащи его на ✕ внизу, чтобы закрыть, нажми «Остановить» в уведомлении или плитку BrawlZone в быстрых настройках — эта плитка и запускает его прямо из игры.</string>
-    <string name="footer_note">Цифры по выборке ранговых боёв — тех же, что на brawlzone.net. Бесплатно, без аккаунта, без рекламы.</string>
+    <string name="footer_note">Цифры по выборке ранговых боёв — тех же, что на brawlzone.net. Бесплатно, без аккаунта.</string>
     <string name="disclaimer">BrawlZone — фанатское приложение. Оно не связано с Supercell, не одобрено, не спонсируется и не утверждено ею, и Supercell не несёт за него ответственности.</string>
     <string name="notification_channel">Пузырь</string>
     <string name="notification_title">Пузырь BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">побед</string>
     <string name="you">Ты</string>
     <string name="you_others">Ты и другие</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Убрать рекламу навсегда</string>
+    <string name="ads_remove_price">%1$s, один раз</string>
+    <string name="ads_remove_once">Один платёж, без подписки</string>
+    <string name="ads_removed_title">Без рекламы, навсегда</string>
+    <string name="ads_removed_sub">Спасибо, что поддерживаешь BrawlZone!</string>
+    <string name="ads_restore">Восстановить покупку</string>
+    <string name="ads_restore_none">На этом аккаунте Google покупок не найдено.</string>
+    <string name="ads_restored">Покупка восстановлена. Рекламы больше нет.</string>
+    <string name="ads_pending">Платёж обрабатывается. Реклама исчезнет, как только он пройдёт.</string>
+    <string name="ads_unavailable">Google Play не отвечает. Попробуй ещё раз чуть позже.</string>
+    <string name="ads_privacy">Настройки конфиденциальности рекламы</string>
 </resources>

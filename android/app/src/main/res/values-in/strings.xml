@@ -63,7 +63,7 @@
     <string name="how_1">Ketuk gelembung untuk membuka panel; ketuk lagi untuk melipatnya.</string>
     <string name="how_2">Seret gelembung ke mana saja — ia menempel ke tepi terdekat.</string>
     <string name="how_3">Seret ke ✕ di bawah untuk menutupnya, pakai Hentikan di notifikasi, atau ubin BrawlZone di Setelan Cepat — ubin itu juga memulainya, dari dalam game.</string>
-    <string name="footer_note">Angka diukur dari sampel pertarungan Berperingkat, sama dengan yang ditampilkan brawlzone.net. Gratis, tanpa akun, tanpa iklan.</string>
+    <string name="footer_note">Angka diukur dari sampel pertarungan Berperingkat, sama dengan yang ditampilkan brawlzone.net. Gratis, tanpa akun.</string>
     <string name="disclaimer">BrawlZone adalah aplikasi buatan penggemar. Aplikasi ini tidak berafiliasi dengan, didukung, disponsori, atau disetujui secara khusus oleh Supercell, dan Supercell tidak bertanggung jawab atasnya.</string>
     <string name="notification_channel">Gelembung</string>
     <string name="notification_title">Gelembung BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">menang</string>
     <string name="you">Kamu</string>
     <string name="you_others">Kamu dan lainnya</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Hapus iklan selamanya</string>
+    <string name="ads_remove_price">%1$s, sekali bayar</string>
+    <string name="ads_remove_once">Sekali bayar, bukan langganan</string>
+    <string name="ads_removed_title">Tanpa iklan, selamanya</string>
+    <string name="ads_removed_sub">Terima kasih sudah mendukung BrawlZone!</string>
+    <string name="ads_restore">Pulihkan pembelian</string>
+    <string name="ads_restore_none">Tidak ada pembelian di akun Google ini.</string>
+    <string name="ads_restored">Pembelian dipulihkan. Tidak ada iklan lagi.</string>
+    <string name="ads_pending">Pembayaran tertunda. Iklan hilang begitu pembayaran selesai.</string>
+    <string name="ads_unavailable">Google Play tidak merespons. Coba lagi sebentar lagi.</string>
+    <string name="ads_privacy">Pilihan privasi iklan</string>
 </resources>

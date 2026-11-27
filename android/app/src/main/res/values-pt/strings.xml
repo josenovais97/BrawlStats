@@ -63,7 +63,7 @@
     <string name="how_1">Toque na bolha para abrir o painel; toque de novo para recolher.</string>
     <string name="how_2">Arraste a bolha para onde quiser — ela encosta na borda mais próxima.</string>
     <string name="how_3">Arraste para o ✕ embaixo para fechar, use Parar na notificação ou o bloco BrawlZone nas Configurações rápidas — esse bloco também inicia a bolha, de dentro do jogo.</string>
-    <string name="footer_note">Números medidos em batalhas do Ranqueado amostradas, as mesmas que o brawlzone.net mostra. Grátis, sem conta, sem anúncios.</string>
+    <string name="footer_note">Números medidos em batalhas do Ranqueado amostradas, as mesmas que o brawlzone.net mostra. Grátis, sem conta.</string>
     <string name="disclaimer">BrawlZone é um app feito por fãs. Não é afiliado, endossado, patrocinado nem especificamente aprovado pela Supercell, e a Supercell não é responsável por ele.</string>
     <string name="notification_channel">Bolha</string>
     <string name="notification_title">Bolha do BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">vencidas</string>
     <string name="you">Você</string>
     <string name="you_others">Você e os outros</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Remover anúncios para sempre</string>
+    <string name="ads_remove_price">%1$s, pagamento único</string>
+    <string name="ads_remove_once">Pagamento único, sem assinatura</string>
+    <string name="ads_removed_title">Sem anúncios, para sempre</string>
+    <string name="ads_removed_sub">Obrigado por apoiar o BrawlZone!</string>
+    <string name="ads_restore">Restaurar compra</string>
+    <string name="ads_restore_none">Nenhuma compra encontrada nesta conta do Google.</string>
+    <string name="ads_restored">Compra restaurada. Chega de anúncios.</string>
+    <string name="ads_pending">Pagamento pendente. Os anúncios somem assim que ele for aprovado.</string>
+    <string name="ads_unavailable">O Google Play não está respondendo. Tente de novo daqui a pouco.</string>
+    <string name="ads_privacy">Opções de privacidade dos anúncios</string>
 </resources>

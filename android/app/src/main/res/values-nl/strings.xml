@@ -63,7 +63,7 @@
     <string name="how_1">Tik op de bubbel om het paneel te openen; tik nog eens om het in te klappen.</string>
     <string name="how_2">Sleep de bubbel waarheen je wilt — hij legt zich tegen de dichtstbijzijnde rand.</string>
     <string name="how_3">Sleep hem naar het ✕ onderaan om te sluiten, gebruik Stoppen in de melding, of de BrawlZone-tegel in Snelle instellingen — die tegel start hem ook, vanuit het spel.</string>
-    <string name="footer_note">Cijfers gemeten uit gesamplede gevechten in de laddermodus, dezelfde als op brawlzone.net. Gratis, geen account, geen advertenties.</string>
+    <string name="footer_note">Cijfers gemeten uit gesamplede gevechten in de laddermodus, dezelfde als op brawlzone.net. Gratis, geen account.</string>
     <string name="disclaimer">BrawlZone is een app gemaakt door fans. Hij is niet verbonden aan, onderschreven, gesponsord of specifiek goedgekeurd door Supercell, en Supercell is er niet verantwoordelijk voor.</string>
     <string name="notification_channel">Bubbel</string>
     <string name="notification_title">BrawlZone-bubbel</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">gewonnen</string>
     <string name="you">Jij</string>
     <string name="you_others">Jij en anderen</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Advertenties voorgoed weg</string>
+    <string name="ads_remove_price">%1$s, eenmalig</string>
+    <string name="ads_remove_once">Eenmalig betalen, geen abonnement</string>
+    <string name="ads_removed_title">Geen advertenties, voorgoed</string>
+    <string name="ads_removed_sub">Bedankt dat je BrawlZone steunt!</string>
+    <string name="ads_restore">Aankoop herstellen</string>
+    <string name="ads_restore_none">Geen aankoop gevonden op dit Google-account.</string>
+    <string name="ads_restored">Aankoop hersteld. Geen advertenties meer.</string>
+    <string name="ads_pending">Betaling in behandeling. De advertenties verdwijnen zodra die rond is.</string>
+    <string name="ads_unavailable">Google Play reageert niet. Probeer het zo opnieuw.</string>
+    <string name="ads_privacy">Privacykeuzes voor advertenties</string>
 </resources>

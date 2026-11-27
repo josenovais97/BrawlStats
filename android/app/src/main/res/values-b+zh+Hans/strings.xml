@@ -63,7 +63,7 @@
     <string name="how_1">点悬浮球打开面板；再点一下收起。</string>
     <string name="how_2">把悬浮球拖到任意位置 — 它会贴靠最近的边缘。</string>
     <string name="how_3">拖到底部的 ✕ 上即可关闭，也可以用通知里的“停止”，或快捷设置里的 BrawlZone 图块 — 该图块也能在游戏内启动它。</string>
-    <string name="footer_note">数据来自抽样的排位赛对局，与 brawlzone.net 显示的相同。免费、无需账号、无广告。</string>
+    <string name="footer_note">数据来自抽样的排位赛对局，与 brawlzone.net 显示的相同。免费、无需账号。</string>
     <string name="disclaimer">BrawlZone 是一款粉丝制作的应用，与 Supercell 无关，未经 Supercell 认可、赞助或特别批准，Supercell 对其不承担责任。</string>
     <string name="notification_channel">悬浮球</string>
     <string name="notification_title">BrawlZone 悬浮球</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">胜率</string>
     <string name="you">你</string>
     <string name="you_others">你和其他人</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">永久移除广告</string>
+    <string name="ads_remove_price">%1$s，一次付清</string>
+    <string name="ads_remove_once">一次付清，不是订阅</string>
+    <string name="ads_removed_title">永久无广告</string>
+    <string name="ads_removed_sub">感谢支持 BrawlZone！</string>
+    <string name="ads_restore">恢复购买</string>
+    <string name="ads_restore_none">这个 Google 账号没有找到购买记录。</string>
+    <string name="ads_restored">购买已恢复，不再有广告。</string>
+    <string name="ads_pending">付款处理中。付款完成后广告就会消失。</string>
+    <string name="ads_unavailable">Google Play 没有响应，请稍后再试。</string>
+    <string name="ads_privacy">广告隐私选项</string>
 </resources>

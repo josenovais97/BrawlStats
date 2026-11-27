@@ -63,7 +63,7 @@
     <string name="how_1">Chạm bong bóng để mở bảng; chạm lần nữa để thu lại.</string>
     <string name="how_2">Kéo bong bóng đến bất kỳ đâu — nó tựa vào mép gần nhất.</string>
     <string name="how_3">Kéo nó vào dấu ✕ ở dưới để đóng, dùng Dừng trong thông báo, hoặc ô BrawlZone trong Cài đặt nhanh — ô đó cũng bật nó ngay trong game.</string>
-    <string name="footer_note">Số liệu đo từ các trận Xếp hạng được lấy mẫu, giống trên brawlzone.net. Miễn phí, không cần tài khoản, không quảng cáo.</string>
+    <string name="footer_note">Số liệu đo từ các trận Xếp hạng được lấy mẫu, giống trên brawlzone.net. Miễn phí, không cần tài khoản.</string>
     <string name="disclaimer">BrawlZone là ứng dụng do người hâm mộ làm. Ứng dụng không liên kết, không được Supercell xác nhận, tài trợ hay phê duyệt cụ thể, và Supercell không chịu trách nhiệm về ứng dụng này.</string>
     <string name="notification_channel">Bong bóng</string>
     <string name="notification_title">Bong bóng BrawlZone</string>
@@ -588,4 +588,17 @@
     <string name="stat_won">thắng</string>
     <string name="you">Bạn</string>
     <string name="you_others">Bạn và người khác</string>
+
+    <!-- 1.46: Remove ads forever (Play build), see Ads. -->
+    <string name="ads_remove_title">Xóa quảng cáo vĩnh viễn</string>
+    <string name="ads_remove_price">%1$s, trả một lần</string>
+    <string name="ads_remove_once">Trả một lần, không phải gói đăng ký</string>
+    <string name="ads_removed_title">Không quảng cáo, mãi mãi</string>
+    <string name="ads_removed_sub">Cảm ơn bạn đã ủng hộ BrawlZone!</string>
+    <string name="ads_restore">Khôi phục giao dịch mua</string>
+    <string name="ads_restore_none">Không tìm thấy giao dịch mua nào trên tài khoản Google này.</string>
+    <string name="ads_restored">Đã khôi phục giao dịch mua. Không còn quảng cáo.</string>
+    <string name="ads_pending">Thanh toán đang chờ xử lý. Quảng cáo sẽ biến mất ngay khi thanh toán xong.</string>
+    <string name="ads_unavailable">Google Play không phản hồi. Hãy thử lại sau giây lát.</string>
+    <string name="ads_privacy">Lựa chọn quyền riêng tư cho quảng cáo</string>
 </resources>
