@@ -590,10 +590,10 @@
     <string name="you_others">Du und andere</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Werbung für immer entfernen</string>
-    <string name="ads_remove_price">%1$s, einmalig</string>
-    <string name="ads_remove_once">Einmal zahlen, kein Abo</string>
-    <string name="ads_removed_title">Keine Werbung, für immer</string>
+    <string name="ads_remove_title">Werde Bubble-Unterstützer</string>
+    <string name="ads_remove_price">%1$s einmalig · Keine Werbung, Unterstützer-Ring, 2 Designs</string>
+    <string name="ads_remove_once">Einmal zahlen · Keine Werbung, Unterstützer-Ring, 2 Designs</string>
+    <string name="ads_removed_title">Du bist Bubble-Unterstützer</string>
     <string name="ads_removed_sub">Danke, dass du BrawlZone unterstützt!</string>
     <string name="ads_restore">Kauf wiederherstellen</string>
     <string name="ads_restore_none">Auf diesem Google-Konto wurde kein Kauf gefunden.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Zahlung ausstehend. Die Werbung verschwindet, sobald sie durch ist.</string>
     <string name="ads_unavailable">Google Play antwortet nicht. Versuch es gleich noch mal.</string>
     <string name="ads_privacy">Datenschutzoptionen für Werbung</string>
-    <string name="ads_offer_body">Zahl einmal %1$s und die Werbung ist für immer weg. Kein Abo.</string>
-    <string name="ads_offer_body_noprice">Einmal zahlen und die Werbung ist für immer weg. Kein Abo.</string>
-    <string name="ads_offer_buy">Werbung weg</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Unterstützer</string>
+    <string name="ring_supporters_only">Unterstützer</string>
+    <string name="theme_obsidian">Obsidian</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Zahl einmal %1$s: für immer keine Werbung, dazu der Unterstützer-Ring und 2 exklusive Designs. Kein Abo.</string>
+    <string name="ads_offer_body_noprice">Einmal zahlen: für immer keine Werbung, dazu der Unterstützer-Ring und 2 exklusive Designs. Kein Abo.</string>
+    <string name="ads_offer_buy">Holen</string>
 </resources>

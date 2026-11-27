@@ -130,7 +130,7 @@ private fun MainActivity.adsCard(): View = Ui.card(this, 0).apply {
     } else {
         val price = Ads.price()
         rows += plainRow(
-            "🚫",
+            "⭐",
             getString(R.string.ads_remove_title),
             if (price != null) getString(R.string.ads_remove_price, price) else getString(R.string.ads_remove_once),
         ) { Ads.buy(this@adsCard) }

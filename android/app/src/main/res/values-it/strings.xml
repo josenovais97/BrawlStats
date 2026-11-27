@@ -590,10 +590,10 @@
     <string name="you_others">Tu e gli altri</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Rimuovi la pubblicità per sempre</string>
-    <string name="ads_remove_price">%1$s, una volta sola</string>
-    <string name="ads_remove_once">Un solo pagamento, nessun abbonamento</string>
-    <string name="ads_removed_title">Niente pubblicità, per sempre</string>
+    <string name="ads_remove_title">Diventa Sostenitore di Bubble</string>
+    <string name="ads_remove_price">%1$s una volta · Niente pubblicità, anello Sostenitore, 2 temi</string>
+    <string name="ads_remove_once">Un solo pagamento · Niente pubblicità, anello Sostenitore, 2 temi</string>
+    <string name="ads_removed_title">Sei un Sostenitore di Bubble</string>
     <string name="ads_removed_sub">Grazie per il tuo supporto a BrawlZone!</string>
     <string name="ads_restore">Ripristina acquisto</string>
     <string name="ads_restore_none">Nessun acquisto trovato su questo account Google.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Pagamento in sospeso. La pubblicità sparisce appena va a buon fine.</string>
     <string name="ads_unavailable">Google Play non risponde. Riprova tra un attimo.</string>
     <string name="ads_privacy">Scelte sulla privacy degli annunci</string>
-    <string name="ads_offer_body">Paga %1$s una volta e la pubblicità sparisce per sempre. Nessun abbonamento.</string>
-    <string name="ads_offer_body_noprice">Paga una volta e la pubblicità sparisce per sempre. Nessun abbonamento.</string>
-    <string name="ads_offer_buy">Rimuovi pubblicità</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Sostenitore</string>
+    <string name="ring_supporters_only">Sostenitori</string>
+    <string name="theme_obsidian">Ossidiana</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Paga %1$s una volta: niente pubblicità per sempre, l’anello Sostenitore e 2 temi esclusivi. Nessun abbonamento.</string>
+    <string name="ads_offer_body_noprice">Paga una volta: niente pubblicità per sempre, l’anello Sostenitore e 2 temi esclusivi. Nessun abbonamento.</string>
+    <string name="ads_offer_buy">Lo voglio</string>
 </resources>

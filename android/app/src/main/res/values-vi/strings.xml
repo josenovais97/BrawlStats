@@ -590,10 +590,10 @@
     <string name="you_others">Bạn và người khác</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Xóa quảng cáo vĩnh viễn</string>
-    <string name="ads_remove_price">%1$s, trả một lần</string>
-    <string name="ads_remove_once">Trả một lần, không phải gói đăng ký</string>
-    <string name="ads_removed_title">Không quảng cáo, mãi mãi</string>
+    <string name="ads_remove_title">Trở thành Người ủng hộ Bubble</string>
+    <string name="ads_remove_price">%1$s một lần · Không quảng cáo, vòng Người ủng hộ, 2 giao diện</string>
+    <string name="ads_remove_once">Trả một lần · Không quảng cáo, vòng Người ủng hộ, 2 giao diện</string>
+    <string name="ads_removed_title">Bạn là Người ủng hộ Bubble</string>
     <string name="ads_removed_sub">Cảm ơn bạn đã ủng hộ BrawlZone!</string>
     <string name="ads_restore">Khôi phục giao dịch mua</string>
     <string name="ads_restore_none">Không tìm thấy giao dịch mua nào trên tài khoản Google này.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Thanh toán đang chờ xử lý. Quảng cáo sẽ biến mất ngay khi thanh toán xong.</string>
     <string name="ads_unavailable">Google Play không phản hồi. Hãy thử lại sau giây lát.</string>
     <string name="ads_privacy">Lựa chọn quyền riêng tư cho quảng cáo</string>
-    <string name="ads_offer_body">Trả %1$s một lần là quảng cáo biến mất vĩnh viễn. Không phải gói đăng ký.</string>
-    <string name="ads_offer_body_noprice">Trả một lần là quảng cáo biến mất vĩnh viễn. Không phải gói đăng ký.</string>
-    <string name="ads_offer_buy">Xóa quảng cáo</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Người ủng hộ</string>
+    <string name="ring_supporters_only">Cho người ủng hộ</string>
+    <string name="theme_obsidian">Hắc diện thạch</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Trả %1$s một lần: không quảng cáo mãi mãi, vòng Người ủng hộ và 2 giao diện độc quyền. Không phải gói đăng ký.</string>
+    <string name="ads_offer_body_noprice">Trả một lần: không quảng cáo mãi mãi, vòng Người ủng hộ và 2 giao diện độc quyền. Không phải gói đăng ký.</string>
+    <string name="ads_offer_buy">Nhận ngay</string>
 </resources>

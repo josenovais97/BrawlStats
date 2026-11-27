@@ -590,10 +590,10 @@
     <string name="you_others">Jij en anderen</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Advertenties voorgoed weg</string>
-    <string name="ads_remove_price">%1$s, eenmalig</string>
-    <string name="ads_remove_once">Eenmalig betalen, geen abonnement</string>
-    <string name="ads_removed_title">Geen advertenties, voorgoed</string>
+    <string name="ads_remove_title">Word Bubble Supporter</string>
+    <string name="ads_remove_price">%1$s eenmalig · Geen advertenties, Supporter-ring, 2 thema’s</string>
+    <string name="ads_remove_once">Eenmalig betalen · Geen advertenties, Supporter-ring, 2 thema’s</string>
+    <string name="ads_removed_title">Je bent Bubble Supporter</string>
     <string name="ads_removed_sub">Bedankt dat je BrawlZone steunt!</string>
     <string name="ads_restore">Aankoop herstellen</string>
     <string name="ads_restore_none">Geen aankoop gevonden op dit Google-account.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Betaling in behandeling. De advertenties verdwijnen zodra die rond is.</string>
     <string name="ads_unavailable">Google Play reageert niet. Probeer het zo opnieuw.</string>
     <string name="ads_privacy">Privacykeuzes voor advertenties</string>
-    <string name="ads_offer_body">Betaal één keer %1$s en de advertenties zijn voorgoed weg. Geen abonnement.</string>
-    <string name="ads_offer_body_noprice">Betaal één keer en de advertenties zijn voorgoed weg. Geen abonnement.</string>
-    <string name="ads_offer_buy">Advertenties weg</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Supporter</string>
+    <string name="ring_supporters_only">Supporters</string>
+    <string name="theme_obsidian">Obsidiaan</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Betaal één keer %1$s: nooit meer advertenties, de Supporter-ring en 2 exclusieve thema’s. Geen abonnement.</string>
+    <string name="ads_offer_body_noprice">Betaal één keer: nooit meer advertenties, de Supporter-ring en 2 exclusieve thema’s. Geen abonnement.</string>
+    <string name="ads_offer_buy">Nemen</string>
 </resources>

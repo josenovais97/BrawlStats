@@ -590,10 +590,10 @@
     <string name="you_others">Ты и другие</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Убрать рекламу навсегда</string>
-    <string name="ads_remove_price">%1$s, один раз</string>
-    <string name="ads_remove_once">Один платёж, без подписки</string>
-    <string name="ads_removed_title">Без рекламы, навсегда</string>
+    <string name="ads_remove_title">Стань спонсором Bubble</string>
+    <string name="ads_remove_price">%1$s один раз · Без рекламы, кольцо спонсора, 2 темы</string>
+    <string name="ads_remove_once">Один платёж · Без рекламы, кольцо спонсора, 2 темы</string>
+    <string name="ads_removed_title">Ты спонсор Bubble</string>
     <string name="ads_removed_sub">Спасибо, что поддерживаешь BrawlZone!</string>
     <string name="ads_restore">Восстановить покупку</string>
     <string name="ads_restore_none">На этом аккаунте Google покупок не найдено.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Платёж обрабатывается. Реклама исчезнет, как только он пройдёт.</string>
     <string name="ads_unavailable">Google Play не отвечает. Попробуй ещё раз чуть позже.</string>
     <string name="ads_privacy">Настройки конфиденциальности рекламы</string>
-    <string name="ads_offer_body">Заплати %1$s один раз — и реклама исчезнет навсегда. Без подписки.</string>
-    <string name="ads_offer_body_noprice">Заплати один раз — и реклама исчезнет навсегда. Без подписки.</string>
-    <string name="ads_offer_buy">Убрать рекламу</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Спонсорское</string>
+    <string name="ring_supporters_only">Для спонсоров</string>
+    <string name="theme_obsidian">Обсидиан</string>
+    <string name="theme_holo">Голо</string>
+    <string name="ads_offer_body">Заплати %1$s один раз: никакой рекламы навсегда, кольцо спонсора и 2 эксклюзивные темы. Без подписки.</string>
+    <string name="ads_offer_body_noprice">Заплати один раз: никакой рекламы навсегда, кольцо спонсора и 2 эксклюзивные темы. Без подписки.</string>
+    <string name="ads_offer_buy">Хочу</string>
 </resources>

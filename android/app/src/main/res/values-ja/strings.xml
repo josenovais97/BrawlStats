@@ -590,10 +590,10 @@
     <string name="you_others">あなたと他の人</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">広告を永久に削除</string>
-    <string name="ads_remove_price">%1$s（買い切り）</string>
-    <string name="ads_remove_once">買い切り、サブスクではありません</string>
-    <string name="ads_removed_title">広告なし、ずっと</string>
+    <string name="ads_remove_title">Bubble サポーターになろう</string>
+    <string name="ads_remove_price">%1$s（買い切り）・広告なし、サポーターリング、テーマ2種</string>
+    <string name="ads_remove_once">買い切り・広告なし、サポーターリング、テーマ2種</string>
+    <string name="ads_removed_title">あなたは Bubble サポーターです</string>
     <string name="ads_removed_sub">BrawlZone を応援してくれてありがとう！</string>
     <string name="ads_restore">購入を復元</string>
     <string name="ads_restore_none">この Google アカウントに購入は見つかりませんでした。</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">支払いを処理中です。完了しだい広告は消えます。</string>
     <string name="ads_unavailable">Google Play が応答しません。少ししてからもう一度お試しください。</string>
     <string name="ads_privacy">広告のプライバシー設定</string>
-    <string name="ads_offer_body">%1$s を一度払うだけで、広告はずっと消えます。サブスクではありません。</string>
-    <string name="ads_offer_body_noprice">一度払うだけで、広告はずっと消えます。サブスクではありません。</string>
-    <string name="ads_offer_buy">広告を消す</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">サポーター</string>
+    <string name="ring_supporters_only">サポーター限定</string>
+    <string name="theme_obsidian">オブシディアン</string>
+    <string name="theme_holo">ホロ</string>
+    <string name="ads_offer_body">%1$s を一度払うだけ：広告がずっと消え、サポーターリングと限定テーマ2種も。サブスクではありません。</string>
+    <string name="ads_offer_body_noprice">一度払うだけ：広告がずっと消え、サポーターリングと限定テーマ2種も。サブスクではありません。</string>
+    <string name="ads_offer_buy">手に入れる</string>
 </resources>

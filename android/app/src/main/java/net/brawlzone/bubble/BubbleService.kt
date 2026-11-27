@@ -590,7 +590,7 @@ class BubbleService : Service() {
          * rings turn on a hardware layer: the GPU rotates a cached picture.
          */
         Rings.byId(BubbleLook.ring(this))?.let { ring ->
-            val ringView = RingView(this, ring, pad * 0.62f).apply {
+            val ringView = Rings.view(this, ring, pad * 0.62f).apply {
                 elevation = dp(7).toFloat()
                 outlineProvider = null
             }
@@ -598,7 +598,7 @@ class BubbleService : Service() {
                 ringView,
                 FrameLayout.LayoutParams(badge + pad * 2, badge + pad * 2).apply { setMargins(-pad, -pad, -pad, -pad) },
             )
-            if (ring.legendary) ringView.spin()
+            if (ring.legendary) (ringView as Spinner).spin()
         }
 
         val params = WindowManager.LayoutParams(

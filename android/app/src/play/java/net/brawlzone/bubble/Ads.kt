@@ -310,6 +310,8 @@ object Ads {
             Purchase.PurchaseState.PURCHASED -> {
                 val fresh = !removed(app)
                 setRemoved(app, true)
+                // The ring is part of what was bought: worn straight away unless another is on.
+                if (fresh && BubbleLook.ring(app) == null) BubbleLook.setRing(app, Rings.SUPPORTER.id)
                 if (!purchase.isAcknowledged) {
                     billing?.acknowledgePurchase(
                         AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build(),

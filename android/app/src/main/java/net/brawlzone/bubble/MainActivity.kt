@@ -1617,6 +1617,9 @@ class MainActivity : AppCompatActivity() {
             val chosen = BubbleLook.theme(this)
             themeLabel.text = getString(R.string.look_theme_named, getString(chosen.label))
             for (theme in BubbleLook.THEMES) {
+                // Not sold in this build (site): its supporter themes stay out of the row.
+                if (theme.supporter && !Ads.SOLD) continue
+                val locked = theme.supporter && !Supporter.active(this)
                 val on = theme.id == chosen.id
                 val ring = android.graphics.drawable.GradientDrawable().apply {
                     shape = android.graphics.drawable.GradientDrawable.OVAL
@@ -1629,15 +1632,35 @@ class MainActivity : AppCompatActivity() {
                 val swatch = View(this).apply {
                     background = layers
                     contentDescription = getString(theme.label)
+                    if (locked) alpha = 0.55f
+                }
+                // 1.46: a star marks the Bubble Supporter themes; a locked one opens the purchase.
+                val cell = android.widget.FrameLayout(this).apply {
+                    addView(swatch, android.widget.FrameLayout.LayoutParams(px(48), px(48)))
+                    if (theme.supporter) addView(
+                        TextView(this@MainActivity).apply {
+                            text = "⭐"
+                            textSize = 12f
+                        },
+                        android.widget.FrameLayout.LayoutParams(
+                            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                            android.view.Gravity.END or android.view.Gravity.BOTTOM,
+                        ),
+                    )
                     isClickable = true
                     isFocusable = true
                     setOnClickListener {
+                        if (locked) {
+                            Ads.buy(this@MainActivity)
+                            return@setOnClickListener
+                        }
                         BubbleLook.setTheme(this@MainActivity, theme.id)
                         paintThemes()
                         paintPreview()
                     }
                 }
-                themeRow.addView(swatch, LinearLayout.LayoutParams(px(48), px(48)).apply { marginEnd = px(6) })
+                themeRow.addView(cell, LinearLayout.LayoutParams(px(48), px(48)).apply { marginEnd = px(6) })
             }
         }
         paintThemes()

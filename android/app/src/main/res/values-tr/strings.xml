@@ -590,10 +590,10 @@
     <string name="you_others">Sen ve diğerleri</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Reklamları sonsuza dek kaldır</string>
-    <string name="ads_remove_price">%1$s, tek seferlik</string>
-    <string name="ads_remove_once">Tek ödeme, abonelik yok</string>
-    <string name="ads_removed_title">Reklam yok, sonsuza dek</string>
+    <string name="ads_remove_title">Bubble Destekçisi ol</string>
+    <string name="ads_remove_price">%1$s tek sefer · Reklamsız, Destekçi halkası, 2 tema</string>
+    <string name="ads_remove_once">Tek ödeme · Reklamsız, Destekçi halkası, 2 tema</string>
+    <string name="ads_removed_title">Bubble Destekçisisin</string>
     <string name="ads_removed_sub">BrawlZone’u desteklediğin için teşekkürler!</string>
     <string name="ads_restore">Satın alımı geri yükle</string>
     <string name="ads_restore_none">Bu Google hesabında satın alım bulunamadı.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Ödeme bekliyor. Ödeme tamamlanınca reklamlar kalkar.</string>
     <string name="ads_unavailable">Google Play yanıt vermiyor. Birazdan tekrar dene.</string>
     <string name="ads_privacy">Reklam gizlilik seçenekleri</string>
-    <string name="ads_offer_body">%1$s bir kez öde, reklamlar sonsuza dek gitsin. Abonelik yok.</string>
-    <string name="ads_offer_body_noprice">Bir kez öde, reklamlar sonsuza dek gitsin. Abonelik yok.</string>
-    <string name="ads_offer_buy">Reklamları kaldır</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Destekçi</string>
+    <string name="ring_supporters_only">Destekçilere</string>
+    <string name="theme_obsidian">Obsidyen</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">%1$s bir kez öde: sonsuza dek reklamsız, Destekçi halkası ve 2 özel tema. Abonelik yok.</string>
+    <string name="ads_offer_body_noprice">Bir kez öde: sonsuza dek reklamsız, Destekçi halkası ve 2 özel tema. Abonelik yok.</string>
+    <string name="ads_offer_buy">Al</string>
 </resources>

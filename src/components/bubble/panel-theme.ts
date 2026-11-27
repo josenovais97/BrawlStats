@@ -22,6 +22,9 @@ export const PANEL_THEMES: Record<string, Theme> = {
   emerald: { brand: '#4be08a', strong: '#26c26a', ink: '#04230f', top: '#b4f7cc', depth: '#13823f' },
   frost: { brand: '#dde5ff', strong: '#b7c3e6', ink: '#0b1024', top: '#ffffff', depth: '#7d8bb5' },
   midnight: { brand: '#8fa4ff', strong: '#6f86f0', ink: '#070b22', top: '#c3cdff', depth: '#4459c2' },
+  // Bubble Supporter themes (app 1.46): gold on dark stone, and holographic.
+  obsidian: { brand: '#ffc53d', strong: '#e0a92a', ink: '#120f1a', top: '#9a90ad', depth: '#2e2938' },
+  holo: { brand: '#c7a8ff', strong: '#9f7dff', ink: '#1a1033', top: '#ffb3e6', depth: '#5a8fd6' },
 };
 
 const KEY = 'brawlzone.bubble.theme';

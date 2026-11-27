@@ -347,6 +347,10 @@ internal fun MainActivity.paintAdsOffer() {
         System.currentTimeMillis() >= prefs.getLong(Tabs.KEY_ADS_OFFER_UNTIL, 0L)
     card.visibility = if (show) View.VISIBLE else View.GONE
     if (!show) return
+    val holder = findViewById<android.widget.FrameLayout>(R.id.ads_offer_ring)
+    if (holder.childCount == 0) {
+        holder.addView(Rings.preview(this, Rings.SUPPORTER, (40 * resources.displayMetrics.density).toInt(), spin = true))
+    }
     val price = Ads.price()
     findViewById<TextView>(R.id.ads_offer_body).text =
         if (price != null) getString(R.string.ads_offer_body, price) else getString(R.string.ads_offer_body_noprice)

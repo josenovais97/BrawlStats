@@ -252,7 +252,9 @@ class PassActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER_HORIZONTAL
             }
             for (ring in chunk) {
-                val have = ring == null || ring.id in owned
+                val have = ring == null || ring.id in owned || (ring.supporter && Supporter.active(this))
+                // 1.46: the Supporter ring shows itself turning even before it is bought.
+                val showOff = ring?.supporter == true && !have && Ads.SOLD
                 val on = ring?.id == equipped
                 val cell = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
@@ -261,7 +263,7 @@ class PassActivity : AppCompatActivity() {
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                     if (on) setBackgroundResource(R.drawable.chip_active)
                 }
-                cell.addView(Rings.preview(this, ring, px(34), spin = false, locked = !have))
+                cell.addView(Rings.preview(this, ring, px(34), spin = showOff, locked = !have && !showOff))
                 cell.addView(TextView(this).apply {
                     text = if (ring == null) getString(R.string.ring_none) else getString(ring.name)
                     setTextColor(if (have) getColor(R.color.foreground) else getColor(R.color.muted))
@@ -275,19 +277,22 @@ class PassActivity : AppCompatActivity() {
                     text = when {
                         on -> getString(R.string.ring_equipped)
                         have -> getString(R.string.ring_equip)
-                        ring!!.legendary -> getString(R.string.ring_legendary)
+                        ring!!.supporter -> getString(R.string.ring_supporters_only)
+                        ring.legendary -> getString(R.string.ring_legendary)
                         else -> getString(R.string.pass_tier, Rings.COMMON_TIER[ring?.id ?: ""] ?: 0)
                     }
                     setTextColor(
                         when {
                             on -> getColor(R.color.victory)
                             have -> getColor(R.color.brand)
+                            showOff -> getColor(R.color.brand)
                             else -> getColor(R.color.muted)
                         },
                     )
                     textSize = 11f
                     gravity = Gravity.CENTER
                 })
+                if (showOff) cell.setOnClickListener { Ads.buy(this) }
                 if (have && !on) {
                     cell.setOnClickListener {
                         BubbleLook.setRing(this, ring?.id)

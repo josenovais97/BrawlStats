@@ -590,10 +590,10 @@
     <string name="you_others">你和其他人</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">永久移除廣告</string>
-    <string name="ads_remove_price">%1$s，一次付清</string>
-    <string name="ads_remove_once">一次付清，不是訂閱</string>
-    <string name="ads_removed_title">永久無廣告</string>
+    <string name="ads_remove_title">成為 Bubble 支持者</string>
+    <string name="ads_remove_price">%1$s 一次 · 無廣告、支持者光環、2 款主題</string>
+    <string name="ads_remove_once">一次付清 · 無廣告、支持者光環、2 款主題</string>
+    <string name="ads_removed_title">你是 Bubble 支持者</string>
     <string name="ads_removed_sub">感謝支持 BrawlZone！</string>
     <string name="ads_restore">恢復購買</string>
     <string name="ads_restore_none">這個 Google 帳號沒有找到購買紀錄。</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">付款處理中。付款完成後廣告就會消失。</string>
     <string name="ads_unavailable">Google Play 沒有回應，請稍後再試。</string>
     <string name="ads_privacy">廣告隱私選項</string>
-    <string name="ads_offer_body">一次付 %1$s，廣告永久消失。不是訂閱。</string>
-    <string name="ads_offer_body_noprice">付一次，廣告永久消失。不是訂閱。</string>
-    <string name="ads_offer_buy">移除廣告</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">支持者</string>
+    <string name="ring_supporters_only">支持者專屬</string>
+    <string name="theme_obsidian">黑曜石</string>
+    <string name="theme_holo">幻彩</string>
+    <string name="ads_offer_body">一次付 %1$s：永久無廣告，外加支持者光環和 2 款專屬主題。不是訂閱。</string>
+    <string name="ads_offer_body_noprice">付一次：永久無廣告，外加支持者光環和 2 款專屬主題。不是訂閱。</string>
+    <string name="ads_offer_buy">立即取得</string>
 </resources>

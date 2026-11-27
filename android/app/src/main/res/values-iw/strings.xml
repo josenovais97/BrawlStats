@@ -590,10 +590,10 @@
     <string name="you_others">אתם ואחרים</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">הסרת פרסומות לתמיד</string>
-    <string name="ads_remove_price">%1$s, תשלום חד־פעמי</string>
-    <string name="ads_remove_once">תשלום חד־פעמי, בלי מנוי</string>
-    <string name="ads_removed_title">בלי פרסומות, לתמיד</string>
+    <string name="ads_remove_title">הצטרפו לתומכי Bubble</string>
+    <string name="ads_remove_price">%1$s פעם אחת · בלי פרסומות, טבעת תומכים, 2 ערכות נושא</string>
+    <string name="ads_remove_once">תשלום חד־פעמי · בלי פרסומות, טבעת תומכים, 2 ערכות נושא</string>
+    <string name="ads_removed_title">אתם תומכי Bubble</string>
     <string name="ads_removed_sub">תודה שאתם תומכים ב-BrawlZone!</string>
     <string name="ads_restore">שחזור רכישה</string>
     <string name="ads_restore_none">לא נמצאה רכישה בחשבון Google הזה.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">התשלום ממתין. הפרסומות ייעלמו ברגע שהוא יעבור.</string>
     <string name="ads_unavailable">Google Play לא עונה. נסו שוב בעוד רגע.</string>
     <string name="ads_privacy">אפשרויות פרטיות לפרסומות</string>
-    <string name="ads_offer_body">משלמים %1$s פעם אחת והפרסומות נעלמות לתמיד. בלי מנוי.</string>
-    <string name="ads_offer_body_noprice">משלמים פעם אחת והפרסומות נעלמות לתמיד. בלי מנוי.</string>
-    <string name="ads_offer_buy">הסרת פרסומות</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">תומכים</string>
+    <string name="ring_supporters_only">לתומכים</string>
+    <string name="theme_obsidian">אובסידיאן</string>
+    <string name="theme_holo">הולו</string>
+    <string name="ads_offer_body">משלמים %1$s פעם אחת: בלי פרסומות לתמיד, טבעת התומכים ו־2 ערכות נושא בלעדיות. בלי מנוי.</string>
+    <string name="ads_offer_body_noprice">משלמים פעם אחת: בלי פרסומות לתמיד, טבעת התומכים ו־2 ערכות נושא בלעדיות. בלי מנוי.</string>
+    <string name="ads_offer_buy">קבלו</string>
 </resources>

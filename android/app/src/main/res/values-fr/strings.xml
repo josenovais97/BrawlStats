@@ -590,10 +590,10 @@
     <string name="you_others">Toi et les autres</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Supprimer les pubs pour toujours</string>
-    <string name="ads_remove_price">%1$s, en une fois</string>
-    <string name="ads_remove_once">Un seul paiement, sans abonnement</string>
-    <string name="ads_removed_title">Plus de pubs, pour toujours</string>
+    <string name="ads_remove_title">Deviens Soutien de Bubble</string>
+    <string name="ads_remove_price">%1$s une fois · Sans pubs, anneau Soutien, 2 thèmes</string>
+    <string name="ads_remove_once">Un seul paiement · Sans pubs, anneau Soutien, 2 thèmes</string>
+    <string name="ads_removed_title">Tu es Soutien de Bubble</string>
     <string name="ads_removed_sub">Merci de soutenir BrawlZone !</string>
     <string name="ads_restore">Restaurer l’achat</string>
     <string name="ads_restore_none">Aucun achat trouvé sur ce compte Google.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Paiement en attente. Les pubs disparaissent dès qu’il est validé.</string>
     <string name="ads_unavailable">Google Play ne répond pas. Réessaie dans un instant.</string>
     <string name="ads_privacy">Choix de confidentialité des pubs</string>
-    <string name="ads_offer_body">Paie %1$s une fois et les pubs disparaissent pour toujours. Sans abonnement.</string>
-    <string name="ads_offer_body_noprice">Paie une fois et les pubs disparaissent pour toujours. Sans abonnement.</string>
-    <string name="ads_offer_buy">Retirer les pubs</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Soutien</string>
+    <string name="ring_supporters_only">Soutiens</string>
+    <string name="theme_obsidian">Obsidienne</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Paie %1$s une fois : plus jamais de pubs, l’anneau Soutien et 2 thèmes exclusifs. Sans abonnement.</string>
+    <string name="ads_offer_body_noprice">Paie une fois : plus jamais de pubs, l’anneau Soutien et 2 thèmes exclusifs. Sans abonnement.</string>
+    <string name="ads_offer_buy">Je le veux</string>
 </resources>

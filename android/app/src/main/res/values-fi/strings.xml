@@ -590,10 +590,10 @@
     <string name="you_others">Sinä ja muut</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Poista mainokset pysyvästi</string>
-    <string name="ads_remove_price">%1$s, kertamaksu</string>
-    <string name="ads_remove_once">Kertamaksu, ei tilausta</string>
-    <string name="ads_removed_title">Ei mainoksia, pysyvästi</string>
+    <string name="ads_remove_title">Ryhdy Bubble-tukijaksi</string>
+    <string name="ads_remove_price">%1$s kerran · Ei mainoksia, tukijan rengas, 2 teemaa</string>
+    <string name="ads_remove_once">Kertamaksu · Ei mainoksia, tukijan rengas, 2 teemaa</string>
+    <string name="ads_removed_title">Olet Bubble-tukija</string>
     <string name="ads_removed_sub">Kiitos, että tuet BrawlZonea!</string>
     <string name="ads_restore">Palauta osto</string>
     <string name="ads_restore_none">Tällä Google-tilillä ei löytynyt ostoa.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Maksu odottaa. Mainokset poistuvat heti, kun se menee läpi.</string>
     <string name="ads_unavailable">Google Play ei vastaa. Yritä hetken päästä uudelleen.</string>
     <string name="ads_privacy">Mainosten tietosuojavalinnat</string>
-    <string name="ads_offer_body">Maksa %1$s kerran, niin mainokset poistuvat pysyvästi. Ei tilausta.</string>
-    <string name="ads_offer_body_noprice">Maksa kerran, niin mainokset poistuvat pysyvästi. Ei tilausta.</string>
-    <string name="ads_offer_buy">Poista mainokset</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Tukija</string>
+    <string name="ring_supporters_only">Tukijoille</string>
+    <string name="theme_obsidian">Obsidiaani</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Maksa %1$s kerran: ei mainoksia koskaan, tukijan rengas ja 2 eksklusiivista teemaa. Ei tilausta.</string>
+    <string name="ads_offer_body_noprice">Maksa kerran: ei mainoksia koskaan, tukijan rengas ja 2 eksklusiivista teemaa. Ei tilausta.</string>
+    <string name="ads_offer_buy">Hanki</string>
 </resources>

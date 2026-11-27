@@ -590,10 +590,10 @@
     <string name="you_others">Você e os outros</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Remover anúncios para sempre</string>
-    <string name="ads_remove_price">%1$s, pagamento único</string>
-    <string name="ads_remove_once">Pagamento único, sem assinatura</string>
-    <string name="ads_removed_title">Sem anúncios, para sempre</string>
+    <string name="ads_remove_title">Seja Apoiador do Bubble</string>
+    <string name="ads_remove_price">%1$s uma vez · Sem anúncios, anel de Apoiador, 2 temas</string>
+    <string name="ads_remove_once">Pagamento único · Sem anúncios, anel de Apoiador, 2 temas</string>
+    <string name="ads_removed_title">Você é Apoiador do Bubble</string>
     <string name="ads_removed_sub">Obrigado por apoiar o BrawlZone!</string>
     <string name="ads_restore">Restaurar compra</string>
     <string name="ads_restore_none">Nenhuma compra encontrada nesta conta do Google.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Pagamento pendente. Os anúncios somem assim que ele for aprovado.</string>
     <string name="ads_unavailable">O Google Play não está respondendo. Tente de novo daqui a pouco.</string>
     <string name="ads_privacy">Opções de privacidade dos anúncios</string>
-    <string name="ads_offer_body">Pague %1$s uma vez e os anúncios somem para sempre. Sem assinatura.</string>
-    <string name="ads_offer_body_noprice">Pague uma vez e os anúncios somem para sempre. Sem assinatura.</string>
-    <string name="ads_offer_buy">Remover anúncios</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Apoiador</string>
+    <string name="ring_supporters_only">Apoiadores</string>
+    <string name="theme_obsidian">Obsidiana</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Pague %1$s uma vez: sem anúncios para sempre, o anel de Apoiador e 2 temas exclusivos. Sem assinatura.</string>
+    <string name="ads_offer_body_noprice">Pague uma vez: sem anúncios para sempre, o anel de Apoiador e 2 temas exclusivos. Sem assinatura.</string>
+    <string name="ads_offer_buy">Quero</string>
 </resources>

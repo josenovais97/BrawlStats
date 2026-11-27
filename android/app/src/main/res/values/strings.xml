@@ -597,10 +597,10 @@
     <string name="you_others">You and others</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Remove ads forever</string>
-    <string name="ads_remove_price">%1$s, paid once</string>
-    <string name="ads_remove_once">Paid once, no subscription</string>
-    <string name="ads_removed_title">No ads, forever</string>
+    <string name="ads_remove_title">Become a Bubble Supporter</string>
+    <string name="ads_remove_price">%1$s once · No ads, Supporter ring, 2 themes</string>
+    <string name="ads_remove_once">Paid once · No ads, Supporter ring, 2 themes</string>
+    <string name="ads_removed_title">You’re a Bubble Supporter</string>
     <string name="ads_removed_sub">Thanks for supporting BrawlZone!</string>
     <string name="ads_restore">Restore purchase</string>
     <string name="ads_restore_none">No purchase found on this Google account.</string>
@@ -608,7 +608,12 @@
     <string name="ads_pending">Payment pending. The ads go as soon as it goes through.</string>
     <string name="ads_unavailable">Google Play isn’t answering. Try again in a moment.</string>
     <string name="ads_privacy">Ad privacy choices</string>
-    <string name="ads_offer_body">Pay %1$s once and the ads are gone for good. No subscription.</string>
-    <string name="ads_offer_body_noprice">Pay once and the ads are gone for good. No subscription.</string>
-    <string name="ads_offer_buy">Remove ads</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Supporter</string>
+    <string name="ring_supporters_only">Supporters</string>
+    <string name="theme_obsidian">Obsidian</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Pay %1$s once: no ads forever, the Supporter ring and 2 exclusive themes. No subscription.</string>
+    <string name="ads_offer_body_noprice">Pay once: no ads forever, the Supporter ring and 2 exclusive themes. No subscription.</string>
+    <string name="ads_offer_buy">Get it</string>
 </resources>

@@ -590,10 +590,10 @@
     <string name="you_others">Tú y los demás</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Quitar anuncios para siempre</string>
-    <string name="ads_remove_price">%1$s, un solo pago</string>
-    <string name="ads_remove_once">Un solo pago, sin suscripción</string>
-    <string name="ads_removed_title">Sin anuncios, para siempre</string>
+    <string name="ads_remove_title">Hazte Colaborador de Bubble</string>
+    <string name="ads_remove_price">%1$s una vez · Sin anuncios, anillo de Colaborador, 2 temas</string>
+    <string name="ads_remove_once">Un solo pago · Sin anuncios, anillo de Colaborador, 2 temas</string>
+    <string name="ads_removed_title">Eres Colaborador de Bubble</string>
     <string name="ads_removed_sub">¡Gracias por apoyar BrawlZone!</string>
     <string name="ads_restore">Restaurar compra</string>
     <string name="ads_restore_none">No hay ninguna compra en esta cuenta de Google.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Pago pendiente. Los anuncios desaparecen en cuanto se complete.</string>
     <string name="ads_unavailable">Google Play no responde. Inténtalo de nuevo en un momento.</string>
     <string name="ads_privacy">Opciones de privacidad de anuncios</string>
-    <string name="ads_offer_body">Paga %1$s una vez y los anuncios desaparecen para siempre. Sin suscripción.</string>
-    <string name="ads_offer_body_noprice">Paga una vez y los anuncios desaparecen para siempre. Sin suscripción.</string>
-    <string name="ads_offer_buy">Quitar anuncios</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Colaborador</string>
+    <string name="ring_supporters_only">Colaboradores</string>
+    <string name="theme_obsidian">Obsidiana</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Paga %1$s una vez: sin anuncios para siempre, el anillo de Colaborador y 2 temas exclusivos. Sin suscripción.</string>
+    <string name="ads_offer_body_noprice">Paga una vez: sin anuncios para siempre, el anillo de Colaborador y 2 temas exclusivos. Sin suscripción.</string>
+    <string name="ads_offer_buy">Lo quiero</string>
 </resources>

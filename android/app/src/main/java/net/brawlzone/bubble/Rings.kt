@@ -34,6 +34,22 @@ object Rings {
         val colors: IntArray,
         val legendary: Boolean = false,
         val sparks: Int = 0,
+        /** Bubble Supporter's own ring (1.46): never in the pass, worn by those who bought it. */
+        val supporter: Boolean = false,
+    )
+
+    /**
+     * The Supporter ring (1.46): metallic gold, a glint running round it, a
+     * rainbow line turning the other way, a breathing halo and three twinkling
+     * stars. Drawn by SupporterRingView, not RingView.
+     */
+    val SUPPORTER = Ring(
+        "supporter",
+        R.string.ring_supporter,
+        intArrayOf(0xFFFFE9A8.toInt(), 0xFFFFC53D.toInt(), 0xFFB8860B.toInt(), 0xFFFFF6D8.toInt(), 0xFFFFC53D.toInt(), 0xFF8A5A00.toInt(), 0xFFFFE08A.toInt(), 0xFFFFE9A8.toInt()),
+        legendary = true,
+        sparks = 3,
+        supporter = true,
     )
 
     val COMMON = listOf(
@@ -54,12 +70,16 @@ object Rings {
         Ring("candy", R.string.ring_candy, intArrayOf(0xFFFF7AC8.toInt(), 0xFFFFFFFF.toInt(), 0xFF7AE1FF.toInt(), 0xFFFF7AC8.toInt()), true, 3),
     )
 
-    val ALL = COMMON + LEGENDARY
+    val ALL = listOf(SUPPORTER) + COMMON + LEGENDARY
 
     /** The tier each common ring comes from. */
     val COMMON_TIER = mapOf("spark" to 2, "ember" to 4, "frost" to 6, "toxic" to 8)
 
     fun byId(id: String?): Ring? = ALL.firstOrNull { it.id == id }
+
+    /** The view that draws a ring: the Supporter ring has its own (1.46). Both are a [Spinner]. */
+    fun view(context: Context, ring: Ring, band: Float): View =
+        if (ring.supporter) SupporterRingView(context, ring, band) else RingView(context, ring, band)
 
     /** The legendary ring for the week starting on `weekStartEpochDay`. */
     fun legendaryFor(weekStartEpochDay: Long): Ring =
@@ -94,9 +114,9 @@ object Rings {
         }
         frame.addView(art, FrameLayout.LayoutParams(size, size, android.view.Gravity.CENTER))
         if (ring != null) {
-            val view = RingView(context, ring, band.toFloat()).apply { if (locked) alpha = 0.35f }
+            val view = view(context, ring, band.toFloat()).apply { if (locked) alpha = 0.35f }
             frame.addView(view, FrameLayout.LayoutParams(outer, outer, android.view.Gravity.CENTER))
-            if (spin && !locked) view.spin()
+            if (spin && !locked) (view as Spinner).spin()
         }
         frame.layoutParams = FrameLayout.LayoutParams(outer, outer)
         frame.minimumWidth = outer
@@ -109,7 +129,13 @@ object Rings {
  * One ring: a gradient band around the badge, a thin dark edge so it reads on
  * any game background, and for legendary rings a halo and sparks.
  */
-class RingView(context: Context, private val ring: Rings.Ring, private val band: Float) : View(context) {
+/** A ring that can turn: RingView and SupporterRingView. */
+interface Spinner {
+    fun spin()
+    fun stop()
+}
+
+class RingView(context: Context, private val ring: Rings.Ring, private val band: Float) : View(context), Spinner {
     private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -159,7 +185,7 @@ class RingView(context: Context, private val ring: Rings.Ring, private val band:
     }
 
     /** A slow turn, forever, for legendary rings (and the pass's big preview). */
-    fun spin() {
+    override fun spin() {
         if (spinner != null) return
         spinner = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f).apply {
             duration = if (ring.legendary) 6000L else 9000L
@@ -169,7 +195,7 @@ class RingView(context: Context, private val ring: Rings.Ring, private val band:
         }
     }
 
-    fun stop() {
+    override fun stop() {
         spinner?.cancel()
         spinner = null
     }

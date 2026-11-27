@@ -590,10 +590,10 @@
     <string name="you_others">Anda dan lain-lain</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">Buang iklan selama-lamanya</string>
-    <string name="ads_remove_price">%1$s, bayar sekali</string>
-    <string name="ads_remove_once">Bayar sekali, bukan langganan</string>
-    <string name="ads_removed_title">Tiada iklan, selama-lamanya</string>
+    <string name="ads_remove_title">Jadi Penyokong Bubble</string>
+    <string name="ads_remove_price">%1$s sekali · Tiada iklan, cincin Penyokong, 2 tema</string>
+    <string name="ads_remove_once">Bayar sekali · Tiada iklan, cincin Penyokong, 2 tema</string>
+    <string name="ads_removed_title">Anda Penyokong Bubble</string>
     <string name="ads_removed_sub">Terima kasih kerana menyokong BrawlZone!</string>
     <string name="ads_restore">Pulihkan pembelian</string>
     <string name="ads_restore_none">Tiada pembelian ditemui pada akaun Google ini.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">Pembayaran belum selesai. Iklan hilang sebaik sahaja ia berjaya.</string>
     <string name="ads_unavailable">Google Play tidak menjawab. Cuba lagi sebentar nanti.</string>
     <string name="ads_privacy">Pilihan privasi iklan</string>
-    <string name="ads_offer_body">Bayar %1$s sekali dan iklan hilang selama-lamanya. Bukan langganan.</string>
-    <string name="ads_offer_body_noprice">Bayar sekali dan iklan hilang selama-lamanya. Bukan langganan.</string>
-    <string name="ads_offer_buy">Buang iklan</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">Penyokong</string>
+    <string name="ring_supporters_only">Penyokong</string>
+    <string name="theme_obsidian">Obsidian</string>
+    <string name="theme_holo">Holo</string>
+    <string name="ads_offer_body">Bayar %1$s sekali: tiada iklan selama-lamanya, cincin Penyokong dan 2 tema eksklusif. Bukan langganan.</string>
+    <string name="ads_offer_body_noprice">Bayar sekali: tiada iklan selama-lamanya, cincin Penyokong dan 2 tema eksklusif. Bukan langganan.</string>
+    <string name="ads_offer_buy">Dapatkan</string>
 </resources>

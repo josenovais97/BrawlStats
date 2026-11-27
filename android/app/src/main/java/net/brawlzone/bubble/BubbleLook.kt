@@ -41,7 +41,17 @@ object BubbleLook {
      * side lives in the site's components/bubble/panel-theme.ts; keep the two
      * lists in step.
      */
-    data class Theme(val id: String, val top: Int, val bottom: Int, val edge: Int, val label: Int)
+    data class Theme(
+        val id: String,
+        val top: Int,
+        val bottom: Int,
+        val edge: Int,
+        val label: Int,
+        /** More than two colours, top to bottom (Holo). */
+        val stops: IntArray? = null,
+        /** Bubble Supporter only (1.46). */
+        val supporter: Boolean = false,
+    )
 
     val THEMES = listOf(
         Theme("gold", 0xFFFFD96B.toInt(), 0xFFF2A81C.toInt(), 0xFF6B4A00.toInt(), R.string.theme_gold),
@@ -52,6 +62,13 @@ object BubbleLook {
         Theme("emerald", 0xFFB4F7CC.toInt(), 0xFF26C26A.toInt(), 0xFF0D5A2C.toInt(), R.string.theme_emerald),
         Theme("frost", 0xFFFFFFFF.toInt(), 0xFFB7C3E6.toInt(), 0xFF3C4766.toInt(), R.string.theme_frost),
         Theme("midnight", 0xFF6F86F0.toInt(), 0xFF1A2350.toInt(), 0xFF9FB0FF.toInt(), R.string.theme_midnight),
+        // 1.46, Bubble Supporter: dark stone with a gold rim, and a holographic shimmer.
+        Theme("obsidian", 0xFF9A90AD.toInt(), 0xFF2E2938.toInt(), 0xFFFFC53D.toInt(), R.string.theme_obsidian, supporter = true),
+        Theme(
+            "holo", 0xFFFFB3E6.toInt(), 0xFFB8FFD9.toInt(), 0xFF4B3A78.toInt(), R.string.theme_holo,
+            stops = intArrayOf(0xFFFFB3E6.toInt(), 0xFFC7A8FF.toInt(), 0xFF8FE3FF.toInt(), 0xFFB8FFD9.toInt()),
+            supporter = true,
+        ),
     )
 
     const val SIZE_SMALL = "s"
@@ -87,12 +104,13 @@ object BubbleLook {
 
     fun theme(context: Context): Theme {
         val id = prefs(context).getString(KEY_THEME, null)
-        return THEMES.firstOrNull { it.id == id } ?: THEMES[0]
+        // A supporter theme only while the purchase stands (a refund puts gold back).
+        return THEMES.firstOrNull { it.id == id && (!it.supporter || Supporter.active(context)) } ?: THEMES[0]
     }
 
     /** The ring behind the bubble's face, in the chosen theme (was drawable/bubble_badge). */
     fun badge(context: Context, theme: Theme = theme(context)): GradientDrawable =
-        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(theme.top, theme.bottom)).apply {
+        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, theme.stops ?: intArrayOf(theme.top, theme.bottom)).apply {
             shape = GradientDrawable.OVAL
             setStroke((2 * context.resources.displayMetrics.density).toInt(), theme.edge)
         }
@@ -115,7 +133,9 @@ object BubbleLook {
 
     /** The ring the bubble wears (1.43): only one the player owns. */
     fun ring(context: Context): String? =
-        prefs(context).getString(KEY_RING, null)?.takeIf { it in Pass.owned(context) }
+        prefs(context).getString(KEY_RING, null)?.takeIf {
+            it in Pass.owned(context) || (it == Rings.SUPPORTER.id && Supporter.active(context))
+        }
 
     fun setRing(context: Context, id: String?) {
         prefs(context).edit().apply { if (id == null) remove(KEY_RING) else putString(KEY_RING, id) }.apply()

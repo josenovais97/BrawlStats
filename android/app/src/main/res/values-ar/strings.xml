@@ -590,10 +590,10 @@
     <string name="you_others">أنت والآخرون</string>
 
     <!-- 1.46: Remove ads forever (Play build), see Ads. -->
-    <string name="ads_remove_title">إزالة الإعلانات للأبد</string>
-    <string name="ads_remove_price">%1$s، تُدفع مرة واحدة</string>
-    <string name="ads_remove_once">دفعة واحدة، بلا اشتراك</string>
-    <string name="ads_removed_title">بلا إعلانات، للأبد</string>
+    <string name="ads_remove_title">كن داعمًا لـ Bubble</string>
+    <string name="ads_remove_price">%1$s مرة واحدة · بلا إعلانات، حلقة الداعم، مظهران</string>
+    <string name="ads_remove_once">دفعة واحدة · بلا إعلانات، حلقة الداعم، مظهران</string>
+    <string name="ads_removed_title">أنت داعم لـ Bubble</string>
     <string name="ads_removed_sub">شكرًا لدعمك BrawlZone!</string>
     <string name="ads_restore">استعادة الشراء</string>
     <string name="ads_restore_none">لا يوجد شراء على حساب Google هذا.</string>
@@ -601,7 +601,12 @@
     <string name="ads_pending">الدفع قيد الانتظار. ستختفي الإعلانات فور اكتماله.</string>
     <string name="ads_unavailable">لا يستجيب Google Play. حاول مرة أخرى بعد قليل.</string>
     <string name="ads_privacy">خيارات خصوصية الإعلانات</string>
-    <string name="ads_offer_body">ادفع %1$s مرة واحدة وتختفي الإعلانات للأبد. بلا اشتراك.</string>
-    <string name="ads_offer_body_noprice">ادفع مرة واحدة وتختفي الإعلانات للأبد. بلا اشتراك.</string>
-    <string name="ads_offer_buy">إزالة الإعلانات</string>
+    <!-- 1.46: Bubble Supporter extras. -->
+    <string name="ring_supporter">الداعم</string>
+    <string name="ring_supporters_only">للداعمين</string>
+    <string name="theme_obsidian">سبج</string>
+    <string name="theme_holo">هولو</string>
+    <string name="ads_offer_body">ادفع %1$s مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان. بلا اشتراك.</string>
+    <string name="ads_offer_body_noprice">ادفع مرة واحدة: بلا إعلانات للأبد، وحلقة الداعم ومظهران حصريان. بلا اشتراك.</string>
+    <string name="ads_offer_buy">احصل عليه</string>
 </resources>
