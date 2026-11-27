@@ -167,11 +167,18 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
-  kotlinOptions { jvmTarget = "17" }
 
   // Unit tests run on the JVM; this keeps the stubbed android.jar from
   // throwing on the handful of platform calls a test touches indirectly.
   testOptions { unitTests.isReturnDefaultValues = true }
+}
+
+/*
+ * Kotlin 2.2 (1.46): play-services-ads 25.5 is compiled with Kotlin 2.3, which
+ * only a 2.2+ compiler can read, and 2.2 refuses the old kotlinOptions block.
+ */
+kotlin {
+  compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
 }
 
 dependencies {
@@ -192,7 +199,7 @@ dependencies {
   /*
    * Ads and "Remove ads forever" (1.46), Play build only: the AdMob banner,
    * Google's consent message for it (UMP) and Play Billing for the one-time
-   * purchase. The ads SDK needs Kotlin 2.x (it brings kotlin-stdlib 2.1).
+   * purchase. The ads SDK needs Kotlin 2.2+ (it is compiled with 2.3).
    */
   "playImplementation"("com.google.android.gms:play-services-ads:25.5.0")
   "playImplementation"("com.google.android.ump:user-messaging-platform:4.0.0")
