@@ -281,6 +281,11 @@ object Ads {
      * null when Play did not answer (nothing changes then).
      */
     private fun checkOwned(app: Context, done: ((Boolean?) -> Unit)? = null) {
+        // The test build's pretend purchase is not on Play; asking Play would undo it.
+        if (BuildConfig.BUILD_TYPE == "qa") {
+            done?.invoke(removed(app))
+            return
+        }
         val client = billing
         if (client == null || !client.isReady) {
             done?.invoke(null)
@@ -334,8 +339,16 @@ object Ads {
     /** "Remove ads forever": Play's own purchase sheet. */
     fun buy(activity: Activity) {
         screen = WeakReference(activity)
+        /*
+         * The test build cannot reach Play's purchase sheet (its package is not
+         * on Play), so it pretends: everything a supporter gets switches on, and
+         * Restore purchase switches it off again.
+         */
         if (BuildConfig.BUILD_TYPE == "qa") {
-            Toast.makeText(activity, "Test build: buying works only in the app from Google Play", Toast.LENGTH_LONG).show()
+            val app = activity.applicationContext
+            setRemoved(app, true)
+            if (BubbleLook.ring(app) == null) BubbleLook.setRing(app, Rings.SUPPORTER.id)
+            Toast.makeText(activity, "Test build: pretend purchase. Restore purchase undoes it.", Toast.LENGTH_LONG).show()
             return
         }
         val app = activity.applicationContext
@@ -362,6 +375,11 @@ object Ads {
     /** "Restore purchase": the same check every visit makes, with an answer. */
     fun restore(activity: Activity) {
         screen = WeakReference(activity)
+        if (BuildConfig.BUILD_TYPE == "qa") {
+            setRemoved(activity.applicationContext, false)
+            Toast.makeText(activity, "Test build: pretend purchase undone. Ads come back on the next start.", Toast.LENGTH_LONG).show()
+            return
+        }
         val app = activity.applicationContext
         connect(app, then = {
             checkOwned(app) { owned ->
