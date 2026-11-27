@@ -44,6 +44,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          # Keeps Gradle's downloads between runs, so a build asks Maven far less often.
+          cache: gradle
 
       # The SDK straight from Google (android-actions/setup-android@v3 failed
       # on the current runners): the runner's own copy when it has one, else
